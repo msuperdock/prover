@@ -64,6 +64,7 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Weak.Sigma.Maybe
                      , MAlonzo.Code.Prover.Client
                      , MAlonzo.Code.Prover.Client.Brick
+                     , MAlonzo.Code.Prover.Client.Event
                      , MAlonzo.Code.Prover.Client.Flat
                      , MAlonzo.Code.Prover.Client.Flatten
                      , MAlonzo.Code.Prover.Client.Run
