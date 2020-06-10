@@ -82,46 +82,44 @@ module _
       = PartialFunctor.map F p' q'
       ∘ PartialFunctor.map G p q
 
-    abstract
+    map-identity
+      : {x' : Category.Object E}
+      → (x : Category.Object C)
+      → (p : base x ≡ just x')
+      → map p p (Category.identity C x) ≡ Category.identity E x'
+    map-identity x p'
+      with PartialFunctor.base G x
+      | inspect (PartialFunctor.base G) x
+    ... | just x' | [ p ]
+      with PartialFunctor.map G p p (Category.identity C x)
+      | PartialFunctor.map-identity G x p
+    ... | _ | refl
+      = PartialFunctor.map-identity F x' p'
 
-      map-identity
-        : {x' : Category.Object E}
-        → (x : Category.Object C)
-        → (p : base x ≡ just x')
-        → map p p (Category.identity C x) ≡ Category.identity E x'
-      map-identity x p'
-        with PartialFunctor.base G x
-        | inspect (PartialFunctor.base G) x
-      ... | just x' | [ p ]
-        with PartialFunctor.map G p p (Category.identity C x)
-        | PartialFunctor.map-identity G x p
-      ... | _ | refl
-        = PartialFunctor.map-identity F x' p'
-  
-      map-compose
-        : {x y z : Category.Object C}
-        → {x' y' z' : Category.Object E}
-        → (p : base x ≡ just x')
-        → (q : base y ≡ just y')
-        → (r : base z ≡ just z')
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → map p r (Category.compose C f g)
-          ≡ Category.compose E (map q r f) (map p q g)
-      map-compose {x = x} {y = y} {z = z} p' q' r' f g
-        with PartialFunctor.base G x
-        | inspect (PartialFunctor.base G) x
-        | PartialFunctor.base G y
-        | inspect (PartialFunctor.base G) y
-        | PartialFunctor.base G z
-        | inspect (PartialFunctor.base G) z
-      ... | just _ | [ p ] | just _ | [ q ] | just _ | [ r ]
-        with PartialFunctor.map G p r (Category.compose C f g)
-        | PartialFunctor.map-compose G p q r f g
-      ... | _ | refl
-        = PartialFunctor.map-compose F p' q' r'
-          (PartialFunctor.map G q r f)
-          (PartialFunctor.map G p q g)
+    map-compose
+      : {x y z : Category.Object C}
+      → {x' y' z' : Category.Object E}
+      → (p : base x ≡ just x')
+      → (q : base y ≡ just y')
+      → (r : base z ≡ just z')
+      → (f : Category.Arrow C y z)
+      → (g : Category.Arrow C x y)
+      → map p r (Category.compose C f g)
+        ≡ Category.compose E (map q r f) (map p q g)
+    map-compose {x = x} {y = y} {z = z} p' q' r' f g
+      with PartialFunctor.base G x
+      | inspect (PartialFunctor.base G) x
+      | PartialFunctor.base G y
+      | inspect (PartialFunctor.base G) y
+      | PartialFunctor.base G z
+      | inspect (PartialFunctor.base G) z
+    ... | just _ | [ p ] | just _ | [ q ] | just _ | [ r ]
+      with PartialFunctor.map G p r (Category.compose C f g)
+      | PartialFunctor.map-compose G p q r f g
+    ... | _ | refl
+      = PartialFunctor.map-compose F p' q' r'
+        (PartialFunctor.map G q r f)
+        (PartialFunctor.map G p q g)
 
   partial-functor-compose
     : PartialFunctor D E

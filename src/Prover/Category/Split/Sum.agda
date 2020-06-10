@@ -50,37 +50,35 @@ module _
         to unmap-compose
       )
 
-    abstract
+    base-unbase
+      : (x' : Category.Object D)
+      → base (unbase x') ≡ just x'
+    base-unbase
+      = SplitFunctor.base-unbase G
 
-      base-unbase
-        : (x' : Category.Object D)
-        → base (unbase x') ≡ just x'
-      base-unbase
-        = SplitFunctor.base-unbase G
-  
-      map-unmap
-        : {x' y' : Category.Object D}
-        → (f' : Category.Arrow D x' y')
-        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-      map-unmap
-        = SplitFunctor.map-unmap G
-  
-      normalize-arrow
-        : {x' : Category.Object D}
-        → (x : Category.Object (category-sum F))
-        → base x ≡ just x'
-        → Category.Arrow (category-sum F) x (unbase x')
-      normalize-arrow (ι₂ x) p
-        = CategorySum.arrow₂ (SplitFunctor.normalize-arrow G x p)
+    map-unmap
+      : {x' y' : Category.Object D}
+      → (f' : Category.Arrow D x' y')
+      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+    map-unmap
+      = SplitFunctor.map-unmap G
 
-      normalize-valid
-        : {x' : Category.Object D}
-        → (x : Category.Object (category-sum F))
-        → (p : base x ≡ just x')
-        → map {x = x} p (base-unbase x') (normalize-arrow x p)
-          ≡ Category.identity D x'
-      normalize-valid (ι₂ x₂) p
-        = SplitFunctor.normalize-valid G x₂ p
+    normalize-arrow
+      : {x' : Category.Object D}
+      → (x : Category.Object (category-sum F))
+      → base x ≡ just x'
+      → Category.Arrow (category-sum F) x (unbase x')
+    normalize-arrow (ι₂ x) p
+      = CategorySum.arrow₂ (SplitFunctor.normalize-arrow G x p)
+
+    normalize-valid
+      : {x' : Category.Object D}
+      → (x : Category.Object (category-sum F))
+      → (p : base x ≡ just x')
+      → map {x = x} p (base-unbase x') (normalize-arrow x p)
+        ≡ Category.identity D x'
+    normalize-valid (ι₂ x₂) p
+      = SplitFunctor.normalize-valid G x₂ p
 
   split-functor-sum₂
     : WeakFunctor F

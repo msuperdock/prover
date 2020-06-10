@@ -16,8 +16,6 @@ record WeakFunctor
   : Set
   where
 
-  no-eta-equality
-
   open Functor F using () renaming
     ( base
       to unbase
@@ -115,83 +113,81 @@ module _
       = WeakFunctor.map F' x' y'
         (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') f)
 
-    abstract
+    map-compose
+      : (x' y' z' : Category.Object E)
+      → (f : Category.Arrow C (unbase y') (unbase z'))
+      → (g : Category.Arrow C (unbase x') (unbase y'))
+      → map x' z' (Category.compose C f g)
+        ≡ Category.compose E (map y' z' f) (map x' y' g)
+    map-compose x' y' z' f g
+      with WeakFunctor.map G'
+        (Functor.base F x')
+        (Functor.base F z')
+        (Category.compose C f g)
+      | WeakFunctor.map-compose G'
+        (Functor.base F x')
+        (Functor.base F y')
+        (Functor.base F z') f g
+    ... | _ | refl
+      = WeakFunctor.map-compose F' x' y' z'
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
 
-      map-compose
-        : (x' y' z' : Category.Object E)
-        → (f : Category.Arrow C (unbase y') (unbase z'))
-        → (g : Category.Arrow C (unbase x') (unbase y'))
-        → map x' z' (Category.compose C f g)
-          ≡ Category.compose E (map y' z' f) (map x' y' g)
-      map-compose x' y' z' f g
-        with WeakFunctor.map G'
-          (Functor.base F x')
-          (Functor.base F z')
-          (Category.compose C f g)
-        | WeakFunctor.map-compose G'
-          (Functor.base F x')
-          (Functor.base F y')
-          (Functor.base F z') f g
-      ... | _ | refl
-        = WeakFunctor.map-compose F' x' y' z'
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
-  
-      map-unmap₁
-        : {y' z' : Category.Object E}
-        → (x' : Category.Object E)
-        → (f' : Category.Arrow E y' z')
-        → (g : Category.Arrow C (unbase x') (unbase y'))
-        → Category.compose E (map y' z' (unmap f')) (map x' y' g)
-          ≡ Category.compose E f' (map x' y' g)
-      map-unmap₁ {y' = y'} {z' = z'} x' f' g
-        with Category.compose E (map y' z' (unmap f')) (map x' y' g)
-        | sym (WeakFunctor.map-compose F' x' y' z'
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') (unmap f'))
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g))
-      ... | _ | refl
-        with Category.compose D
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') (unmap f'))
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
-        | WeakFunctor.map-unmap₁ G' (Functor.base F x') (Functor.map F f') g
-      ... | _ | refl
-        with WeakFunctor.map F' x' z' (Category.compose D
-          (Functor.map F f')
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g))
-        | WeakFunctor.map-compose F' x' y' z'
-          (Functor.map F f')
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
-      ... | _ | refl
-        = WeakFunctor.map-unmap₁ F' x' f'
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
-        
-      map-unmap₂
-        : {x' y' : Category.Object E}
-        → (z' : Category.Object E)
-        → (f : Category.Arrow C (unbase y') (unbase z'))
-        → (g' : Category.Arrow E x' y')
-        → Category.compose E (map y' z' f) (map x' y' (unmap g'))
-          ≡ Category.compose E (map y' z' f) g'
-      map-unmap₂ {x' = x'} {y' = y'} z' f g'
-        with Category.compose E (map y' z' f) (map x' y' (unmap g'))
-        | sym (WeakFunctor.map-compose F' x' y' z'
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') (unmap g')))
-      ... | _ | refl
-        with Category.compose D
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
-          (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') (unmap g'))
-        | WeakFunctor.map-unmap₂ G' (Functor.base F z') f (Functor.map F g')
-      ... | _ | refl
-        with WeakFunctor.map F' x' z' (Category.compose D
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
-          (Functor.map F g'))
-        | WeakFunctor.map-compose F' x' y' z'
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
-          (Functor.map F g')
-      ... | _ | refl
-        = WeakFunctor.map-unmap₂ F' z'
-          (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f) g'
+    map-unmap₁
+      : {y' z' : Category.Object E}
+      → (x' : Category.Object E)
+      → (f' : Category.Arrow E y' z')
+      → (g : Category.Arrow C (unbase x') (unbase y'))
+      → Category.compose E (map y' z' (unmap f')) (map x' y' g)
+        ≡ Category.compose E f' (map x' y' g)
+    map-unmap₁ {y' = y'} {z' = z'} x' f' g
+      with Category.compose E (map y' z' (unmap f')) (map x' y' g)
+      | sym (WeakFunctor.map-compose F' x' y' z'
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') (unmap f'))
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g))
+    ... | _ | refl
+      with Category.compose D
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') (unmap f'))
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
+      | WeakFunctor.map-unmap₁ G' (Functor.base F x') (Functor.map F f') g
+    ... | _ | refl
+      with WeakFunctor.map F' x' z' (Category.compose D
+        (Functor.map F f')
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g))
+      | WeakFunctor.map-compose F' x' y' z'
+        (Functor.map F f')
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
+    ... | _ | refl
+      = WeakFunctor.map-unmap₁ F' x' f'
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') g)
+      
+    map-unmap₂
+      : {x' y' : Category.Object E}
+      → (z' : Category.Object E)
+      → (f : Category.Arrow C (unbase y') (unbase z'))
+      → (g' : Category.Arrow E x' y')
+      → Category.compose E (map y' z' f) (map x' y' (unmap g'))
+        ≡ Category.compose E (map y' z' f) g'
+    map-unmap₂ {x' = x'} {y' = y'} z' f g'
+      with Category.compose E (map y' z' f) (map x' y' (unmap g'))
+      | sym (WeakFunctor.map-compose F' x' y' z'
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') (unmap g')))
+    ... | _ | refl
+      with Category.compose D
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
+        (WeakFunctor.map G' (Functor.base F x') (Functor.base F y') (unmap g'))
+      | WeakFunctor.map-unmap₂ G' (Functor.base F z') f (Functor.map F g')
+    ... | _ | refl
+      with WeakFunctor.map F' x' z' (Category.compose D
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
+        (Functor.map F g'))
+      | WeakFunctor.map-compose F' x' y' z'
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f)
+        (Functor.map F g')
+    ... | _ | refl
+      = WeakFunctor.map-unmap₂ F' z'
+        (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f) g'
 
   weak-functor-compose
     : (F' : WeakFunctor F)
