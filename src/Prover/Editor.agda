@@ -586,8 +586,7 @@ record MainEditor
 record SplitMainEditor
   (V : ViewStack)
   (E : EventStack)
-  (A : Set)
-  (B : Set)
+  (A B : Set)
   (C : Category)
   : Set₁
   where

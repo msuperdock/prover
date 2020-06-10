@@ -11,9 +11,9 @@ open import Prover.Category.Split.Unit
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; EventStackMap; PartialEditor; SimpleEditor;
-    SplitEditor; ViewStack; ViewStackMap; partial-editor; simple-editor;
-    view-stack-map-compose-with)
+  using (Editor; EventStack; EventStackMap; MainEditor; PartialEditor;
+    SimpleEditor; SplitEditor; SplitMainEditor; ViewStack; ViewStackMap;
+    partial-editor; simple-editor; view-stack-map-compose-with)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatEventStackMap; FlatViewStack;
     FlatViewStackMap; flat-view-stack-map-compose)
@@ -142,6 +142,81 @@ module _
     → SplitEditor W E C
   split-editor-map-view F
     = split-editor-map-view-with (const F)
+
+-- ### MainEditor
+
+module _
+  {V W : ViewStack}
+  {E : EventStack}
+  {A : Set}
+  where
+
+  module MainEditorMapViewWith
+    (F : Bool → ViewStackMap V W)
+    (e : MainEditor V E A)
+    where
+
+    open MainEditor e public
+      hiding (editor)
+
+    editor
+      : Editor W E StateCategory
+    editor
+      = editor-map-view-with
+        (λ s → F (MainEditor.is-complete e s))
+        (MainEditor.editor e)
+
+  main-editor-map-view-with
+    : (Bool → ViewStackMap V W)
+    → MainEditor V E A
+    → MainEditor W E A
+  main-editor-map-view-with F e
+    = record {MainEditorMapViewWith F e}
+
+  main-editor-map-view
+    : ViewStackMap V W
+    → MainEditor V E A
+    → MainEditor W E A
+  main-editor-map-view F
+    = main-editor-map-view-with (const F)
+
+-- ### SplitMainEditor
+
+module _
+  {V W : ViewStack}
+  {E : EventStack}
+  {A B : Set}
+  {C : Category}
+  where
+
+  module SplitMainEditorMapViewWith
+    (F : Bool → ViewStackMap V W)
+    (e : SplitMainEditor V E A B C)
+    where
+
+    open SplitMainEditor e public
+      hiding (editor)
+
+    editor
+      : Editor W E StateCategory
+    editor
+      = editor-map-view-with
+        (λ s → F (SplitMainEditor.is-complete e s))
+        (SplitMainEditor.editor e)
+
+  split-main-editor-map-view-with
+    : (Bool → ViewStackMap V W)
+    → SplitMainEditor V E A B C
+    → SplitMainEditor W E A B C
+  split-main-editor-map-view-with F e
+    = record {SplitMainEditorMapViewWith F e}
+
+  split-main-editor-map-view
+    : ViewStackMap V W
+    → SplitMainEditor V E A B C
+    → SplitMainEditor W E A B C
+  split-main-editor-map-view F
+    = split-main-editor-map-view-with (const F)
 
 -- ### FlatEditor
 
@@ -325,6 +400,65 @@ module _
   split-editor-map-event G e
     = record {SplitEditorMapEvent G e}
 
+-- ### MainEditor
+
+module _
+  {V : ViewStack}
+  {E F : EventStack}
+  {A : Set}
+  where
+
+  module MainEditorMapEvent
+    (G : EventStackMap E F)
+    (e : MainEditor V E A)
+    where
+
+    open MainEditor e public
+      hiding (editor)
+
+    editor
+      : Editor V F StateCategory
+    editor
+      = editor-map-event G
+        (MainEditor.editor e)
+
+  main-editor-map-event
+    : EventStackMap E F
+    → MainEditor V E A
+    → MainEditor V F A
+  main-editor-map-event G e
+    = record {MainEditorMapEvent G e}
+
+-- ### SplitMainEditor
+
+module _
+  {V : ViewStack}
+  {E F : EventStack}
+  {A B : Set}
+  {C : Category}
+  where
+
+  module SplitMainEditorMapEvent
+    (G : EventStackMap E F)
+    (e : SplitMainEditor V E A B C)
+    where
+
+    open SplitMainEditor e public
+      hiding (editor)
+
+    editor
+      : Editor V F StateCategory
+    editor
+      = editor-map-event G
+        (SplitMainEditor.editor e)
+
+  split-main-editor-map-event
+    : EventStackMap E F
+    → SplitMainEditor V E A B C
+    → SplitMainEditor V F A B C
+  split-main-editor-map-event G e
+    = record {SplitMainEditorMapEvent G e}
+
 -- ### FlatEditor
 
 module _
@@ -452,6 +586,43 @@ split-editor-map-simple
   → SplitEditor V E (category-unit B)
 split-editor-map-simple F
   = split-editor-map (split-functor-unit F)
+
+-- ### SplitMainEditor
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {A B : Set}
+  {C D : Category}
+  where
+
+  module SplitMainEditorMap
+    (F : SplitFunctor C D)
+    (e : SplitMainEditor V E A B C)
+    where
+
+    open SplitMainEditor e public
+      hiding (split-functor; pure-partial-retraction)
+
+    split-functor
+      : SplitFunctor StateCategory D
+    split-functor
+      = split-functor-compose F
+        (SplitMainEditor.split-functor e)
+
+    pure-partial-retraction
+      : PartialRetraction B (Category.Object D)
+    pure-partial-retraction
+      = partial-retraction-compose
+        (SplitFunctor.partial-retraction F)
+        (SplitMainEditor.pure-partial-retraction e)
+
+  split-main-editor-map
+    : SplitFunctor C D
+    → SplitMainEditor V E A B C
+    → SplitMainEditor V E A B D
+  split-main-editor-map F e
+    = record {SplitMainEditorMap F e}
 
 -- ### FlatEditor
 
