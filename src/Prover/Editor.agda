@@ -525,3 +525,146 @@ split-editor-partial
 split-editor-partial e
   = record {SplitEditor e}
 
+-- ### MainEditor
+
+record MainEditor
+  (V : ViewStack)
+  (E : EventStack)
+  (A : Set)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : Category
+
+  open Category StateCategory public using () renaming
+    ( Object
+      to State
+    ; Arrow
+      to StateArrow
+    ; identity
+      to state-identity
+    ; compose
+      to state-compose
+    ; precompose
+      to state-precompose
+    ; postcompose
+      to state-postcompose
+    ; associative
+      to state-associative
+    )
+
+  field
+
+    editor
+      : Editor V E StateCategory
+
+  open Editor editor public
+
+  field
+
+    is-complete
+      : State
+      → Bool
+
+    partial-retraction
+      : PartialRetraction A State
+
+  open PartialRetraction partial-retraction public using () renaming
+    ( to
+      to decode
+    ; from
+      to encode
+    ; to-from
+      to decode-encode
+    )
+
+-- ### SplitMainEditor
+
+record SplitMainEditor
+  (V : ViewStack)
+  (E : EventStack)
+  (A : Set)
+  (B : Set)
+  (C : Category)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : Category
+
+  open Category StateCategory public using () renaming
+    ( Object
+      to State
+    ; Arrow
+      to StateArrow
+    ; identity
+      to state-identity
+    ; compose
+      to state-compose
+    ; precompose
+      to state-precompose
+    ; postcompose
+      to state-postcompose
+    ; associative
+      to state-associative
+    )
+
+  field
+
+    editor
+      : Editor V E StateCategory
+
+  open Editor editor public
+
+  field
+
+    split-functor
+      : SplitFunctor StateCategory C
+
+  open SplitFunctor split-functor public
+
+  is-complete
+    : State
+    → Bool
+  is-complete s
+    = Maybe.is-just (base s)
+
+  draw-pure
+    : Category.Object C
+    → ViewStack.View V
+  draw-pure x
+    = draw (unbase x)
+  
+  field
+
+    state-partial-retraction
+      : PartialRetraction A State
+
+  open PartialRetraction state-partial-retraction public using () renaming
+    ( to
+      to state-decode
+    ; from
+      to state-encode
+    ; to-from
+      to state-decode-encode
+    )
+
+  field
+
+    pure-partial-retraction
+      : PartialRetraction B (Category.Object C)
+
+  open PartialRetraction pure-partial-retraction public using () renaming
+    ( to
+      to pure-decode
+    ; from
+      to pure-encode
+    ; to-from
+      to pure-decode-encode
+    )
+
