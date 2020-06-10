@@ -45,9 +45,7 @@ open import Prover.Prelude.Nat public
 open import Prover.Prelude.Pair public
   using (Pair; pair)
 open import Prover.Prelude.Retraction public
-  using (PartialRetraction; Retraction; partial-retraction-compose;
-    partial-retraction-identity; retraction-compose; retraction-identity;
-    retraction-partial)
+  using (Retraction; retraction-compose; retraction-identity)
 open import Prover.Prelude.Sigma public
   using (Sigma; Σ; _,_; _×_; π₁; π₂)
 open import Prover.Prelude.String public

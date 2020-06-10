@@ -2,6 +2,8 @@ module Prover.Data.Number.Editor where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Simple
+  using (retraction-partial)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit

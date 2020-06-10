@@ -6,6 +6,8 @@ open import Prover.Category.Partial
   using (PartialFunctor)
 open import Prover.Category.Partial.Unit
   using (partial-functor-unit)
+open import Prover.Category.Simple
+  using (PartialRetraction)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Category.Unit

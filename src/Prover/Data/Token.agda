@@ -1,5 +1,7 @@
 module Prover.Data.Token where
 
+open import Prover.Category.Simple
+  using (PartialRetraction)
 open import Prover.Data.Text
   using (Text)
 open import Prover.Prelude

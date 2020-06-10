@@ -3,7 +3,7 @@ module Prover.Editor.Map where
 open import Prover.Category
   using (Category)
 open import Prover.Category.Simple
-  using (PartialFunction)
+  using (PartialFunction; PartialRetraction; partial-retraction-compose)
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
 open import Prover.Category.Split.Unit

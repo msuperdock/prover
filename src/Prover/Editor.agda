@@ -2,6 +2,8 @@ module Prover.Editor where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Simple
+  using (PartialRetraction)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Prelude

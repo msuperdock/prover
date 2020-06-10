@@ -2,6 +2,8 @@ module Prover.Data.Text.Editor where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Simple
+  using (PartialRetraction; retraction-partial)
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Data.Text

@@ -8,6 +8,8 @@ open import Prover.Category.Partial
   using (PartialDependentFunctor; PartialDependentFunctorSquare; PartialFunctor;
     PartialFunctorSquare; PartialFunctorSquare'; partial-functor-compose;
     partial-functor-square'; partial-functor-square-compose)
+open import Prover.Category.Simple
+  using (PartialRetraction)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Prelude

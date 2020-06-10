@@ -1,5 +1,7 @@
 module Prover.Data.Formula.State where
 
+open import Prover.Category.Simple
+  using (PartialRetraction)
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Construct

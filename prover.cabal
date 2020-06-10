@@ -47,7 +47,7 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Sigma.Sum
                      , MAlonzo.Code.Prover.Category.Simple
-                     -- , MAlonzo.Code.Prover.Category.Simple.Product
+                     , MAlonzo.Code.Prover.Category.Simple.Product
                      -- , MAlonzo.Code.Prover.Category.Simple.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Snoc
                      , MAlonzo.Code.Prover.Category.Split

@@ -4,13 +4,17 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Product
   using (category-product)
+open import Prover.Category.Simple
+  using (PartialRetraction)
+open import Prover.Category.Simple.Product
+  using (partial-retraction-product)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Category.Split.Product
   using (split-functor-product)
 open import Prover.Editor
-  using (Editor; EventStack; PartialEditor; SimpleEditor; SplitEditor;
-    ViewStack; ViewStackMap; simple-editor)
+  using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
+    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; simple-editor)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -541,6 +545,7 @@ module _
     ... | just x₁ | just x₂
       = just (x₁ , x₂)
 
+  -- Takes direction from first to second component.
   partial-editor-product
     : Direction
     → PartialEditor V₁ E₁ A₁
@@ -592,6 +597,7 @@ module _
         (SplitEditor.split-functor e₁)
         (SplitEditor.split-functor e₂)
 
+  -- Takes direction from first to second component.
   split-editor-product
     : Direction
     → SplitEditor V₁ E₁ C₁
@@ -602,4 +608,164 @@ module _
       (category-product C₁ C₂)
   split-editor-product d e₁ e₂
     = record {SplitEditorProduct d e₁ e₂}
+
+-- ### MainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {A₁ A₂ : Set}
+  where
+
+  module MainEditorProduct
+    (d : Direction)
+    (e₁ : MainEditor V₁ E₁ A₁)
+    (e₂ : MainEditor V₂ E₂ A₂)
+    where
+
+    StateCategory
+      : Category
+    StateCategory
+      = category-product
+        (MainEditor.StateCategory e₁)
+        (MainEditor.StateCategory e₂)
+
+    open Category StateCategory using () renaming
+      ( Object
+        to State
+      ; Arrow
+        to StateArrow
+      ; identity
+        to state-identity
+      ; compose
+        to state-compose
+      ; precompose
+        to state-precompose
+      ; postcompose
+        to state-postcompose
+      ; associative
+        to state-associative
+      )
+
+    editor
+      : Editor
+        (view-stack-product V₁ V₂)
+        (event-stack-product E₁ E₂)
+        StateCategory
+    editor
+      = editor-product d
+        (MainEditor.editor e₁)
+        (MainEditor.editor e₂)
+
+    is-complete
+      : State
+      → Bool
+    is-complete (s₁ , s₂)
+      = MainEditor.is-complete e₁ s₁
+      ∧ MainEditor.is-complete e₂ s₂
+
+    partial-retraction
+      : PartialRetraction (A₁ × A₂) State
+    partial-retraction
+      = partial-retraction-product
+        (MainEditor.partial-retraction e₁)
+        (MainEditor.partial-retraction e₂)
+
+  -- Takes direction from first to second component.
+  main-editor-product
+    : Direction
+    → MainEditor V₁ E₁ A₁
+    → MainEditor V₂ E₂ A₂
+    → MainEditor
+      (view-stack-product V₁ V₂)
+      (event-stack-product E₁ E₂)
+      (A₁ × A₂)
+  main-editor-product d e₁ e₂
+    = record {MainEditorProduct d e₁ e₂}
+
+-- ### SplitMainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {A₁ A₂ B₁ B₂ : Set}
+  {C₁ C₂ : Category}
+  where
+
+  module SplitMainEditorProduct
+    (d : Direction)
+    (e₁ : SplitMainEditor V₁ E₁ A₁ B₁ C₁)
+    (e₂ : SplitMainEditor V₂ E₂ A₂ B₂ C₂)
+    where
+
+    StateCategory
+      : Category
+    StateCategory
+      = category-product
+        (SplitMainEditor.StateCategory e₁)
+        (SplitMainEditor.StateCategory e₂)
+
+    open Category StateCategory using () renaming
+      ( Object
+        to State
+      ; Arrow
+        to StateArrow
+      ; identity
+        to state-identity
+      ; compose
+        to state-compose
+      ; precompose
+        to state-precompose
+      ; postcompose
+        to state-postcompose
+      ; associative
+        to state-associative
+      )
+
+    editor
+      : Editor
+        (view-stack-product V₁ V₂)
+        (event-stack-product E₁ E₂)
+        StateCategory
+    editor
+      = editor-product d
+        (SplitMainEditor.editor e₁)
+        (SplitMainEditor.editor e₂)
+
+    split-functor
+      : SplitFunctor
+        StateCategory
+        (category-product C₁ C₂)
+    split-functor
+      = split-functor-product
+        (SplitMainEditor.split-functor e₁)
+        (SplitMainEditor.split-functor e₂)
+
+    state-partial-retraction
+      : PartialRetraction (A₁ × A₂) State
+    state-partial-retraction
+      = partial-retraction-product
+        (SplitMainEditor.state-partial-retraction e₁)
+        (SplitMainEditor.state-partial-retraction e₂)
+
+    pure-partial-retraction
+      : PartialRetraction (B₁ × B₂) (Category.Object (category-product C₁ C₂))
+    pure-partial-retraction
+      = partial-retraction-product
+        (SplitMainEditor.pure-partial-retraction e₁)
+        (SplitMainEditor.pure-partial-retraction e₂)
+
+  -- Takes direction from first to second component.
+  split-main-editor-product
+    : Direction
+    → SplitMainEditor V₁ E₁ A₁ B₁ C₁
+    → SplitMainEditor V₂ E₂ A₂ B₂ C₂
+    → SplitMainEditor
+      (view-stack-product V₁ V₂)
+      (event-stack-product E₁ E₂)
+      (A₁ × A₂)
+      (B₁ × B₂)
+      (category-product C₁ C₂)
+  split-main-editor-product d e₁ e₂
+    = record {SplitMainEditorProduct d e₁ e₂}
 
