@@ -24,10 +24,13 @@ open import Prover.Prelude
 draw-meta
   : PlainText
   → RichText
-draw-meta
-  = RichText.style Style.meta
-  ∘ RichText.wrap "[" "]"
-  ∘ RichText.plain
+draw-meta t
+  = RichText.style Style.meta (RichText.wrap "[" "]" (RichText.plain t))
+
+draw-meta-empty
+  : RichText
+draw-meta-empty
+  = RichText.style Style.meta (RichText.wrap "[" "]" (RichText.string "_"))
 
 -- ## Editor
 
@@ -36,8 +39,10 @@ module MetaBaseViewStackMap where
   view
     : BaseViewStack.View PlainTextBaseViewStack
     → BaseViewStack.View RichTextBaseViewStack
-  view
-    = draw-meta
+  view (any [])
+    = draw-meta-empty
+  view t@(any cs@(_ ∷ _))
+    = draw-meta t
 
   view-with
     : (v : BaseViewStack.View PlainTextBaseViewStack)
@@ -50,9 +55,11 @@ module MetaBaseViewStackMap where
     : (v : BaseViewStack.View PlainTextBaseViewStack)
     → (vp : BaseViewStack.ViewPath PlainTextBaseViewStack v)
     → BaseViewStack.ViewPath RichTextBaseViewStack (view-with v vp)
-  view-path _ nothing
+  view-path (any []) nothing
+    = style (text (suc zero) (plain zero))
+  view-path (any (_ ∷ _)) nothing
     = style (text (suc (suc zero)) (plain zero))
-  view-path _ (just tp)
+  view-path (any (_ ∷ _)) (just tp)
     = style (text (suc zero) (plain tp))
 
 meta-base-view-stack-map
