@@ -3,8 +3,9 @@ module Prover.Editor.Flatten where
 open import Prover.Category
   using (Category)
 open import Prover.Editor
-  using (Editor; EventStack; PartialEditor; SimpleEditor; SplitEditor;
-    ViewStack; ViewStackMap; simple-editor; split-editor-partial)
+  using (Editor; EventStack; MainEditor; PartialEditor; SimpleEditor;
+    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; simple-editor;
+    split-editor-partial; split-main-editor-partial)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack)
 open import Prover.Editor.Flat
@@ -367,4 +368,40 @@ split-editor-flatten
 split-editor-flatten
   = partial-editor-flatten
   ∘ split-editor-partial
+
+-- ### MainEditor
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {A : Set}
+  where
+
+  main-editor-flatten
+    : (e : MainEditor V E A)
+    → FlatEditor
+      (view-stack-flatten V)
+      (event-stack-flatten E)
+      (MainEditor.State e)
+  main-editor-flatten e
+    = editor-flatten (MainEditor.editor e)
+
+-- ### SplitMainEditor
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {A B : Set}
+  {C : Category}
+  where
+
+  split-main-editor-flatten
+    : SplitMainEditor V E A B C
+    → FlatEditor
+      (view-stack-flatten V)
+      (event-stack-flatten E)
+      (Category.Object C)
+  split-main-editor-flatten
+    = partial-editor-flatten
+    ∘ split-main-editor-partial
 

@@ -583,6 +583,8 @@ record MainEditor
 
 -- ### SplitMainEditor
 
+-- #### Definition
+
 record SplitMainEditor
   (V : ViewStack)
   (E : EventStack)
@@ -666,4 +668,26 @@ record SplitMainEditor
     ; to-from
       to pure-decode-encode
     )
+
+-- #### Conversion
+
+split-main-editor-unmain
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A B : Set}
+  → {C : Category}
+  → SplitMainEditor V E A B C
+  → SplitEditor V E C
+split-main-editor-unmain e
+  = record {SplitMainEditor e}
+
+split-main-editor-partial
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A B : Set}
+  → {C : Category}
+  → SplitMainEditor V E A B C
+  → PartialEditor V E (Category.Object C)
+split-main-editor-partial e
+  = record {SplitMainEditor e}
 
