@@ -276,11 +276,8 @@ record Editor
     initial
       : State
 
-    initial-path
-      : StatePath initial
-
     -- The initial path when entering from the given direction.
-    initial-path-with
+    initial-path
       : (s : State)
       → Direction
       → StatePath s
@@ -353,7 +350,7 @@ record Editor
     handle-direction-valid
       : (s : State)
       → (d : Direction)
-      → handle-direction s (initial-path-with s d) d ≡ nothing
+      → handle-direction s (initial-path s d) d ≡ nothing
 
     handle-inner
       : (s : State)

@@ -336,21 +336,16 @@ module FormulaSimpleBaseEditor
     = SandboxState.hole
 
   initial-path
-    : StatePath initial
-  initial-path
-    = go zero stop
-
-  initial-path-with
     : (s : State)
     → Direction
     → StatePath s
-  initial-path-with _ Direction.up
+  initial-path _ Direction.up
     = SandboxStatePath.leftmost
-  initial-path-with _ Direction.down
+  initial-path _ Direction.down
     = SandboxStatePath.leftmost
-  initial-path-with _ Direction.left
+  initial-path _ Direction.left
     = SandboxStatePath.leftmost
-  initial-path-with _ Direction.right
+  initial-path _ Direction.right
     = SandboxStatePath.end
 
   -- ##### Draw
@@ -411,7 +406,7 @@ module FormulaSimpleBaseEditor
   handle-direction-valid
     : (s : State)
     → (d : Direction)
-    → handle-direction s (initial-path-with s d) d ≡ nothing
+    → handle-direction s (initial-path s d) d ≡ nothing
   handle-direction-valid _ Direction.up
     = refl
   handle-direction-valid _ Direction.down

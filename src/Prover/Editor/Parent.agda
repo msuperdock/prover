@@ -135,7 +135,7 @@ module _
     -- ##### State
 
     open BaseEditor e public
-      using (StatePath; initial; initial-path; initial-path-with)
+      using (StatePath; initial; initial-path)
 
     StateInner
       : (s : State)

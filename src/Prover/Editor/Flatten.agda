@@ -228,7 +228,7 @@ module _
     initial-path
       : StatePath initial
     initial-path
-      = Editor.initial-path e
+      = Editor.initial-path e (Editor.initial e) Direction.up
 
     -- ##### Draw
 

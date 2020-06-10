@@ -218,22 +218,17 @@ module _
       = ι₁ (SplitEditor.initial e₁)
 
     initial-path
-      : StatePath initial
-    initial-path
-      = SplitEditor.initial-path e₁
-
-    initial-path-with
       : (s : State)
       → Direction
       → StatePath s
-    initial-path-with (ι₁ s₁) d'
-      = SplitEditor.initial-path-with e₁ s₁ d'
-    initial-path-with (ι₂ (x₁ , s₂)) d'
+    initial-path (ι₁ s₁) d'
+      = SplitEditor.initial-path e₁ s₁ d'
+    initial-path (ι₂ (x₁ , s₂)) d'
       with d' ≟ d dir
     ... | no _
-      = ι₁ (SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁) d')
+      = ι₁ (SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁) d')
     ... | yes _
-      = ι₂ (Editor.initial-path-with (e₂ x₁) s₂ d')
+      = ι₂ (Editor.initial-path (e₂ x₁) s₂ d')
 
     -- ##### Draw
 
@@ -416,7 +411,7 @@ module _
       with Editor.handle-escape (e₂ x₁) s₂ sp₂
     ... | nothing
       = just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁)
-        , SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁) d
+        , SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁) d
         , CategorySum.arrow₁
           (SplitEditor.state-identity e₁
             (SplitEditor.unbase e₁ x₁))))
@@ -444,7 +439,9 @@ module _
       = nothing
     ... | nothing | just x₁ | [ p₁ ]
       = just (ι₁ (ι₂ (x₁ , Editor.initial (e₂ x₁))
-        , ι₂ (Editor.initial-path (e₂ x₁))
+        , ι₂ (Editor.initial-path (e₂ x₁)
+          (Editor.initial (e₂ x₁))
+          (Direction.reverse d))
         , CategorySum.arrow₁ (SplitEditor.normalize-arrow e₁ s₁ p₁)))
     ... | just (ι₁ (s₁' , sp₁' , f₁)) | _ | _
       = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
@@ -489,7 +486,7 @@ module _
     ... | nothing | no _
       = nothing
     ... | nothing | yes _
-      = just (ι₂ (Editor.initial-path-with (e₂ x₁) s₂ (Direction.reverse d')))
+      = just (ι₂ (Editor.initial-path (e₂ x₁) s₂ (Direction.reverse d')))
     ... | just sp₁' | _
       = just (ι₁ sp₁')
     handle-direction (ι₂ (x₁ , s₂)) (ι₂ sp₂) d'
@@ -498,7 +495,7 @@ module _
     ... | nothing | no _
       = nothing
     ... | nothing | yes _
-      = just (ι₁ (SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁)
+      = just (ι₁ (SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁)
         (Direction.reverse d')))
     ... | just sp₂' | _
       = just (ι₂ sp₂')
@@ -506,7 +503,7 @@ module _
     handle-direction-valid
       : (s : State)
       → (d : Direction)
-      → handle-direction s (initial-path-with s d) d ≡ nothing
+      → handle-direction s (initial-path s d) d ≡ nothing
     handle-direction-valid (ι₁ s₁) d'
       = SplitEditor.handle-direction-valid e₁ s₁ d'
     handle-direction-valid (ι₂ _) d'
@@ -514,14 +511,14 @@ module _
       | inspect (_≟_dir d') d
     handle-direction-valid (ι₂ (x₁ , s₂)) d' | no _ | [ _ ]
       with SplitEditor.handle-direction e₁ (SplitEditor.unbase e₁ x₁)
-        (SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁) d') d'
+        (SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁) d') d'
       | SplitEditor.handle-direction-valid e₁ (SplitEditor.unbase e₁ x₁) d'
       | d' ≟ d dir
     handle-direction-valid _ _ _ | _ | [ refl ] | _ | refl | _
       = refl
     handle-direction-valid (ι₂ (x₁ , s₂)) d' | yes refl | _
       with Editor.handle-direction (e₂ x₁) s₂
-        (Editor.initial-path-with (e₂ x₁) s₂ d') d'
+        (Editor.initial-path (e₂ x₁) s₂ d') d'
       | Editor.handle-direction-valid (e₂ x₁) s₂ d'
       | Direction.reverse d' ≟ d dir
     ... | _ | refl | no _
@@ -597,7 +594,7 @@ module _
       = ι₁ (ι₁ s₁ , sp₁ , CategorySum.arrow₁ f₁)
     ... | nothing | just x₁' | [ p₁ ]
       = ι₁ (ι₂ (x₁' , s₂')
-        , ι₂ (Editor.initial-path-with (e₂ x₁') s₂' (Direction.reverse d))
+        , ι₂ (Editor.initial-path (e₂ x₁') s₂' (Direction.reverse d))
         , CategorySum.arrow₂
           (CategorySigma.arrow s₂' f₁'
             (just (DependentCategory.identity C₂ x₁' s₂')) refl))
