@@ -1,9 +1,9 @@
 module Prover.Client.Flat where
 
-open import Prover.Client
-  using (SpecialEvent)
 open import Prover.Client.Brick
   using (InputEvent; Widget)
+open import Prover.Client.Event
+  using (SpecialEvent)
 open import Prover.Editor.Flat
   using (FlatEventStack; FlatViewStack)
 open import Prover.Prelude

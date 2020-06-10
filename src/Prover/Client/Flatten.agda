@@ -1,9 +1,11 @@
 module Prover.Client.Flatten where
 
 open import Prover.Client
-  using (Client; SpecialEvent)
+  using (Client)
 open import Prover.Client.Brick
   using (InputEvent; Widget)
+open import Prover.Client.Event
+  using (SpecialEvent)
 open import Prover.Client.Flat
   using (FlatClient)
 open import Prover.Editor

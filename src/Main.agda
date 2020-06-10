@@ -3,9 +3,11 @@ module Main where
 open import Examples
   using (∧-commutative; rules)
 open import Prover.Client
-  using (Client; SpecialEvent)
+  using (Client)
 open import Prover.Client.Brick
   using (InputEvent; Widget; draw-interface-with)
+open import Prover.Client.Event
+  using (SpecialEvent)
 open import Prover.Client.Run
   using (partial-editor-run)
 open import Prover.Data.Formula.Editor

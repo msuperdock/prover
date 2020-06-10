@@ -2,27 +2,11 @@ module Prover.Client where
 
 open import Prover.Client.Brick
   using (InputEvent; Widget)
+open import Prover.Client.Event
+  using (SpecialEvent)
 open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Prelude
-
--- ## SpecialEvent
-
-data SpecialEvent
-  : Set
-  where
-
-  escape
-    : SpecialEvent
-
-  return
-    : SpecialEvent
-
-  direction
-    : Direction
-    → SpecialEvent
-
--- ## Client
 
 record Client
   (V : ViewStack)

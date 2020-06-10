@@ -3,10 +3,12 @@ module Prover.Client.Run where
 open import Prover.Category
   using (Category)
 open import Prover.Client
-  using (Client; SpecialEvent)
+  using (Client)
 open import Prover.Client.Brick
   using (App; AttributeMap; BrickEvent; CursorLocation; EventM; Next; Widget;
     app; attributes; continue; default-main; from-brick-event; halt; pure)
+open import Prover.Client.Event
+  using (SpecialEvent)
 open import Prover.Client.Flat
   using (FlatClient)
 open import Prover.Client.Flatten
