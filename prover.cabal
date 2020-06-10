@@ -1,0 +1,157 @@
+name:                prover
+version:             0.1.0.0
+license:             MIT
+license-file:        LICENSE
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable prover
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  other-modules:       MAlonzo.Code.Agda.Builtin.Bool
+                     , MAlonzo.Code.Agda.Builtin.Char
+                     , MAlonzo.Code.Agda.Builtin.Equality
+                     , MAlonzo.Code.Agda.Builtin.IO
+                     , MAlonzo.Code.Agda.Builtin.List
+                     , MAlonzo.Code.Agda.Builtin.Nat
+                     , MAlonzo.Code.Agda.Builtin.Sigma
+                     , MAlonzo.Code.Agda.Builtin.String
+                     , MAlonzo.Code.Agda.Builtin.Unit
+                     , MAlonzo.Code.Agda.Primitive
+                     , MAlonzo.Code.Examples
+                     , MAlonzo.Code.Main
+                     , MAlonzo.Code.Prover.Category
+                     -- , MAlonzo.Code.Prover.Category.Chain
+                     -- , MAlonzo.Code.Prover.Category.Indexed
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Product
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Sigma.Maybe
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Sigma.Sum
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Convert
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Product
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Sigma
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Sigma.Sum
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split.Product
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split.Sigma.Sum
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Unit
+                     -- , MAlonzo.Code.Prover.Category.Maybe
+                     , MAlonzo.Code.Prover.Category.Partial
+                     -- , MAlonzo.Code.Prover.Category.Partial.Maybe
+                     , MAlonzo.Code.Prover.Category.Partial.Product
+                     -- , MAlonzo.Code.Prover.Category.Partial.Sigma
+                     -- , MAlonzo.Code.Prover.Category.Partial.Sum
+                     , MAlonzo.Code.Prover.Category.Partial.Unit
+                     , MAlonzo.Code.Prover.Category.Product
+                     -- , MAlonzo.Code.Prover.Category.Sigma
+                     -- , MAlonzo.Code.Prover.Category.Sigma.Maybe
+                     -- , MAlonzo.Code.Prover.Category.Sigma.Sum
+                     , MAlonzo.Code.Prover.Category.Simple
+                     -- , MAlonzo.Code.Prover.Category.Simple.Product
+                     -- , MAlonzo.Code.Prover.Category.Simple.Sigma.Sum
+                     -- , MAlonzo.Code.Prover.Category.Snoc
+                     , MAlonzo.Code.Prover.Category.Split
+                     -- , MAlonzo.Code.Prover.Category.Split.Maybe
+                     , MAlonzo.Code.Prover.Category.Split.Product
+                     -- , MAlonzo.Code.Prover.Category.Split.Sigma
+                     -- , MAlonzo.Code.Prover.Category.Split.Sigma.Maybe
+                     -- , MAlonzo.Code.Prover.Category.Split.Sigma.Sum
+                     -- , MAlonzo.Code.Prover.Category.Split.Sum
+                     , MAlonzo.Code.Prover.Category.Split.Unit
+                     -- , MAlonzo.Code.Prover.Category.Sum
+                     , MAlonzo.Code.Prover.Category.Unit
+                     , MAlonzo.Code.Prover.Category.Weak
+                     -- , MAlonzo.Code.Prover.Category.Weak.Sigma.Maybe
+                     , MAlonzo.Code.Prover.Client
+                     , MAlonzo.Code.Prover.Client.Brick
+                     , MAlonzo.Code.Prover.Client.Flat
+                     , MAlonzo.Code.Prover.Client.Flatten
+                     , MAlonzo.Code.Prover.Client.Run
+                     , MAlonzo.Code.Prover.Data.Associativity
+                     , MAlonzo.Code.Prover.Data.Formula
+                     , MAlonzo.Code.Prover.Data.Formula.Construct
+                     , MAlonzo.Code.Prover.Data.Formula.Editor
+                     , MAlonzo.Code.Prover.Data.Formula.Insert
+                     , MAlonzo.Code.Prover.Data.Formula.State
+                     , MAlonzo.Code.Prover.Data.Identifier
+                     , MAlonzo.Code.Prover.Data.Meta
+                     , MAlonzo.Code.Prover.Data.Meta.Editor
+                     , MAlonzo.Code.Prover.Data.Metas
+                     , MAlonzo.Code.Prover.Data.Number.Editor
+                     , MAlonzo.Code.Prover.Data.Number.Editor
+                     , MAlonzo.Code.Prover.Data.Precedence
+                     , MAlonzo.Code.Prover.Data.Proof
+                     , MAlonzo.Code.Prover.Data.Proof.Editor
+                     , MAlonzo.Code.Prover.Data.Proof.Editor.Meta
+                     , MAlonzo.Code.Prover.Data.Rule
+                     , MAlonzo.Code.Prover.Data.Rules
+                     , MAlonzo.Code.Prover.Data.Symbol
+                     , MAlonzo.Code.Prover.Data.Symbols
+                     , MAlonzo.Code.Prover.Data.Text
+                     , MAlonzo.Code.Prover.Data.Text.Editor
+                     -- , MAlonzo.Code.Prover.Data.Theorem
+                     , MAlonzo.Code.Prover.Data.Token
+                     , MAlonzo.Code.Prover.Data.Variable
+                     , MAlonzo.Code.Prover.Data.Variables
+                     , MAlonzo.Code.Prover.Editor
+                     , MAlonzo.Code.Prover.Editor.Base
+                     , MAlonzo.Code.Prover.Editor.Child
+                     , MAlonzo.Code.Prover.Editor.Flat
+                     , MAlonzo.Code.Prover.Editor.Flatten
+                     -- , MAlonzo.Code.Prover.Editor.Indexed
+                     -- , MAlonzo.Code.Prover.Editor.Indexed.Map
+                     -- , MAlonzo.Code.Prover.Editor.Indexed.Product
+                     -- , MAlonzo.Code.Prover.Editor.Indexed.Sigma
+                     -- , MAlonzo.Code.Prover.Editor.Indexed.Unit
+                     , MAlonzo.Code.Prover.Editor.Lift
+                     , MAlonzo.Code.Prover.Editor.Map
+                     , MAlonzo.Code.Prover.Editor.Parent
+                     , MAlonzo.Code.Prover.Editor.Product
+                     -- , MAlonzo.Code.Prover.Editor.Sigma
+                     , MAlonzo.Code.Prover.Editor.Unit
+                     , MAlonzo.Code.Prover.Prelude
+                     , MAlonzo.Code.Prover.Prelude.Any
+                     , MAlonzo.Code.Prover.Prelude.Any1
+                     , MAlonzo.Code.Prover.Prelude.Bool
+                     , MAlonzo.Code.Prover.Prelude.Char
+                     , MAlonzo.Code.Prover.Prelude.CharWith
+                     , MAlonzo.Code.Prover.Prelude.Collection
+                     , MAlonzo.Code.Prover.Prelude.Decidable
+                     , MAlonzo.Code.Prover.Prelude.Digit
+                     , MAlonzo.Code.Prover.Prelude.Direction
+                     , MAlonzo.Code.Prover.Prelude.Empty
+                     , MAlonzo.Code.Prover.Prelude.Equality
+                     , MAlonzo.Code.Prover.Prelude.Fin
+                     , MAlonzo.Code.Prover.Prelude.FinSet
+                     , MAlonzo.Code.Prover.Prelude.Function
+                     , MAlonzo.Code.Prover.Prelude.If
+                     , MAlonzo.Code.Prover.Prelude.Inspect
+                     , MAlonzo.Code.Prover.Prelude.IO
+                     , MAlonzo.Code.Prover.Prelude.Level
+                     , MAlonzo.Code.Prover.Prelude.List
+                     , MAlonzo.Code.Prover.Prelude.Map
+                     , MAlonzo.Code.Prover.Prelude.Maybe
+                     , MAlonzo.Code.Prover.Prelude.Nat
+                     , MAlonzo.Code.Prover.Prelude.Pair
+                     , MAlonzo.Code.Prover.Prelude.Retraction
+                     , MAlonzo.Code.Prover.Prelude.Sigma
+                     , MAlonzo.Code.Prover.Prelude.String
+                     , MAlonzo.Code.Prover.Prelude.Sum
+                     , MAlonzo.Code.Prover.Prelude.Trichotomous
+                     , MAlonzo.Code.Prover.Prelude.Unit
+                     , MAlonzo.Code.Prover.Prelude.Vec
+                     , MAlonzo.Code.Prover.View.Command
+                     , MAlonzo.Code.Prover.View.Interface
+                     , MAlonzo.Code.Prover.View.Line
+                     , MAlonzo.Code.Prover.View.Style
+                     , MAlonzo.Code.Prover.View.Text
+                     , MAlonzo.Code.Prover.View.Tree
+                     , MAlonzo.Code.Prover.View.Window
+                     , MAlonzo.RTE
+  build-depends:       base
+                     , brick
+                     , ieee754
+                     , text
+                     , vty
+  default-language:    Haskell2010
+  ghc-options:         -threaded -Wno-overlapping-patterns
