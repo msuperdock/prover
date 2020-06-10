@@ -4,6 +4,10 @@ open import Prover.Editor
   using (ViewStack)
 open import Prover.Editor.Base
   using (BaseViewStack)
+open import Prover.Editor.Flat
+  using (FlatViewStack)
+open import Prover.Editor.Flatten
+  using (base-view-stack-flatten)
 open import Prover.Editor.Lift
   using (view-stack-lift)
 open import Prover.View.Style
@@ -86,6 +90,28 @@ module Internal where
   
   -- ### Stacks
   
+  PlainTextBaseViewStack
+    : BaseViewStack
+  PlainTextBaseViewStack
+    = record
+    { View
+      = PlainText
+    ; ViewPath
+      = λ t → Maybe (PlainTextPath t)
+    }
+
+  PlainTextViewStack
+    : ViewStack
+  PlainTextViewStack
+    = view-stack-lift
+      PlainTextBaseViewStack
+
+  PlainTextFlatViewStack
+    : FlatViewStack
+  PlainTextFlatViewStack
+    = base-view-stack-flatten
+      PlainTextBaseViewStack
+
   RichTextBaseViewStack
     : BaseViewStack
   RichTextBaseViewStack
@@ -107,7 +133,8 @@ module Internal where
 -- ### PlainText
 
 open Internal public
-  using (PlainText)
+  using (PlainText; PlainTextBaseViewStack; PlainTextFlatViewStack;
+    PlainTextViewStack)
 
 -- ### RichText
 

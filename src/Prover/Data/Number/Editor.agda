@@ -7,7 +7,7 @@ open import Prover.Category.Split.Unit
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Data.Text.Editor
-  using (TextWithEvent; TextViewStack; text-with-split-editor)
+  using (TextWithEvent; text-with-split-editor)
 open import Prover.Editor
   using (EventStack; PartialEditor; SplitEditor; split-editor-partial)
 open import Prover.Editor.Base
@@ -16,6 +16,8 @@ open import Prover.Editor.Lift
   using (event-stack-lift)
 open import Prover.Editor.Map
   using (split-editor-map)
+open import Prover.View.Text
+  using (PlainTextViewStack)
 open import Prover.Prelude
 
 -- ## Types
@@ -56,7 +58,7 @@ NumberCategory
 
 number-split-editor
   : SplitEditor
-    TextViewStack
+    PlainTextViewStack
     NumberEventStack
     NumberCategory
 number-split-editor
@@ -68,7 +70,7 @@ number-split-editor
 
 number-partial-editor
   : PartialEditor
-    TextViewStack
+    PlainTextViewStack
     NumberEventStack
     ℕ
 number-partial-editor

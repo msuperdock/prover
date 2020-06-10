@@ -7,14 +7,14 @@ open import Prover.Category.Unit
 open import Prover.Data.Text
   using (Text; TextWith)
 open import Prover.Editor
-  using (EventStack; EventStackMap; SimpleEditor; SplitEditor; ViewStack)
+  using (EventStack; EventStackMap; SimpleEditor; SplitEditor)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseEventStackMap; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack; FlatViewStackMap)
 open import Prover.Editor.Flatten
   using (base-event-stack-flatten; base-event-stack-flatten-lift;
-    base-view-stack-flatten; base-view-stack-flatten-lift; split-editor-flatten)
+    base-view-stack-flatten-lift; split-editor-flatten)
 open import Prover.Editor.Lift
   using (event-stack-lift; event-stack-map-lift; simple-editor-lift;
     view-stack-lift)
@@ -25,42 +25,11 @@ open import Prover.Editor.Unit
   using (split-editor-unit)
 open import Prover.View.Command
   using (CommandFlatViewStack; command)
+open import Prover.View.Text
+  using (PlainTextBaseViewStack; PlainTextFlatViewStack; PlainTextViewStack)
 open import Prover.Prelude
 
 -- ## Types
-
--- ### View
-
-TextView
-  : Set
-TextView
-  = Any (Vec Char)
-
-TextViewPath
-  : TextView
-  → Set
-TextViewPath (any {n} _)
-  = Maybe (Fin n)
-
-TextBaseViewStack
-  : BaseViewStack
-TextBaseViewStack
-  = record
-  { View
-    = TextView
-  ; ViewPath
-    = TextViewPath
-  }
-
-TextViewStack
-  : ViewStack
-TextViewStack
-  = view-stack-lift
-    TextBaseViewStack
-
-TextFlatViewStack
-  = base-view-stack-flatten
-    TextBaseViewStack
 
 -- ### Event
 
@@ -166,7 +135,7 @@ module TextWithSimpleBaseEditor
 
   -- ##### Types
 
-  open BaseViewStack TextBaseViewStack
+  open BaseViewStack PlainTextBaseViewStack
   open BaseEventStack (TextWithBaseEventStack p)
 
   State
@@ -290,7 +259,7 @@ module TextWithSimpleBaseEditor
 text-with-simple-base-editor
   : (p : Char → Bool)
   → SimpleBaseEditor
-    TextBaseViewStack
+    PlainTextBaseViewStack
     (TextWithBaseEventStack p)
     (TextWithState p)
 text-with-simple-base-editor p
@@ -301,7 +270,7 @@ text-with-simple-base-editor p
 text-with-simple-editor
   : (p : Char → Bool)
   → SimpleEditor
-    TextViewStack
+    PlainTextViewStack
     (TextWithEventStack p)
     (TextWithState p)
 text-with-simple-editor p
@@ -347,7 +316,7 @@ text-with-partial-retraction p
 text-with-split-editor
   : (p : Char → Bool)
   → SplitEditor
-    TextViewStack
+    PlainTextViewStack
     (TextWithEventStack p)
     (TextWithCategory p)
 text-with-split-editor p
@@ -392,7 +361,7 @@ text-event-stack-map
 
 text-split-editor
   : SplitEditor
-    TextViewStack
+    PlainTextViewStack
     TextEventStack
     TextCategory
 text-split-editor
@@ -404,11 +373,11 @@ text-split-editor
 
 text-flat-editor
   : FlatEditor
-    TextFlatViewStack
+    PlainTextFlatViewStack
     TextFlatEventStack
     Text
 text-flat-editor
-  = flat-editor-map-view (base-view-stack-flatten-lift TextBaseViewStack)
+  = flat-editor-map-view (base-view-stack-flatten-lift PlainTextBaseViewStack)
   $ flat-editor-map-event (base-event-stack-flatten-lift TextBaseEventStack)
   $ split-editor-flatten
   $ text-split-editor
@@ -420,8 +389,8 @@ module CommandFlatStackMap
   where
 
   view-with
-    : (v : FlatViewStack.View TextFlatViewStack)
-    → FlatViewStack.ViewPath TextFlatViewStack v
+    : (v : FlatViewStack.View PlainTextFlatViewStack)
+    → FlatViewStack.ViewPath PlainTextFlatViewStack v
     → FlatViewStack.View CommandFlatViewStack
   view-with (any cs) nothing
     = command p (any (Vec.snoc cs ' '))
@@ -429,8 +398,8 @@ module CommandFlatStackMap
     = command p t
 
   view-path
-    : (v : FlatViewStack.View TextFlatViewStack)
-    → (vp : FlatViewStack.ViewPath TextFlatViewStack v)
+    : (v : FlatViewStack.View PlainTextFlatViewStack)
+    → (vp : FlatViewStack.ViewPath PlainTextFlatViewStack v)
     → FlatViewStack.ViewPath CommandFlatViewStack (view-with v vp)
   view-path _ nothing
     = Fin.maximum
@@ -441,7 +410,7 @@ module CommandFlatStackMap
 command-flat-stack-map
   : String
   → FlatViewStackMap
-    TextFlatViewStack
+    PlainTextFlatViewStack
     CommandFlatViewStack
 command-flat-stack-map p
   = record {CommandFlatStackMap p}
