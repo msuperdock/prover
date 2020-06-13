@@ -1,7 +1,7 @@
 module Prover.Data.Token where
 
-open import Prover.Category.Simple
-  using (PartialRetraction)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
 open import Prover.Data.Text
   using (Text)
 open import Prover.Prelude
@@ -96,40 +96,45 @@ module Token where
   ... | yes refl
     = yes refl
   
-  -- ### Retraction
+  -- ### Split
   
-  module TokenPartialRetraction where
+  token-from-text
+    : Text
+    → Maybe Token
+  token-from-text (any cs)
+    with is-valid? cs
+  ... | no _
+    = nothing
+  ... | yes v
+    = just (token cs v)
 
-    to
-      : Text
-      → Maybe Token
-    to (any cs)
-      with is-valid? cs
-    ... | no _
-      = nothing
-    ... | yes v
-      = just (token cs v)
+  token-to-text
+    : Token
+    → Text
+  token-to-text (token cs@(_ ∷ _) _)
+    = any cs
 
-    from
-      : Token
-      → Text
-    from (token cs@(_ ∷ _) _)
-      = any cs
+  token-from-to-text
+    : (t : Token)
+    → token-from-text (token-to-text t) ≡ just t
+  token-from-to-text (token cs@(_ ∷ _) v)
+    with is-valid? cs
+  ... | no ¬v
+    = ⊥-elim (¬v v)
+  ... | yes _
+    = refl
 
-    to-from
-      : (t : Token)
-      → to (from t) ≡ just t
-    to-from (token cs@(_ ∷ _) v)
-      with is-valid? cs
-    ... | no ¬v
-      = ⊥-elim (¬v v)
-    ... | yes _
-      = refl
-
-  partial-retraction
-    : PartialRetraction Text Token
-  partial-retraction
-    = record {TokenPartialRetraction}
+  split-function
+    : SplitFunction Text Token
+  split-function
+    = record
+    { partial-function
+      = token-from-text
+    ; function
+      = token-to-text
+    ; valid
+      = token-from-to-text
+    }
 
 -- ## Exports
 

@@ -2,10 +2,10 @@ module Prover.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Simple
-  using (PartialRetraction)
 open import Prover.Category.Split
   using (SplitFunctor)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -571,15 +571,15 @@ record MainEditor
       : State
       → Bool
 
-    partial-retraction
-      : PartialRetraction A State
+    split-function
+      : SplitFunction A State
 
-  open PartialRetraction partial-retraction public using () renaming
-    ( to
+  open SplitFunction split-function public using () renaming
+    ( partial-function
       to decode
-    ; from
+    ; function
       to encode
-    ; to-from
+    ; valid
       to decode-encode
     )
 
@@ -645,29 +645,29 @@ record SplitMainEditor
   
   field
 
-    state-partial-retraction
-      : PartialRetraction A State
+    state-split-function
+      : SplitFunction A State
 
-  open PartialRetraction state-partial-retraction public using () renaming
-    ( to
+  open SplitFunction state-split-function public using () renaming
+    ( partial-function
       to state-decode
-    ; from
+    ; function
       to state-encode
-    ; to-from
+    ; valid
       to state-decode-encode
     )
 
   field
 
-    pure-partial-retraction
-      : PartialRetraction B (Category.Object C)
+    pure-split-function
+      : SplitFunction B (Category.Object C)
 
-  open PartialRetraction pure-partial-retraction public using () renaming
-    ( to
+  open SplitFunction pure-split-function public using () renaming
+    ( partial-function
       to pure-decode
-    ; from
+    ; function
       to pure-encode
-    ; to-from
+    ; valid
       to pure-decode-encode
     )
 

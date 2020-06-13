@@ -4,14 +4,14 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Product
   using (category-product)
-open import Prover.Category.Simple
-  using (PartialRetraction)
-open import Prover.Category.Simple.Product
-  using (partial-retraction-product)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Category.Split.Product
   using (split-functor-product)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
+open import Prover.Category.Split.Simple.Product
+  using (split-function-product)
 open import Prover.Editor
   using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
     SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; simple-editor)
@@ -664,12 +664,12 @@ module _
       = MainEditor.is-complete e₁ s₁
       ∧ MainEditor.is-complete e₂ s₂
 
-    partial-retraction
-      : PartialRetraction (A₁ × A₂) State
-    partial-retraction
-      = partial-retraction-product
-        (MainEditor.partial-retraction e₁)
-        (MainEditor.partial-retraction e₂)
+    split-function
+      : SplitFunction (A₁ × A₂) State
+    split-function
+      = split-function-product
+        (MainEditor.split-function e₁)
+        (MainEditor.split-function e₂)
 
   -- Takes direction from first to second component.
   main-editor-product
@@ -741,19 +741,19 @@ module _
         (SplitMainEditor.split-functor e₁)
         (SplitMainEditor.split-functor e₂)
 
-    state-partial-retraction
-      : PartialRetraction (A₁ × A₂) State
-    state-partial-retraction
-      = partial-retraction-product
-        (SplitMainEditor.state-partial-retraction e₁)
-        (SplitMainEditor.state-partial-retraction e₂)
+    state-split-function
+      : SplitFunction (A₁ × A₂) State
+    state-split-function
+      = split-function-product
+        (SplitMainEditor.state-split-function e₁)
+        (SplitMainEditor.state-split-function e₂)
 
-    pure-partial-retraction
-      : PartialRetraction (B₁ × B₂) (Category.Object (category-product C₁ C₂))
-    pure-partial-retraction
-      = partial-retraction-product
-        (SplitMainEditor.pure-partial-retraction e₁)
-        (SplitMainEditor.pure-partial-retraction e₂)
+    pure-split-function
+      : SplitFunction (B₁ × B₂) (Category.Object (category-product C₁ C₂))
+    pure-split-function
+      = split-function-product
+        (SplitMainEditor.pure-split-function e₁)
+        (SplitMainEditor.pure-split-function e₂)
 
   -- Takes direction from first to second component.
   split-main-editor-product

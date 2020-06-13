@@ -1,7 +1,7 @@
 module Prover.Data.Formula.State where
 
-open import Prover.Category.Simple
-  using (PartialRetraction)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Construct
@@ -957,187 +957,187 @@ module Internal where
     {m : Bool}
     where
   
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       : (f : Formula ss vs m)
       → formula-state-to-formula (formula-state-from-formula f) ≡ just f
 
-    formula-state-to-formula-from-formulas-last
+    formula-state-to-from-formulas-last
       : {n : ℕ}
       → (fs : Vec (Formula ss vs m) (suc n))
       → formula-state-to-formula (formula-state-from-formulas-last fs)
         ≡ just (Vec.last fs)
 
-    sandbox-state-to-formula-from-formula
+    sandbox-state-to-from-formula
       : (f : Formula ss vs m)
       → sandbox-state-to-formula (sandbox-state-from-formula f) ≡ just f
 
-    sandbox-state-to-formulas-from-formulas
+    sandbox-state-to-from-formulas
       : {n : ℕ}
       → (fs : Vec (Formula ss vs m) n)
       → sandbox-state-to-formulas (sandbox-state-from-formulas fs) ≡ just fs
 
-    sandbox-state-to-formulas-from-formulas-init
+    sandbox-state-to-from-formulas-init
       : {n : ℕ}
       → (fs : Vec (Formula ss vs m) (suc n))
       → sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
         ≡ just (Vec.init fs)
 
-    formula-state-to-formula-from-formula (Formula.meta _)
+    formula-state-to-from-formula (Formula.meta _)
       = refl
-    formula-state-to-formula-from-formula (Formula.variable' _ _)
+    formula-state-to-from-formula (Formula.variable' _ _)
       = refl
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol neither _ _ _ _) _ fs)
       with sandbox-state-to-formulas (sandbox-state-from-formulas fs)
-      | sandbox-state-to-formulas-from-formulas fs
+      | sandbox-state-to-from-formulas fs
     ... | _ | refl
       = refl
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol left _ _ _ _) _ (f ∷ _))
       with Construct.left-valid? s
         (formula-state-construct (formula-state-from-formula f))
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol (symbol left _ _ _ _) _ (f ∷ fs)) | no _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | sandbox-state-to-formulas (sandbox-state-from-formulas fs)
-      | sandbox-state-to-formulas-from-formulas fs
+      | sandbox-state-to-from-formulas fs
     ... | _ | refl | _ | refl
       = refl
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol (symbol left _ _ _ _) _ (f ∷ fs)) | yes _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | sandbox-state-to-formulas (sandbox-state-from-formulas fs)
-      | sandbox-state-to-formulas-from-formulas fs
+      | sandbox-state-to-from-formulas fs
     ... | _ | refl | _ | refl
       = refl
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol right _ _ _ _) _ fs)
       with Construct.right-valid? s
         (formula-state-construct (formula-state-from-formulas-last fs))
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol right _ _ _ _) p fs) | no _
       with formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p fs')) (Vec.snoc-init-last fs) 
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol right _ _ _ _) p fs) | yes _
       with formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p fs')) (Vec.snoc-init-last fs) 
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) _ (f ∷ fs))
       with Construct.left-valid? s
         (formula-state-construct (formula-state-from-formula f))
       | Construct.right-valid? s
         (formula-state-construct (formula-state-from-formulas-last fs))
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) p (f ∷ fs)) | no _ | no _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p (f ∷ fs')))
         (Vec.snoc-init-last fs)
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) p (f ∷ fs)) | no _ | yes _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p (f ∷ fs')))
         (Vec.snoc-init-last fs)
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) p (f ∷ fs)) | yes _ | no _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p (f ∷ fs')))
         (Vec.snoc-init-last fs)
 
-    formula-state-to-formula-from-formula
+    formula-state-to-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) p (f ∷ fs)) | yes _ | yes _
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | formula-state-to-formula (formula-state-from-formulas-last fs)
-      | formula-state-to-formula-from-formulas-last fs
+      | formula-state-to-from-formulas-last fs
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl | _ | refl
       = sub (λ fs' → just (Formula.symbol s p (f ∷ fs')))
         (Vec.snoc-init-last fs)
 
-    formula-state-to-formula-from-formulas-last (f ∷ [])
-      = formula-state-to-formula-from-formula f
-    formula-state-to-formula-from-formulas-last (_ ∷ fs@(_ ∷ _))
-      = formula-state-to-formula-from-formulas-last fs
+    formula-state-to-from-formulas-last (f ∷ [])
+      = formula-state-to-from-formula f
+    formula-state-to-from-formulas-last (_ ∷ fs@(_ ∷ _))
+      = formula-state-to-from-formulas-last fs
 
-    sandbox-state-to-formula-from-formula
-      = formula-state-to-formula-from-formula
+    sandbox-state-to-from-formula
+      = formula-state-to-from-formula
 
-    sandbox-state-to-formulas-from-formulas []
+    sandbox-state-to-from-formulas []
       = refl
-    sandbox-state-to-formulas-from-formulas (f ∷ fs)
+    sandbox-state-to-from-formulas (f ∷ fs)
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | sandbox-state-to-formulas (sandbox-state-from-formulas fs)
-      | sandbox-state-to-formulas-from-formulas fs
+      | sandbox-state-to-from-formulas fs
     ... | _ | refl | _ | refl
       = refl
 
-    sandbox-state-to-formulas-from-formulas-init (_ ∷ [])
+    sandbox-state-to-from-formulas-init (_ ∷ [])
       = refl
-    sandbox-state-to-formulas-from-formulas-init (f ∷ fs@(_ ∷ _))
+    sandbox-state-to-from-formulas-init (f ∷ fs@(_ ∷ _))
       with formula-state-to-formula (formula-state-from-formula f)
-      | formula-state-to-formula-from-formula f
+      | formula-state-to-from-formula f
       | sandbox-state-to-formulas (sandbox-state-from-formulas-init fs)
-      | sandbox-state-to-formulas-from-formulas-init fs
+      | sandbox-state-to-from-formulas-init fs
     ... | _ | refl | _ | refl
       = refl
 
   -- #### Retraction
 
-  sandbox-state-partial-retraction
+  sandbox-state-split-function
     : (ss : Symbols)
     → (vs : Variables)
     → (m : Bool)
-    → PartialRetraction (Any (SandboxState ss vs m)) (Formula ss vs m)
-  sandbox-state-partial-retraction _ _ _
+    → SplitFunction (Any (SandboxState ss vs m)) (Formula ss vs m)
+  sandbox-state-split-function _ _ _
     = record
-    { to
+    { partial-function
       = sandbox-state-to-formula
-    ; from
+    ; function
       = sandbox-state-from-formula
-    ; to-from
-      = sandbox-state-to-formula-from-formula
+    ; valid
+      = sandbox-state-to-from-formula
     }
   
   -- ### Properties
@@ -1319,8 +1319,8 @@ module SandboxState where
       to length
     ; sandbox-state-lookup
       to lookup
-    ; sandbox-state-partial-retraction
-      to partial-retraction
+    ; sandbox-state-split-function
+      to split-function
     ; sandbox-state-to-formula
       to to-formula
     )

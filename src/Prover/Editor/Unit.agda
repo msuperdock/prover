@@ -2,10 +2,10 @@ module Prover.Editor.Unit where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Simple
-  using (PartialRetraction)
 open import Prover.Category.Split
   using (SplitFunctor)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -120,7 +120,7 @@ module _
   where
 
   module SplitEditorUnit
-    (F : PartialRetraction A B)
+    (F : SplitFunction A B)
     (e : SimpleEditor V E A)
     where
 
@@ -140,7 +140,7 @@ module _
       = split-functor-unit F
 
   split-editor-unit
-    : PartialRetraction A B
+    : SplitFunction A B
     → SimpleEditor V E A
     → SplitEditor V E (category-unit B)
   split-editor-unit F e

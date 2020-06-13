@@ -2,8 +2,8 @@ module Prover.Data.Number.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Simple
-  using (retraction-partial)
+open import Prover.Category.Split.Simple
+  using (split-function-from-retraction)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -65,7 +65,9 @@ number-split-editor
     NumberCategory
 number-split-editor
   = split-editor-map
-    (split-functor-unit (retraction-partial CharWith.retraction-digits))
+    (split-functor-unit
+      (split-function-from-retraction
+        CharWith.retraction-digits))
   $ text-with-split-editor Char.is-digit
 
 -- ### Partial

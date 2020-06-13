@@ -6,10 +6,10 @@ open import Prover.Category.Partial
   using (PartialFunctor)
 open import Prover.Category.Partial.Unit
   using (partial-functor-unit)
-open import Prover.Category.Simple
-  using (PartialRetraction)
 open import Prover.Category.Split
   using (SplitFunctor)
+open import Prover.Category.Split.Simple
+  using (SplitFunction)
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit; functor-unit)
 open import Prover.Prelude
@@ -21,7 +21,7 @@ module _
   where
 
   module SplitFunctorUnit
-    (r : PartialRetraction A B)
+    (F : SplitFunction A B)
     where
 
     partial-functor
@@ -30,7 +30,7 @@ module _
         (category-unit B)
     partial-functor
       = partial-functor-unit
-        (PartialRetraction.to r)
+        (SplitFunction.partial-function F)
 
     open PartialFunctor partial-functor
 
@@ -40,7 +40,7 @@ module _
         (category-unit A)
     functor
       = functor-unit
-        (PartialRetraction.from r)
+        (SplitFunction.function F)
 
     open Functor functor using () renaming
       ( base
@@ -59,7 +59,7 @@ module _
       : (x' : Category.Object (category-unit B))
       → base (unbase x') ≡ just x'
     base-unbase
-      = PartialRetraction.to-from r
+      = SplitFunction.valid F
 
     map-unmap
       : {x' y' : Category.Object (category-unit B)}
@@ -86,7 +86,7 @@ module _
       = refl
 
   split-functor-unit
-    : PartialRetraction A B
+    : SplitFunction A B
     → SplitFunctor
       (category-unit A)
       (category-unit B)

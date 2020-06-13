@@ -2,10 +2,14 @@ module Prover.Editor.Map where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Simple
-  using (PartialFunction; PartialRetraction; partial-retraction-compose)
+open import Prover.Category.Partial.Simple
+  using (PartialFunction)
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
+open import Prover.Category.Split.Simple
+  using (SplitFunction; split-functor-simple)
+open import Prover.Category.Split.Simple.Compose
+  using (split-function-compose)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -581,7 +585,7 @@ split-editor-map-simple
   : {V : ViewStack}
   → {E : EventStack}
   → {A B : Set}
-  → PartialRetraction A B
+  → SplitFunction A B
   → SplitEditor V E (category-unit A)
   → SplitEditor V E (category-unit B)
 split-editor-map-simple F
@@ -602,7 +606,7 @@ module _
     where
 
     open SplitMainEditor e public
-      hiding (split-functor; pure-partial-retraction)
+      hiding (split-functor; pure-split-function)
 
     split-functor
       : SplitFunctor StateCategory D
@@ -610,12 +614,12 @@ module _
       = split-functor-compose F
         (SplitMainEditor.split-functor e)
 
-    pure-partial-retraction
-      : PartialRetraction B (Category.Object D)
-    pure-partial-retraction
-      = partial-retraction-compose
-        (SplitFunctor.partial-retraction F)
-        (SplitMainEditor.pure-partial-retraction e)
+    pure-split-function
+      : SplitFunction B (Category.Object D)
+    pure-split-function
+      = split-function-compose
+        (split-functor-simple F)
+        (SplitMainEditor.pure-split-function e)
 
   split-main-editor-map
     : SplitFunctor C D

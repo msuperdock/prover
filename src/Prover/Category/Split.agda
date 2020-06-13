@@ -7,9 +7,8 @@ open import Prover.Category
 open import Prover.Category.Partial
   using (PartialDependentFunctor; PartialDependentFunctorSquare; PartialFunctor;
     PartialFunctorSquare; PartialFunctorSquare'; partial-functor-compose;
-    partial-functor-square'; partial-functor-square-compose)
-open import Prover.Category.Simple
-  using (PartialRetraction)
+    partial-functor-identity; partial-functor-square';
+    partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Prelude
@@ -71,19 +70,75 @@ record SplitFunctor
       → (p : base x ≡ just x')
       → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity D x'
 
-  partial-retraction
-    : PartialRetraction
-      (Category.Object C)
-      (Category.Object D)
-  partial-retraction
-    = record
-      { to
-        = base
-      ; from
-        = unbase
-      ; to-from
-        = base-unbase
-      }
+-- ### Identity
+
+module SplitFunctorIdentity
+  (C : Category)
+  where
+
+  module SplitFunctorIdentity
+    (C : Category)
+    where
+
+    partial-functor
+      : PartialFunctor C C
+    partial-functor
+      = partial-functor-identity C
+
+    open PartialFunctor partial-functor
+
+    functor
+      : Functor C C
+    functor
+      = functor-identity' C
+
+    open Functor functor using () renaming
+      ( base
+        to unbase
+      ; map
+        to unmap
+      ; map-identity
+        to unmap-identity
+      ; map-compose
+        to unmap-compose
+      ; map-compose-eq
+        to unmap-compose-eq
+      )
+
+    base-unbase
+      : (x' : Category.Object C)
+      → base (unbase x') ≡ just x'
+    base-unbase _
+      = refl
+
+    map-unmap
+      : {x' y' : Category.Object C}
+      → (f' : Category.Arrow C x' y')
+      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+    map-unmap _
+      = refl
+
+    normalize-arrow
+      : {x' : Category.Object C}
+      → (x : Category.Object C)
+      → base x ≡ just x'
+      → Category.Arrow C x (unbase x')
+    normalize-arrow x refl
+      = Category.identity C x
+    
+    normalize-valid
+      : {x' : Category.Object C}
+      → (x : Category.Object C)
+      → (p : base x ≡ just x')
+      → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity C x'
+    normalize-valid _ refl
+      = refl
+
+  split-functor-identity
+    : (C : Category)
+    → SplitFunctor C C
+  split-functor-identity C
+    = record {SplitFunctorIdentity C}
 
 -- ### Compose
 

@@ -2,8 +2,8 @@ module Prover.Data.Text.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Simple
-  using (PartialRetraction; retraction-partial)
+open import Prover.Category.Split.Simple
+  using (SplitFunction; split-function-from-retraction)
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Data.Text
@@ -278,37 +278,37 @@ text-with-simple-editor p
 
 -- #### TextWith
 
-module TextWithPartialRetraction
+module TextWithSplitFunction
   (p : Char → Bool)
   where
 
-  to
+  partial-function
     : TextWithState p
     → Maybe (TextWith p)
-  to (any [])
+  partial-function (any [])
     = nothing
-  to (any cs@(_ ∷ _))
+  partial-function (any cs@(_ ∷ _))
     = just (any cs)
 
-  from
+  function
     : TextWith p
     → TextWithState p
-  from (any cs)
+  function (any cs)
     = any cs
 
-  to-from
+  valid
     : (t : TextWith p)
-    → to (from t) ≡ just t
-  to-from (any (_ ∷ _))
+    → partial-function (function t) ≡ just t
+  valid (any (_ ∷ _))
     = refl
 
-text-with-partial-retraction
+text-with-split-function
   : (p : Char → Bool)
-  → PartialRetraction
+  → SplitFunction
     (TextWithState p)
     (TextWith p)
-text-with-partial-retraction p
-  = record {TextWithPartialRetraction p}
+text-with-split-function p
+  = record {TextWithSplitFunction p}
 
 text-with-split-editor
   : (p : Char → Bool)
@@ -317,7 +317,7 @@ text-with-split-editor
     (TextWithEventStack p)
     (TextWithCategory p)
 text-with-split-editor p
-  = split-editor-unit (text-with-partial-retraction p)
+  = split-editor-unit (text-with-split-function p)
   $ text-with-simple-editor p
 
 -- #### Text
@@ -363,7 +363,7 @@ text-split-editor
     TextCategory
 text-split-editor
   = split-editor-map-event text-event-stack-map
-  $ split-editor-map-simple (retraction-partial Text.retraction)
+  $ split-editor-map-simple (split-function-from-retraction Text.retraction)
   $ text-with-split-editor (const true)
 
 -- ### Flat

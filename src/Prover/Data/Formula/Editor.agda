@@ -746,7 +746,7 @@ formula-split-editor
     FormulaEventStack
     (FormulaCategory ss vs m)
 formula-split-editor ss vs m
-  = split-editor-unit (SandboxState.partial-retraction ss vs m)
+  = split-editor-unit (SandboxState.split-function ss vs m)
   $ formula-simple-editor ss vs m
 
 -- ### Partial
