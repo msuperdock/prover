@@ -536,6 +536,10 @@ record MainEditor
   : Set₁
   where
 
+  constructor
+
+    main-editor
+
   field
 
     {StateCategory}
@@ -594,6 +598,10 @@ record SplitMainEditor
   (C : Category)
   : Set₁
   where
+
+  constructor
+
+    split-main-editor
 
   field
 

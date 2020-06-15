@@ -152,9 +152,13 @@ record IndexedPartialEditor
   : Set₁
   where
 
+  constructor
+
+    indexed-partial-editor
+
   field
   
-    State
+    {State}
       : IndexedSet C
 
     indexed-simple-editor
@@ -176,9 +180,13 @@ record IndexedSplitEditor
   : Set₁
   where
 
+  constructor
+
+    indexed-split-editor
+
   field
 
-    StateCategory
+    {StateCategory}
       : IndexedCategory C
 
     indexed-editor

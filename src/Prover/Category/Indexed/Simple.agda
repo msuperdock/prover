@@ -6,8 +6,9 @@ open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)
 open import Prover.Category.Simple
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare;
-    PartialFunction; partial-function-compose)
+  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
+open import Prover.Category.Partial.Simple
+  using (PartialFunction; partial-function-compose)
 open import Prover.Prelude
 
 -- ## Internal
