@@ -5,8 +5,8 @@ open import Prover.Category.Chain
 open import Prover.Category.Indexed.Product
   using (indexed-category-product)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSet; empty; indexed-partial-function₀;
-    sigma)
+  using (IndexedPartialFunction; IndexedSimpleCategory; empty;
+    indexed-partial-function₀; sigma)
 open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Unit
@@ -15,14 +15,14 @@ open import Prover.Category.Partial.Base.Product
   using (partial-function-product)
 open import Prover.Prelude
 
--- ## IndexedSet
+-- ## IndexedSimpleCategory
 
 indexed-set-product
   : {n : ℕ}
   → {C : ChainCategory n}
-  → IndexedSet C
-  → IndexedSet C
-  → IndexedSet C
+  → IndexedSimpleCategory C
+  → IndexedSimpleCategory C
+  → IndexedSimpleCategory C
 indexed-set-product C₁' C₂'
   = indexed-category-simple
   $ indexed-category-product
@@ -34,7 +34,7 @@ indexed-set-product C₁' C₂'
 indexed-partial-function-product
   : {n : ℕ}
   → {C : ChainCategory n}
-  → {C₁' C₂' D₁' D₂' : IndexedSet C}
+  → {C₁' C₂' D₁' D₂' : IndexedSimpleCategory C}
   → IndexedPartialFunction C₁' D₁'
   → IndexedPartialFunction C₂' D₂'
   → IndexedPartialFunction

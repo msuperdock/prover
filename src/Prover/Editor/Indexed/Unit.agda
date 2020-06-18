@@ -3,7 +3,7 @@ module Prover.Editor.Indexed.Unit where
 open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed.Simple
-  using (IndexedSet)
+  using (IndexedSimpleCategory)
 open import Prover.Category.Indexed.Unit
   using (indexed-category-unit)
 open import Prover.Editor
@@ -22,7 +22,7 @@ indexed-editor-unit
   → {E : EventStack}
   → {n : ℕ}
   → {C : ChainCategory n}
-  → {C' : IndexedSet C}
+  → {C' : IndexedSimpleCategory C}
   → IndexedSimpleEditor V E C'
   → IndexedEditor V E
     (indexed-category-unit C')

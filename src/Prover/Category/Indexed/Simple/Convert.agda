@@ -13,10 +13,11 @@ open import Prover.Category.Indexed
     indexed-functor₀; indexed-functor-compose₀; indexed-functor-identity₀;
     indexed-functor-square₀)
 open import Prover.Category.Indexed.Simple
-  using (IndexedDependentFunction; IndexedDependentFunctionCompose;
-    IndexedDependentFunctionIdentity; IndexedDependentFunctionSquare;
-    IndexedDependentSet; IndexedFunction; IndexedFunctionCompose;
-    IndexedFunctionIdentity; IndexedFunctionSquare; IndexedSet; empty;
+  using (IndexedSimpleDependentFunctor; IndexedSimpleDependentFunctorCompose;
+    IndexedSimpleDependentFunctorIdentity; IndexedSimpleDependentFunctorSquare;
+    IndexedSimpleDependentCategory; IndexedSimpleFunctor;
+    IndexedSimpleFunctorCompose; IndexedSimpleFunctorIdentity;
+    IndexedSimpleFunctorSquare; IndexedSimpleCategory; empty;
     indexed-dependent-function; indexed-dependent-function-compose;
     indexed-dependent-function-identity; indexed-dependent-function-square;
     indexed-dependent-set; sigma)
@@ -30,7 +31,7 @@ indexed-category-simple
   : {n : ℕ}
   → {C : ChainCategory n}
   → IndexedCategory C
-  → IndexedSet C
+  → IndexedSimpleCategory C
 
 -- ### IndexedFunctor
 
@@ -41,7 +42,7 @@ indexed-functor-simple
   → {D' : IndexedCategory D}
   → {F : ChainFunctor C D}
   → IndexedFunctor C' D' F
-  → IndexedFunction
+  → IndexedSimpleFunctor
     (indexed-category-simple C')
     (indexed-category-simple D') F
 
@@ -54,7 +55,7 @@ indexed-functor-identity-simple
   → {F : ChainFunctor C C}
   → {F' : IndexedFunctor C' C' F}
   → IndexedFunctorIdentity F'
-  → IndexedFunctionIdentity
+  → IndexedSimpleFunctorIdentity
     (indexed-functor-simple F')
 
 indexed-functor-identity-simple-eq
@@ -67,7 +68,7 @@ indexed-functor-identity-simple-eq
   → {F' : IndexedFunctor (C' x₁) (C' x₂) F}
   → x₂ ≡ x₁
   → IndexedFunctorIdentity F'
-  → IndexedFunctionIdentity
+  → IndexedSimpleFunctorIdentity
     (indexed-functor-simple F')
 
 -- ### IndexedFunctorCompose
@@ -85,7 +86,7 @@ indexed-functor-compose-simple
   → {G' : IndexedFunctor C' D' G}
   → {H' : IndexedFunctor C' E' H}
   → IndexedFunctorCompose F' G' H'
-  → IndexedFunctionCompose
+  → IndexedSimpleFunctorCompose
     (indexed-functor-simple F')
     (indexed-functor-simple G')
     (indexed-functor-simple H')
@@ -107,7 +108,7 @@ indexed-functor-compose-simple-eq
   → {H' : IndexedFunctor C' (E' x₂) H}
   → x₂ ≡ x₁
   → IndexedFunctorCompose F' G' H'
-  → IndexedFunctionCompose
+  → IndexedSimpleFunctorCompose
     (indexed-functor-simple F')
     (indexed-functor-simple G')
     (indexed-functor-simple H')
@@ -130,7 +131,7 @@ indexed-functor-square-simple
   → {H₁' : IndexedFunctor C₁' D₁' H₁}
   → {H₂' : IndexedFunctor C₂' D₂' H₂}
   → IndexedFunctorSquare F' G' H₁' H₂'
-  → IndexedFunctionSquare
+  → IndexedSimpleFunctorSquare
     (indexed-functor-simple F')
     (indexed-functor-simple G')
     (indexed-functor-simple H₁')
@@ -156,7 +157,7 @@ indexed-functor-square-simple-eq
   → {H₂' : IndexedFunctor C₂' (D₂' x₂) H₂}
   → x₂ ≡ x₁
   → IndexedFunctorSquare F' G' H₁' H₂'
-  → IndexedFunctionSquare
+  → IndexedSimpleFunctorSquare
     (indexed-functor-simple F')
     (indexed-functor-simple G')
     (indexed-functor-simple H₁')
@@ -169,7 +170,7 @@ indexed-dependent-category-simple
   → {C : Category}
   → {C' : ChainDependentCategory C n}
   → IndexedDependentCategory C'
-  → IndexedDependentSet C'
+  → IndexedSimpleDependentCategory C'
 
 -- ### IndexedDependentFunctor
 
@@ -182,7 +183,7 @@ indexed-dependent-functor-simple
   → {D'' : IndexedDependentCategory D'}
   → {F : ChainDependentFunctor C' D'}
   → IndexedDependentFunctor C'' D'' F
-  → IndexedDependentFunction
+  → IndexedSimpleDependentFunctor
     (indexed-dependent-category-simple C'')
     (indexed-dependent-category-simple D'') F
 
@@ -196,7 +197,7 @@ indexed-dependent-functor-identity-simple
   → {F : ChainDependentFunctor C' C'}
   → {F' : IndexedDependentFunctor C'' C'' F}
   → IndexedDependentFunctorIdentity F'
-  → IndexedDependentFunctionIdentity
+  → IndexedSimpleDependentFunctorIdentity
     (indexed-dependent-functor-simple F')
 
 -- ### IndexedDependentFunctorCompose
@@ -217,7 +218,7 @@ indexed-dependent-functor-compose-simple
   → {G' : IndexedDependentFunctor C'' D'' G}
   → {H' : IndexedDependentFunctor C'' E'' H}
   → IndexedDependentFunctorCompose F' G' H'
-  → IndexedDependentFunctionCompose
+  → IndexedSimpleDependentFunctorCompose
     (indexed-dependent-functor-simple F')
     (indexed-dependent-functor-simple G')
     (indexed-dependent-functor-simple H')
@@ -244,7 +245,7 @@ indexed-dependent-functor-square-simple
   → {H₁' : IndexedDependentFunctor C₁'' D₁'' H₁}
   → {H₂' : IndexedDependentFunctor C₂'' D₂'' H₂}
   → IndexedDependentFunctorSquare F' G' H₁' H₂'
-  → IndexedDependentFunctionSquare
+  → IndexedSimpleDependentFunctorSquare
     (indexed-dependent-functor-simple F')
     (indexed-dependent-functor-simple G')
     (indexed-dependent-functor-simple H₁')

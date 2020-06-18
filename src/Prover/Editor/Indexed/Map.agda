@@ -5,7 +5,8 @@ open import Prover.Category.Chain
 open import Prover.Category.Indexed
   using (IndexedCategory)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSet; indexed-partial-function-compose)
+  using (IndexedPartialFunction; IndexedSimpleCategory;
+    indexed-partial-function-compose)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor; indexed-split-functor-compose)
 open import Prover.Editor
@@ -48,7 +49,7 @@ indexed-simple-editor-map-view
   → {E : EventStack}
   → {n : ℕ}
   → {C : ChainCategory n}
-  → {C' : IndexedSet C}
+  → {C' : IndexedSimpleCategory C}
   → ViewStackMap V W
   → IndexedSimpleEditor V E C'
   → IndexedSimpleEditor W E C'
@@ -68,7 +69,7 @@ module _
   {E : EventStack}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' : IndexedSet C}
+  {C' : IndexedSimpleCategory C}
   where
 
   module IndexedPartialEditorMapView
@@ -152,7 +153,7 @@ indexed-simple-editor-map-event
   → {E F : EventStack}
   → {n : ℕ}
   → {C : ChainCategory n}
-  → {C' : IndexedSet C}
+  → {C' : IndexedSimpleCategory C}
   → EventStackMap E F
   → IndexedSimpleEditor V E C'
   → IndexedSimpleEditor V F C'
@@ -172,7 +173,7 @@ module _
   {E F : EventStack}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' : IndexedSet C}
+  {C' : IndexedSimpleCategory C}
   where
 
   module IndexedPartialEditorMapEvent
@@ -236,7 +237,7 @@ module _
   {E : EventStack}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' D' : IndexedSet C}
+  {C' D' : IndexedSimpleCategory C}
   where
 
   module IndexedPartialEditorMap

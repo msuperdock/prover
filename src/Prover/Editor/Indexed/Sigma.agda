@@ -9,7 +9,7 @@ open import Prover.Category.Indexed.Sigma.Maybe
 open import Prover.Category.Indexed.Sigma.Sum
   using (indexed-category-sigma-sum)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSet)
+  using (IndexedPartialFunction; IndexedSimpleCategory)
 open import Prover.Category.Indexed.Simple.Sigma
   using (indexed-set-sigma)
 open import Prover.Category.Indexed.Simple.Sigma.Sum
@@ -73,7 +73,7 @@ indexed-simple-editor-sigma
   → {n : ℕ}
   → {C : ChainCategory n}
   → {C₁' : IndexedCategory C}
-  → {C₂' : IndexedSet (chain-category-snoc C₁')}
+  → {C₂' : IndexedSimpleCategory (chain-category-snoc C₁')}
   → Direction
   → (e₁ : IndexedSplitEditor V₁ E₁ C₁')
   → IndexedSimpleEditor V₂ E₂ C₂'
@@ -94,7 +94,7 @@ module _
   {n : ℕ}
   {C : ChainCategory n}
   {C₁' : IndexedCategory C}
-  {C₂' : IndexedSet (chain-category-snoc C₁')}
+  {C₂' : IndexedSimpleCategory (chain-category-snoc C₁')}
   where
 
   module IndexedPartialEditorSigma
@@ -104,7 +104,7 @@ module _
     where
 
     State
-      : IndexedSet C
+      : IndexedSimpleCategory C
     State
       = indexed-set-sigma-sum
         (IndexedPartialEditor.State e₂)

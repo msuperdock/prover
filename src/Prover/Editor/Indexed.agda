@@ -7,7 +7,7 @@ open import Prover.Category.Chain
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSet; indexed-set₀)
+  using (IndexedPartialFunction; IndexedSimpleCategory; indexed-set₀)
 open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Split
@@ -81,22 +81,22 @@ data IndexedSimpleEditor
   (E : EventStack)
   : {n : ℕ}
   → {C : ChainCategory n}
-  → IndexedSet C
+  → IndexedSimpleCategory C
   → Set₁
   where
 
   empty
     : {C : ChainCategory zero}
-    → {A : IndexedSet C}
+    → {A : IndexedSimpleCategory C}
     → SimpleEditor V E (indexed-set₀ A)
     → IndexedSimpleEditor V E A
 
   sigma
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
-    → {A : IndexedSet C}
+    → {A : IndexedSimpleCategory C}
     → ((x : Category.Object (ChainCategory.head C))
-      → IndexedSimpleEditor V E (IndexedSet.tail A x))
+      → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x))
     → IndexedSimpleEditor V E A
 
 -- ### Destruction
@@ -105,7 +105,7 @@ indexed-simple-editor₀
   : {V : ViewStack}
   → {E : EventStack}
   → {C : ChainCategory zero}
-  → {A : IndexedSet C}
+  → {A : IndexedSimpleCategory C}
   → IndexedSimpleEditor V E A
   → SimpleEditor V E (indexed-set₀ A)
 indexed-simple-editor₀ (empty e)
@@ -134,10 +134,10 @@ indexed-simple-editor-tail
   → {E : EventStack}
   → {n : ℕ}
   → {C : ChainCategory (suc n)}
-  → {A : IndexedSet C}
+  → {A : IndexedSimpleCategory C}
   → IndexedSimpleEditor V E A
   → (x : Category.Object (ChainCategory.head C))
-  → IndexedSimpleEditor V E (IndexedSet.tail A x)
+  → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x)
 indexed-simple-editor-tail (sigma e)
   = e
 
@@ -148,7 +148,7 @@ record IndexedPartialEditor
   {C : ChainCategory n}
   (V : ViewStack)
   (E : EventStack)
-  (C' : IndexedSet C)
+  (C' : IndexedSimpleCategory C)
   : Set₁
   where
 
@@ -159,7 +159,7 @@ record IndexedPartialEditor
   field
   
     {State}
-      : IndexedSet C
+      : IndexedSimpleCategory C
 
     indexed-simple-editor
       : IndexedSimpleEditor V E State

@@ -9,8 +9,9 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.Sigma.Sum
   using (indexed-category-sigma-sum)
 open import Prover.Category.Indexed.Simple
-  using (IndexedDependentSet; IndexedPartialFunction; IndexedSet; empty;
-    indexed-partial-function₀; indexed-set₀; sigma)
+  using (IndexedPartialFunction; IndexedSimpleCategory;
+    IndexedSimpleDependentCategory; empty; indexed-partial-function₀;
+    indexed-set₀; sigma)
 open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Simple.Sigma
@@ -25,15 +26,15 @@ open import Prover.Category.Snoc
   using (chain-category-snoc)
 open import Prover.Prelude
 
--- ## IndexedSet
+-- ## IndexedSimpleCategory
 
 indexed-set-sigma-sum
   : {n : ℕ}
   → {C : ChainCategory n}
   → {C₁' D₁' : IndexedCategory C}
-  → IndexedSet (chain-category-snoc D₁')
+  → IndexedSimpleCategory (chain-category-snoc D₁')
   → IndexedSplitFunctor C₁' D₁'
-  → IndexedSet C
+  → IndexedSimpleCategory C
 indexed-set-sigma-sum C₂' F₁
   = indexed-category-simple
   $ indexed-category-sigma-sum
@@ -45,7 +46,7 @@ indexed-partial-function-sigma-sum
   : {n : ℕ}
   → {C : ChainCategory n}
   → {C₁' D₁' : IndexedCategory C}
-  → {C₂' D₂' : IndexedSet (chain-category-snoc D₁')}
+  → {C₂' D₂' : IndexedSimpleCategory (chain-category-snoc D₁')}
   → (F₁ : IndexedSplitFunctor C₁' D₁')
   → IndexedPartialFunction C₂' D₂'
   → IndexedPartialFunction
@@ -60,9 +61,9 @@ indexed-partial-function-sigma-sum
       (Category.Object
         (indexed-category₀ D₁'))
       (λ y₁ → indexed-set₀
-        (IndexedSet.tail C₂' y₁))
+        (IndexedSimpleCategory.tail C₂' y₁))
       (λ y₁ → indexed-set₀
-        (IndexedSet.tail D₂' y₁))
+        (IndexedSimpleCategory.tail D₂' y₁))
       (λ y₁ → indexed-partial-function₀
         (IndexedPartialFunction.tail F₂ y₁)))
 indexed-partial-function-sigma-sum

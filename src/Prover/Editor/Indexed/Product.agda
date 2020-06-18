@@ -7,7 +7,7 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.Product
   using (indexed-category-product)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSet)
+  using (IndexedPartialFunction; IndexedSimpleCategory)
 open import Prover.Category.Indexed.Simple.Product
   using (indexed-partial-function-product; indexed-set-product)
 open import Prover.Category.Indexed.Split
@@ -59,7 +59,7 @@ indexed-simple-editor-product
   → {E₁ E₂ : EventStack}
   → {n : ℕ}
   → {C : ChainCategory n}
-  → {C₁' C₂' : IndexedSet C}
+  → {C₁' C₂' : IndexedSimpleCategory C}
   → Direction
   → IndexedSimpleEditor V₁ E₁ C₁'
   → IndexedSimpleEditor V₂ E₂ C₂'
@@ -80,7 +80,7 @@ module _
   {E₁ E₂ : EventStack}
   {n : ℕ}
   {C : ChainCategory n}
-  {C₁' C₂' : IndexedSet C}
+  {C₁' C₂' : IndexedSimpleCategory C}
   where
 
   module IndexedPartialEditorProduct
@@ -90,7 +90,7 @@ module _
     where
 
     State
-      : IndexedSet C
+      : IndexedSimpleCategory C
     State
       = indexed-set-product
         (IndexedPartialEditor.State e₁)
