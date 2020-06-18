@@ -495,11 +495,6 @@ module Internal where
     chain-dependent-functor₀ F
       = record {ChainDependentFunctor₀ F}
   
-  -- chain-transformation₀ F
-  --   = chain-transformation F
-  --     (λ _ → empty)
-  --     (λ _ → empty)
-  
   -- #### ChainDependentFunctorIdentity
   
   module _

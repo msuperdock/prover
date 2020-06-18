@@ -170,16 +170,6 @@ chain-dependent-category-snoc
   → IndexedDependentCategory C'
   → ChainDependentCategory C (suc n)
 
--- chain-dependent-functor-snoc
---   : {n : ℕ}
---   → {C : Category}
---   → {C' : Category.Object C → ChainCategory n}
---   → {C'' : (x : Category.Object C) → IndexedCategory (C' x)}
---   → {F : ChainDependentFunctor C C'}
---   → IndexedDependentFunctor C'' F
---   → ChainDependentFunctor C
---     (λ x → chain-category-snoc (C'' x))
-
 -- ### ChainDependentFunctor
 
 chain-dependent-functor-snoc
