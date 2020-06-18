@@ -11,7 +11,7 @@ open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Unit
   using (indexed-category-unit)
-open import Prover.Category.Simple.Product
+open import Prover.Category.Partial.Base.Product
   using (partial-function-product)
 open import Prover.Prelude
 

@@ -1,4 +1,4 @@
-module Prover.Category.Split.Simple where
+module Prover.Category.Split.Base where
 
 open import Prover.Category
   using (Category)

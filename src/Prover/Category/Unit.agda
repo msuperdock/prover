@@ -2,7 +2,7 @@ module Prover.Category.Unit where
 
 open import Prover.Category
   using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
-open import Prover.Category.Simple
+open import Prover.Category.Base
   using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Prelude
 

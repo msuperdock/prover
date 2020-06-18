@@ -2,13 +2,15 @@ module Prover.Category.Indexed.Simple where
 
 open import Prover.Category
   using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+open import Prover.Category.Base
+  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)
-open import Prover.Category.Simple
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
-open import Prover.Category.Partial.Simple
-  using (PartialFunction; partial-function-compose)
+open import Prover.Category.Partial.Base
+  using (PartialFunction)
+open import Prover.Category.Partial.Base.Compose
+  using (partial-function-compose)
 open import Prover.Prelude
 
 -- ## Internal

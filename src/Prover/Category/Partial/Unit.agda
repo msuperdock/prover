@@ -4,6 +4,8 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Partial
   using (PartialFunctor)
+open import Prover.Category.Partial.Base
+  using (PartialFunction)
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit)
 open import Prover.Prelude
@@ -15,7 +17,7 @@ module _
   where
 
   module PartialFunctorUnit
-    (f : A → Maybe B)
+    (f : PartialFunction A B)
     where
 
     base
@@ -59,7 +61,7 @@ module _
         = refl
 
   partial-functor-unit
-    : (A → Maybe B)
+    : PartialFunction A B
     → PartialFunctor
       (category-unit A)
       (category-unit B)

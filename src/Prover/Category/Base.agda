@@ -1,4 +1,4 @@
-module Prover.Category.Simple where
+module Prover.Category.Base where
 
 open import Prover.Category
   using (Category; Functor)

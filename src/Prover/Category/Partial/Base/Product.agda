@@ -1,11 +1,11 @@
-module Prover.Category.Partial.Simple.Product where
+module Prover.Category.Partial.Base.Product where
 
 open import Prover.Category.Partial
   using (PartialFunctor)
+open import Prover.Category.Partial.Base
+  using (PartialFunction)
 open import Prover.Category.Partial.Product
   using (partial-functor-product)
-open import Prover.Category.Partial.Simple
-  using (PartialFunction)
 open import Prover.Category.Partial.Unit
   using (partial-functor-unit)
 open import Prover.Prelude

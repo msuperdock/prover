@@ -8,7 +8,7 @@ open import Prover.Category.Partial.Unit
   using (partial-functor-unit)
 open import Prover.Category.Split
   using (SplitFunctor)
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction)
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit; functor-unit)

@@ -1,8 +1,8 @@
-module Prover.Category.Split.Simple.Compose where
+module Prover.Category.Split.Base.Compose where
 
 open import Prover.Category.Split
   using (split-functor-compose)
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction; split-functor-simple)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)

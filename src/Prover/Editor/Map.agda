@@ -2,13 +2,13 @@ module Prover.Editor.Map where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Partial.Simple
+open import Prover.Category.Partial.Base
   using (PartialFunction)
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction; split-functor-simple)
-open import Prover.Category.Split.Simple.Compose
+open import Prover.Category.Split.Base.Compose
   using (split-function-compose)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)

@@ -1,11 +1,11 @@
-module Prover.Category.Simple.Product where
+module Prover.Category.Base.Product where
 
 open import Prover.Category
   using (Functor)
+open import Prover.Category.Base
+  using (Function)
 open import Prover.Category.Product
   using (functor-product)
-open import Prover.Category.Simple
-  using (Function)
 open import Prover.Category.Unit
   using (functor-unit)
 open import Prover.Prelude

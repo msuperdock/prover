@@ -1,6 +1,6 @@
-module Prover.Category.Simple.Sigma.Sum where
+module Prover.Category.Partial.Base.Sigma.Sum where
 
-open import Prover.Category.Simple
+open import Prover.Category.Partial.Base
   using (PartialDependentFunction; PartialFunction)
 open import Prover.Prelude
 

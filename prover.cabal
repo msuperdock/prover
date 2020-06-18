@@ -21,6 +21,8 @@ executable prover
                      , MAlonzo.Code.Examples
                      , MAlonzo.Code.Main
                      , MAlonzo.Code.Prover.Category
+                     , MAlonzo.Code.Prover.Category.Base
+                     , MAlonzo.Code.Prover.Category.Base.Product
                      -- , MAlonzo.Code.Prover.Category.Chain
                      -- , MAlonzo.Code.Prover.Category.Indexed
                      -- , MAlonzo.Code.Prover.Category.Indexed.Product
@@ -37,31 +39,30 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Indexed.Unit
                      -- , MAlonzo.Code.Prover.Category.Maybe
                      , MAlonzo.Code.Prover.Category.Partial
+                     , MAlonzo.Code.Prover.Category.Partial.Base
+                     , MAlonzo.Code.Prover.Category.Partial.Base.Compose
+                     , MAlonzo.Code.Prover.Category.Partial.Base.Product
+                     , MAlonzo.Code.Prover.Category.Partial.Base.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Partial.Maybe
                      , MAlonzo.Code.Prover.Category.Partial.Product
                      -- , MAlonzo.Code.Prover.Category.Partial.Sigma
-                     , MAlonzo.Code.Prover.Category.Partial.Simple
-                     -- , MAlonzo.Code.Prover.Category.Partial.Simple.Product
                      -- , MAlonzo.Code.Prover.Category.Partial.Sum
                      , MAlonzo.Code.Prover.Category.Partial.Unit
                      , MAlonzo.Code.Prover.Category.Product
                      -- , MAlonzo.Code.Prover.Category.Sigma
                      -- , MAlonzo.Code.Prover.Category.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Sigma.Sum
-                     , MAlonzo.Code.Prover.Category.Simple
-                     -- , MAlonzo.Code.Prover.Category.Simple.Product
-                     -- , MAlonzo.Code.Prover.Category.Simple.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Snoc
                      , MAlonzo.Code.Prover.Category.Split
+                     , MAlonzo.Code.Prover.Category.Split.Base
+                     , MAlonzo.Code.Prover.Category.Split.Base.Compose
+                     , MAlonzo.Code.Prover.Category.Split.Base.Identity
+                     , MAlonzo.Code.Prover.Category.Split.Base.Product
                      -- , MAlonzo.Code.Prover.Category.Split.Maybe
                      , MAlonzo.Code.Prover.Category.Split.Product
                      -- , MAlonzo.Code.Prover.Category.Split.Sigma
                      -- , MAlonzo.Code.Prover.Category.Split.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Split.Sigma.Sum
-                     , MAlonzo.Code.Prover.Category.Split.Simple
-                     , MAlonzo.Code.Prover.Category.Split.Simple.Compose
-                     -- , MAlonzo.Code.Prover.Category.Split.Simple.Identity
-                     , MAlonzo.Code.Prover.Category.Split.Simple.Product
                      -- , MAlonzo.Code.Prover.Category.Split.Sum
                      , MAlonzo.Code.Prover.Category.Split.Unit
                      -- , MAlonzo.Code.Prover.Category.Sum

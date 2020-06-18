@@ -19,7 +19,7 @@ open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
 open import Prover.Category.Indexed.Unit
   using (indexed-category-unit)
-open import Prover.Category.Simple.Sigma.Sum
+open import Prover.Category.Partial.Base.Sigma.Sum
   using (partial-function-sigma-sum)
 open import Prover.Category.Snoc
   using (chain-category-snoc)

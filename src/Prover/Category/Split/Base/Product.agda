@@ -1,9 +1,9 @@
-module Prover.Category.Split.Simple.Product where
+module Prover.Category.Split.Base.Product where
 
+open import Prover.Category.Split.Base
+  using (SplitFunction; split-functor-simple)
 open import Prover.Category.Split.Product
   using (split-functor-product)
-open import Prover.Category.Split.Simple
-  using (SplitFunction; split-functor-simple)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Prelude
