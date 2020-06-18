@@ -374,11 +374,12 @@ split-editor-flatten
 module _
   {V : ViewStack}
   {E : EventStack}
-  {A : Set}
+  {S : Set}
+  {C : Category}
   where
 
   main-editor-flatten
-    : (e : MainEditor V E A)
+    : (e : MainEditor V E S C)
     → FlatEditor
       (view-stack-flatten V)
       (event-stack-flatten E)
@@ -391,12 +392,12 @@ module _
 module _
   {V : ViewStack}
   {E : EventStack}
-  {A B : Set}
+  {S P : Set}
   {C : Category}
   where
 
   split-main-editor-flatten
-    : SplitMainEditor V E A B C
+    : SplitMainEditor V E S P C
     → FlatEditor
       (view-stack-flatten V)
       (event-stack-flatten E)

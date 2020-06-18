@@ -614,23 +614,17 @@ module _
 module _
   {V₁ V₂ : ViewStack}
   {E₁ E₂ : EventStack}
-  {A₁ A₂ : Set}
+  {S₁ S₂ : Set}
+  {C₁ C₂ : Category}
   where
 
   module MainEditorProduct
     (d : Direction)
-    (e₁ : MainEditor V₁ E₁ A₁)
-    (e₂ : MainEditor V₂ E₂ A₂)
+    (e₁ : MainEditor V₁ E₁ S₁ C₁)
+    (e₂ : MainEditor V₂ E₂ S₂ C₂)
     where
 
-    StateCategory
-      : Category
-    StateCategory
-      = category-product
-        (MainEditor.StateCategory e₁)
-        (MainEditor.StateCategory e₂)
-
-    open Category StateCategory using () renaming
+    open Category (category-product C₁ C₂) using () renaming
       ( Object
         to State
       ; Arrow
@@ -651,7 +645,7 @@ module _
       : Editor
         (view-stack-product V₁ V₂)
         (event-stack-product E₁ E₂)
-        StateCategory
+        (category-product C₁ C₂)
     editor
       = editor-product d
         (MainEditor.editor e₁)
@@ -665,7 +659,7 @@ module _
       ∧ MainEditor.is-complete e₂ s₂
 
     split-function
-      : SplitFunction (A₁ × A₂) State
+      : SplitFunction (S₁ × S₂) State
     split-function
       = split-function-product
         (MainEditor.split-function e₁)
@@ -674,12 +668,13 @@ module _
   -- Takes direction from first to second component.
   main-editor-product
     : Direction
-    → MainEditor V₁ E₁ A₁
-    → MainEditor V₂ E₂ A₂
+    → MainEditor V₁ E₁ S₁ C₁
+    → MainEditor V₂ E₂ S₂ C₂
     → MainEditor
       (view-stack-product V₁ V₂)
       (event-stack-product E₁ E₂)
-      (A₁ × A₂)
+      (S₁ × S₂)
+      (category-product C₁ C₂)
   main-editor-product d e₁ e₂
     = record {MainEditorProduct d e₁ e₂}
 
@@ -688,14 +683,14 @@ module _
 module _
   {V₁ V₂ : ViewStack}
   {E₁ E₂ : EventStack}
-  {A₁ A₂ B₁ B₂ : Set}
+  {S₁ S₂ P₁ P₂ : Set}
   {C₁ C₂ : Category}
   where
 
   module SplitMainEditorProduct
     (d : Direction)
-    (e₁ : SplitMainEditor V₁ E₁ A₁ B₁ C₁)
-    (e₂ : SplitMainEditor V₂ E₂ A₂ B₂ C₂)
+    (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
+    (e₂ : SplitMainEditor V₂ E₂ S₂ P₂ C₂)
     where
 
     StateCategory
@@ -742,14 +737,14 @@ module _
         (SplitMainEditor.split-functor e₂)
 
     state-split-function
-      : SplitFunction (A₁ × A₂) State
+      : SplitFunction (S₁ × S₂) State
     state-split-function
       = split-function-product
         (SplitMainEditor.state-split-function e₁)
         (SplitMainEditor.state-split-function e₂)
 
     pure-split-function
-      : SplitFunction (B₁ × B₂) (Category.Object (category-product C₁ C₂))
+      : SplitFunction (P₁ × P₂) (Category.Object (category-product C₁ C₂))
     pure-split-function
       = split-function-product
         (SplitMainEditor.pure-split-function e₁)
@@ -758,13 +753,13 @@ module _
   -- Takes direction from first to second component.
   split-main-editor-product
     : Direction
-    → SplitMainEditor V₁ E₁ A₁ B₁ C₁
-    → SplitMainEditor V₂ E₂ A₂ B₂ C₂
+    → SplitMainEditor V₁ E₁ S₁ P₁ C₁
+    → SplitMainEditor V₂ E₂ S₂ P₂ C₂
     → SplitMainEditor
       (view-stack-product V₁ V₂)
       (event-stack-product E₁ E₂)
-      (A₁ × A₂)
-      (B₁ × B₂)
+      (S₁ × S₂)
+      (P₁ × P₂)
       (category-product C₁ C₂)
   split-main-editor-product d e₁ e₂
     = record {SplitMainEditorProduct d e₁ e₂}

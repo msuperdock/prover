@@ -6,10 +6,15 @@ open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum)
+open import Prover.Category.Split.Base
+  using (SplitFunction)
+open import Prover.Category.Split.Base.Sigma.Sum
+  using (split-function-sigma-sum)
 open import Prover.Category.Sum
   using (module CategorySum)
 open import Prover.Editor
-  using (Editor; EventStack; SplitEditor; ViewStack; ViewStackMap)
+  using (Editor; EventStack; MainEditor; SplitEditor; SplitMainEditor;
+    ViewStack; ViewStackMap; split-main-editor-unmain)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -654,4 +659,85 @@ module _
       (category-sigma-sum C₂ (SplitEditor.split-functor e₁))
   editor-sigma C₂ d e₁ e₂
     = record {EditorSigma C₂ d e₁ e₂}
+
+-- ### MainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {S₁ S₂ P₁ : Set}
+  {C₁ : Category}
+  where
+
+  module MainEditorSigma
+    (C₂ : DependentCategory C₁)
+    (d : Direction)
+    (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
+    (e₂ : (x₁ : Category.Object C₁)
+      → MainEditor V₂ E₂ S₂ (DependentCategory.category C₂ x₁))
+    where
+
+    StateCategory
+      : Category
+    StateCategory
+      = category-sigma-sum C₂
+        (SplitMainEditor.split-functor e₁)
+
+    open Category StateCategory using () renaming
+      ( Object
+        to State
+      ; Arrow
+        to StateArrow
+      ; identity
+        to state-identity
+      ; compose
+        to state-compose
+      ; precompose
+        to state-precompose
+      ; postcompose
+        to state-postcompose
+      ; associative
+        to state-associative
+      )
+
+    editor
+      : Editor
+        (view-stack-sigma V₁ V₂)
+        (event-stack-sigma E₁ E₂)
+        StateCategory
+    editor
+      = editor-sigma C₂ d
+        (split-main-editor-unmain e₁)
+        (λ x₁ → MainEditor.editor (e₂ x₁))
+
+    is-complete
+      : State
+      → Bool
+    is-complete (ι₁ _)
+      = false
+    is-complete (ι₂ (x₁ , s₂))
+      = MainEditor.is-complete (e₂ x₁) s₂
+
+    split-function
+      : SplitFunction (S₁ ⊔ P₁ × S₂) State
+    split-function
+      = split-function-sigma-sum
+        (λ x₁ → DependentCategory.Object C₂ x₁)
+        (SplitMainEditor.state-split-function e₁)
+        (SplitMainEditor.pure-split-function e₁)
+        (λ x₁ → MainEditor.split-function (e₂ x₁))
+
+  main-editor-sigma
+    : (C₂ : DependentCategory C₁)
+    → Direction
+    → (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
+    → ((x₁ : Category.Object C₁)
+      → MainEditor V₂ E₂ S₂ (DependentCategory.category C₂ x₁))
+    → MainEditor
+      (view-stack-sigma V₁ V₂)
+      (event-stack-sigma E₁ E₂)
+      (S₁ ⊔ P₁ × S₂)
+      (category-sigma-sum C₂ (SplitMainEditor.split-functor e₁))
+  main-editor-sigma C₂ d e₁ e₂
+    = record {MainEditorSigma C₂ d e₁ e₂}
 

@@ -532,7 +532,8 @@ split-editor-partial e
 record MainEditor
   (V : ViewStack)
   (E : EventStack)
-  (A : Set)
+  (S : Set)
+  (C : Category)
   : Set₁
   where
 
@@ -540,12 +541,7 @@ record MainEditor
 
     main-editor
 
-  field
-
-    {StateCategory}
-      : Category
-
-  open Category StateCategory public using () renaming
+  open Category C public using () renaming
     ( Object
       to State
     ; Arrow
@@ -565,7 +561,7 @@ record MainEditor
   field
 
     editor
-      : Editor V E StateCategory
+      : Editor V E C
 
   open Editor editor public
 
@@ -576,7 +572,7 @@ record MainEditor
       → Bool
 
     split-function
-      : SplitFunction A State
+      : SplitFunction S State
 
   open SplitFunction split-function public using () renaming
     ( partial-function
@@ -594,7 +590,8 @@ record MainEditor
 record SplitMainEditor
   (V : ViewStack)
   (E : EventStack)
-  (A B : Set)
+  (S : Set)
+  (P : Set)
   (C : Category)
   : Set₁
   where
@@ -654,7 +651,7 @@ record SplitMainEditor
   field
 
     state-split-function
-      : SplitFunction A State
+      : SplitFunction S State
 
   open SplitFunction state-split-function public using () renaming
     ( partial-function
@@ -668,7 +665,7 @@ record SplitMainEditor
   field
 
     pure-split-function
-      : SplitFunction B (Category.Object C)
+      : SplitFunction P (Category.Object C)
 
   open SplitFunction pure-split-function public using () renaming
     ( partial-function
@@ -684,9 +681,9 @@ record SplitMainEditor
 split-main-editor-unmain
   : {V : ViewStack}
   → {E : EventStack}
-  → {A B : Set}
+  → {S P : Set}
   → {C : Category}
-  → SplitMainEditor V E A B C
+  → SplitMainEditor V E S P C
   → SplitEditor V E C
 split-main-editor-unmain e
   = record {SplitMainEditor e}
@@ -694,9 +691,9 @@ split-main-editor-unmain e
 split-main-editor-partial
   : {V : ViewStack}
   → {E : EventStack}
-  → {A B : Set}
+  → {S P : Set}
   → {C : Category}
-  → SplitMainEditor V E A B C
+  → SplitMainEditor V E S P C
   → PartialEditor V E (Category.Object C)
 split-main-editor-partial e
   = record {SplitMainEditor e}

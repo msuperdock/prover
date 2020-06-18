@@ -152,19 +152,20 @@ module _
 module _
   {V W : ViewStack}
   {E : EventStack}
-  {A : Set}
+  {S : Set}
+  {C : Category}
   where
 
   module MainEditorMapViewWith
     (F : Bool → ViewStackMap V W)
-    (e : MainEditor V E A)
+    (e : MainEditor V E S C)
     where
 
     open MainEditor e public
       hiding (editor)
 
     editor
-      : Editor W E StateCategory
+      : Editor W E C
     editor
       = editor-map-view-with
         (λ s → F (MainEditor.is-complete e s))
@@ -172,15 +173,15 @@ module _
 
   main-editor-map-view-with
     : (Bool → ViewStackMap V W)
-    → MainEditor V E A
-    → MainEditor W E A
+    → MainEditor V E S C
+    → MainEditor W E S C
   main-editor-map-view-with F e
     = record {MainEditorMapViewWith F e}
 
   main-editor-map-view
     : ViewStackMap V W
-    → MainEditor V E A
-    → MainEditor W E A
+    → MainEditor V E S C
+    → MainEditor W E S C
   main-editor-map-view F
     = main-editor-map-view-with (const F)
 
@@ -189,13 +190,13 @@ module _
 module _
   {V W : ViewStack}
   {E : EventStack}
-  {A B : Set}
+  {S P : Set}
   {C : Category}
   where
 
   module SplitMainEditorMapViewWith
     (F : Bool → ViewStackMap V W)
-    (e : SplitMainEditor V E A B C)
+    (e : SplitMainEditor V E S P C)
     where
 
     open SplitMainEditor e public
@@ -210,15 +211,15 @@ module _
 
   split-main-editor-map-view-with
     : (Bool → ViewStackMap V W)
-    → SplitMainEditor V E A B C
-    → SplitMainEditor W E A B C
+    → SplitMainEditor V E S P C
+    → SplitMainEditor W E S P C
   split-main-editor-map-view-with F e
     = record {SplitMainEditorMapViewWith F e}
 
   split-main-editor-map-view
     : ViewStackMap V W
-    → SplitMainEditor V E A B C
-    → SplitMainEditor W E A B C
+    → SplitMainEditor V E S P C
+    → SplitMainEditor W E S P C
   split-main-editor-map-view F
     = split-main-editor-map-view-with (const F)
 
@@ -409,27 +410,28 @@ module _
 module _
   {V : ViewStack}
   {E F : EventStack}
-  {A : Set}
+  {S : Set}
+  {C : Category}
   where
 
   module MainEditorMapEvent
     (G : EventStackMap E F)
-    (e : MainEditor V E A)
+    (e : MainEditor V E S C)
     where
 
     open MainEditor e public
       hiding (editor)
 
     editor
-      : Editor V F StateCategory
+      : Editor V F C
     editor
       = editor-map-event G
         (MainEditor.editor e)
 
   main-editor-map-event
     : EventStackMap E F
-    → MainEditor V E A
-    → MainEditor V F A
+    → MainEditor V E S C
+    → MainEditor V F S C
   main-editor-map-event G e
     = record {MainEditorMapEvent G e}
 
@@ -438,13 +440,13 @@ module _
 module _
   {V : ViewStack}
   {E F : EventStack}
-  {A B : Set}
+  {S P : Set}
   {C : Category}
   where
 
   module SplitMainEditorMapEvent
     (G : EventStackMap E F)
-    (e : SplitMainEditor V E A B C)
+    (e : SplitMainEditor V E S P C)
     where
 
     open SplitMainEditor e public
@@ -458,8 +460,8 @@ module _
 
   split-main-editor-map-event
     : EventStackMap E F
-    → SplitMainEditor V E A B C
-    → SplitMainEditor V F A B C
+    → SplitMainEditor V E S P C
+    → SplitMainEditor V F S P C
   split-main-editor-map-event G e
     = record {SplitMainEditorMapEvent G e}
 
@@ -596,13 +598,13 @@ split-editor-map-simple F
 module _
   {V : ViewStack}
   {E : EventStack}
-  {A B : Set}
+  {S P : Set}
   {C D : Category}
   where
 
   module SplitMainEditorMap
     (F : SplitFunctor C D)
-    (e : SplitMainEditor V E A B C)
+    (e : SplitMainEditor V E S P C)
     where
 
     open SplitMainEditor e public
@@ -615,7 +617,7 @@ module _
         (SplitMainEditor.split-functor e)
 
     pure-split-function
-      : SplitFunction B (Category.Object D)
+      : SplitFunction P (Category.Object D)
     pure-split-function
       = split-function-compose
         (split-functor-simple F)
@@ -623,8 +625,8 @@ module _
 
   split-main-editor-map
     : SplitFunctor C D
-    → SplitMainEditor V E A B C
-    → SplitMainEditor V E A B D
+    → SplitMainEditor V E S P C
+    → SplitMainEditor V E S P D
   split-main-editor-map F e
     = record {SplitMainEditorMap F e}
 
