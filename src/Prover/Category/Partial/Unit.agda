@@ -8,6 +8,8 @@ open import Prover.Category.Unit
   using (module CategoryUnit; category-unit)
 open import Prover.Prelude
 
+-- ## PartialFunctor
+
 module _
   {A B : Set}
   where
