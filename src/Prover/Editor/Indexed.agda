@@ -16,6 +16,8 @@ open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor; indexed-split-functor₀)
+open import Prover.Category.Indexed.Split.Base
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Editor
@@ -273,4 +275,62 @@ module _
     → IndexedSplitEditor V E (IndexedCategory.tail C' x)
   indexed-split-editor-tail e x
     = record {IndexedSplitEditorTail e x}
+
+-- ## IndexedSimpleMainEditor
+
+record IndexedSimpleMainEditor
+  {n : ℕ}
+  {C : ChainCategory n}
+  (V : ViewStack)
+  (E : EventStack)
+  (S : Set)
+  (C' : IndexedSimpleCategory C)
+  : Set₁
+  where
+
+  constructor
+  
+    indexed-simple-main-editor
+
+  field
+
+    indexed-simple-editor
+      : IndexedSimpleEditor V E C'
+
+    indexed-simple-split-function
+      : IndexedSimpleSplitFunction S C'
+
+-- ## IndexedSplitMainEditor
+
+record IndexedSplitMainEditor
+  {n : ℕ}
+  {C : ChainCategory n}
+  (V : ViewStack)
+  (E : EventStack)
+  (S : Set)
+  (P : Set)
+  (C' : IndexedCategory C)
+  : Set₁
+  where
+
+  constructor
+
+    indexed-split-main-editor
+
+  field
+
+    {StateCategory}
+      : IndexedCategory C
+
+    indexed-editor
+      : IndexedEditor V E StateCategory
+
+    state-indexed-split-function
+      : IndexedSplitFunction S StateCategory
+
+    pure-indexed-split-function
+      : IndexedSplitFunction P C'
+
+    indexed-split-functor
+      : IndexedSplitFunctor StateCategory C'
 
