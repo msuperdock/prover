@@ -6,8 +6,12 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀)
+open import Prover.Category.Indexed.Base
+  using (IndexedSet)
+open import Prover.Category.Indexed.Partial.Base
+  using (IndexedPartialFunction)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSimpleCategory; indexed-set₀)
+  using (IndexedSimpleCategory; indexed-simple-category₀)
 open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Split
@@ -46,7 +50,7 @@ data IndexedEditor
       → IndexedEditor V E (IndexedCategory.tail C' x))
     → IndexedEditor V E C'
 
--- ### Destruction
+-- ### Interface
 
 indexed-editor₀
   : {V : ViewStack}
@@ -57,8 +61,6 @@ indexed-editor₀
   → Editor V E (indexed-category₀ C')
 indexed-editor₀ (empty e)
   = e
-
--- ### Tail
 
 indexed-editor-tail
   : {V : ViewStack}
@@ -88,7 +90,7 @@ data IndexedSimpleEditor
   empty
     : {C : ChainCategory zero}
     → {A : IndexedSimpleCategory C}
-    → SimpleEditor V E (indexed-set₀ A)
+    → SimpleEditor V E (indexed-simple-category₀ A)
     → IndexedSimpleEditor V E A
 
   sigma
@@ -99,7 +101,7 @@ data IndexedSimpleEditor
       → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x))
     → IndexedSimpleEditor V E A
 
--- ### Destruction
+-- ### Interface
 
 indexed-simple-editor₀
   : {V : ViewStack}
@@ -107,8 +109,20 @@ indexed-simple-editor₀
   → {C : ChainCategory zero}
   → {A : IndexedSimpleCategory C}
   → IndexedSimpleEditor V E A
-  → SimpleEditor V E (indexed-set₀ A)
+  → SimpleEditor V E (indexed-simple-category₀ A)
 indexed-simple-editor₀ (empty e)
+  = e
+
+indexed-simple-editor-tail
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {n : ℕ}
+  → {C : ChainCategory (suc n)}
+  → {A : IndexedSimpleCategory C}
+  → IndexedSimpleEditor V E A
+  → (x : Category.Object (ChainCategory.head C))
+  → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x)
+indexed-simple-editor-tail (sigma e)
   = e
 
 -- ### Conversion
@@ -127,20 +141,6 @@ indexed-editor-simple {n = zero} e
 indexed-editor-simple {n = suc _} e
   = sigma (λ x → indexed-editor-simple (indexed-editor-tail e x))
 
--- ### Tail
-
-indexed-simple-editor-tail
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {n : ℕ}
-  → {C : ChainCategory (suc n)}
-  → {A : IndexedSimpleCategory C}
-  → IndexedSimpleEditor V E A
-  → (x : Category.Object (ChainCategory.head C))
-  → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x)
-indexed-simple-editor-tail (sigma e)
-  = e
-
 -- ## IndexedPartialEditor
 
 record IndexedPartialEditor
@@ -148,7 +148,7 @@ record IndexedPartialEditor
   {C : ChainCategory n}
   (V : ViewStack)
   (E : EventStack)
-  (C' : IndexedSimpleCategory C)
+  (C' : IndexedSet C)
   : Set₁
   where
 
@@ -195,7 +195,9 @@ record IndexedSplitEditor
     indexed-split-functor
       : IndexedSplitFunctor StateCategory C'
 
--- ### Destruction
+-- ### Interface
+
+-- #### Destruction
 
 module _
   {V : ViewStack}
@@ -232,7 +234,7 @@ module _
   indexed-split-editor₀ e
     = record {IndexedSplitEditor₀ e}
 
--- ### Tail
+-- #### Tail
 
 module _
   {V : ViewStack}

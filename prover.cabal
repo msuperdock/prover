@@ -25,6 +25,12 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Base.Product
                      -- , MAlonzo.Code.Prover.Category.Chain
                      -- , MAlonzo.Code.Prover.Category.Indexed
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Base
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Base.Product
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Base.Sigma
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Partial.Base
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Partial.Base.Product
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Partial.Base.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Product
                      -- , MAlonzo.Code.Prover.Category.Indexed.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Indexed.Sigma.Sum

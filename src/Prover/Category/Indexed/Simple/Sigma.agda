@@ -18,13 +18,13 @@ open import Prover.Prelude
 
 -- ## IndexedSimpleCategory
 
-indexed-set-sigma
+indexed-simple-category-sigma
   : {n : ℕ}
   → {C : ChainCategory n}
   → (C₁' : IndexedCategory C)
   → IndexedSimpleCategory (chain-category-snoc C₁')
   → IndexedSimpleCategory C
-indexed-set-sigma C₁' C₂'
+indexed-simple-category-sigma C₁' C₂'
   = indexed-category-simple
   $ indexed-category-sigma-may C₁'
     (indexed-category-unit C₂')

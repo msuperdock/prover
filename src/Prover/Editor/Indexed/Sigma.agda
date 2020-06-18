@@ -4,16 +4,22 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀; indexed-dependent-category₀)
+open import Prover.Category.Indexed.Base
+  using (IndexedSet)
+open import Prover.Category.Indexed.Base.Sigma
+  using (indexed-set-sigma)
+open import Prover.Category.Indexed.Partial.Base
+  using (IndexedPartialFunction)
+open import Prover.Category.Indexed.Partial.Base.Sigma.Sum
+  using (indexed-partial-function-sigma-sum)
 open import Prover.Category.Indexed.Sigma.Maybe
   using (indexed-category-sigma-may)
 open import Prover.Category.Indexed.Sigma.Sum
   using (indexed-category-sigma-sum)
 open import Prover.Category.Indexed.Simple
-  using (IndexedPartialFunction; IndexedSimpleCategory)
-open import Prover.Category.Indexed.Simple.Sigma
-  using (indexed-set-sigma)
+  using (IndexedSimpleCategory)
 open import Prover.Category.Indexed.Simple.Sigma.Sum
-  using (indexed-partial-function-sigma-sum; indexed-set-sigma-sum)
+  using (indexed-simple-category-sigma-sum)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
 open import Prover.Category.Indexed.Split.Sigma.Sum
@@ -80,7 +86,8 @@ indexed-simple-editor-sigma
   → IndexedSimpleEditor
     (view-stack-sigma V₁ V₂)
     (event-stack-sigma E₁ E₂)
-    (indexed-set-sigma-sum C₂' (IndexedSplitEditor.indexed-split-functor e₁))
+    (indexed-simple-category-sigma-sum C₂'
+      (IndexedSplitEditor.indexed-split-functor e₁))
 indexed-simple-editor-sigma d e₁ e₂
   = indexed-editor-simple
   $ indexed-editor-sigma d e₁
@@ -94,7 +101,7 @@ module _
   {n : ℕ}
   {C : ChainCategory n}
   {C₁' : IndexedCategory C}
-  {C₂' : IndexedSimpleCategory (chain-category-snoc C₁')}
+  {C₂' : IndexedSet (chain-category-snoc C₁')}
   where
 
   module IndexedPartialEditorSigma
@@ -106,7 +113,7 @@ module _
     State
       : IndexedSimpleCategory C
     State
-      = indexed-set-sigma-sum
+      = indexed-simple-category-sigma-sum
         (IndexedPartialEditor.State e₂)
         (IndexedSplitEditor.indexed-split-functor e₁)
 
