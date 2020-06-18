@@ -97,7 +97,6 @@ executable prover
                      , MAlonzo.Code.Prover.Data.Symbols
                      , MAlonzo.Code.Prover.Data.Text
                      , MAlonzo.Code.Prover.Data.Text.Editor
-                     -- , MAlonzo.Code.Prover.Data.Theorem
                      , MAlonzo.Code.Prover.Data.Token
                      , MAlonzo.Code.Prover.Data.Variable
                      , MAlonzo.Code.Prover.Data.Variables
