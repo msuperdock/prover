@@ -54,87 +54,89 @@ module _
         to unmap-compose
       )
 
-    base-unbase
-      : (x' : Category.Object (category-product D₁ D₂))
-      → base (unbase x') ≡ just x'
-    base-unbase (x₁' , x₂')
-      with SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
-      | SplitFunctor.base-unbase F₁ x₁'
-      | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
-      | SplitFunctor.base-unbase F₂ x₂'
-    ... | _ | refl | _ | refl
-      = refl
+    abstract
 
-    map-unmap
-      : {x' y' : Category.Object (category-product D₁ D₂)}
-      → (f' : Category.Arrow (category-product D₁ D₂) x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap {x' = (x₁' , x₂')} {y' = (y₁' , y₂')} _
-      with SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
-      | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ x₁')
-      | SplitFunctor.base-unbase F₁ x₁'
-      | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
-      | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ x₂')
-      | SplitFunctor.base-unbase F₂ x₂'
-      | SplitFunctor.base F₁ (SplitFunctor.unbase F₁ y₁')
-      | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ y₁')
-      | SplitFunctor.base-unbase F₁ y₁'
-      | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ y₂')
-      | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ y₂')
-      | SplitFunctor.base-unbase F₂ y₂'
-    map-unmap {x' = (x₁' , x₂')} {y' = (y₁' , y₂')} (f₁' , f₂')
-      | just _ | [ p₁ ] | refl | just _ | [ p₂ ] | refl
-      | just _ | [ q₁ ] | refl | just _ | [ q₂ ] | refl
-      with irrelevant p₁ (SplitFunctor.base-unbase F₁ x₁')
-      | irrelevant p₂ (SplitFunctor.base-unbase F₂ x₂')
-      | irrelevant q₁ (SplitFunctor.base-unbase F₁ y₁')
-      | irrelevant q₂ (SplitFunctor.base-unbase F₂ y₂')
-    ... | refl | refl | refl | refl
-      = Sigma.comma-eq
-        (SplitFunctor.map-unmap F₁ f₁')
-        (SplitFunctor.map-unmap F₂ f₂')
+      base-unbase
+        : (x' : Category.Object (category-product D₁ D₂))
+        → base (unbase x') ≡ just x'
+      base-unbase (x₁' , x₂')
+        with SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
+        | SplitFunctor.base-unbase F₁ x₁'
+        | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
+        | SplitFunctor.base-unbase F₂ x₂'
+      ... | _ | refl | _ | refl
+        = refl
+  
+      map-unmap
+        : {x' y' : Category.Object (category-product D₁ D₂)}
+        → (f' : Category.Arrow (category-product D₁ D₂) x' y')
+        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+      map-unmap {x' = (x₁' , x₂')} {y' = (y₁' , y₂')} _
+        with SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
+        | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ x₁')
+        | SplitFunctor.base-unbase F₁ x₁'
+        | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
+        | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ x₂')
+        | SplitFunctor.base-unbase F₂ x₂'
+        | SplitFunctor.base F₁ (SplitFunctor.unbase F₁ y₁')
+        | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ y₁')
+        | SplitFunctor.base-unbase F₁ y₁'
+        | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ y₂')
+        | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ y₂')
+        | SplitFunctor.base-unbase F₂ y₂'
+      map-unmap {x' = (x₁' , x₂')} {y' = (y₁' , y₂')} (f₁' , f₂')
+        | just _ | [ p₁ ] | refl | just _ | [ p₂ ] | refl
+        | just _ | [ q₁ ] | refl | just _ | [ q₂ ] | refl
+        with irrelevant p₁ (SplitFunctor.base-unbase F₁ x₁')
+        | irrelevant p₂ (SplitFunctor.base-unbase F₂ x₂')
+        | irrelevant q₁ (SplitFunctor.base-unbase F₁ y₁')
+        | irrelevant q₂ (SplitFunctor.base-unbase F₂ y₂')
+      ... | refl | refl | refl | refl
+        = Sigma.comma-eq
+          (SplitFunctor.map-unmap F₁ f₁')
+          (SplitFunctor.map-unmap F₂ f₂')
 
-    normalize-arrow
-      : {x' : Category.Object (category-product D₁ D₂)}
-      → (x : Category.Object (category-product C₁ C₂))
-      → base x ≡ just x'
-      → Category.Arrow (category-product C₁ C₂) x (unbase x')
-    normalize-arrow (x₁ , x₂) _
-      with SplitFunctor.base F₁ x₁
-      | inspect (SplitFunctor.base F₁) x₁
-      | SplitFunctor.base F₂ x₂
-      | inspect (SplitFunctor.base F₂) x₂
-    normalize-arrow (x₁ , x₂) refl
-      | just _ | [ p₁ ] | just _ | [ p₂ ]
-      = SplitFunctor.normalize-arrow F₁ x₁ p₁
-      , SplitFunctor.normalize-arrow F₂ x₂ p₂
+      normalize-arrow
+        : {x' : Category.Object (category-product D₁ D₂)}
+        → (x : Category.Object (category-product C₁ C₂))
+        → base x ≡ just x'
+        → Category.Arrow (category-product C₁ C₂) x (unbase x')
+      normalize-arrow (x₁ , x₂) _
+        with SplitFunctor.base F₁ x₁
+        | inspect (SplitFunctor.base F₁) x₁
+        | SplitFunctor.base F₂ x₂
+        | inspect (SplitFunctor.base F₂) x₂
+      normalize-arrow (x₁ , x₂) refl
+        | just _ | [ p₁ ] | just _ | [ p₂ ]
+        = SplitFunctor.normalize-arrow F₁ x₁ p₁
+        , SplitFunctor.normalize-arrow F₂ x₂ p₂
 
-    normalize-valid
-      : {x' : Category.Object (category-product D₁ D₂)}
-      → (x : Category.Object (category-product C₁ C₂))
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p)
-        ≡ Category.identity (category-product D₁ D₂) x'
-    normalize-valid {x' = (x₁' , x₂')} (x₁ , x₂) _
-      with SplitFunctor.base F₁ x₁
-      | inspect (SplitFunctor.base F₁) x₁
-      | SplitFunctor.base F₂ x₂
-      | inspect (SplitFunctor.base F₂) x₂
-      | SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
-      | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ x₁')
-      | SplitFunctor.base-unbase F₁ x₁'
-      | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
-      | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ x₂')
-      | SplitFunctor.base-unbase F₂ x₂'
-    normalize-valid {x' = (x₁' , x₂')} (x₁ , x₂) refl
-      | just _ | [ p₁ ] | just _ | [ p₂ ]
-      | just _ | [ p₁' ] | refl | just _ | [ p₂' ] | refl
-      with irrelevant p₁' (SplitFunctor.base-unbase F₁ x₁')
-      | irrelevant p₂' (SplitFunctor.base-unbase F₂ x₂')
-    ... | refl | refl
-      = Sigma.comma-eq
-        (SplitFunctor.normalize-valid F₁ x₁ p₁)
-        (SplitFunctor.normalize-valid F₂ x₂ p₂)
+      normalize-valid
+        : {x' : Category.Object (category-product D₁ D₂)}
+        → (x : Category.Object (category-product C₁ C₂))
+        → (p : base x ≡ just x')
+        → map p (base-unbase x') (normalize-arrow x p)
+          ≡ Category.identity (category-product D₁ D₂) x'
+      normalize-valid {x' = (x₁' , x₂')} (x₁ , x₂) _
+        with SplitFunctor.base F₁ x₁
+        | inspect (SplitFunctor.base F₁) x₁
+        | SplitFunctor.base F₂ x₂
+        | inspect (SplitFunctor.base F₂) x₂
+        | SplitFunctor.base F₁ (SplitFunctor.unbase F₁ x₁')
+        | inspect (SplitFunctor.base F₁) (SplitFunctor.unbase F₁ x₁')
+        | SplitFunctor.base-unbase F₁ x₁'
+        | SplitFunctor.base F₂ (SplitFunctor.unbase F₂ x₂')
+        | inspect (SplitFunctor.base F₂) (SplitFunctor.unbase F₂ x₂')
+        | SplitFunctor.base-unbase F₂ x₂'
+      normalize-valid {x' = (x₁' , x₂')} (x₁ , x₂) refl
+        | just _ | [ p₁ ] | just _ | [ p₂ ]
+        | just _ | [ p₁' ] | refl | just _ | [ p₂' ] | refl
+        with irrelevant p₁' (SplitFunctor.base-unbase F₁ x₁')
+        | irrelevant p₂' (SplitFunctor.base-unbase F₂ x₂')
+      ... | refl | refl
+        = Sigma.comma-eq
+          (SplitFunctor.normalize-valid F₁ x₁ p₁)
+          (SplitFunctor.normalize-valid F₂ x₂ p₂)
 
   split-functor-product
     : SplitFunctor C₁ D₁

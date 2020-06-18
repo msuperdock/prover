@@ -55,35 +55,37 @@ module _
         to unmap-compose-eq
       )
 
-    base-unbase
-      : (x' : Category.Object (category-unit B))
-      → base (unbase x') ≡ just x'
-    base-unbase
-      = SplitFunction.valid F
+    abstract
 
-    map-unmap
-      : {x' y' : Category.Object (category-unit B)}
-      → (f' : Category.Arrow (category-unit B) x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap CategoryUnit.arrow
-      = refl
-
-    normalize-arrow
-      : {x' : Category.Object (category-unit B)}
-      → (x : Category.Object (category-unit A))
-      → base x ≡ just x'
-      → Category.Arrow (category-unit A) x (unbase x')
-    normalize-arrow _ _
-      = CategoryUnit.arrow
-
-    normalize-valid
-      : {x' : Category.Object (category-unit B)}
-      → (x : Category.Object (category-unit A))
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p)
-        ≡ Category.identity (category-unit B) x'
-    normalize-valid _ _
-      = refl
+      base-unbase
+        : (x' : Category.Object (category-unit B))
+        → base (unbase x') ≡ just x'
+      base-unbase
+        = SplitFunction.valid F
+  
+      map-unmap
+        : {x' y' : Category.Object (category-unit B)}
+        → (f' : Category.Arrow (category-unit B) x' y')
+        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+      map-unmap CategoryUnit.arrow
+        = refl
+  
+      normalize-arrow
+        : {x' : Category.Object (category-unit B)}
+        → (x : Category.Object (category-unit A))
+        → base x ≡ just x'
+        → Category.Arrow (category-unit A) x (unbase x')
+      normalize-arrow _ _
+        = CategoryUnit.arrow
+  
+      normalize-valid
+        : {x' : Category.Object (category-unit B)}
+        → (x : Category.Object (category-unit A))
+        → (p : base x ≡ just x')
+        → map p (base-unbase x') (normalize-arrow x p)
+          ≡ Category.identity (category-unit B) x'
+      normalize-valid _ _
+        = refl
 
   split-functor-unit
     : SplitFunction A B

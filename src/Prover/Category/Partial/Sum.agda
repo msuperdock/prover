@@ -42,59 +42,61 @@ module _
     map p₂ q₂ (CategorySum.arrow₂ f₂)
       = PartialFunctor.map G p₂ q₂ f₂
 
-    map-identity
-      : {x' : Category.Object D}
-      → (x : Category.Object (category-sum F))
-      → (p : base x ≡ just x')
-      → map p p (Category.identity (category-sum F) x)
-        ≡ Category.identity D x'
-    map-identity (ι₂ x₂)
-      = PartialFunctor.map-identity G x₂
+    abstract
 
-    map-compose
-      : {x y z : Category.Object (category-sum F)}
-      → {x' y' z' : Category.Object D}
-      → (p : base x ≡ just x')
-      → (q : base y ≡ just y')
-      → (r : base z ≡ just z')
-      → (f : Category.Arrow (category-sum F) y z)
-      → (g : Category.Arrow (category-sum F) x y)
-      → map p r (Category.compose (category-sum F) f g)
-        ≡ Category.compose D (map q r f) (map p q g)
-    map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
-      (CategorySum.arrow₁ f₁) (CategorySum.arrow₁ g₁)
-      with WeakFunctor.map F' x₂ z₂ (Category.compose C₁ f₁ g₁)
-      | WeakFunctor.map-compose F' x₂ y₂ z₂ f₁ g₁
-    ... | _ | refl
-      = PartialFunctor.map-compose G p₂ q₂ r₂
-        (WeakFunctor.map F' y₂ z₂ f₁)
-        (WeakFunctor.map F' x₂ y₂ g₁)
-    map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
-      (CategorySum.arrow₁ f₁) (CategorySum.arrow₂ g₂)
-      with WeakFunctor.map F' x₂ z₂
-        (Category.compose C₁ f₁ (Functor.map F g₂))
-      | WeakFunctor.map-compose F' x₂ y₂ z₂ f₁ (Functor.map F g₂)
-    ... | _ | refl
-      with Category.compose C₂
-        (WeakFunctor.map F' y₂ z₂ f₁)
-        (WeakFunctor.map F' x₂ y₂ (Functor.map F g₂))
-      | WeakFunctor.map-unmap₂ F' z₂ f₁ g₂
-    ... | _ | refl
-      = PartialFunctor.map-compose G p₂ q₂ r₂ (WeakFunctor.map F' y₂ z₂ f₁) g₂
-    map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
-      (CategorySum.arrow₂ f₂) (CategorySum.arrow₁ g₁)
-      with WeakFunctor.map F' x₂ z₂
-        (Category.compose C₁ (Functor.map F f₂) g₁)
-      | WeakFunctor.map-compose F' x₂ y₂ z₂ (Functor.map F f₂) g₁
-    ... | _ | refl
-      with Category.compose C₂
-        (WeakFunctor.map F' y₂ z₂ (Functor.map F f₂))
-        (WeakFunctor.map F' x₂ y₂ g₁)
-      | WeakFunctor.map-unmap₁ F' x₂ f₂ g₁
-    ... | _ | refl
-      = PartialFunctor.map-compose G p₂ q₂ r₂ f₂ (WeakFunctor.map F' x₂ y₂ g₁)
-    map-compose p₂ q₂ r₂ (CategorySum.arrow₂ f₂) (CategorySum.arrow₂ g₂)
-      = PartialFunctor.map-compose G p₂ q₂ r₂ f₂ g₂
+      map-identity
+        : {x' : Category.Object D}
+        → (x : Category.Object (category-sum F))
+        → (p : base x ≡ just x')
+        → map p p (Category.identity (category-sum F) x)
+          ≡ Category.identity D x'
+      map-identity (ι₂ x₂)
+        = PartialFunctor.map-identity G x₂
+  
+      map-compose
+        : {x y z : Category.Object (category-sum F)}
+        → {x' y' z' : Category.Object D}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → (r : base z ≡ just z')
+        → (f : Category.Arrow (category-sum F) y z)
+        → (g : Category.Arrow (category-sum F) x y)
+        → map p r (Category.compose (category-sum F) f g)
+          ≡ Category.compose D (map q r f) (map p q g)
+      map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
+        (CategorySum.arrow₁ f₁) (CategorySum.arrow₁ g₁)
+        with WeakFunctor.map F' x₂ z₂ (Category.compose C₁ f₁ g₁)
+        | WeakFunctor.map-compose F' x₂ y₂ z₂ f₁ g₁
+      ... | _ | refl
+        = PartialFunctor.map-compose G p₂ q₂ r₂
+          (WeakFunctor.map F' y₂ z₂ f₁)
+          (WeakFunctor.map F' x₂ y₂ g₁)
+      map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
+        (CategorySum.arrow₁ f₁) (CategorySum.arrow₂ g₂)
+        with WeakFunctor.map F' x₂ z₂
+          (Category.compose C₁ f₁ (Functor.map F g₂))
+        | WeakFunctor.map-compose F' x₂ y₂ z₂ f₁ (Functor.map F g₂)
+      ... | _ | refl
+        with Category.compose C₂
+          (WeakFunctor.map F' y₂ z₂ f₁)
+          (WeakFunctor.map F' x₂ y₂ (Functor.map F g₂))
+        | WeakFunctor.map-unmap₂ F' z₂ f₁ g₂
+      ... | _ | refl
+        = PartialFunctor.map-compose G p₂ q₂ r₂ (WeakFunctor.map F' y₂ z₂ f₁) g₂
+      map-compose {x = ι₂ x₂} {y = ι₂ y₂} {z = ι₂ z₂} p₂ q₂ r₂
+        (CategorySum.arrow₂ f₂) (CategorySum.arrow₁ g₁)
+        with WeakFunctor.map F' x₂ z₂
+          (Category.compose C₁ (Functor.map F f₂) g₁)
+        | WeakFunctor.map-compose F' x₂ y₂ z₂ (Functor.map F f₂) g₁
+      ... | _ | refl
+        with Category.compose C₂
+          (WeakFunctor.map F' y₂ z₂ (Functor.map F f₂))
+          (WeakFunctor.map F' x₂ y₂ g₁)
+        | WeakFunctor.map-unmap₁ F' x₂ f₂ g₁
+      ... | _ | refl
+        = PartialFunctor.map-compose G p₂ q₂ r₂ f₂ (WeakFunctor.map F' x₂ y₂ g₁)
+      map-compose p₂ q₂ r₂ (CategorySum.arrow₂ f₂) (CategorySum.arrow₂ g₂)
+        = PartialFunctor.map-compose G p₂ q₂ r₂ f₂ g₂
 
   partial-functor-sum₂
     : WeakFunctor F

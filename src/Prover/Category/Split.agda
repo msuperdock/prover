@@ -22,6 +22,8 @@ record SplitFunctor
   : Set
   where
 
+  no-eta-equality
+
   field
 
     partial-functor
@@ -178,44 +180,46 @@ module _
         to unmap-compose
       )
 
-    base-unbase
-      : (x' : Category.Object E)
-      → base (unbase x') ≡ just x'
-    base-unbase x''
-      with SplitFunctor.base G
-        (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
-      | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
-    ... | _ | refl
-      = SplitFunctor.base-unbase F x''
+    abstract
 
-    map-unmap
-      : {x' y' : Category.Object E}
-      → (f' : Category.Arrow E x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap {x' = x''} {y' = y''} f''
-      with SplitFunctor.base G
-        (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
-      | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
-      | inspect (SplitFunctor.base G)
-        (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
-      | SplitFunctor.base G (SplitFunctor.unbase G
-        (SplitFunctor.unbase F y''))
-      | SplitFunctor.base-unbase G (SplitFunctor.unbase F y'')
-      | inspect (SplitFunctor.base G)
-        (SplitFunctor.unbase G (SplitFunctor.unbase F y''))
-    ... | _ | refl | [ p ] | _ | refl | [ q ]
-      with irrelevant p
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
-      | irrelevant q
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F y''))
-    ... | refl | refl
-      with SplitFunctor.map G
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F y''))
-        (SplitFunctor.unmap G (SplitFunctor.unmap F f''))
-      | SplitFunctor.map-unmap G (SplitFunctor.unmap F f'')
-    ... | _ | refl
-      = SplitFunctor.map-unmap F f''
+      base-unbase
+        : (x' : Category.Object E)
+        → base (unbase x') ≡ just x'
+      base-unbase x''
+        with SplitFunctor.base G
+          (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
+        | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
+      ... | _ | refl
+        = SplitFunctor.base-unbase F x''
+  
+      map-unmap
+        : {x' y' : Category.Object E}
+        → (f' : Category.Arrow E x' y')
+        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+      map-unmap {x' = x''} {y' = y''} f''
+        with SplitFunctor.base G
+          (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
+        | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
+        | inspect (SplitFunctor.base G)
+          (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
+        | SplitFunctor.base G (SplitFunctor.unbase G
+          (SplitFunctor.unbase F y''))
+        | SplitFunctor.base-unbase G (SplitFunctor.unbase F y'')
+        | inspect (SplitFunctor.base G)
+          (SplitFunctor.unbase G (SplitFunctor.unbase F y''))
+      ... | _ | refl | [ p ] | _ | refl | [ q ]
+        with irrelevant p
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
+        | irrelevant q
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F y''))
+      ... | refl | refl
+        with SplitFunctor.map G
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F y''))
+          (SplitFunctor.unmap G (SplitFunctor.unmap F f''))
+        | SplitFunctor.map-unmap G (SplitFunctor.unmap F f'')
+      ... | _ | refl
+        = SplitFunctor.map-unmap F f''
 
     normalize-arrow
       : {x' : Category.Object E}
@@ -230,44 +234,46 @@ module _
         (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
         (SplitFunctor.normalize-arrow G x p)
 
-    normalize-valid
-      : {x' : Category.Object E}
-      → (x : Category.Object C)
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity E x'
-    normalize-valid {x' = x''} x p'
-      with SplitFunctor.base G x
-      | inspect (SplitFunctor.base G) x
-      | SplitFunctor.base G
-        (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
-      | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
-      | inspect (SplitFunctor.base G)
-        (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
-    ... | just x' | [ p ] | _ | refl | [ q ]
-      with SplitFunctor.map G p q (Category.compose C
-        (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
-        (SplitFunctor.normalize-arrow G x p))
-      | SplitFunctor.map-compose G p (SplitFunctor.base-unbase G x') q
-        (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
-        (SplitFunctor.normalize-arrow G x p)
-      | irrelevant q
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
-    ... | _ | refl | refl
-      with SplitFunctor.map G
-        (SplitFunctor.base-unbase G x')
-        (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
-        (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
-      | SplitFunctor.map-unmap G (SplitFunctor.normalize-arrow F x' p')
-      | SplitFunctor.map G p (SplitFunctor.base-unbase G x')
-        (SplitFunctor.normalize-arrow G x p)
-      | SplitFunctor.normalize-valid G x p
-    ... | _ | refl | _ | refl
-      with Category.compose D
-        (SplitFunctor.normalize-arrow F x' p')
-        (Category.identity D x')
-      | Category.precompose D (SplitFunctor.normalize-arrow F x' p')
-    ... | _ | refl
-      = SplitFunctor.normalize-valid F x' p'
+    abstract
+
+      normalize-valid
+        : {x' : Category.Object E}
+        → (x : Category.Object C)
+        → (p : base x ≡ just x')
+        → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity E x'
+      normalize-valid {x' = x''} x p'
+        with SplitFunctor.base G x
+        | inspect (SplitFunctor.base G) x
+        | SplitFunctor.base G
+          (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
+        | SplitFunctor.base-unbase G (SplitFunctor.unbase F x'')
+        | inspect (SplitFunctor.base G)
+          (SplitFunctor.unbase G (SplitFunctor.unbase F x''))
+      ... | just x' | [ p ] | _ | refl | [ q ]
+        with SplitFunctor.map G p q (Category.compose C
+          (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
+          (SplitFunctor.normalize-arrow G x p))
+        | SplitFunctor.map-compose G p (SplitFunctor.base-unbase G x') q
+          (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
+          (SplitFunctor.normalize-arrow G x p)
+        | irrelevant q
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
+      ... | _ | refl | refl
+        with SplitFunctor.map G
+          (SplitFunctor.base-unbase G x')
+          (SplitFunctor.base-unbase G (SplitFunctor.unbase F x''))
+          (SplitFunctor.unmap G (SplitFunctor.normalize-arrow F x' p'))
+        | SplitFunctor.map-unmap G (SplitFunctor.normalize-arrow F x' p')
+        | SplitFunctor.map G p (SplitFunctor.base-unbase G x')
+          (SplitFunctor.normalize-arrow G x p)
+        | SplitFunctor.normalize-valid G x p
+      ... | _ | refl | _ | refl
+        with Category.compose D
+          (SplitFunctor.normalize-arrow F x' p')
+          (Category.identity D x')
+        | Category.precompose D (SplitFunctor.normalize-arrow F x' p')
+      ... | _ | refl
+        = SplitFunctor.normalize-valid F x' p'
 
   split-functor-compose
     : SplitFunctor D E
@@ -306,41 +312,43 @@ module _
         (SplitFunctor.base-unbase F x')
         (SplitFunctor.base-unbase F y') f
 
-    map-compose
-      : (x' y' z' : Category.Object D)
-      → (f : Category.Arrow C (unbase y') (unbase z'))
-      → (g : Category.Arrow C (unbase x') (unbase y'))
-      → map x' z' (Category.compose C f g)
-        ≡ Category.compose D (map y' z' f) (map x' y' g)
-    map-compose x' y' z' f g
-      = SplitFunctor.map-compose F
-        (SplitFunctor.base-unbase F x')
-        (SplitFunctor.base-unbase F y')
-        (SplitFunctor.base-unbase F z') f g
+    abstract
 
-    map-unmap₁
-      : {y' z' : Category.Object D}
-      → (x' : Category.Object D)
-      → (f' : Category.Arrow D y' z')
-      → (g : Category.Arrow C (unbase x') (unbase y'))
-      → Category.compose D (map y' z' (unmap f')) (map x' y' g)
-        ≡ Category.compose D f' (map x' y' g)
-    map-unmap₁ {y' = y'} {z' = z'} x' f' g
-      = sub
-        (λ f → Category.compose D f (map x' y' g))
-        (SplitFunctor.map-unmap F f')
-
-    map-unmap₂
-      : {x' y' : Category.Object D}
-      → (z' : Category.Object D)
-      → (f : Category.Arrow C (unbase y') (unbase z'))
-      → (g' : Category.Arrow D x' y')
-      → Category.compose D (map y' z' f) (map x' y' (unmap g'))
-        ≡ Category.compose D (map y' z' f) g'
-    map-unmap₂ {x' = x'} {y' = y'} z' f g'
-      = sub
-        (λ g → Category.compose D (map y' z' f) g)
-        (SplitFunctor.map-unmap F g')
+      map-compose
+        : (x' y' z' : Category.Object D)
+        → (f : Category.Arrow C (unbase y') (unbase z'))
+        → (g : Category.Arrow C (unbase x') (unbase y'))
+        → map x' z' (Category.compose C f g)
+          ≡ Category.compose D (map y' z' f) (map x' y' g)
+      map-compose x' y' z' f g
+        = SplitFunctor.map-compose F
+          (SplitFunctor.base-unbase F x')
+          (SplitFunctor.base-unbase F y')
+          (SplitFunctor.base-unbase F z') f g
+  
+      map-unmap₁
+        : {y' z' : Category.Object D}
+        → (x' : Category.Object D)
+        → (f' : Category.Arrow D y' z')
+        → (g : Category.Arrow C (unbase x') (unbase y'))
+        → Category.compose D (map y' z' (unmap f')) (map x' y' g)
+          ≡ Category.compose D f' (map x' y' g)
+      map-unmap₁ {y' = y'} {z' = z'} x' f' g
+        = sub
+          (λ f → Category.compose D f (map x' y' g))
+          (SplitFunctor.map-unmap F f')
+  
+      map-unmap₂
+        : {x' y' : Category.Object D}
+        → (z' : Category.Object D)
+        → (f : Category.Arrow C (unbase y') (unbase z'))
+        → (g' : Category.Arrow D x' y')
+        → Category.compose D (map y' z' f) (map x' y' (unmap g'))
+          ≡ Category.compose D (map y' z' f) g'
+      map-unmap₂ {x' = x'} {y' = y'} z' f g'
+        = sub
+          (λ g → Category.compose D (map y' z' f) g)
+          (SplitFunctor.map-unmap F g')
 
   split-functor-weak
     : (F : SplitFunctor C D)

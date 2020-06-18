@@ -54,52 +54,54 @@ module _
       = PartialFunctor.map F₁ p₁ q₁ f₁
       , PartialFunctor.map F₂ p₂ q₂ f₂
 
-    map-identity
-      : {x' : Category.Object (category-product D₁ D₂)}
-      → (x : Category.Object (category-product C₁ C₂))
-      → (p : base x ≡ just x')
-      → map p p (Category.identity (category-product C₁ C₂) x)
-        ≡ Category.identity (category-product D₁ D₂) x'
-    map-identity (x₁ , x₂) _
-      with PartialFunctor.base F₁ x₁
-      | inspect (PartialFunctor.base F₁) x₁
-      | PartialFunctor.base F₂ x₂
-      | inspect (PartialFunctor.base F₂) x₂
-    map-identity (x₁ , x₂) refl | just _ | [ p₁ ] | just _ | [ p₂ ]
-      = Sigma.comma-eq
-        (PartialFunctor.map-identity F₁ x₁ p₁)
-        (PartialFunctor.map-identity F₂ x₂ p₂)
+    abstract
 
-    map-compose
-      : {x y z : Category.Object (category-product C₁ C₂)}
-      → {x' y' z' : Category.Object (category-product D₁ D₂)}
-      → (p : base x ≡ just x')
-      → (q : base y ≡ just y')
-      → (r : base z ≡ just z')
-      → (f : Category.Arrow (category-product C₁ C₂) y z)
-      → (g : Category.Arrow (category-product C₁ C₂) x y)
-      → map p r (Category.compose (category-product C₁ C₂) f g)
-        ≡ Category.compose (category-product D₁ D₂) (map q r f) (map p q g)
-    map-compose {x = (x₁ , x₂)} {y = (y₁ , y₂)} {z = (z₁ , z₂)} _ _ _ _ _
-      with PartialFunctor.base F₁ x₁
-      | inspect (PartialFunctor.base F₁) x₁
-      | PartialFunctor.base F₂ x₂
-      | inspect (PartialFunctor.base F₂) x₂
-      | PartialFunctor.base F₁ y₁
-      | inspect (PartialFunctor.base F₁) y₁
-      | PartialFunctor.base F₂ y₂
-      | inspect (PartialFunctor.base F₂) y₂
-      | PartialFunctor.base F₁ z₁
-      | inspect (PartialFunctor.base F₁) z₁
-      | PartialFunctor.base F₂ z₂
-      | inspect (PartialFunctor.base F₂) z₂
-    map-compose refl refl refl (f₁ , f₂) (g₁ , g₂)
-      | just _ | [ p₁ ] | just _ | [ p₂ ]
-      | just _ | [ q₁ ] | just _ | [ q₂ ]
-      | just _ | [ r₁ ] | just _ | [ r₂ ]
-      = Sigma.comma-eq
-        (PartialFunctor.map-compose F₁ p₁ q₁ r₁ f₁ g₁)
-        (PartialFunctor.map-compose F₂ p₂ q₂ r₂ f₂ g₂)
+      map-identity
+        : {x' : Category.Object (category-product D₁ D₂)}
+        → (x : Category.Object (category-product C₁ C₂))
+        → (p : base x ≡ just x')
+        → map p p (Category.identity (category-product C₁ C₂) x)
+          ≡ Category.identity (category-product D₁ D₂) x'
+      map-identity (x₁ , x₂) _
+        with PartialFunctor.base F₁ x₁
+        | inspect (PartialFunctor.base F₁) x₁
+        | PartialFunctor.base F₂ x₂
+        | inspect (PartialFunctor.base F₂) x₂
+      map-identity (x₁ , x₂) refl | just _ | [ p₁ ] | just _ | [ p₂ ]
+        = Sigma.comma-eq
+          (PartialFunctor.map-identity F₁ x₁ p₁)
+          (PartialFunctor.map-identity F₂ x₂ p₂)
+  
+      map-compose
+        : {x y z : Category.Object (category-product C₁ C₂)}
+        → {x' y' z' : Category.Object (category-product D₁ D₂)}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → (r : base z ≡ just z')
+        → (f : Category.Arrow (category-product C₁ C₂) y z)
+        → (g : Category.Arrow (category-product C₁ C₂) x y)
+        → map p r (Category.compose (category-product C₁ C₂) f g)
+          ≡ Category.compose (category-product D₁ D₂) (map q r f) (map p q g)
+      map-compose {x = (x₁ , x₂)} {y = (y₁ , y₂)} {z = (z₁ , z₂)} _ _ _ _ _
+        with PartialFunctor.base F₁ x₁
+        | inspect (PartialFunctor.base F₁) x₁
+        | PartialFunctor.base F₂ x₂
+        | inspect (PartialFunctor.base F₂) x₂
+        | PartialFunctor.base F₁ y₁
+        | inspect (PartialFunctor.base F₁) y₁
+        | PartialFunctor.base F₂ y₂
+        | inspect (PartialFunctor.base F₂) y₂
+        | PartialFunctor.base F₁ z₁
+        | inspect (PartialFunctor.base F₁) z₁
+        | PartialFunctor.base F₂ z₂
+        | inspect (PartialFunctor.base F₂) z₂
+      map-compose refl refl refl (f₁ , f₂) (g₁ , g₂)
+        | just _ | [ p₁ ] | just _ | [ p₂ ]
+        | just _ | [ q₁ ] | just _ | [ q₂ ]
+        | just _ | [ r₁ ] | just _ | [ r₂ ]
+        = Sigma.comma-eq
+          (PartialFunctor.map-compose F₁ p₁ q₁ r₁ f₁ g₁)
+          (PartialFunctor.map-compose F₂ p₂ q₂ r₂ f₂ g₂)
 
   partial-functor-product
     : PartialFunctor C₁ D₁

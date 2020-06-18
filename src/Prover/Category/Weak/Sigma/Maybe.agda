@@ -50,64 +50,66 @@ module _
         = refl
       }
 
-    map-compose
-      : (x y z : Category.Object (category-sigma-may C₂))
-      → (f₁ : Category.Arrow C₁ (unbase y) (unbase z))
-      → (g₁ : Category.Arrow C₁ (unbase x) (unbase y))
-      → map x z (Category.compose C₁ f₁ g₁)
-        ≡ Category.compose (category-sigma-may C₂) (map y z f₁) (map x y g₁)
-    map-compose (_ , x₂) _ (z₁ , _) f₁ g₁
-      = CategorySigma.arrow-eq (dependent-category-maybe C₂) p₂ refl
-        (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) p₂ refl)
-      where p₂ = DependentCategory.base-compose C₂ f₁ g₁ x₂
+    abstract
 
-    map-unmap₁₂
-      : (x₁ : Category.Object C₁)
-      → {x₂ y₁₂ y₂₂ z₂ : DependentCategory.Object C₂ x₁}
-      → (p₂ : y₁₂ ≡ y₂₂)
-      → (f₂ : DependentCategory.Arrow
-        (dependent-category-maybe C₂) x₁ y₂₂ z₂)
-      → DependentCategory.compose-eq
-        (dependent-category-maybe C₂) x₁ {x' = x₂} p₂ f₂ nothing
-      ≡ nothing
-    map-unmap₁₂ _ refl nothing
-      = refl
-    map-unmap₁₂ _ refl (just _)
-      = refl
-
-    map-unmap₁
-      : {y z : Category.Object (category-sigma-may C₂)}
-      → (x : Category.Object (category-sigma-may C₂))
-      → (f : Category.Arrow (category-sigma-may C₂) y z)
-      → (g₁ : Category.Arrow C₁ (unbase x) (unbase y))
-      → Category.compose
-        (category-sigma-may C₂)
-        (map y z (unmap f))
-        (map x y g₁)
-      ≡ Category.compose
-        (category-sigma-may C₂) f
-        (map x y g₁)
-    map-unmap₁ {z = (z₁ , z₂)} _ (CategorySigma.arrow _ f₁ f₂ p₂) _
-      = CategorySigma.arrow-eq
-        (dependent-category-maybe C₂) refl refl
-        (sym (map-unmap₁₂ z₁ p₂ f₂))
-
-    map-unmap₂
-      : {x y : Category.Object (category-sigma-may C₂)}
-      → (z : Category.Object (category-sigma-may C₂))
-      → (f₁ : Category.Arrow C₁ (unbase y) (unbase z))
-      → (g : Category.Arrow (category-sigma-may C₂) x y)
-      → Category.compose
-        (category-sigma-may C₂)
-        (map y z f₁)
-        (map x y (unmap g))
-      ≡ Category.compose
-        (category-sigma-may C₂)
-        (map y z f₁) g
-    map-unmap₂ (z₁ , _) f₁ (CategorySigma.arrow _ _ _ p₂)
-      = CategorySigma.arrow-eq (dependent-category-maybe C₂) q₂ refl
-        (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) q₂ refl)
-      where q₂ = sub (DependentCategory.base C₂ f₁) p₂
+      map-compose
+        : (x y z : Category.Object (category-sigma-may C₂))
+        → (f₁ : Category.Arrow C₁ (unbase y) (unbase z))
+        → (g₁ : Category.Arrow C₁ (unbase x) (unbase y))
+        → map x z (Category.compose C₁ f₁ g₁)
+          ≡ Category.compose (category-sigma-may C₂) (map y z f₁) (map x y g₁)
+      map-compose (_ , x₂) _ (z₁ , _) f₁ g₁
+        = CategorySigma.arrow-eq (dependent-category-maybe C₂) p₂ refl
+          (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) p₂ refl)
+        where p₂ = DependentCategory.base-compose C₂ f₁ g₁ x₂
+  
+      map-unmap₁₂
+        : (x₁ : Category.Object C₁)
+        → {x₂ y₁₂ y₂₂ z₂ : DependentCategory.Object C₂ x₁}
+        → (p₂ : y₁₂ ≡ y₂₂)
+        → (f₂ : DependentCategory.Arrow
+          (dependent-category-maybe C₂) x₁ y₂₂ z₂)
+        → DependentCategory.compose-eq
+          (dependent-category-maybe C₂) x₁ {x' = x₂} p₂ f₂ nothing
+        ≡ nothing
+      map-unmap₁₂ _ refl nothing
+        = refl
+      map-unmap₁₂ _ refl (just _)
+        = refl
+  
+      map-unmap₁
+        : {y z : Category.Object (category-sigma-may C₂)}
+        → (x : Category.Object (category-sigma-may C₂))
+        → (f : Category.Arrow (category-sigma-may C₂) y z)
+        → (g₁ : Category.Arrow C₁ (unbase x) (unbase y))
+        → Category.compose
+          (category-sigma-may C₂)
+          (map y z (unmap f))
+          (map x y g₁)
+        ≡ Category.compose
+          (category-sigma-may C₂) f
+          (map x y g₁)
+      map-unmap₁ {z = (z₁ , z₂)} _ (CategorySigma.arrow _ f₁ f₂ p₂) _
+        = CategorySigma.arrow-eq
+          (dependent-category-maybe C₂) refl refl
+          (sym (map-unmap₁₂ z₁ p₂ f₂))
+  
+      map-unmap₂
+        : {x y : Category.Object (category-sigma-may C₂)}
+        → (z : Category.Object (category-sigma-may C₂))
+        → (f₁ : Category.Arrow C₁ (unbase y) (unbase z))
+        → (g : Category.Arrow (category-sigma-may C₂) x y)
+        → Category.compose
+          (category-sigma-may C₂)
+          (map y z f₁)
+          (map x y (unmap g))
+        ≡ Category.compose
+          (category-sigma-may C₂)
+          (map y z f₁) g
+      map-unmap₂ (z₁ , _) f₁ (CategorySigma.arrow _ _ _ p₂)
+        = CategorySigma.arrow-eq (dependent-category-maybe C₂) q₂ refl
+          (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) q₂ refl)
+        where q₂ = sub (DependentCategory.base C₂ f₁) p₂
 
   weak-functor-sigma-may₁
     : (C₂ : DependentCategory C₁)

@@ -31,31 +31,33 @@ module _
     map p q
       = Maybe.map (PartialFunctor.map F p q)
 
-    map-identity
-      : {x' : Category.Object (category-maybe D)}
-      → (x : Category.Object (category-maybe C))
-      → (p : base x ≡ just x')
-      → map p p (Category.identity (category-maybe C) x)
-        ≡ Category.identity (category-maybe D) x'
-    map-identity x p
-      = sub just (PartialFunctor.map-identity F x p)
+    abstract
 
-    map-compose
-      : {x y z : Category.Object (category-maybe C)}
-      → {x' y' z' : Category.Object (category-maybe D)}
-      → (p : base x ≡ just x')
-      → (q : base y ≡ just y')
-      → (r : base z ≡ just z')
-      → (f : Category.Arrow (category-maybe C) y z)
-      → (g : Category.Arrow (category-maybe C) x y)
-      → map p r (Category.compose (category-maybe C) f g)
-        ≡ Category.compose (category-maybe D) (map q r f) (map p q g)
-    map-compose _ _ _ nothing _
-      = refl
-    map-compose _ _ _ (just _) nothing
-      = refl
-    map-compose p q r (just f) (just g)
-      = sub just (PartialFunctor.map-compose F p q r f g)
+      map-identity
+        : {x' : Category.Object (category-maybe D)}
+        → (x : Category.Object (category-maybe C))
+        → (p : base x ≡ just x')
+        → map p p (Category.identity (category-maybe C) x)
+          ≡ Category.identity (category-maybe D) x'
+      map-identity x p
+        = sub just (PartialFunctor.map-identity F x p)
+  
+      map-compose
+        : {x y z : Category.Object (category-maybe C)}
+        → {x' y' z' : Category.Object (category-maybe D)}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → (r : base z ≡ just z')
+        → (f : Category.Arrow (category-maybe C) y z)
+        → (g : Category.Arrow (category-maybe C) x y)
+        → map p r (Category.compose (category-maybe C) f g)
+          ≡ Category.compose (category-maybe D) (map q r f) (map p q g)
+      map-compose _ _ _ nothing _
+        = refl
+      map-compose _ _ _ (just _) nothing
+        = refl
+      map-compose p q r (just f) (just g)
+        = sub just (PartialFunctor.map-compose F p q r f g)
 
   partial-functor-maybe
     : PartialFunctor C D

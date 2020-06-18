@@ -54,37 +54,39 @@ module _
         to unmap-compose
       )
 
-    base-unbase
-      : (x' : Category.Object (category-maybe D))
-      → base (unbase x') ≡ just x'
-    base-unbase x'
-      = SplitFunctor.base-unbase F x'
+    abstract
 
-    map-unmap
-      : {x' y' : Category.Object (category-maybe D)}
-      → (f' : Category.Arrow (category-maybe D) x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap nothing
-      = refl
-    map-unmap (just f')
-      = sub just (SplitFunctor.map-unmap F f')
+      base-unbase
+        : (x' : Category.Object (category-maybe D))
+        → base (unbase x') ≡ just x'
+      base-unbase x'
+        = SplitFunctor.base-unbase F x'
+  
+      map-unmap
+        : {x' y' : Category.Object (category-maybe D)}
+        → (f' : Category.Arrow (category-maybe D) x' y')
+        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+      map-unmap nothing
+        = refl
+      map-unmap (just f')
+        = sub just (SplitFunctor.map-unmap F f')
 
-    normalize-arrow
-      : {x' : Category.Object (category-maybe D)}
-      → (x : Category.Object (category-maybe C))
-      → base x ≡ just x'
-      → Category.Arrow (category-maybe C) x (unbase x')
-    normalize-arrow x p
-      = just (SplitFunctor.normalize-arrow F x p)
+      normalize-arrow
+        : {x' : Category.Object (category-maybe D)}
+        → (x : Category.Object (category-maybe C))
+        → base x ≡ just x'
+        → Category.Arrow (category-maybe C) x (unbase x')
+      normalize-arrow x p
+        = just (SplitFunctor.normalize-arrow F x p)
 
-    normalize-valid
-      : {x' : Category.Object (category-maybe D)}
-      → (x : Category.Object (category-maybe C))
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p)
-        ≡ Category.identity (category-maybe D) x'
-    normalize-valid x p
-      = sub just (SplitFunctor.normalize-valid F x p)
+      normalize-valid
+        : {x' : Category.Object (category-maybe D)}
+        → (x : Category.Object (category-maybe C))
+        → (p : base x ≡ just x')
+        → map p (base-unbase x') (normalize-arrow x p)
+          ≡ Category.identity (category-maybe D) x'
+      normalize-valid x p
+        = sub just (SplitFunctor.normalize-valid F x p)
 
   split-functor-maybe
     : SplitFunctor C D
@@ -175,17 +177,19 @@ module _
       = split-functor-maybe
         (SplitDependentFunctor.split-functor F x)
 
-    split-functor-square
-      : {x y : Category.Object C}
-      → (f : Category.Arrow C x y)
-      → SplitFunctorSquare
-        (DependentCategory.functor (dependent-category-maybe C') f)
-        (DependentCategory.functor (dependent-category-maybe D') f)
-        (split-functor x)
-        (split-functor y)
-    split-functor-square f
-      = split-functor-square-maybe
-        (SplitDependentFunctor.split-functor-square F f)
+    abstract
+
+      split-functor-square
+        : {x y : Category.Object C}
+        → (f : Category.Arrow C x y)
+        → SplitFunctorSquare
+          (DependentCategory.functor (dependent-category-maybe C') f)
+          (DependentCategory.functor (dependent-category-maybe D') f)
+          (split-functor x)
+          (split-functor y)
+      split-functor-square f
+        = split-functor-square-maybe
+          (SplitDependentFunctor.split-functor-square F f)
 
   split-dependent-functor-maybe
     : SplitDependentFunctor C' D'
