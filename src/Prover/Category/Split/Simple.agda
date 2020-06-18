@@ -3,7 +3,7 @@ module Prover.Category.Split.Simple where
 open import Prover.Category
   using (Category)
 open import Prover.Category.Split
-  using (SplitFunctor; split-functor-compose)
+  using (SplitFunctor)
 open import Prover.Prelude
 
 -- ## SplitFunction
