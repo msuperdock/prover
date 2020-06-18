@@ -1,6 +1,6 @@
 module Prover.Data.Formula.State where
 
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction)
 open import Prover.Data.Formula
   using (Formula)

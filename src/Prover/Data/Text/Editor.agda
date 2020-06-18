@@ -2,7 +2,7 @@ module Prover.Data.Text.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction; split-function-from-retraction)
 open import Prover.Category.Unit
   using (category-unit)

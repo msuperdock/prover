@@ -1,6 +1,6 @@
 module Prover.Data.Token where
 
-open import Prover.Category.Split.Simple
+open import Prover.Category.Split.Base
   using (SplitFunction)
 open import Prover.Data.Text
   using (Text)
