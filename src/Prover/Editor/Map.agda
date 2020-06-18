@@ -507,6 +507,98 @@ module _
   flat-editor-map-event G e
     = record {FlatEditorMapEvent G e}
 
+-- ## Raw
+
+-- ### MainEditor
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {S T : Set}
+  {C : Category}
+  where
+
+  module MainEditorMapRaw
+    (F : SplitFunction T S)
+    (e : MainEditor V E S C)
+    where
+
+    open MainEditor e public
+      hiding (split-function)
+
+    split-function
+      : SplitFunction T State
+    split-function
+      = split-function-compose
+        (MainEditor.split-function e) F
+
+  main-editor-map-raw
+    : SplitFunction T S
+    → MainEditor V E S C
+    → MainEditor V E T C
+  main-editor-map-raw F e
+    = record {MainEditorMapRaw F e}
+
+-- ### SplitMainEditor (state)
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {S T P : Set}
+  {C : Category}
+  where
+
+  module SplitMainEditorMapRawState
+    (F : SplitFunction T S)
+    (e : SplitMainEditor V E S P C)
+    where
+
+    open SplitMainEditor e public
+      hiding (state-split-function)
+
+    state-split-function
+      : SplitFunction T State
+    state-split-function
+      = split-function-compose
+        (SplitMainEditor.state-split-function e) F
+
+  split-main-editor-map-raw-state
+    : SplitFunction T S
+    → SplitMainEditor V E S P C
+    → SplitMainEditor V E T P C
+  split-main-editor-map-raw-state F e
+    = record {SplitMainEditorMapRawState F e}
+
+-- ### SplitMainEditor (pure)
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {S P Q : Set}
+  {C : Category}
+  where
+
+  module SplitMainEditorMapRawPure
+    (F : SplitFunction Q P)
+    (e : SplitMainEditor V E S P C)
+    where
+
+    open SplitMainEditor e public
+      hiding (pure-split-function)
+
+    pure-split-function
+      : SplitFunction Q (Category.Object C)
+    pure-split-function
+      = split-function-compose
+        (SplitMainEditor.pure-split-function e) F
+
+  split-main-editor-map-raw-pure
+    : SplitFunction Q P
+    → SplitMainEditor V E S P C
+    → SplitMainEditor V E S Q C
+  split-main-editor-map-raw-pure F e
+    = record {SplitMainEditorMapRawPure F e}
+
 -- ## Result
 
 -- ### SimpleEditor
