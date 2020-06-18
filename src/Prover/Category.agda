@@ -854,6 +854,8 @@ record DependentFunctor
   : Set
   where
 
+  no-eta-equality
+
   field
 
     functor

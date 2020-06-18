@@ -107,18 +107,20 @@ module SplitFunctorIdentity
         to unmap-compose-eq
       )
 
-    base-unbase
-      : (x' : Category.Object C)
-      → base (unbase x') ≡ just x'
-    base-unbase _
-      = refl
+    abstract
 
-    map-unmap
-      : {x' y' : Category.Object C}
-      → (f' : Category.Arrow C x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap _
-      = refl
+      base-unbase
+        : (x' : Category.Object C)
+        → base (unbase x') ≡ just x'
+      base-unbase _
+        = refl
+  
+      map-unmap
+        : {x' y' : Category.Object C}
+        → (f' : Category.Arrow C x' y')
+        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+      map-unmap _
+        = refl
 
     normalize-arrow
       : {x' : Category.Object C}
@@ -128,13 +130,15 @@ module SplitFunctorIdentity
     normalize-arrow x refl
       = Category.identity C x
     
-    normalize-valid
-      : {x' : Category.Object C}
-      → (x : Category.Object C)
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity C x'
-    normalize-valid _ refl
-      = refl
+    abstract
+
+      normalize-valid
+        : {x' : Category.Object C}
+        → (x : Category.Object C)
+        → (p : base x ≡ just x')
+        → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity C x'
+      normalize-valid _ refl
+        = refl
 
   split-functor-identity
     : (C : Category)

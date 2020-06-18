@@ -275,17 +275,19 @@ module Internal where
         = indexed-split-functor₀
           (IndexedSplitDependentFunctor.indexed-split-functor F x)
   
-      split-functor-square
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → SplitFunctorSquare
-          (DependentCategory.functor (indexed-dependent-category₀ C'') f)
-          (DependentCategory.functor (indexed-dependent-category₀ D'') f)
-          (split-functor x)
-          (split-functor y)
-      split-functor-square f
-        = indexed-split-functor-square₀
-          (IndexedSplitDependentFunctor.indexed-split-functor-square F f)
+      abstract
+
+        split-functor-square
+          : {x y : Category.Object C}
+          → (f : Category.Arrow C x y)
+          → SplitFunctorSquare
+            (DependentCategory.functor (indexed-dependent-category₀ C'') f)
+            (DependentCategory.functor (indexed-dependent-category₀ D'') f)
+            (split-functor x)
+            (split-functor y)
+        split-functor-square f
+          = indexed-split-functor-square₀
+            (IndexedSplitDependentFunctor.indexed-split-functor-square F f)
 
     indexed-split-dependent-functor₀
       : IndexedSplitDependentFunctor C'' D''

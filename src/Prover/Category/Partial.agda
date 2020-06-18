@@ -14,6 +14,8 @@ record PartialFunctor
   : Set
   where
 
+  no-eta-equality
+
   field
 
     base
@@ -72,27 +74,29 @@ module _
     map refl refl f
       = Functor.map F f
 
-    map-identity
-      : {x' : Category.Object D}
-      → (x : Category.Object C)
-      → (p : base x ≡ just x')
-      → map p p (Category.identity C x)
-        ≡ Category.identity D x'
-    map-identity x refl
-      = Functor.map-identity F x
+    abstract
 
-    map-compose
-      : {x y z : Category.Object C}
-      → {x' y' z' : Category.Object D}
-      → (p : base x ≡ just x')
-      → (q : base y ≡ just y')
-      → (r : base z ≡ just z')
-      → (f : Category.Arrow C y z)
-      → (g : Category.Arrow C x y)
-      → map p r (Category.compose C f g)
-        ≡ Category.compose D (map q r f) (map p q g)
-    map-compose refl refl refl
-      = Functor.map-compose F
+      map-identity
+        : {x' : Category.Object D}
+        → (x : Category.Object C)
+        → (p : base x ≡ just x')
+        → map p p (Category.identity C x)
+          ≡ Category.identity D x'
+      map-identity x refl
+        = Functor.map-identity F x
+  
+      map-compose
+        : {x y z : Category.Object C}
+        → {x' y' z' : Category.Object D}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → (r : base z ≡ just z')
+        → (f : Category.Arrow C y z)
+        → (g : Category.Arrow C x y)
+        → map p r (Category.compose C f g)
+          ≡ Category.compose D (map q r f) (map p q g)
+      map-compose refl refl refl
+        = Functor.map-compose F
 
   functor-partial
     : Functor C D
