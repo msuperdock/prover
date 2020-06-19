@@ -22,6 +22,13 @@ open import Prover.Category.Indexed.Simple.Sigma.Sum
   using (indexed-simple-category-sigma-sum)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
+open import Prover.Category.Indexed.Split.Base
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+open import Prover.Category.Indexed.Split.Base.Sigma.Maybe
+  using (indexed-split-function-sigma-may)
+open import Prover.Category.Indexed.Split.Base.Sigma.Sum
+  using (indexed-simple-split-function-sigma-sum;
+    indexed-split-function-sigma-sum)
 open import Prover.Category.Indexed.Split.Sigma.Sum
   using (indexed-split-functor-sigma-sum)
 open import Prover.Category.Snoc
@@ -29,10 +36,11 @@ open import Prover.Category.Snoc
 open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Editor.Indexed
-  using (IndexedEditor; IndexedPartialEditor; IndexedSimpleEditor;
-    IndexedSplitEditor; empty; indexed-editor₀; indexed-editor-simple;
-    indexed-editor-tail; indexed-split-editor₀; indexed-split-editor-tail;
-    sigma)
+  using (IndexedEditor; IndexedMainEditor; IndexedPartialEditor;
+    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
+    indexed-editor₀; indexed-editor-simple; indexed-editor-tail;
+    indexed-split-editor₀; indexed-split-editor-tail;
+    indexed-split-main-editor-unmain; sigma)
 open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.Sigma
@@ -41,6 +49,7 @@ open import Prover.Prelude
 
 -- ## IndexedEditor
 
+-- Takes direction from first to second component.
 indexed-editor-sigma
   : {V₁ V₂ : ViewStack}
   → {E₁ E₂ : EventStack}
@@ -73,6 +82,7 @@ indexed-editor-sigma {n = suc _} d e₁ e₂
 
 -- ## IndexedSimpleEditor
 
+-- Takes direction from first to second component.
 indexed-simple-editor-sigma
   : {V₁ V₂ : ViewStack}
   → {E₁ E₂ : EventStack}
@@ -110,31 +120,32 @@ module _
     (e₂ : IndexedPartialEditor V₂ E₂ C₂')
     where
 
-    State
+    StateSimpleCategory
       : IndexedSimpleCategory C
-    State
+    StateSimpleCategory
       = indexed-simple-category-sigma-sum
-        (IndexedPartialEditor.State e₂)
+        (IndexedPartialEditor.StateSimpleCategory e₂)
         (IndexedSplitEditor.indexed-split-functor e₁)
 
     indexed-simple-editor
       : IndexedSimpleEditor
         (view-stack-sigma V₁ V₂)
         (event-stack-sigma E₁ E₂)
-        State
+        StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-sigma d e₁
         (IndexedPartialEditor.indexed-simple-editor e₂)
 
     indexed-partial-function
       : IndexedPartialFunction
-        State
+        StateSimpleCategory
         (indexed-set-sigma C₁' C₂')
     indexed-partial-function
       = indexed-partial-function-sigma-sum
         (IndexedSplitEditor.indexed-split-functor e₁)
         (IndexedPartialEditor.indexed-partial-function e₂)
 
+  -- Takes direction from first to second component.
   indexed-partial-editor-sigma
     : Direction
     → IndexedSplitEditor V₁ E₁ C₁'
@@ -188,6 +199,7 @@ module _
         (IndexedSplitEditor.indexed-split-functor e₁)
         (IndexedSplitEditor.indexed-split-functor e₂)
 
+  -- Takes direction from first to second component.
   indexed-split-editor-sigma
     : Direction
     → IndexedSplitEditor V₁ E₁ C₁'
@@ -198,4 +210,139 @@ module _
       (indexed-category-sigma-may C₁' C₂')
   indexed-split-editor-sigma d e₁ e₂
     = record {IndexedSplitEditorSigma d e₁ e₂}
+
+-- ## IndexedMainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {S₁ S₂ P₁ : Set}
+  {n : ℕ}
+  {C : ChainCategory n}
+  {C₁' : IndexedCategory C}
+  where
+
+  module IndexedMainEditorSigma
+    (d : Direction)
+    (e₁ : IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁')
+    (e₂ : IndexedMainEditor V₂ E₂ S₂ (chain-category-snoc C₁'))
+    where
+
+    StateSimpleCategory
+      : IndexedSimpleCategory C
+    StateSimpleCategory
+      = indexed-simple-category-sigma-sum
+        (IndexedMainEditor.StateSimpleCategory e₂)
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+
+    indexed-simple-editor
+      : IndexedSimpleEditor
+        (view-stack-sigma V₁ V₂)
+        (event-stack-sigma E₁ E₂)
+        StateSimpleCategory
+    indexed-simple-editor
+      = indexed-simple-editor-sigma d
+        (indexed-split-main-editor-unmain e₁)
+        (IndexedMainEditor.indexed-simple-editor e₂)
+
+    indexed-simple-split-function
+      : IndexedSimpleSplitFunction
+        (S₁ ⊔ P₁ × S₂)
+        StateSimpleCategory
+    indexed-simple-split-function
+      = indexed-simple-split-function-sigma-sum
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+        (IndexedSplitMainEditor.state-indexed-split-function e₁)
+        (IndexedSplitMainEditor.pure-indexed-split-function e₁)
+        (IndexedMainEditor.indexed-simple-split-function e₂)
+
+  -- Takes direction from first to second component.
+  indexed-main-editor-sigma
+    : Direction
+    → IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁'
+    → IndexedMainEditor V₂ E₂ S₂ (chain-category-snoc C₁')
+    → IndexedMainEditor
+      (view-stack-sigma V₁ V₂)
+      (event-stack-sigma E₁ E₂)
+      (S₁ ⊔ P₁ × S₂) C
+  indexed-main-editor-sigma d e₁ e₂
+    = record {IndexedMainEditorSigma d e₁ e₂}
+
+-- ## IndexedSplitMainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {S₁ S₂ P₁ P₂ : Set}
+  {n : ℕ}
+  {C : ChainCategory n}
+  {C₁' : IndexedCategory C}
+  {C₂' : IndexedCategory (chain-category-snoc C₁')}
+  where
+
+  module IndexedSplitMainEditorSigma
+    (d : Direction)
+    (e₁ : IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁')
+    (e₂ : IndexedSplitMainEditor V₂ E₂ S₂ P₂ C₂')
+    where
+
+    StateCategory
+      : IndexedCategory C
+    StateCategory
+      = indexed-category-sigma-sum
+        (IndexedSplitMainEditor.StateCategory e₂)
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+
+    indexed-editor
+      : IndexedEditor
+        (view-stack-sigma V₁ V₂)
+        (event-stack-sigma E₁ E₂)
+        StateCategory
+    indexed-editor
+      = indexed-editor-sigma d 
+        (indexed-split-main-editor-unmain e₁)
+        (IndexedSplitMainEditor.indexed-editor e₂)
+
+    state-indexed-split-function
+      : IndexedSplitFunction
+        (S₁ ⊔ P₁ × S₂)
+        StateCategory
+    state-indexed-split-function
+      = indexed-split-function-sigma-sum
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+        (IndexedSplitMainEditor.state-indexed-split-function e₁)
+        (IndexedSplitMainEditor.pure-indexed-split-function e₁)
+        (IndexedSplitMainEditor.state-indexed-split-function e₂)
+
+    pure-indexed-split-function
+      : IndexedSplitFunction
+        (P₁ × P₂)
+        (indexed-category-sigma-may C₁' C₂')
+    pure-indexed-split-function
+      = indexed-split-function-sigma-may
+        (IndexedSplitMainEditor.pure-indexed-split-function e₁)
+        (IndexedSplitMainEditor.pure-indexed-split-function e₂)
+
+    indexed-split-functor
+      : IndexedSplitFunctor
+        StateCategory
+        (indexed-category-sigma-may C₁' C₂')
+    indexed-split-functor
+      = indexed-split-functor-sigma-sum
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+        (IndexedSplitMainEditor.indexed-split-functor e₂)
+
+  -- Takes direction from first to second component.
+  indexed-split-main-editor-sigma
+    : Direction
+    → IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁'
+    → IndexedSplitMainEditor V₂ E₂ S₂ P₂ C₂'
+    → IndexedSplitMainEditor
+      (view-stack-sigma V₁ V₂)
+      (event-stack-sigma E₁ E₂)
+      (S₁ ⊔ P₁ × S₂)
+      (P₁ × P₂)
+      (indexed-category-sigma-may C₁' C₂')
+  indexed-split-main-editor-sigma d e₁ e₂
+    = record {IndexedSplitMainEditorSigma d e₁ e₂}
 

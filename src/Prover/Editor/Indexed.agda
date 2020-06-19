@@ -21,8 +21,7 @@ open import Prover.Category.Indexed.Split.Base
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack;
-    simple-editor)
+  using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
 open import Prover.Prelude
 
 -- ## IndexedEditor
@@ -139,7 +138,7 @@ indexed-editor-simple
   → IndexedSimpleEditor V E
     (indexed-category-simple C')
 indexed-editor-simple {n = zero} e
-  = empty (simple-editor (indexed-editor₀ e))
+  = empty (any (indexed-editor₀ e))
 indexed-editor-simple {n = suc _} e
   = sigma (λ x → indexed-editor-simple (indexed-editor-tail e x))
 
@@ -160,14 +159,14 @@ record IndexedPartialEditor
 
   field
   
-    {State}
+    {StateSimpleCategory}
       : IndexedSimpleCategory C
 
     indexed-simple-editor
-      : IndexedSimpleEditor V E State
+      : IndexedSimpleEditor V E StateSimpleCategory
 
     indexed-partial-function
-      : IndexedPartialFunction State C'
+      : IndexedPartialFunction StateSimpleCategory C'
 
 -- ## IndexedSplitEditor
 
@@ -276,31 +275,35 @@ module _
   indexed-split-editor-tail e x
     = record {IndexedSplitEditorTail e x}
 
--- ## IndexedSimpleMainEditor
+-- ## IndexedMainEditor
 
-record IndexedSimpleMainEditor
+record IndexedMainEditor
   {n : ℕ}
-  {C : ChainCategory n}
   (V : ViewStack)
   (E : EventStack)
   (S : Set)
-  (C' : IndexedSimpleCategory C)
+  (C : ChainCategory n)
   : Set₁
   where
 
   constructor
   
-    indexed-simple-main-editor
+    indexed-main-editor
 
   field
 
+    {StateSimpleCategory}
+      : IndexedSimpleCategory C
+
     indexed-simple-editor
-      : IndexedSimpleEditor V E C'
+      : IndexedSimpleEditor V E StateSimpleCategory
 
     indexed-simple-split-function
-      : IndexedSimpleSplitFunction S C'
+      : IndexedSimpleSplitFunction S StateSimpleCategory
 
 -- ## IndexedSplitMainEditor
+
+-- ### Definition
 
 record IndexedSplitMainEditor
   {n : ℕ}
@@ -333,4 +336,18 @@ record IndexedSplitMainEditor
 
     indexed-split-functor
       : IndexedSplitFunctor StateCategory C'
+
+-- ### Conversion
+
+indexed-split-main-editor-unmain
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → {C' : IndexedCategory C}
+  → IndexedSplitMainEditor V E S P C'
+  → IndexedSplitEditor V E C'
+indexed-split-main-editor-unmain e
+  = record {IndexedSplitMainEditor e}
 

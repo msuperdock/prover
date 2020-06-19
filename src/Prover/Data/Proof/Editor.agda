@@ -34,8 +34,7 @@ open import Prover.Editor.Child
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack)
 open import Prover.Editor.Map
-  using (flat-editor-map; simple-editor-map; simple-editor-map-event;
-    simple-editor-map-view)
+  using (flat-editor-map; simple-editor-map-event; simple-editor-map-view)
 open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
 open import Prover.View.Command
@@ -776,14 +775,14 @@ proof-simple-editor rs r
 
 -- ### Partial
 
-proof-map
+proof-base
   : {ss : Symbols}
   → {a : ℕ}
   → {rs : Rules ss}
   → {r : Rule ss a}
   → Proof rs r
   → Maybe ⊤
-proof-map p
+proof-base p
   with Proof.is-complete p
 ... | false
   = nothing
@@ -800,6 +799,10 @@ proof-partial-editor
     ProofEventStack
     ⊤
 proof-partial-editor rs r
-  = simple-editor-map proof-map
-  $ proof-simple-editor rs r
+  = record
+  { simple-editor
+    = proof-simple-editor rs r
+  ; base
+    = proof-base
+  }
 

@@ -3,15 +3,15 @@ module Prover.Editor.Parent where
 open import Prover.Category
   using (Category)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; ViewStack; ViewStackMap;
-    simple-editor)
+  using (Editor; EventStack; SimpleEditor; ViewStack; ViewStackMap; any)
 open import Prover.Editor.Base
-  using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor;
-    base-editor-from-simple)
+  using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
-  using (ChildEditor; SimpleChildEditor; child-editor-from-simple)
+  using (ChildEditor; SimpleChildEditor)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack)
+open import Prover.Editor.Unit
+  using (base-editor-unit; child-editor-unit)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -337,8 +337,8 @@ simple-editor-parent
     (view-stack-parent V V')
     (event-stack-parent E E') A
 simple-editor-parent V' E' e e'
-  = simple-editor
+  = any
     (editor-parent V' E'
-      (base-editor-from-simple e) 
-      (λ k → child-editor-from-simple (e' k)))
+      (base-editor-unit e) 
+      (λ k → child-editor-unit (e' k)))
 

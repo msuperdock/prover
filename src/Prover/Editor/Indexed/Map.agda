@@ -23,7 +23,7 @@ open import Prover.Editor
   using (EventStack; EventStackMap; ViewStack; ViewStackMap)
 open import Prover.Editor.Indexed
   using (IndexedEditor; IndexedPartialEditor; IndexedSimpleEditor;
-    IndexedSimpleMainEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
+    IndexedMainEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
     indexed-editor₀; indexed-editor-tail; indexed-simple-editor₀;
     indexed-simple-editor-tail; sigma)
 open import Prover.Editor.Map
@@ -92,7 +92,7 @@ module _
       hiding (indexed-simple-editor)
 
     indexed-simple-editor
-      : IndexedSimpleEditor W E State
+      : IndexedSimpleEditor W E StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-map-view F
         (IndexedPartialEditor.indexed-simple-editor e)
@@ -135,7 +135,7 @@ module _
   indexed-split-editor-map-view F e
     = record {IndexedSplitEditorMapView F e}
 
--- ### IndexedSimpleMainEditor
+-- ### IndexedMainEditor
 
 module _
   {V W : ViewStack}
@@ -143,29 +143,28 @@ module _
   {S : Set}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' : IndexedSimpleCategory C}
   where
 
-  module IndexedSimpleMainEditorMapView
+  module IndexedMainEditorMapView
     (F : ViewStackMap V W)
-    (e : IndexedSimpleMainEditor V E S C')
+    (e : IndexedMainEditor V E S C)
     where
 
-    open IndexedSimpleMainEditor e public
+    open IndexedMainEditor e public
       hiding (indexed-simple-editor)
 
     indexed-simple-editor
-      : IndexedSimpleEditor W E C'
+      : IndexedSimpleEditor W E StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-map-view F
-        (IndexedSimpleMainEditor.indexed-simple-editor e)
+        (IndexedMainEditor.indexed-simple-editor e)
 
   indexed-simple-main-editor-map-view
     : ViewStackMap V W
-    → IndexedSimpleMainEditor V E S C'
-    → IndexedSimpleMainEditor W E S C'
+    → IndexedMainEditor V E S C
+    → IndexedMainEditor W E S C
   indexed-simple-main-editor-map-view F e
-    = record {IndexedSimpleMainEditorMapView F e}
+    = record {IndexedMainEditorMapView F e}
 
 -- ### IndexedSplitMainEditor
 
@@ -260,7 +259,7 @@ module _
       hiding (indexed-simple-editor)
 
     indexed-simple-editor
-      : IndexedSimpleEditor V F State
+      : IndexedSimpleEditor V F StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-map-event G
         (IndexedPartialEditor.indexed-simple-editor e)
@@ -303,7 +302,7 @@ module _
   indexed-split-editor-map-event G e
     = record {IndexedSplitEditorMapEvent G e}
 
--- ### IndexedSimpleMainEditor
+-- ### IndexedMainEditor
 
 module _
   {V : ViewStack}
@@ -311,29 +310,28 @@ module _
   {S : Set}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' : IndexedSimpleCategory C}
   where
 
-  module IndexedSimpleMainEditorMapEvent
+  module IndexedMainEditorMapEvent
     (G : EventStackMap E F)
-    (e : IndexedSimpleMainEditor V E S C')
+    (e : IndexedMainEditor V E S C)
     where
 
-    open IndexedSimpleMainEditor e public
+    open IndexedMainEditor e public
       hiding (indexed-simple-editor)
 
     indexed-simple-editor
-      : IndexedSimpleEditor V F C'
+      : IndexedSimpleEditor V F StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-map-event G
-        (IndexedSimpleMainEditor.indexed-simple-editor e)
+        (IndexedMainEditor.indexed-simple-editor e)
 
   indexed-simple-main-editor-map-event
     : EventStackMap E F
-    → IndexedSimpleMainEditor V E S C'
-    → IndexedSimpleMainEditor V F S C'
+    → IndexedMainEditor V E S C
+    → IndexedMainEditor V F S C
   indexed-simple-main-editor-map-event G e
-    = record {IndexedSimpleMainEditorMapEvent G e}
+    = record {IndexedMainEditorMapEvent G e}
 
 -- ### IndexedSplitMainEditor
 
@@ -369,7 +367,7 @@ module _
 
 -- ## Raw
 
--- ### IndexedSimpleMainEditor
+-- ### IndexedMainEditor
 
 module _
   {V : ViewStack}
@@ -377,29 +375,28 @@ module _
   {S T : Set}
   {n : ℕ}
   {C : ChainCategory n}
-  {C' : IndexedSimpleCategory C}
   where
 
-  module IndexedSimpleMainEditorMapRaw
+  module IndexedMainEditorMapRaw
     (F : SplitFunction T S)
-    (e : IndexedSimpleMainEditor V E S C')
+    (e : IndexedMainEditor V E S C)
     where
 
-    open IndexedSimpleMainEditor e public
+    open IndexedMainEditor e public
       hiding (indexed-simple-split-function)
 
     indexed-simple-split-function
-      : IndexedSimpleSplitFunction T C'
+      : IndexedSimpleSplitFunction T StateSimpleCategory
     indexed-simple-split-function
       = indexed-simple-split-function-compose
-        (IndexedSimpleMainEditor.indexed-simple-split-function e) F
+        (IndexedMainEditor.indexed-simple-split-function e) F
 
   indexed-simple-main-editor-map-raw
     : SplitFunction T S
-    → IndexedSimpleMainEditor V E S C'
-    → IndexedSimpleMainEditor V E T C'
+    → IndexedMainEditor V E S C
+    → IndexedMainEditor V E T C
   indexed-simple-main-editor-map-raw F e
-    = record {IndexedSimpleMainEditorMapRaw F e}
+    = record {IndexedMainEditorMapRaw F e}
 
 -- ### IndexedSplitMainEditor (state)
 
@@ -412,7 +409,7 @@ module _
   {C' : IndexedCategory C}
   where
 
-  module IndexedSimpleMainEditorMapState
+  module IndexedMainEditorMapState
     (F : SplitFunction T S)
     (e : IndexedSplitMainEditor V E S P C')
     where
@@ -431,7 +428,7 @@ module _
     → IndexedSplitMainEditor V E S P C'
     → IndexedSplitMainEditor V E T P C'
   indexed-simple-main-editor-map-state F e
-    = record {IndexedSimpleMainEditorMapState F e}
+    = record {IndexedMainEditorMapState F e}
 
 -- ### IndexedSplitMainEditor (pure)
 
@@ -444,7 +441,7 @@ module _
   {C' : IndexedCategory C}
   where
 
-  module IndexedSimpleMainEditorMapPure
+  module IndexedMainEditorMapPure
     (F : SplitFunction Q P)
     (e : IndexedSplitMainEditor V E S P C')
     where
@@ -463,7 +460,7 @@ module _
     → IndexedSplitMainEditor V E S P C'
     → IndexedSplitMainEditor V E S Q C'
   indexed-simple-main-editor-map-pure F e
-    = record {IndexedSimpleMainEditorMapPure F e}
+    = record {IndexedMainEditorMapPure F e}
 
 -- ## Result
 
@@ -486,7 +483,7 @@ module _
       hiding (indexed-partial-function)
 
     indexed-partial-function
-      : IndexedPartialFunction State D'
+      : IndexedPartialFunction StateSimpleCategory D'
     indexed-partial-function
       = indexed-partial-function-compose F
         (IndexedPartialEditor.indexed-partial-function e)

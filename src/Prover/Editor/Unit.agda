@@ -11,8 +11,13 @@ open import Prover.Category.Split.Unit
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack;
-    simple-editor)
+  using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
+open import Prover.Editor.Base
+  using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor)
+open import Prover.Editor.Child
+  using (ChildEditor; SimpleChildEditor)
+open import Prover.Editor.Flat
+  using (FlatEventStack; FlatViewStack)
 open import Prover.Prelude
 
 -- ## Editor
@@ -108,7 +113,7 @@ module _
   editor-unit
     : SimpleEditor V E A
     → Editor V E (category-unit A)
-  editor-unit (simple-editor e)
+  editor-unit (any e)
     = record {EditorUnit e}
 
 -- ## SplitEditor
@@ -145,4 +150,113 @@ module _
     → SplitEditor V E (category-unit B)
   split-editor-unit F e
     = record {SplitEditorUnit F e}
+
+-- ## BaseEditor
+
+module _
+  {V : BaseViewStack}
+  {E : BaseEventStack}
+  {A : Set}
+  where
+
+  module BaseEditorUnit
+    (e : SimpleBaseEditor V E A)
+    where
+
+    open BaseEventStack E
+
+    open Category (category-unit A) using () renaming
+      ( Object
+        to State
+      ; Arrow
+        to StateArrow
+      ; identity
+        to state-identity
+      ; compose
+        to state-compose
+      ; precompose
+        to state-precompose
+      ; postcompose
+        to state-postcompose
+      ; associative
+        to state-associative
+      )
+
+    open SimpleBaseEditor e public
+      hiding (handle)
+
+    handle
+      : (s : State)
+      → (sp : StatePath s)
+      → Event (mode s sp)
+      → s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
+    handle s sp e'
+      with SimpleBaseEditor.handle e s sp e'
+    ... | (s' , sp')
+      = (s' , sp' , CategoryUnit.arrow)
+
+  base-editor-unit
+    : SimpleBaseEditor V E A
+    → BaseEditor V E (category-unit A)
+  base-editor-unit e
+    = record {BaseEditorUnit e}
+
+-- ## ChildEditor
+
+module _
+  {V : BaseViewStack}
+  {W : FlatViewStack}
+  {E : BaseEventStack}
+  {F : FlatEventStack}
+  {A : Set}
+  {e : SimpleBaseEditor V E A}
+  where
+
+  module ChildEditorUnit
+    (e' : SimpleChildEditor W F e)
+    where
+
+    open Category (category-unit A) using () renaming
+      ( Object
+        to BaseState
+      ; Arrow
+        to BaseStateArrow
+      ; identity
+        to base-state-identity
+      ; compose
+        to base-state-compose
+      ; precompose
+        to base-state-precompose
+      ; postcompose
+        to base-state-postcompose
+      ; associative
+        to base-state-associative
+      )
+
+    open SimpleBaseEditor e using () renaming
+      ( StatePath
+        to BaseStatePath
+      )
+
+    open SimpleChildEditor e' public
+      hiding (update)
+
+    update
+      : (s : BaseState)
+      → (sp : BaseStatePath s)
+      → Result s sp
+      → s' ∈ BaseState
+        × sp' ∈ BaseStatePath s'
+        × BaseStateArrow s s'
+    update s sp r
+      with SimpleChildEditor.update e' s sp r
+    ... | (s' , sp')
+      = (s' , sp' , CategoryUnit.arrow)
+
+  child-editor-unit
+    : SimpleChildEditor W F e
+    → ChildEditor W F
+      (base-editor-unit e)
+  child-editor-unit e'
+    = record {ChildEditorUnit e'}
 

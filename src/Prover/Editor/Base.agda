@@ -2,8 +2,6 @@ module Prover.Editor.Base where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Unit
-  using (module CategoryUnit; category-unit)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -205,8 +203,6 @@ record BaseEditor
 
 -- ### SimpleBaseEditor
 
--- #### Definition
-
 record SimpleBaseEditor
   (V : BaseViewStack)
   (E : BaseEventStack)
@@ -314,54 +310,4 @@ record SimpleBaseEditor
       : (s : State)
       → (d : Direction)
       → handle-direction s (initial-path s d) d ≡ nothing
-
--- #### Conversion
-
-module _
-  {V : BaseViewStack}
-  {E : BaseEventStack}
-  {A : Set}
-  where
-
-  module BaseEditorFromSimple
-    (e : SimpleBaseEditor V E A)
-    where
-
-    open BaseEventStack E
-
-    open Category (category-unit A) using () renaming
-      ( Object
-        to State
-      ; Arrow
-        to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
-      )
-
-    open SimpleBaseEditor e public
-      hiding (handle)
-
-    handle
-      : (s : State)
-      → (sp : StatePath s)
-      → Event (mode s sp)
-      → s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
-    handle s sp e'
-      with SimpleBaseEditor.handle e s sp e'
-    ... | (s' , sp')
-      = (s' , sp' , CategoryUnit.arrow)
-
-  base-editor-from-simple
-    : SimpleBaseEditor V E A
-    → BaseEditor V E (category-unit A)
-  base-editor-from-simple e
-    = record {BaseEditorFromSimple e}
 

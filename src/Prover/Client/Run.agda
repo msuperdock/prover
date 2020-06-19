@@ -15,7 +15,7 @@ open import Prover.Client.Flatten
   using (client-flatten)
 open import Prover.Editor
   using (Editor; EventStack; PartialEditor; SimpleEditor; SplitEditor;
-    ViewStack; simple-editor)
+    ViewStack; any)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack)
 open import Prover.Editor.Flatten
@@ -138,7 +138,7 @@ simple-editor-run
   → SimpleEditor V E A
   → Client V E
   → IO ⊤
-simple-editor-run (simple-editor e)
+simple-editor-run (any e)
   = editor-run e
 
 -- ## PartialEditor
@@ -151,7 +151,7 @@ partial-editor-run
   → Client V E
   → IO ⊤
 partial-editor-run e c
-  = editor-run (PartialEditor.editor e) c
+  = simple-editor-run (PartialEditor.simple-editor e) c
 
 -- ## SplitEditor
 

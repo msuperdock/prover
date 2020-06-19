@@ -52,7 +52,7 @@ split-functor-square-sigma-sum
   → (s₁ : SplitFunctorSquare F₁ (DependentFunctor.functor F₂) H₁₁ H₂₁)
   → SplitDependentFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
-    (functor-sigma-sum {C₂ = C₁₂} {D₂ = C₂₂} F₂ s₁)
+    (functor-sigma-sum {C₂₂ = C₁₂} {D₂₂ = C₂₂} F₂ s₁)
     (functor-sigma-may G₂)
     (split-functor-sigma-sum {C₂ = C₁₂} {D₂ = D₁₂} H₁₁ H₁₂)
     (split-functor-sigma-sum {C₂ = C₂₂} {D₂ = D₂₂} H₂₁ H₂₂)

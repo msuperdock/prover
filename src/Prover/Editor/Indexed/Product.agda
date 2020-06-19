@@ -36,6 +36,7 @@ open import Prover.Prelude
 
 -- ## IndexedEditor
 
+-- Takes direction from first to second component.
 indexed-editor-product
   : {V₁ V₂ : ViewStack}
   → {E₁ E₂ : EventStack}
@@ -62,6 +63,7 @@ indexed-editor-product {n = suc _} d e₁ e₂
 
 -- ## IndexedSimpleEditor
 
+-- Takes direction from first to second component.
 indexed-simple-editor-product
   : {V₁ V₂ : ViewStack}
   → {E₁ E₂ : EventStack}
@@ -97,18 +99,18 @@ module _
     (e₂ : IndexedPartialEditor V₂ E₂ C₂')
     where
 
-    State
+    StateSimpleCategory
       : IndexedSimpleCategory C
-    State
+    StateSimpleCategory
       = indexed-simple-category-product
-        (IndexedPartialEditor.State e₁)
-        (IndexedPartialEditor.State e₂)
+        (IndexedPartialEditor.StateSimpleCategory e₁)
+        (IndexedPartialEditor.StateSimpleCategory e₂)
 
     indexed-simple-editor
       : IndexedSimpleEditor
         (view-stack-product V₁ V₂)
         (event-stack-product E₁ E₂)
-        State
+        StateSimpleCategory
     indexed-simple-editor
       = indexed-simple-editor-product d
         (IndexedPartialEditor.indexed-simple-editor e₁)
@@ -116,13 +118,14 @@ module _
 
     indexed-partial-function
       : IndexedPartialFunction
-        State
+        StateSimpleCategory
         (indexed-set-product C₁' C₂')
     indexed-partial-function
       = indexed-partial-function-product
         (IndexedPartialEditor.indexed-partial-function e₁)
         (IndexedPartialEditor.indexed-partial-function e₂)
 
+  -- Takes direction from first to second component.
   indexed-partial-editor-product
     : Direction
     → IndexedPartialEditor V₁ E₁ C₁'
@@ -176,6 +179,7 @@ module _
         (IndexedSplitEditor.indexed-split-functor e₁)
         (IndexedSplitEditor.indexed-split-functor e₂)
 
+  -- Takes direction from first to second component.
   indexed-split-editor-product
     : Direction
     → IndexedSplitEditor V₁ E₁ C₁'

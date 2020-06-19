@@ -16,8 +16,8 @@ open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Editor
   using (Editor; EventStack; EventStackMap; MainEditor; PartialEditor;
-    SimpleEditor; SplitEditor; SplitMainEditor; ViewStack; ViewStackMap;
-    partial-editor; simple-editor; view-stack-map-compose-with)
+    SimpleEditor; SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any;
+    view-stack-map-compose-with)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatEventStackMap; FlatViewStack;
     FlatViewStackMap; flat-view-stack-map-compose)
@@ -63,15 +63,25 @@ module _
 
 -- ### SimpleEditor
 
-simple-editor-map-view
-  : {V W : ViewStack}
-  → {E : EventStack}
-  → {A : Set}
-  → ViewStackMap V W
-  → SimpleEditor V E A
-  → SimpleEditor W E A
-simple-editor-map-view F (simple-editor e)
-  = simple-editor (editor-map-view F e)
+module _
+  {V W : ViewStack}
+  {E : EventStack}
+  {A : Set}
+  where
+
+  simple-editor-map-view-with
+    : (A → ViewStackMap V W)
+    → SimpleEditor V E A
+    → SimpleEditor W E A
+  simple-editor-map-view-with F (any e)
+    = any (editor-map-view-with F e)
+  
+  simple-editor-map-view
+    : ViewStackMap V W
+    → SimpleEditor V E A
+    → SimpleEditor W E A
+  simple-editor-map-view F
+    = simple-editor-map-view-with (const F)
 
 -- ### PartialEditor
 
@@ -81,27 +91,27 @@ module _
   {A : Set}
   where
 
-  module PartialEditorMapView
+  module PartialEditorMapViewWith
     (F : Bool → ViewStackMap V W)
     (e : PartialEditor V E A)
     where
 
     open PartialEditor e public
-      hiding (editor)
+      hiding (simple-editor)
 
-    editor
-      : Editor W E StateCategory
-    editor
-      = editor-map-view-with
+    simple-editor
+      : SimpleEditor W E State
+    simple-editor
+      = simple-editor-map-view-with
         (λ s → F (PartialEditor.is-complete e s))
-        (PartialEditor.editor e)
+        (PartialEditor.simple-editor e)
 
   partial-editor-map-view-with
     : (Bool → ViewStackMap V W)
     → PartialEditor V E A
     → PartialEditor W E A
   partial-editor-map-view-with F e
-    = record {PartialEditorMapView F e}
+    = record {PartialEditorMapViewWith F e}
 
   partial-editor-map-view
     : ViewStackMap V W
@@ -152,36 +162,35 @@ module _
 module _
   {V W : ViewStack}
   {E : EventStack}
-  {S : Set}
-  {C : Category}
+  {S A : Set}
   where
 
   module MainEditorMapViewWith
     (F : Bool → ViewStackMap V W)
-    (e : MainEditor V E S C)
+    (e : MainEditor V E S A)
     where
 
     open MainEditor e public
-      hiding (editor)
+      hiding (simple-editor)
 
-    editor
-      : Editor W E C
-    editor
-      = editor-map-view-with
+    simple-editor
+      : SimpleEditor W E A
+    simple-editor
+      = simple-editor-map-view-with
         (λ s → F (MainEditor.is-complete e s))
-        (MainEditor.editor e)
+        (MainEditor.simple-editor e)
 
   main-editor-map-view-with
     : (Bool → ViewStackMap V W)
-    → MainEditor V E S C
-    → MainEditor W E S C
+    → MainEditor V E S A
+    → MainEditor W E S A
   main-editor-map-view-with F e
     = record {MainEditorMapViewWith F e}
 
   main-editor-map-view
     : ViewStackMap V W
-    → MainEditor V E S C
-    → MainEditor W E S C
+    → MainEditor V E S A
+    → MainEditor W E S A
   main-editor-map-view F
     = main-editor-map-view-with (const F)
 
@@ -344,8 +353,8 @@ simple-editor-map-event
   → EventStackMap E F
   → SimpleEditor V E A
   → SimpleEditor V F A
-simple-editor-map-event G (simple-editor e)
-  = simple-editor (editor-map-event G e)
+simple-editor-map-event G (any e)
+  = any (editor-map-event G e)
 
 -- ### PartialEditor
 
@@ -361,13 +370,13 @@ module _
     where
 
     open PartialEditor e public
-      hiding (editor)
+      hiding (simple-editor)
 
-    editor
-      : Editor V F StateCategory
-    editor
-      = editor-map-event G
-        (PartialEditor.editor e)
+    simple-editor
+      : SimpleEditor V F State
+    simple-editor
+      = simple-editor-map-event G
+        (PartialEditor.simple-editor e)
 
   partial-editor-map-event
     : EventStackMap E F
@@ -410,28 +419,27 @@ module _
 module _
   {V : ViewStack}
   {E F : EventStack}
-  {S : Set}
-  {C : Category}
+  {S A : Set}
   where
 
   module MainEditorMapEvent
     (G : EventStackMap E F)
-    (e : MainEditor V E S C)
+    (e : MainEditor V E S A)
     where
 
     open MainEditor e public
-      hiding (editor)
+      hiding (simple-editor)
 
-    editor
-      : Editor V F C
-    editor
-      = editor-map-event G
-        (MainEditor.editor e)
+    simple-editor
+      : SimpleEditor V F A
+    simple-editor
+      = simple-editor-map-event G
+        (MainEditor.simple-editor e)
 
   main-editor-map-event
     : EventStackMap E F
-    → MainEditor V E S C
-    → MainEditor V F S C
+    → MainEditor V E S A
+    → MainEditor V F S A
   main-editor-map-event G e
     = record {MainEditorMapEvent G e}
 
@@ -514,28 +522,27 @@ module _
 module _
   {V : ViewStack}
   {E : EventStack}
-  {S T : Set}
-  {C : Category}
+  {S T A : Set}
   where
 
   module MainEditorMapRaw
     (F : SplitFunction T S)
-    (e : MainEditor V E S C)
+    (e : MainEditor V E S A)
     where
 
     open MainEditor e public
       hiding (split-function)
 
     split-function
-      : SplitFunction T State
+      : SplitFunction T A
     split-function
       = split-function-compose
         (MainEditor.split-function e) F
 
   main-editor-map-raw
     : SplitFunction T S
-    → MainEditor V E S C
-    → MainEditor V E T C
+    → MainEditor V E S A
+    → MainEditor V E T A
   main-editor-map-raw F e
     = record {MainEditorMapRaw F e}
 
@@ -600,18 +607,6 @@ module _
     = record {SplitMainEditorMapPure F e}
 
 -- ## Result
-
--- ### SimpleEditor
-
-simple-editor-map
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {A B : Set}
-  → PartialFunction A B
-  → SimpleEditor V E A
-  → PartialEditor V E B
-simple-editor-map f (simple-editor e)
-  = partial-editor e f
 
 -- ### PartialEditor
 

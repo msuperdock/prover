@@ -39,10 +39,11 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Indexed.Simple
                      -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Convert
                      -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Product
-                     -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Sigma
                      -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base.Sigma.Maybe
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Product
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Unit
@@ -63,6 +64,7 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Sigma
                      -- , MAlonzo.Code.Prover.Category.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Sigma.Sum
+                     , MAlonzo.Code.Prover.Category.Simple
                      -- , MAlonzo.Code.Prover.Category.Snoc
                      , MAlonzo.Code.Prover.Category.Split
                      , MAlonzo.Code.Prover.Category.Split.Base

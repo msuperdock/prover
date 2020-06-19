@@ -41,17 +41,16 @@ module _
     (F : Retraction A B)
     where
 
+    open Retraction F public using () renaming
+      ( from
+        to function
+      )
+
     partial-function
       : A
       → Maybe B
     partial-function x
       = just (Retraction.to F x)
-
-    function
-      : B
-      → A
-    function
-      = Retraction.from F
 
     valid
       : (y : B)

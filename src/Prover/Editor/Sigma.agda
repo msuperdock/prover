@@ -6,15 +6,21 @@ open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum)
+open import Prover.Category.Simple
+  using (SimpleDependentCategory)
 open import Prover.Category.Split.Base
   using (SplitFunction)
 open import Prover.Category.Split.Base.Sigma.Sum
   using (split-function-sigma-sum)
 open import Prover.Category.Sum
   using (module CategorySum)
+open import Prover.Category.Unit
+  using (dependent-category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; MainEditor; SplitEditor; SplitMainEditor;
-    ViewStack; ViewStackMap; split-main-editor-unmain)
+  using (Editor; EventStack; MainEditor; SimpleEditor; SplitEditor;
+    SplitMainEditor; ViewStack; ViewStackMap; any; split-main-editor-unmain)
+open import Prover.Editor.Unit
+  using (editor-unit)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -647,6 +653,7 @@ module _
 
   -- #### Function
 
+  -- Takes direction from first to second component.
   editor-sigma
     : (C₂ : DependentCategory C₁)
     → Direction
@@ -660,6 +667,40 @@ module _
   editor-sigma C₂ d e₁ e₂
     = record {EditorSigma C₂ d e₁ e₂}
 
+-- ### SimpleEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {C₁ : Category}
+  where
+
+  module SimpleEditorSigma
+    (C₂ : SimpleDependentCategory C₁)
+    (d : Direction)
+    (e₁ : SplitEditor V₁ E₁ C₁)
+    (e₂ : (x₁ : Category.Object C₁)
+      → SimpleEditor V₂ E₂ (SimpleDependentCategory.set C₂ x₁))
+    where
+
+  -- Takes direction from first to second component.
+  simple-editor-sigma
+    : (C₂ : SimpleDependentCategory C₁)
+    → Direction
+    → (e₁ : SplitEditor V₁ E₁ C₁)
+    → ((x₁ : Category.Object C₁)
+      → SimpleEditor V₂ E₂ (SimpleDependentCategory.set C₂ x₁))
+    → SimpleEditor
+      (view-stack-sigma V₁ V₂)
+      (event-stack-sigma E₁ E₂)
+      (SplitEditor.State e₁
+        ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂))
+  simple-editor-sigma C₂ d e₁ e₂
+    = any
+      (editor-sigma
+        (dependent-category-unit C₂) d e₁
+        (λ x₁ → editor-unit (e₂ x₁)))
+
 -- ### MainEditor
 
 module _
@@ -670,45 +711,39 @@ module _
   where
 
   module MainEditorSigma
-    (C₂ : DependentCategory C₁)
+    (C₂ : SimpleDependentCategory C₁)
     (d : Direction)
     (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
     (e₂ : (x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (DependentCategory.category C₂ x₁))
+      → MainEditor V₂ E₂ S₂ (SimpleDependentCategory.set C₂ x₁))
     where
 
-    StateCategory
-      : Category
-    StateCategory
-      = category-sigma-sum C₂
-        (SplitMainEditor.split-functor e₁)
+    State
+      : Set
+    State
+      = SplitMainEditor.State e₁
+      ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂)
 
-    open Category StateCategory using () renaming
-      ( Object
-        to State
-      ; Arrow
-        to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
-      )
-
-    editor
-      : Editor
+    simple-editor
+      : SimpleEditor
         (view-stack-sigma V₁ V₂)
         (event-stack-sigma E₁ E₂)
-        StateCategory
-    editor
-      = editor-sigma C₂ d
+        State
+    simple-editor
+      = simple-editor-sigma C₂ d
         (split-main-editor-unmain e₁)
-        (λ x₁ → MainEditor.editor (e₂ x₁))
+        (λ x₁ → MainEditor.simple-editor (e₂ x₁))
+
+    split-function
+      : SplitFunction
+        (S₁ ⊔ P₁ × S₂)
+        State
+    split-function
+      = split-function-sigma-sum
+        (λ x₁ → SimpleDependentCategory.set C₂ x₁)
+        (SplitMainEditor.state-split-function e₁)
+        (SplitMainEditor.pure-split-function e₁)
+        (λ x₁ → MainEditor.split-function (e₂ x₁))
 
     is-complete
       : State
@@ -718,26 +753,19 @@ module _
     is-complete (ι₂ (x₁ , s₂))
       = MainEditor.is-complete (e₂ x₁) s₂
 
-    split-function
-      : SplitFunction (S₁ ⊔ P₁ × S₂) State
-    split-function
-      = split-function-sigma-sum
-        (λ x₁ → DependentCategory.Object C₂ x₁)
-        (SplitMainEditor.state-split-function e₁)
-        (SplitMainEditor.pure-split-function e₁)
-        (λ x₁ → MainEditor.split-function (e₂ x₁))
-
+  -- Takes direction from first to second component.
   main-editor-sigma
-    : (C₂ : DependentCategory C₁)
+    : (C₂ : SimpleDependentCategory C₁)
     → Direction
     → (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
     → ((x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (DependentCategory.category C₂ x₁))
+      → MainEditor V₂ E₂ S₂ (SimpleDependentCategory.set C₂ x₁))
     → MainEditor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
       (S₁ ⊔ P₁ × S₂)
-      (category-sigma-sum C₂ (SplitMainEditor.split-functor e₁))
+      (SplitMainEditor.State e₁
+        ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂))
   main-editor-sigma C₂ d e₁ e₂
     = record {MainEditorSigma C₂ d e₁ e₂}
 

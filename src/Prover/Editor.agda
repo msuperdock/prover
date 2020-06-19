@@ -394,7 +394,7 @@ data SimpleEditor
   → Set₁
   where
 
-  simple-editor
+  any
     : {C : Category}
     → Editor V E C
     → SimpleEditor V E (Category.Object C)
@@ -414,34 +414,11 @@ record PartialEditor
 
   field
 
-    {StateCategory}
-      : Category
+    {State}
+      : Set
 
-  open Category StateCategory public using () renaming
-    ( Object
-      to State
-    ; Arrow
-      to StateArrow
-    ; identity
-      to state-identity
-    ; compose
-      to state-compose
-    ; precompose
-      to state-precompose
-    ; postcompose
-      to state-postcompose
-    ; associative
-      to state-associative
-    )
-
-  field
-
-    editor
-      : Editor V E StateCategory
-
-  open Editor editor public
-
-  field
+    simple-editor 
+      : SimpleEditor V E State
 
     base
       : State
@@ -518,14 +495,29 @@ record SplitEditor
 
 -- #### Conversion
 
-split-editor-partial
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {C : Category}
-  → SplitEditor V E C
-  → PartialEditor V E (Category.Object C)
-split-editor-partial e
-  = record {SplitEditor e}
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {C : Category}
+  where
+
+  module SplitEditorPartial
+    (e : SplitEditor V E C)
+    where
+
+    open SplitEditor e public
+      using (State; base)
+
+    simple-editor 
+      : SimpleEditor V E State
+    simple-editor 
+      = any (SplitEditor.editor e)
+
+  split-editor-partial
+    : SplitEditor V E C
+    → PartialEditor V E (Category.Object C)
+  split-editor-partial e
+    = record {SplitEditorPartial e}
 
 -- ### MainEditor
 
@@ -533,7 +525,7 @@ record MainEditor
   (V : ViewStack)
   (E : EventStack)
   (S : Set)
-  (C : Category)
+  (A : Set)
   : Set₁
   where
 
@@ -541,38 +533,13 @@ record MainEditor
 
     main-editor
 
-  open Category C public using () renaming
-    ( Object
-      to State
-    ; Arrow
-      to StateArrow
-    ; identity
-      to state-identity
-    ; compose
-      to state-compose
-    ; precompose
-      to state-precompose
-    ; postcompose
-      to state-postcompose
-    ; associative
-      to state-associative
-    )
-
   field
 
-    editor
-      : Editor V E C
-
-  open Editor editor public
-
-  field
-
-    is-complete
-      : State
-      → Bool
+    simple-editor
+      : SimpleEditor V E A
 
     split-function
-      : SplitFunction S State
+      : SplitFunction S A
 
   open SplitFunction split-function public using () renaming
     ( partial-function
@@ -582,6 +549,12 @@ record MainEditor
     ; valid
       to decode-encode
     )
+
+  field
+
+    is-complete
+      : A
+      → Bool
 
 -- ### SplitMainEditor
 
@@ -678,6 +651,8 @@ record SplitMainEditor
 
 -- #### Conversion
 
+-- ##### SplitEditor
+
 split-main-editor-unmain
   : {V : ViewStack}
   → {E : EventStack}
@@ -688,13 +663,30 @@ split-main-editor-unmain
 split-main-editor-unmain e
   = record {SplitMainEditor e}
 
-split-main-editor-partial
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {S P : Set}
-  → {C : Category}
-  → SplitMainEditor V E S P C
-  → PartialEditor V E (Category.Object C)
-split-main-editor-partial e
-  = record {SplitMainEditor e}
+-- ##### PartialEditor
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {S P : Set}
+  {C : Category}
+  where
+
+  module SplitMainEditorPartial
+    (e : SplitMainEditor V E S P C)
+    where
+
+    open SplitMainEditor e public
+      using (State; base)
+
+    simple-editor
+      : SimpleEditor V E State
+    simple-editor
+      = any (SplitMainEditor.editor e)
+
+  split-main-editor-partial
+    : SplitMainEditor V E S P C
+    → PartialEditor V E (Category.Object C)
+  split-main-editor-partial e
+    = record {SplitMainEditorPartial e}
 

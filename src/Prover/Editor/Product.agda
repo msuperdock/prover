@@ -14,7 +14,7 @@ open import Prover.Category.Split.Base.Product
   using (split-function-product)
 open import Prover.Editor
   using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
-    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; simple-editor)
+    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -481,8 +481,8 @@ simple-editor-product
     (view-stack-product V₁ V₂)
     (event-stack-product E₁ E₂)
     (A₁ × A₂)
-simple-editor-product d (simple-editor e₁) (simple-editor e₂)
-  = simple-editor (editor-product d e₁ e₂)
+simple-editor-product d (any e₁) (any e₂)
+  = any (editor-product d e₁ e₂)
 
 -- ### PartialEditor
 
@@ -498,39 +498,21 @@ module _
     (e₂ : PartialEditor V₂ E₂ A₂)
     where
 
-    StateCategory
-      : Category
-    StateCategory
-      = category-product
-        (PartialEditor.StateCategory e₁)
-        (PartialEditor.StateCategory e₂)
+    State
+      : Set
+    State
+      = PartialEditor.State e₁
+      × PartialEditor.State e₂
 
-    open Category StateCategory using () renaming
-      ( Object
-        to State
-      ; Arrow
-        to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
-      )
-
-    editor
-      : Editor
+    simple-editor
+      : SimpleEditor
         (view-stack-product V₁ V₂)
         (event-stack-product E₁ E₂)
-        StateCategory
-    editor
-      = editor-product d
-        (PartialEditor.editor e₁)
-        (PartialEditor.editor e₂)
+        State
+    simple-editor
+      = simple-editor-product d
+        (PartialEditor.simple-editor e₁)
+        (PartialEditor.simple-editor e₂)
 
     base
       : State
@@ -614,52 +596,36 @@ module _
 module _
   {V₁ V₂ : ViewStack}
   {E₁ E₂ : EventStack}
-  {S₁ S₂ : Set}
-  {C₁ C₂ : Category}
+  {S₁ S₂ A₁ A₂ : Set}
   where
 
   module MainEditorProduct
     (d : Direction)
-    (e₁ : MainEditor V₁ E₁ S₁ C₁)
-    (e₂ : MainEditor V₂ E₂ S₂ C₂)
+    (e₁ : MainEditor V₁ E₁ S₁ A₁)
+    (e₂ : MainEditor V₂ E₂ S₂ A₂)
     where
 
-    open Category (category-product C₁ C₂) using () renaming
-      ( Object
-        to State
-      ; Arrow
-        to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
-      )
-
-    editor
-      : Editor
+    simple-editor
+      : SimpleEditor
         (view-stack-product V₁ V₂)
         (event-stack-product E₁ E₂)
-        (category-product C₁ C₂)
-    editor
-      = editor-product d
-        (MainEditor.editor e₁)
-        (MainEditor.editor e₂)
+        (A₁ × A₂)
+    simple-editor
+      = simple-editor-product d
+        (MainEditor.simple-editor e₁)
+        (MainEditor.simple-editor e₂)
 
     is-complete
-      : State
+      : A₁ × A₂
       → Bool
     is-complete (s₁ , s₂)
       = MainEditor.is-complete e₁ s₁
       ∧ MainEditor.is-complete e₂ s₂
 
     split-function
-      : SplitFunction (S₁ × S₂) State
+      : SplitFunction
+        (S₁ × S₂)
+        (A₁ × A₂)
     split-function
       = split-function-product
         (MainEditor.split-function e₁)
@@ -668,13 +634,13 @@ module _
   -- Takes direction from first to second component.
   main-editor-product
     : Direction
-    → MainEditor V₁ E₁ S₁ C₁
-    → MainEditor V₂ E₂ S₂ C₂
+    → MainEditor V₁ E₁ S₁ A₁
+    → MainEditor V₂ E₂ S₂ A₂
     → MainEditor
       (view-stack-product V₁ V₂)
       (event-stack-product E₁ E₂)
       (S₁ × S₂)
-      (category-product C₁ C₂)
+      (A₁ × A₂)
   main-editor-product d e₁ e₂
     = record {MainEditorProduct d e₁ e₂}
 
@@ -737,14 +703,18 @@ module _
         (SplitMainEditor.split-functor e₂)
 
     state-split-function
-      : SplitFunction (S₁ × S₂) State
+      : SplitFunction
+        (S₁ × S₂)
+        State
     state-split-function
       = split-function-product
         (SplitMainEditor.state-split-function e₁)
         (SplitMainEditor.state-split-function e₂)
 
     pure-split-function
-      : SplitFunction (P₁ × P₂) (Category.Object (category-product C₁ C₂))
+      : SplitFunction
+        (P₁ × P₂)
+        (Category.Object (category-product C₁ C₂))
     pure-split-function
       = split-function-product
         (SplitMainEditor.pure-split-function e₁)

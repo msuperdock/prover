@@ -1,7 +1,5 @@
 module Prover.Category.Base where
 
-open import Prover.Category
-  using (Category; Functor)
 open import Prover.Prelude
 
 -- ## Function
