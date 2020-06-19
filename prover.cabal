@@ -42,6 +42,7 @@ executable prover
                      -- , MAlonzo.Code.Prover.Category.Indexed.Simple.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base
+                     -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base.Product
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base.Sigma.Maybe
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Base.Sigma.Sum
                      -- , MAlonzo.Code.Prover.Category.Indexed.Split.Product

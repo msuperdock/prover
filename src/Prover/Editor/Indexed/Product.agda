@@ -20,14 +20,18 @@ open import Prover.Category.Indexed.Simple.Product
   using (indexed-simple-category-product)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
+open import Prover.Category.Indexed.Split.Base
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+open import Prover.Category.Indexed.Split.Base.Product
+  using (indexed-simple-split-function-product; indexed-split-function-product)
 open import Prover.Category.Indexed.Split.Product
   using (indexed-split-functor-product)
 open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Editor.Indexed
-  using (IndexedEditor; IndexedPartialEditor; IndexedSimpleEditor;
-    IndexedSplitEditor; empty; indexed-editor₀; indexed-editor-simple;
-    indexed-editor-tail; sigma)
+  using (IndexedEditor; IndexedMainEditor; IndexedPartialEditor;
+    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
+    indexed-editor₀; indexed-editor-simple; indexed-editor-tail; sigma)
 open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.Product
@@ -190,4 +194,133 @@ module _
       (indexed-category-product C₁' C₂')
   indexed-split-editor-product d e₁ e₂
     = record {IndexedSplitEditorProduct d e₁ e₂}
+
+-- ## IndexedMainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {S₁ S₂ : Set}
+  {n : ℕ}
+  {C : ChainCategory n}
+  where
+
+  module IndexedMainEditorProduct
+    (d : Direction)
+    (e₁ : IndexedMainEditor V₁ E₁ S₁ C)
+    (e₂ : IndexedMainEditor V₂ E₂ S₂ C)
+    where
+
+    StateSimpleCategory
+      : IndexedSimpleCategory C
+    StateSimpleCategory
+      = indexed-simple-category-product
+        (IndexedMainEditor.StateSimpleCategory e₁)
+        (IndexedMainEditor.StateSimpleCategory e₂)
+
+    indexed-simple-editor
+      : IndexedSimpleEditor
+        (view-stack-product V₁ V₂)
+        (event-stack-product E₁ E₂)
+        StateSimpleCategory
+    indexed-simple-editor
+      = indexed-simple-editor-product d
+        (IndexedMainEditor.indexed-simple-editor e₁)
+        (IndexedMainEditor.indexed-simple-editor e₂)
+
+    indexed-simple-split-function
+      : IndexedSimpleSplitFunction
+        (S₁ × S₂)
+        StateSimpleCategory
+    indexed-simple-split-function
+      = indexed-simple-split-function-product
+        (IndexedMainEditor.indexed-simple-split-function e₁)
+        (IndexedMainEditor.indexed-simple-split-function e₂)
+
+  -- Takes direction from first to second component.
+  indexed-main-editor-product
+    : Direction
+    → IndexedMainEditor V₁ E₁ S₁ C
+    → IndexedMainEditor V₂ E₂ S₂ C
+    → IndexedMainEditor
+      (view-stack-product V₁ V₂)
+      (event-stack-product E₁ E₂)
+      (S₁ × S₂) C
+  indexed-main-editor-product d e₁ e₂
+    = record {IndexedMainEditorProduct d e₁ e₂}
+
+-- ## IndexedSplitMainEditor
+
+module _
+  {V₁ V₂ : ViewStack}
+  {E₁ E₂ : EventStack}
+  {S₁ S₂ P₁ P₂ : Set}
+  {n : ℕ}
+  {C : ChainCategory n}
+  {C₁' C₂' : IndexedCategory C}
+  where
+
+  module IndexedSplitMainEditorProduct
+    (d : Direction)
+    (e₁ : IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁')
+    (e₂ : IndexedSplitMainEditor V₂ E₂ S₂ P₂ C₂')
+    where
+
+    StateCategory
+      : IndexedCategory C
+    StateCategory
+      = indexed-category-product
+        (IndexedSplitMainEditor.StateCategory e₁)
+        (IndexedSplitMainEditor.StateCategory e₂)
+
+    indexed-editor
+      : IndexedEditor
+        (view-stack-product V₁ V₂)
+        (event-stack-product E₁ E₂)
+        StateCategory
+    indexed-editor
+      = indexed-editor-product d
+        (IndexedSplitMainEditor.indexed-editor e₁)
+        (IndexedSplitMainEditor.indexed-editor e₂)
+
+    state-indexed-split-function
+      : IndexedSplitFunction
+        (S₁ × S₂)
+        StateCategory
+    state-indexed-split-function
+      = indexed-split-function-product
+        (IndexedSplitMainEditor.state-indexed-split-function e₁)
+        (IndexedSplitMainEditor.state-indexed-split-function e₂)
+
+    pure-indexed-split-function
+      : IndexedSplitFunction
+        (P₁ × P₂)
+        (indexed-category-product C₁' C₂')
+    pure-indexed-split-function
+      = indexed-split-function-product
+        (IndexedSplitMainEditor.pure-indexed-split-function e₁)
+        (IndexedSplitMainEditor.pure-indexed-split-function e₂)
+
+    indexed-split-functor
+      : IndexedSplitFunctor
+        StateCategory
+        (indexed-category-product C₁' C₂')
+    indexed-split-functor
+      = indexed-split-functor-product
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+        (IndexedSplitMainEditor.indexed-split-functor e₂)
+
+  -- Takes direction from first to second component.
+  indexed-split-main-editor-product
+    : Direction
+    → IndexedSplitMainEditor V₁ E₁ S₁ P₁ C₁'
+    → IndexedSplitMainEditor V₂ E₂ S₂ P₂ C₂'
+    → IndexedSplitMainEditor
+      (view-stack-product V₁ V₂)
+      (event-stack-product E₁ E₂)
+      (S₁ × S₂)
+      (P₁ × P₂)
+      (indexed-category-product C₁' C₂')
+  indexed-split-main-editor-product d e₁ e₂
+    = record {IndexedSplitMainEditorProduct d e₁ e₂}
 
