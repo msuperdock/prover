@@ -1,7 +1,7 @@
 module Prover.Category.Split.Base.Product where
 
 open import Prover.Category.Split.Base
-  using (SplitFunction; split-functor-simple)
+  using (SplitFunction; split-functor-base)
 open import Prover.Category.Split.Product
   using (split-functor-product)
 open import Prover.Category.Split.Unit
@@ -16,7 +16,7 @@ split-function-product
   → SplitFunction A₂ B₂
   → SplitFunction (A₁ × A₂) (B₁ × B₂)
 split-function-product F₁ F₂
-  = split-functor-simple
+  = split-functor-base
   $ split-functor-product
     (split-functor-unit F₁)
     (split-functor-unit F₂)

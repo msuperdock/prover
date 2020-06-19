@@ -71,7 +71,7 @@ module _
   {C D : Category}
   where
 
-  module SplitFunctorSimple
+  module SplitFunctorBase
     (F : SplitFunctor C D)
     where
 
@@ -93,11 +93,11 @@ module _
     valid
       = SplitFunctor.base-unbase F
 
-  split-functor-simple
+  split-functor-base
     : SplitFunctor C D
     → SplitFunction
       (Category.Object C)
       (Category.Object D)
-  split-functor-simple F
-    = record {SplitFunctorSimple F}
+  split-functor-base F
+    = record {SplitFunctorBase F}
 

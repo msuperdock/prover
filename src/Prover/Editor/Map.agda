@@ -7,7 +7,7 @@ open import Prover.Category.Partial.Base
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
 open import Prover.Category.Split.Base
-  using (SplitFunction; split-functor-simple)
+  using (SplitFunction; split-functor-base)
 open import Prover.Category.Split.Base.Compose
   using (split-function-compose)
 open import Prover.Category.Split.Unit
@@ -548,7 +548,7 @@ module _
   {C : Category}
   where
 
-  module SplitMainEditorMapRawState
+  module SplitMainEditorMapState
     (F : SplitFunction T S)
     (e : SplitMainEditor V E S P C)
     where
@@ -562,12 +562,12 @@ module _
       = split-function-compose
         (SplitMainEditor.state-split-function e) F
 
-  split-main-editor-map-raw-state
+  split-main-editor-map-state
     : SplitFunction T S
     → SplitMainEditor V E S P C
     → SplitMainEditor V E T P C
-  split-main-editor-map-raw-state F e
-    = record {SplitMainEditorMapRawState F e}
+  split-main-editor-map-state F e
+    = record {SplitMainEditorMapState F e}
 
 -- ### SplitMainEditor (pure)
 
@@ -578,7 +578,7 @@ module _
   {C : Category}
   where
 
-  module SplitMainEditorMapRawPure
+  module SplitMainEditorMapPure
     (F : SplitFunction Q P)
     (e : SplitMainEditor V E S P C)
     where
@@ -592,12 +592,12 @@ module _
       = split-function-compose
         (SplitMainEditor.pure-split-function e) F
 
-  split-main-editor-map-raw-pure
+  split-main-editor-map-pure
     : SplitFunction Q P
     → SplitMainEditor V E S P C
     → SplitMainEditor V E S Q C
-  split-main-editor-map-raw-pure F e
-    = record {SplitMainEditorMapRawPure F e}
+  split-main-editor-map-pure F e
+    = record {SplitMainEditorMapPure F e}
 
 -- ## Result
 
@@ -712,7 +712,7 @@ module _
       : SplitFunction P (Category.Object D)
     pure-split-function
       = split-function-compose
-        (split-functor-simple F)
+        (split-functor-base F)
         (SplitMainEditor.pure-split-function e)
 
   split-main-editor-map

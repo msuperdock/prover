@@ -3,7 +3,7 @@ module Prover.Category.Split.Base.Compose where
 open import Prover.Category.Split
   using (split-functor-compose)
 open import Prover.Category.Split.Base
-  using (SplitFunction; split-functor-simple)
+  using (SplitFunction; split-functor-base)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Prelude
@@ -16,7 +16,7 @@ split-function-compose
   → SplitFunction A B
   → SplitFunction A C
 split-function-compose F G
-  = split-functor-simple
+  = split-functor-base
   $ split-functor-compose
     (split-functor-unit F)
     (split-functor-unit G)
