@@ -64,8 +64,6 @@ postulate
 -- ### Imports
 
 {-# FOREIGN GHC
-  import Data.Aeson
-    (FromJSON, ToJSON)
   import qualified Data.Aeson as Aeson
     (decode, encode, Value (Array, Bool, Null, Number, Object, String))
   import Data.ByteString.Lazy
