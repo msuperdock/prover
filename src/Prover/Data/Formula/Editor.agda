@@ -4,6 +4,8 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Unit
   using (category-unit)
+open import Prover.Client.Aeson
+  using (Value)
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.State
@@ -12,10 +14,12 @@ open import Prover.Data.Formula.State
 open import Prover.Data.Formula.Insert
   using (sandbox-state-insert-parens; sandbox-state-insert-symbol;
     sandbox-state-insert-variable)
+open import Prover.Data.Identifier.Editor
+  using (decode-encode-identifier; decode-identifier; encode-identifier)
 open import Prover.Data.Meta.Editor
   using (draw-meta)
 open import Prover.Data.Symbol
-  using (Symbol)
+  using (Symbol; symbol)
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Data.Text.Editor
@@ -23,7 +27,7 @@ open import Prover.Data.Text.Editor
 open import Prover.Data.Token
   using (Token)
 open import Prover.Data.Variables
-  using (Variables)
+  using (Variables; var_∈?_)
 open import Prover.Editor
   using (EventStack; EventStackMap; PartialEditor; SimpleEditor; SplitEditor;
     ViewStack; ViewStackMap; split-editor-partial)
@@ -268,6 +272,186 @@ module _
     = text zero (draw-path-formula f fp)
   draw-path-sandbox-go (any (SandboxState.cons f _ s _)) (suc k) fp
     = text (suc (suc zero)) (draw-path-sandbox-go s k fp)
+
+-- ## Encode
+
+-- ### Pattern
+
+pattern tag-meta
+  = Value.string ('m' ∷ 'e' ∷ 't' ∷ 'a' ∷ [])
+pattern tag-variable
+  = Value.string ('v' ∷ 'a' ∷ 'r' ∷ 'i' ∷ 'a' ∷ 'b' ∷ 'l' ∷ 'e' ∷ [])
+pattern tag-symbol
+  = Value.string ('s' ∷ 'y' ∷ 'm' ∷ 'b' ∷ 'o' ∷ 'l' ∷ [])
+
+-- ### Encode
+
+encode-formula
+  : {ss : Symbols}
+  → {vs : Variables}
+  → {m : Bool}
+  → Formula ss vs m
+  → Value
+
+encode-formulas
+  : {ss : Symbols}
+  → {vs : Variables}
+  → {m : Bool}
+  → {n : ℕ}
+  → Vec (Formula ss vs m) n
+  → List Value
+
+encode-formula (Formula.meta m)
+  = Value.array
+  $ tag-meta
+  ∷ Value.number m
+  ∷ []
+
+encode-formula (Formula.variable' v _)
+  = Value.array 
+  $ tag-variable
+  ∷ encode-identifier v
+  ∷ []
+
+encode-formula (Formula.symbol (symbol _ n _ _ _) _ fs)
+  = Value.array
+  $ tag-symbol
+  ∷ encode-identifier n
+  ∷ Value.array (encode-formulas fs)
+  ∷ []
+
+encode-formulas []
+  = []
+encode-formulas (f ∷ fs)
+  = encode-formula f ∷ encode-formulas fs
+
+-- ### Decode
+
+decode-formula
+  : (ss : Symbols)
+  → (vs : Variables)
+  → (m : Bool)
+  → Value
+  → Maybe (Formula ss vs m)
+
+decode-formulas
+  : (ss : Symbols)
+  → (vs : Variables)
+  → (m : Bool)
+  → List Value
+  → Maybe (Σ ℕ (Vec (Formula ss vs m)))
+
+decode-formula _ vs _
+  (Value.array (tag-variable ∷ n ∷ []))
+  with decode-identifier n
+... | nothing
+  = nothing
+... | just v
+  with var v ∈? vs
+... | no _
+  = nothing
+... | yes p
+  = just (Formula.variable' v p)
+
+decode-formula ss vs m
+  (Value.array (tag-symbol ∷ n ∷ Value.array fs ∷ []))
+  with decode-identifier n
+  | decode-formulas ss vs m fs
+... | nothing | _
+  = nothing
+... | _ | nothing
+  = nothing
+... | just n' | just (a , fs')
+  with Symbols.lookup-member ss n'
+... | nothing
+  = nothing
+... | just (Symbols.member {a'} s p)
+  with a ≟ a' nat
+... | no _
+  = nothing
+... | yes refl
+  = just (Formula.symbol s p fs')
+
+decode-formula _ _ true
+  (Value.array (tag-meta ∷ Value.number n ∷ []))
+  = just (Formula.meta n)
+
+decode-formula _ _ _ _
+  = nothing
+
+decode-formulas _ _ _ []
+  = just (zero , [])
+decode-formulas ss vs m (f ∷ fs)
+  with decode-formula ss vs m f
+  | decode-formulas ss vs m fs
+... | nothing | _
+  = nothing
+... | _ | nothing
+  = nothing
+... | just f' | just (n , fs')
+  = just (suc n , f' ∷ fs')
+
+-- ### Valid
+
+decode-encode-formula
+  : {ss : Symbols}
+  → {vs : Variables}
+  → {m : Bool}
+  → (f : Formula ss vs m)
+  → decode-formula ss vs m (encode-formula f) ≡ just f
+
+decode-encode-formulas
+  : {ss : Symbols}
+  → {vs : Variables}
+  → {m : Bool}
+  → {n : ℕ}
+  → (fs : Vec (Formula ss vs m) n)
+  → decode-formulas ss vs m (encode-formulas fs) ≡ just (n , fs)
+
+decode-encode-formula
+  (Formula.meta _)
+  = refl
+
+decode-encode-formula {vs = vs}
+  (Formula.variable' v p)
+  with decode-identifier (encode-identifier v)
+  | decode-encode-identifier v
+... | _ | refl
+  with var v ∈? vs
+... | no ¬p
+  = ⊥-elim (¬p p)
+... | yes _
+  = refl
+
+decode-encode-formula {ss = ss} {vs = vs} {m = m}
+  (Formula.symbol {a = a} s@(symbol _ n _ _ _) p fs)
+  with decode-identifier (encode-identifier n)
+  | decode-encode-identifier n
+  | decode-formulas ss vs m (encode-formulas fs)
+  | decode-encode-formulas fs
+... | _ | refl | _ | refl
+  with Symbols.lookup-member ss n
+  | inspect (Symbols.lookup-member ss) n
+... | nothing | [ q ]
+  = ⊥-elim (Maybe.just≢nothing
+    (trans (sym p) (Symbols.lookup-member-nothing ss n q)))
+... | just (Symbols.member {a'} _ _) | [ q ]
+  with a ≟ a' nat
+  | Symbols.lookup-member-eq s p q
+... | no ¬q | _
+  = ⊥-elim (¬q (Symbols.lookup-member-arity s p q))
+... | yes refl | refl
+  = refl
+
+decode-encode-formulas []
+  = refl
+decode-encode-formulas {ss = ss} {vs = vs} {m = m} (f ∷ fs)
+  with decode-formula ss vs m (encode-formula f)
+  | decode-encode-formula f
+  | decode-formulas ss vs m (encode-formulas fs)
+  | decode-encode-formulas fs
+... | _ | refl | _ | refl
+  = refl
 
 -- ## Editors
 

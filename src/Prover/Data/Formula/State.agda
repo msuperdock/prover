@@ -949,7 +949,7 @@ module Internal where
     sandbox-state-from-formulas-init (f ∷ fs@(_ ∷ _))
       = sandbox-state-from-formula f ∷ sandbox-state-from-formulas-init fs
   
-  -- #### Validity
+  -- #### Valid
 
   module _
     {ss : Symbols}

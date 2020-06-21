@@ -1,10 +1,14 @@
-{ mkDerivation, base, brick, ieee754, stdenv, text, vty }:
+{ mkDerivation, aeson, base, brick, bytestring, ieee754, scientific
+, stdenv, text, vector, vty
+}:
 mkDerivation {
   pname = "prover";
   version = "0.1.0.0";
   src = ./.;
   isLibrary = false;
   isExecutable = true;
-  executableHaskellDepends = [ base brick ieee754 text vty ];
+  executableHaskellDepends = [
+    aeson base brick bytestring ieee754 scientific text vector vty
+  ];
   license = stdenv.lib.licenses.mit;
 }

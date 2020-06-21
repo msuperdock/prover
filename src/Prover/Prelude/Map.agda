@@ -68,7 +68,7 @@ module Map where
     ... | nothing
       = refl
     ... | just (_ , v)
-      = ⊥-elim (Maybe.just≢nothing v q)
+      = ⊥-elim (Maybe.just≢nothing q)
     
     empty
       : {V : Set}
@@ -112,7 +112,7 @@ module Map where
     ... | no _
       = lookup-map-nothing f m k q
     ... | yes _
-      = ⊥-elim (Maybe.just≢nothing (k' , v) q)
+      = ⊥-elim (Maybe.just≢nothing q)
 
   -- ### Properties
 
@@ -121,43 +121,45 @@ module Map where
     {p : Decidable K}
     where
 
-    lookup-to-eq
+    lookup-eq
       : {V : Set}
+      → {l : K}
+      → {v : V}
       → (m : Map V p)
-      → (k l : K)
-      → (v : V)
+      → (k : K)
       → Collection.lookup m k ≡ just (l , v)
       → k ≡ l
-    lookup-to-eq m k l v
-      = Collection.lookup-to-eq m k (l , v)
+    lookup-eq m k
+      = Collection.lookup-eq m k
     
     lookup-to-collection-just
       : {V : Set}
+      → {v : V}
       → (m : Map V p)
       → (k : K)
-      → (v : V)
       → lookup m k ≡ just v
       → Collection.lookup m k ≡ just (k , v)
-    lookup-to-collection-just m k v q
+    lookup-to-collection-just m k q
       with Collection.lookup m k
       | inspect (Collection.lookup m) k
     ... | nothing | _
-      = ⊥-elim (Maybe.nothing≢just v q)
+      = ⊥-elim (Maybe.nothing≢just q)
     ... | just (l , v') | [ r ]
       = sub just (Sigma.comma-eq
-        (sym (lookup-to-eq m k l v' r))
+        (sym (lookup-eq m k r))
         (Maybe.just-injective q))
     
     lookup-from-collection-just
       : {V : Set}
+      → {l : K}
+      → {v : V}
       → (m : Map V p)
-      → (k l : K)
-      → (v : V)
+      → (k : K)
       → Collection.lookup m k ≡ just (l , v)
       → lookup m k ≡ just v
-    lookup-from-collection-just m k _ _ _
+    lookup-from-collection-just m k _
       with Collection.lookup m k
-    lookup-from-collection-just _ _ _ _ refl | _
+    lookup-from-collection-just _ _ refl | _
       = refl
     
     lookup-from-collection-eq
@@ -206,29 +208,29 @@ module Map where
     
     lookup-map
       : {V W : Set}
+      → {v : V}
       → (f : V → W)
       → (m : Map V p)
       → (k : K)
-      → (v : V)
       → lookup m k ≡ just v
       → lookup (map f m) k ≡ just (f v)
-    lookup-map _ Collection.empty _ v q
-      = ⊥-elim (Maybe.nothing≢just v q)
-    lookup-map _ (Collection.insert m (k' , v') _) k v q
+    lookup-map _ Collection.empty _ q
+      = ⊥-elim (Maybe.nothing≢just q)
+    lookup-map _ (Collection.insert m (k' , v') _) k q
       with p k k'
     ... | no _
       with Collection.lookup m k
       | inspect (Collection.lookup m) k
     ... | nothing | _
-      = ⊥-elim (Maybe.nothing≢just v q)
-    lookup-map f (Collection.insert m _ _) k _ refl
+      = ⊥-elim (Maybe.nothing≢just q)
+    lookup-map f (Collection.insert m _ _) k refl
       | no _ | just (k'' , v'') | [ r ]
       with Collection.lookup (map f m) k
-      | lookup-to-collection-just (map f m) k (f v'')
-        (lookup-map f m k v'' (lookup-from-collection-just m k k'' v'' r))
+      | lookup-to-collection-just (map f m) k
+        (lookup-map f m k (lookup-from-collection-just m k r))
     ... | _ | refl
       = refl
-    lookup-map _ _ _ _ refl | yes _
+    lookup-map _ _ _ refl | yes _
       = refl
     
     _⊆_
@@ -236,8 +238,8 @@ module Map where
       → (m₁ m₂ : Map V p)
       → Set
     _⊆_ {V} m₁ m₂
-      = (k : K)
-      → (v : V)
+      = {v : V}
+      → (k : K)
       → lookup m₁ k ≡ just v
       → lookup m₂ k ≡ just v
     
@@ -246,12 +248,12 @@ module Map where
       → (m₁ m₂ : Map V p)
       → m₁ ⊆ m₂
       → Subset m₁ m₂
-    ⊆-to-collection m₁ m₂ p k (l , v) q
-      with lookup-to-eq m₁ k l v q
+    ⊆-to-collection m₁ m₂ p k q
+      with lookup-eq m₁ k q
     ... | refl
-      = lookup-to-collection-just m₂ k v
-      $ p k v
-      $ lookup-from-collection-just m₁ k k v
+      = lookup-to-collection-just m₂ k
+      $ p k
+      $ lookup-from-collection-just m₁ k
       $ q
     
     ⊆-from-collection
@@ -259,17 +261,17 @@ module Map where
       → (m₁ m₂ : Map V p)
       → Subset m₁ m₂
       → m₁ ⊆ m₂
-    ⊆-from-collection m₁ m₂ p k v q
-      = lookup-from-collection-just m₂ k k v
-      $ p k (k , v)
-      $ lookup-to-collection-just m₁ k v
+    ⊆-from-collection m₁ m₂ p k q
+      = lookup-from-collection-just m₂ k
+      $ p k
+      $ lookup-to-collection-just m₁ k
       $ q
     
     ⊆-empty
       : {V : Set}
       → (m : Map V p)
       → empty ⊆ m
-    ⊆-empty _ _ _ ()
+    ⊆-empty _ _ ()
     
     ⊆-insert
       : {V : Set}
@@ -289,7 +291,7 @@ module Map where
       : {V : Set}
       → (m : Map V p)
       → m ⊆ m
-    ⊆-reflexive _ _ _
+    ⊆-reflexive _ _
       = id
     
     ⊆-transitive
@@ -298,7 +300,7 @@ module Map where
       → m₁ ⊆ m₂
       → m₂ ⊆ m₃
       → m₁ ⊆ m₃
-    ⊆-transitive m₁ m₂ m₃ p q k v
-      = q k v
-      ∘ p k v
+    ⊆-transitive m₁ m₂ m₃ p q k
+      = q k
+      ∘ p k
 

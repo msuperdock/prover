@@ -111,7 +111,9 @@ record FlatEventStackMap
       → FlatEventStack.Event F (mode m)
       → FlatEventStack.Event E m
 
--- ## Editor
+-- ## Editors
+
+-- ### FlatEditor
 
 record FlatEditor
   (V : FlatViewStack)
@@ -120,12 +122,12 @@ record FlatEditor
   : Set₁
   where
 
-  -- ### Types
+  -- #### Types
 
   open FlatViewStack V
   open FlatEventStack E
 
-  -- ### State
+  -- #### State
 
   field
 
@@ -147,7 +149,7 @@ record FlatEditor
     initial-path
       : StatePath initial
 
-  -- ### Draw
+  -- #### Draw
 
   field
 
@@ -161,7 +163,7 @@ record FlatEditor
       to draw-path
     )
 
-  -- ### Mode
+  -- #### Mode
 
   field
 
@@ -170,7 +172,7 @@ record FlatEditor
       → StatePath s
       → Mode
 
-  -- ### Handle
+  -- #### Handle
 
   field
 
@@ -195,4 +197,93 @@ record FlatEditor
       → StatePath s
       → Direction
       → StatePath s
+
+-- ### FlatMainEditor
+
+record FlatMainEditor
+  (V : FlatViewStack)
+  (E : FlatEventStack)
+  (S : Set)
+  : Set₁
+  where
+
+  -- #### Types
+
+  open FlatViewStack V
+  open FlatEventStack E
+
+  -- #### State
+
+  field
+
+    StateStack
+      : FlatViewStack
+
+  open FlatViewStack StateStack public using () renaming
+    ( View
+      to State
+    ; ViewPath
+      to StatePath
+    )
+
+  field
+
+    initial
+      : State
+
+    initial-path
+      : StatePath initial
+
+  -- #### Draw
+
+  field
+
+    draw-stack
+      : FlatViewStackMap StateStack V
+
+  open FlatViewStackMap draw-stack public using () renaming
+    ( view-with
+      to draw-with
+    ; view-path
+      to draw-path
+    )
+
+  -- #### Mode
+
+  field
+
+    mode
+      : (s : State)
+      → StatePath s
+      → Mode
+
+  -- #### Handle
+
+  field
+
+    handle
+      : (s : State)
+      → (sp : StatePath s)
+      → Event (mode s sp)
+      → Σ State StatePath
+
+    handle-escape
+      : (s : State)
+      → (sp : StatePath s)
+      → Σ State StatePath
+
+    handle-return
+      : (s : State)
+      → (sp : StatePath s)
+      → Σ State StatePath
+
+    handle-direction
+      : (s : State)
+      → StatePath s
+      → Direction
+      → StatePath s
+
+    handle-save
+      : State
+      → S
 

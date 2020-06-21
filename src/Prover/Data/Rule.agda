@@ -87,7 +87,7 @@ module Rule where
     _≟_rul?
       : Decidable (Any (Rule ss))
     _≟_rul?
-      = Any.decidable _≟_nat _≟_rul
+      = Any.decidable (Rule ss) _≟_nat _≟_rul
 
   -- ### Matching
 

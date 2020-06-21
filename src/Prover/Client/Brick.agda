@@ -143,6 +143,17 @@ postulate
   empty-widget
     : Widget
 
+  event-bind
+    : {A B : Set}
+    → EventM A
+    → (A → EventM B)
+    → EventM B
+
+  event-pure
+    : {S : Set}
+    → S
+    → EventM S
+
   from-brick-event
     : BrickEvent
     → Maybe InputEvent
@@ -156,6 +167,11 @@ postulate
     : List Widget
     → Widget
 
+  liftIO
+    : {A : Set}
+    → IO A
+    → EventM A
+
   location
     : ℕ
     → ℕ
@@ -168,11 +184,6 @@ postulate
 
   padding-max
     : Padding
-
-  pure
-    : {S : Set}
-    → S
-    → EventM S
 
   show-cursor
     : Location
@@ -272,6 +283,8 @@ postulate
   import Brick.Widgets.Core
     (emptyWidget, hBox, padRight, showCursor, txt, vBox, viewport,
       withDefAttr)
+  import Control.Monad.IO.Class
+    (liftIO)
   import Data.String
     (fromString)
   import Data.Text
@@ -404,20 +417,24 @@ postulate
   = \ _ -> defaultMain #-}
 {-# COMPILE GHC empty-widget
   = emptyWidget #-}
+{-# COMPILE GHC event-bind
+  = \ _ _ -> (>>=) #-}
+{-# COMPILE GHC event-pure
+  = \ _ -> pure #-}
 {-# COMPILE GHC from-brick-event
   = fromBrickEvent #-}
 {-# COMPILE GHC halt
   = \ _ -> halt #-}
 {-# COMPILE GHC horizontal-box-list
   = hBox #-}
+{-# COMPILE GHC liftIO
+  = \ _ -> liftIO #-}
 {-# COMPILE GHC location
   = location #-}
 {-# COMPILE GHC pad-right-with
   = padRight #-}
 {-# COMPILE GHC padding-max
   = Max #-}
-{-# COMPILE GHC pure
-  = \ _ -> pure #-}
 {-# COMPILE GHC show-cursor
   = showCursor () #-}
 {-# COMPILE GHC string

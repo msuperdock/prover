@@ -1,12 +1,13 @@
 module Prover.Client.Run where
 
-open import Prover.Category
-  using (Category)
 open import Prover.Client
   using (Client)
+open import Prover.Client.Aeson
+  using (Value)
 open import Prover.Client.Brick
   using (App; AttributeMap; BrickEvent; CursorLocation; EventM; Next; Widget;
-    app; attributes; continue; default-main; from-brick-event; halt; pure)
+    app; attributes; continue; default-main; event-bind; event-pure;
+    from-brick-event; halt; liftIO)
 open import Prover.Client.Event
   using (SpecialEvent)
 open import Prover.Client.Flat
@@ -14,44 +15,44 @@ open import Prover.Client.Flat
 open import Prover.Client.Flatten
   using (client-flatten)
 open import Prover.Editor
-  using (Editor; EventStack; PartialEditor; SimpleEditor; SplitEditor;
-    ViewStack; any)
+  using (EventStack; MainEditor; ViewStack)
 open import Prover.Editor.Flat
-  using (FlatEditor; FlatEventStack; FlatViewStack)
+  using (FlatEventStack; FlatMainEditor; FlatViewStack)
 open import Prover.Editor.Flatten
-  using (editor-flatten)
+  using (main-editor-flatten)
 open import Prover.Prelude
 
--- ## FlatEditor
+-- ## FlatMainEditor
 
 module _
   {V : FlatViewStack}
   {E : FlatEventStack}
-  {A : Set}
   where
 
-  module FlatEditorRun
-    (e : FlatEditor V E A)
+  module FlatMainEditorRun
+    (e : FlatMainEditor V E Value)
     (c : FlatClient V E)
     where
 
     State
       : Set
     State
-      = Σ (FlatEditor.State e) (FlatEditor.StatePath e)
+      = s ∈ FlatMainEditor.State e
+      × FlatMainEditor.StatePath e s
 
     initial
       : State
     initial
-      = (FlatEditor.initial e , FlatEditor.initial-path e)
+      = FlatMainEditor.initial e
+      , FlatMainEditor.initial-path e
 
     draw
       : State
       → List Widget
     draw (s , sp)
       = FlatClient.draw c
-        (FlatEditor.draw-with e s sp)
-        (FlatEditor.draw-path e s sp)
+        (FlatMainEditor.draw-with e s sp)
+        (FlatMainEditor.draw-path e s sp)
       ∷ []
 
     cursor
@@ -72,25 +73,28 @@ module _
     ... | nothing
       = continue (s , sp)
     ... | just e''
-      with FlatClient.handle c (FlatEditor.mode e s sp) e''
+      with FlatClient.handle c (FlatMainEditor.mode e s sp) e''
     ... | nothing
       = continue (s , sp)
     ... | just (ι₁ e''')
-      = continue (FlatEditor.handle e s sp e''')
+      = continue (FlatMainEditor.handle e s sp e''')
+    ... | just (ι₂ SpecialEvent.quit)
+      = halt (s , sp)
+    ... | just (ι₂ SpecialEvent.write)
+      = continue (s , sp)
+      -- = event-bind (liftIO {!   !}) (const (continue (s , sp)))
     ... | just (ι₂ SpecialEvent.escape)
-      = maybe (FlatEditor.handle-escape e s sp)
-        (halt (s , sp)) continue
+      = continue (FlatMainEditor.handle-escape e s sp)
     ... | just (ι₂ SpecialEvent.return)
-      = sum (FlatEditor.handle-return e s sp)
-        (const (continue (s , sp))) continue
+      = continue (FlatMainEditor.handle-return e s sp)
     ... | just (ι₂ (SpecialEvent.direction d))
-      = continue (s , FlatEditor.handle-direction e s sp d)
+      = continue (s , FlatMainEditor.handle-direction e s sp d)
 
     start
       : State
       → EventM State
     start
-      = pure
+      = event-pure
 
     attributes'
       : State
@@ -108,60 +112,24 @@ module _
     main
       = IO.void (default-main app' initial)
 
-  flat-editor-run
-    : FlatEditor V E A
+  flat-main-editor-run
+    : FlatMainEditor V E Value
     → FlatClient V E
     → IO ⊤
-  flat-editor-run
-    = FlatEditorRun.main
+  flat-main-editor-run
+    = FlatMainEditorRun.main
 
--- ## Editor
+-- ## MainEditor
 
-editor-run
+main-editor-run
   : {V : ViewStack}
   → {E : EventStack}
-  → {C : Category}
-  → Editor V E C
+  → {A : Set}
+  → MainEditor V E Value A
   → Client V E
   → IO ⊤
-editor-run e c
-  = flat-editor-run
-    (editor-flatten e)
+main-editor-run e c
+  = flat-main-editor-run
+    (main-editor-flatten e)
     (client-flatten c)
-
--- ## SimpleEditor
-
-simple-editor-run
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {A : Set}
-  → SimpleEditor V E A
-  → Client V E
-  → IO ⊤
-simple-editor-run (any e)
-  = editor-run e
-
--- ## PartialEditor
-
-partial-editor-run
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {A : Set}
-  → PartialEditor V E A
-  → Client V E
-  → IO ⊤
-partial-editor-run e c
-  = simple-editor-run (PartialEditor.simple-editor e) c
-
--- ## SplitEditor
-
-split-editor-run
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {C : Category}
-  → SplitEditor V E C
-  → Client V E
-  → IO ⊤
-split-editor-run e c
-  = editor-run (SplitEditor.editor e) c
 

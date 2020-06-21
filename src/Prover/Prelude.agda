@@ -13,7 +13,7 @@ open import Prover.Prelude.CharWith public
 open import Prover.Prelude.Collection public
   using (Collection)
 open import Prover.Prelude.Decidable public
-  using (Dec; Decidable; no; yes)
+  using (Dec; Decidable; no; recompute; yes)
 open import Prover.Prelude.Direction public
   using (Direction; _≟_dir)
 open import Prover.Prelude.Empty public

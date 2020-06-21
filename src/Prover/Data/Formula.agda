@@ -500,8 +500,8 @@ module Formula where
       → substitutes fs subs ≡ just fs'
       → substitutes fs subs' ≡ just fs'
     
-    substitute-⊆ _ _ (variable' v _) f p q
-      = p v f q
+    substitute-⊆ _ _ (variable' v _) _ p q
+      = p v q
     substitute-⊆ subs subs' (symbol _ _ fs) f p q
       with substitutes fs subs
       | inspect (substitutes fs) subs
@@ -707,8 +707,8 @@ module Formula where
       → substitutes fs (substitute-meta-substitutions subs m f'')
         ≡ just (substitutes-meta fs' m f'')
     
-    substitute-substitute-meta-substitutions (variable' v _) subs m f'' f' p
-      = Map.lookup-map (λ x → substitute-meta x m f'') subs v f' p
+    substitute-substitute-meta-substitutions (variable' v _) subs m f'' _ p
+      = Map.lookup-map (λ x → substitute-meta x m f'') subs v p
     
     substitute-substitute-meta-substitutions (symbol _ _ fs) subs _ _ _ _
       with substitutes fs subs
@@ -939,14 +939,14 @@ module Formula where
       → (q : Map.lookup subs v ≡ nothing)
       → (m : MatchWith subs (variable' v p) f)
       → Map.insert subs v f q ⊆ MatchWith.substitutions m
-    insert-minimal subs v _ f p (match-with _ q _) w f' r
+    insert-minimal subs v _ f p (match-with _ q _) w r
       with w ≟ v var
     ... | no ¬p
       with Map.lookup (Map.insert subs v f p) w
       | Map.lookup-other subs v f p w ¬p
     ... | _ | refl
-      = q w f' r
-    insert-minimal _ _ _ _ _ (match-with _ _ p) _ _ refl | yes refl
+      = q w r
+    insert-minimal _ _ _ _ _ (match-with _ _ p) _ refl | yes refl
       = p
     
     match-with?
@@ -977,10 +977,10 @@ module Formula where
     
     ... | no r
       = no (λ {(match-with subs' s t)
-        → r (Maybe.just-injective (trans (sym t) (s v f' q)))})
+        → r (Maybe.just-injective (trans (sym t) (s v q)))})
     ... | yes refl
       = yes (match-with-minimal subs (Map.⊆-reflexive subs) q
-        (λ {(match-with subs' p _) w f' s → p w f' s}))
+        (λ {(match-with subs' p _) w s → p w s}))
     
     match-with? _ (symbol s p fs) (meta m)
       = no (λ {(match-with subs _ q)
@@ -1016,7 +1016,7 @@ module Formula where
     
     matches-with? subs [] []
       = yes (matches-with-minimal subs (Map.⊆-reflexive subs) refl
-        (λ {(matches-with subs' p _) v f q → p v f q}))
+        (λ {(matches-with subs' p _) → p}))
     
     matches-with? subs (f ∷ fs) (f' ∷ fs')
       with match-with? subs f f'

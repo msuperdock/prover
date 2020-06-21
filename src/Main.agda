@@ -4,24 +4,34 @@ open import Examples
   using (∧-commutative; rules)
 open import Prover.Client
   using (Client)
+open import Prover.Client.Aeson
+  using (Value)
 open import Prover.Client.Brick
   using (InputEvent; Widget; draw-interface-with)
 open import Prover.Client.Event
   using (SpecialEvent)
 open import Prover.Client.Run
-  using (partial-editor-run)
+  using (main-editor-run)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent)
+open import Prover.Data.Proof
+  using (Proof)
 open import Prover.Data.Proof.Editor
   using (ProofEvent; ProofEventStack; ProofModeInner; ProofViewInner;
-    ProofViewInnerPath; ProofViewStack; both; command; proof-partial-editor;
+    ProofViewInnerPath; ProofViewStack; both; command; proof-main-editor;
     window)
+open import Prover.Data.Rule
+  using (Rule)
+open import Prover.Data.Rules
+  using (Rules)
+open import Prover.Data.Symbols
+  using (Symbols)
 open import Prover.Data.Text.Editor
   using (TextEvent; TextWithEvent)
 open import Prover.Editor
-  using (EventStack; PartialEditor; ViewStack; ViewStackMap)
+  using (EventStack; MainEditor; ViewStack; ViewStackMap)
 open import Prover.Editor.Map
-  using (partial-editor-map-view-with)
+  using (main-editor-map-view-with)
 open import Prover.View.Interface
   using (command; interface; nothing; window)
 open import Prover.View.Window
@@ -109,14 +119,19 @@ proof-view-stack-map
 proof-view-stack-map b
   = record {ProofViewStackMap b}
 
-proof-window-partial-editor
-  : PartialEditor
+proof-window-main-editor
+  : {ss : Symbols}
+  → {a : ℕ}
+  → (rs : Rules ss)
+  → (r : Rule ss a)
+  → MainEditor
     ProofWindowViewStack
     ProofEventStack
-    ⊤
-proof-window-partial-editor
-  = partial-editor-map-view-with proof-view-stack-map
-  $ proof-partial-editor rules ∧-commutative
+    Value
+    (Proof rs r)
+proof-window-main-editor rs r
+  = main-editor-map-view-with proof-view-stack-map
+  $ proof-main-editor rs r
 
 -- ## Client
 
@@ -171,6 +186,8 @@ module ProofClient where
     = just (ι₁ ProofEvent.infer-hypotheses)
   handle _ (InputEvent.char 'm')
     = just (ι₁ ProofEvent.substitute-meta)
+  handle _ (InputEvent.char 'q')
+    = just (ι₂ SpecialEvent.quit)
   handle _ _
     = nothing
 
@@ -231,7 +248,7 @@ proof-client
 main
   : IO ⊤
 main
-  = partial-editor-run
-    proof-window-partial-editor
+  = main-editor-run
+    (proof-window-main-editor rules ∧-commutative)
     proof-client
 

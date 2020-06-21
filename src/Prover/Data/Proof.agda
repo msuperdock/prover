@@ -49,7 +49,7 @@ module Internal where
       → .(rul r ∈ rs)
       → (bs : Vec (Branch rs vs) a)
       → (c : Formula ss vs true)
-      → Rule.Match r (Vec.map branch-conclusion bs) c
+      → .(Rule.Match r (Vec.map branch-conclusion bs) c)
       → Branch rs vs
 
   branch-conclusion (assumption c)
@@ -120,7 +120,7 @@ module Internal where
       branch
         : Branch rs (Rule.variables r)
   
-      valid
+      .valid
         : branch-conclusion branch ≡ Formula.to-meta-formula (Rule.conclusion r)
 
   -- #### BranchPath
@@ -624,7 +624,9 @@ module Branch where
   open Internal.Branch public
 
   open Internal public using () renaming
-    ( branch-is-complete-assumption
+    ( branch-conclusion
+      to conclusion
+    ; branch-is-complete-assumption
       to is-complete-assumption
     )
 

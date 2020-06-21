@@ -5,9 +5,9 @@ open import Prover.Prelude.Any
 open import Prover.Prelude.Decidable
   using (Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (Equal; _≡_; refl)
+  using (Equal; _≅_; _≡_; refl)
 open import Prover.Prelude.Nat
-  using (ℕ)
+  using (Nat; ℕ)
 open import Prover.Prelude.Vec
   using (Vec; []; _∷_)
 
@@ -141,11 +141,40 @@ module List where
     {A : Set}
     where
 
-    from-vec-to-vec
+    to-from-vec-index
+      : {n : ℕ}
+      → (xs : Vec A n)
+      → Any.index (to-vec (from-vec xs)) ≡ n
+    to-from-vec-index []
+      = refl
+    to-from-vec-index (_ ∷ xs)
+      = Nat.suc-eq (to-from-vec-index xs)
+
+    to-from-vec-value
+      : {n : ℕ}
+      → (xs : Vec A n)
+      → Any.value (to-vec (from-vec xs)) ≅ xs
+    to-from-vec-value []
+      = refl
+    to-from-vec-value (_ ∷ xs)
+      = Vec.cons-eq' (to-from-vec-index xs) refl (to-from-vec-value xs)
+
+    to-from-vec
+      : {n : ℕ}
+      → (xs : Vec A n)
+      → to-vec (from-vec xs) ≡ any xs
+    to-from-vec []
+      = refl
+    to-from-vec (_ ∷ xs)
+      = Any.any-eq (Vec A)
+        (Nat.suc-eq (to-from-vec-index xs))
+        (Vec.cons-eq' (to-from-vec-index xs) refl (to-from-vec-value xs))
+
+    from-to-vec
       : (xs : List A)
       → from-vec (Any.value (to-vec xs)) ≡ xs
-    from-vec-to-vec []
+    from-to-vec []
       = refl
-    from-vec-to-vec (x ∷ xs)
-      = cons-eq refl (from-vec-to-vec xs)
+    from-to-vec (_ ∷ xs)
+      = cons-eq refl (from-to-vec xs)
 

@@ -119,15 +119,15 @@ module Maybe where
 
   nothing≢just
     : {A : Set}
-    → (x : A)
+    → {x : A}
     → nothing ≢ just x
-  nothing≢just _ ()
+  nothing≢just ()
 
   just≢nothing
     : {A : Set}
-    → (x : A)
+    → {x : A}
     → just x ≢ nothing
-  just≢nothing _ ()
+  just≢nothing ()
 
   just-injective
     : {A : Set}

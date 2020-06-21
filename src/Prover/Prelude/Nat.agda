@@ -63,6 +63,13 @@ module Nat where
     = no (λ ())
   suc _ ≟ zero nat
     = no (λ ())
+
+  suc-eq
+    : {n₁ n₂ : ℕ}
+    → n₁ ≡ n₂
+    → suc n₁ ≡ suc n₂
+  suc-eq refl
+    = refl
   
   -- ### Comparison
 

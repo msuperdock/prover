@@ -218,7 +218,7 @@ module Internal where
     to-from (digits₁ [] ¬p)
       = ⊥-elim (¬p refl)
     to-from (digits₁ ds@(_ ∷ _) ¬p)
-      = digits₁-eq (λ ()) ¬p (List.from-vec-to-vec ds)
+      = digits₁-eq (λ ()) ¬p (List.from-to-vec ds)
 
   digits-retraction₁
     : Retraction Digits Digits₁

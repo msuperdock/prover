@@ -6,6 +6,8 @@ open import Prover.Category.Split.Base
   using (SplitFunction; split-function-from-retraction)
 open import Prover.Category.Unit
   using (category-unit)
+open import Prover.Client.Aeson
+  using (Value)
 open import Prover.Data.Text
   using (Text; TextWith)
 open import Prover.Editor
@@ -124,6 +126,41 @@ TextCategory
   : Category
 TextCategory
   = category-unit Text
+
+-- ## Encode
+
+-- ### Encode
+
+encode-text
+  : Text
+  → Value
+encode-text (any cs)
+  = Value.string (List.from-vec cs)
+
+-- ### Decode
+
+decode-text
+  : Value
+  → Maybe Text
+decode-text (Value.string cs)
+  with List.to-vec cs
+... | any []
+  = nothing
+... | any cs'@(_ ∷ _)
+  = just (any cs')
+decode-text _
+  = nothing
+
+-- ### Valid
+
+decode-encode-text
+  : (t : Text)
+  → decode-text (encode-text t) ≡ just t
+decode-encode-text (any cs)
+  with List.to-vec (List.from-vec cs)
+  | List.to-from-vec cs
+... | any (_ ∷ _) | refl
+  = refl
 
 -- ## Editors
 

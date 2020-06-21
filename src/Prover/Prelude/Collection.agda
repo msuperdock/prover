@@ -156,19 +156,17 @@ module Collection where
         valid
           : IsMember xs value
     
-    lookup-to-eq
-      : (xs : Collection f p)
+    lookup-eq
+      : {x : A}
+      → (xs : Collection f p)
       → (k : K)
-      → (x : A)
       → lookup xs k ≡ just x
       → k ≡ f x
-    lookup-to-eq empty _ x q
-      = ⊥-elim (Maybe.nothing≢just x q)
-    lookup-to-eq (insert xs x' _) k x q
+    lookup-eq (insert xs x' _) k q
       with p k (f x')
     ... | no _ 
-      = lookup-to-eq xs k x q
-    lookup-to-eq _ _ _ refl | yes r
+      = lookup-eq xs k q
+    lookup-eq _ _ refl | yes r
       = r
     
     lookup-member
@@ -182,7 +180,33 @@ module Collection where
       = nothing
     ... | just x | [ q ]
       = just (member x
-        (trans (sub (lookup xs) (sym (lookup-to-eq xs k x q))) q))
+        (trans (sub (lookup xs) (sym (lookup-eq xs k q))) q))
+
+    lookup-member-eq
+      : {xs : Collection f p}
+      → {m : Member xs}
+      → (x : A)
+      → IsMember xs x
+      → lookup-member xs (f x) ≡ just m
+      → x ≡ Member.value m
+    lookup-member-eq {xs = xs} x _ _
+      with lookup xs (f x)
+      | inspect (lookup xs) (f x)
+    lookup-member-eq _ refl refl | just _ | [ _ ]
+      = refl
+
+    lookup-member-nothing
+      : (xs : Collection f p)
+      → (k : K)
+      → lookup-member xs k ≡ nothing
+      → lookup xs k ≡ nothing
+    lookup-member-nothing xs k q
+      with lookup xs k
+      | inspect (lookup xs) k
+    ... | nothing | _
+      = refl
+    ... | just _ | [ _ ]
+      = ⊥-elim (Maybe.just≢nothing q)
 
   -- ### Properties
 
@@ -222,15 +246,15 @@ module Collection where
       : (xs₁ xs₂ : Collection f p)
       → Set
     _⊆_ xs₁ xs₂
-      = (k : K)
-      → (x : A)
+      = {x : A}
+      → (k : K)
       → lookup xs₁ k ≡ just x
       → lookup xs₂ k ≡ just x
     
     ⊆-empty
       : (xs : Collection f p)
       → empty ⊆ xs
-    ⊆-empty _ _ _ ()
+    ⊆-empty _ _ ()
     
     ⊆-insert
       : (xs₁ xs₂ : Collection f p)
@@ -238,19 +262,19 @@ module Collection where
       → (q : lookup xs₂ (f x) ≡ nothing)
       → xs₁ ⊆ xs₂
       → xs₁ ⊆ insert xs₂ x q
-    ⊆-insert _ xs₂ x q r k y s
+    ⊆-insert _ xs₂ x q r k s
       with p k (f x)
     ... | no _
-      = r k y s
+      = r k s
     ... | yes refl
-      with lookup xs₂ k | r (f x) y s
+      with lookup xs₂ k | r (f x) s
     ... | _ | refl
-      = ⊥-elim (Maybe.just≢nothing y q)
+      = ⊥-elim (Maybe.just≢nothing q)
     
     ⊆-reflexive
       : (xs : Collection f p)
       → xs ⊆ xs
-    ⊆-reflexive _ _ _
+    ⊆-reflexive _ _
       = id
     
     ⊆-transitive
@@ -258,7 +282,7 @@ module Collection where
       → xs₁ ⊆ xs₂
       → xs₂ ⊆ xs₃
       → xs₁ ⊆ xs₃
-    ⊆-transitive _ _ _ p q k x
-      = q k x
-      ∘ p k x
+    ⊆-transitive _ _ _ p q k
+      = q k
+      ∘ p k
 

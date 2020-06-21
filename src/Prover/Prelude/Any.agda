@@ -3,7 +3,7 @@ module Prover.Prelude.Any where
 open import Prover.Prelude.Decidable
   using (Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (_≡_; refl)
+  using (Equal; _≅_; _≡_; refl)
 open import Prover.Prelude.Retraction
   using (Retraction)
 
@@ -63,14 +63,14 @@ module Any where
 
   module _
     {A : Set}
-    {B : A → Set}
     where
 
     decidable
-      : Decidable A
+      : (B : A → Set)
+      → Decidable A
       → ({x : A} → Decidable (B x))
       → Decidable (Any B)
-    decidable p q (any {x₁} y₁) (any {x₂} y₂)
+    decidable _ p q (any {x₁} y₁) (any {x₂} y₂)
       with p x₁ x₂
     ... | no ¬r
       = no (λ {refl → ¬r refl})
@@ -80,6 +80,17 @@ module Any where
       = no (λ {refl → ¬r refl})
     ... | yes refl
       = yes refl
+
+    any-eq
+      : (B : A → Set)
+      → {x₁ y₁ : A}
+      → {x₂ : B x₁}
+      → {y₂ : B y₁}
+      → x₁ ≡ y₁
+      → x₂ ≅ y₂
+      → Equal (Any B) (Any B) (any x₂) (any y₂)
+    any-eq _ refl refl 
+      = refl
 
   -- ### Retraction
 

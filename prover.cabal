@@ -87,6 +87,7 @@ executable prover
                      , MAlonzo.Code.Prover.Category.Weak
                      -- , MAlonzo.Code.Prover.Category.Weak.Sigma.Maybe
                      , MAlonzo.Code.Prover.Client
+                     , MAlonzo.Code.Prover.Client.Aeson
                      , MAlonzo.Code.Prover.Client.Brick
                      , MAlonzo.Code.Prover.Client.Event
                      , MAlonzo.Code.Prover.Client.Flat
@@ -99,6 +100,7 @@ executable prover
                      , MAlonzo.Code.Prover.Data.Formula.Insert
                      , MAlonzo.Code.Prover.Data.Formula.State
                      , MAlonzo.Code.Prover.Data.Identifier
+                     , MAlonzo.Code.Prover.Data.Identifier.Editor
                      , MAlonzo.Code.Prover.Data.Meta
                      , MAlonzo.Code.Prover.Data.Meta.Editor
                      , MAlonzo.Code.Prover.Data.Metas
@@ -173,9 +175,13 @@ executable prover
                      , MAlonzo.Code.Prover.View.Window
                      , MAlonzo.RTE
   build-depends:       base
+                     , aeson
                      , brick
+                     , bytestring
                      , ieee754
+                     , scientific
                      , text
+                     , vector
                      , vty
   default-language:    Haskell2010
   ghc-options:         -threaded -Wno-overlapping-patterns

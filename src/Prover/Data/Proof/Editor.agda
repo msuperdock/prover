@@ -1,11 +1,18 @@
 module Prover.Data.Proof.Editor where
 
+open import Prover.Category.Split.Base
+  using (SplitFunction)
+open import Prover.Client.Aeson
+  using (Value)
 open import Prover.Data.Formula
-  using (Formula; frm_∈?_)
+  using (Formula; frm_∈?_; _≟_frm)
 open import Prover.Data.Formula.Editor
-  using (FormulaEvent; formula-split-editor)
+  using (FormulaEvent; decode-encode-formula; decode-formula; encode-formula;
+  formula-split-editor)
 open import Prover.Data.Identifier
   using (Identifier)
+open import Prover.Data.Identifier.Editor
+  using (decode-encode-identifier; decode-identifier; encode-identifier)
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Number.Editor
@@ -15,7 +22,7 @@ open import Prover.Data.Proof
 open import Prover.Data.Proof.Editor.Meta
   using (ProofMetaFlatEventStack; ProofMetaFlatMode; proof-meta-flat-editor)
 open import Prover.Data.Rule
-  using (Rule)
+  using (Rule; rule)
 open import Prover.Data.Rules
   using (Rules; rul_∈_)
 open import Prover.Data.Symbols
@@ -25,7 +32,7 @@ open import Prover.Data.Text.Editor
 open import Prover.Data.Variables
   using (Variables)
 open import Prover.Editor
-  using (EventStack; EventStackMap; PartialEditor; SimpleEditor; SplitEditor;
+  using (EventStack; EventStackMap; MainEditor; SimpleEditor; SplitEditor;
     ViewStack; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack; SimpleBaseEditor)
@@ -249,6 +256,237 @@ module _
     = draw-tree-with
       (draw-branch (Rule.hypotheses r) b)
       (draw-path-branch (Rule.hypotheses r) b bp)
+
+-- ## Encode
+
+-- ### Pattern
+
+pattern tag-assumption
+  = Value.string
+    ('a' ∷ 's' ∷ 's' ∷ 'u' ∷ 'm' ∷ 'p' ∷ 't' ∷ 'i' ∷ 'o' ∷ 'n' ∷ [])
+pattern tag-rule
+  = Value.string
+    ('r' ∷ 'u' ∷ 'l' ∷ 'e' ∷ [])
+
+-- ### Encode
+
+encode-branch
+  : {ss : Symbols}
+  → {rs : Rules ss}
+  → {vs : Variables}
+  → Branch rs vs
+  → Value
+
+encode-branches
+  : {ss : Symbols}
+  → {rs : Rules ss}
+  → {vs : Variables}
+  → {n : ℕ}
+  → Vec (Branch rs vs) n
+  → List Value
+
+encode-branch (Branch.assumption c)
+  = Value.array
+  $ tag-assumption
+  ∷ encode-formula c
+  ∷ []
+
+encode-branch (Branch.rule (rule n _ _ _) _ bs c _)
+  = Value.array
+  $ tag-rule
+  ∷ encode-identifier n
+  ∷ Value.array (encode-branches bs)
+  ∷ encode-formula c
+  ∷ []
+
+encode-branches []
+  = []
+encode-branches (b ∷ bs)
+  = encode-branch b ∷ encode-branches bs
+
+encode-proof
+  : {ss : Symbols}
+  → {a : ℕ}
+  → {rs : Rules ss}
+  → {r : Rule ss a}
+  → Proof rs r
+  → Value
+encode-proof (proof b _)
+  = encode-branch b
+
+-- ### Decode
+
+decode-branch
+  : {ss : Symbols}
+  → (rs : Rules ss)
+  → (vs : Variables)
+  → Value
+  → Maybe (Branch rs vs)
+
+decode-branches
+  : {ss : Symbols}
+  → (rs : Rules ss)
+  → (vs : Variables)
+  → List Value
+  → Maybe (Σ ℕ (Vec (Branch rs vs)))
+
+decode-branch {ss = ss} _ vs
+  (Value.array (tag-assumption ∷ c ∷ []))
+  = Maybe.map Branch.assumption (decode-formula ss vs true c)
+
+decode-branch {ss = ss} rs vs
+  (Value.array (tag-rule ∷ n ∷ Value.array bs ∷ c ∷ []))
+  with decode-identifier n
+  | decode-branches rs vs bs
+  | decode-formula ss vs true c
+... | nothing | _ | _
+  = nothing
+... | _ | nothing | _
+  = nothing
+... | _ | _ | nothing
+  = nothing
+... | just n' | just (a , bs') | just c'
+  with Rules.lookup-member rs n'
+... | nothing
+  = nothing
+... | just (Rules.member {a'} r p)
+  with a ≟ a' nat
+... | no _
+  = nothing
+... | yes refl
+  with Rule.match? r (Vec.map Branch.conclusion bs') c'
+... | no _
+  = nothing
+... | yes m
+  = just (Branch.rule r p bs' c' m)
+
+decode-branch _ _ _
+  = nothing
+
+decode-branches _ _ []
+  = just (zero , [])
+decode-branches rs vs (p ∷ ps)
+  with decode-branch rs vs p
+  | decode-branches rs vs ps
+... | nothing | _
+  = nothing
+... | _ | nothing
+  = nothing
+... | just b | just (n , bs)
+  = just (suc n , b ∷ bs)
+
+decode-proof
+  : {ss : Symbols}
+  → {a : ℕ}
+  → (rs : Rules ss)
+  → (r : Rule ss a)
+  → Value
+  → Maybe (Proof rs r)
+decode-proof rs (rule _ vs _ c) v
+  with decode-branch rs vs v
+... | nothing
+  = nothing
+... | just b
+  with Branch.conclusion b ≟ (Formula.to-meta-formula c) frm
+... | no _
+  = nothing
+... | yes q
+  = just (proof b q)
+
+-- ### Valid
+
+decode-encode-branch
+  : {ss : Symbols}
+  → {rs : Rules ss}
+  → {vs : Variables}
+  → (b : Branch rs vs)
+  → decode-branch rs vs (encode-branch b) ≡ just b
+
+decode-encode-branches
+  : {ss : Symbols}
+  → {rs : Rules ss}
+  → {vs : Variables}
+  → {n : ℕ}
+  → (bs : Vec (Branch rs vs) n)
+  → decode-branches rs vs (encode-branches bs) ≡ just (n , bs)
+
+decode-encode-branch {ss = ss} {vs = vs}
+  (Branch.assumption c)
+  with decode-formula ss vs true (encode-formula c)
+  | decode-encode-formula c
+... | _ | refl
+  = refl
+
+decode-encode-branch {ss = ss} {rs = rs} {vs = vs}
+  (Branch.rule {a = a} r@(rule n _ _ _) p bs c m)
+  with decode-identifier (encode-identifier n)
+  | decode-encode-identifier n
+  | decode-branches rs vs (encode-branches bs)
+  | decode-encode-branches bs
+  | decode-formula ss vs true (encode-formula c)
+  | decode-encode-formula c
+... | _ | refl | _ | refl | _ | refl
+  with Rules.lookup-member rs n
+  | inspect (Rules.lookup-member rs) n
+... | nothing | [ q ] 
+  = ⊥-elim (Maybe.just≢nothing
+    (trans (sym p) (Rules.lookup-member-nothing rs n q)))
+... | just (Rules.member {a'} r' _) | [ q ]
+  with a ≟ a' nat
+  | Rules.lookup-member-eq r p q
+... | no ¬q | _
+  = ⊥-elim (¬q (Rules.lookup-member-arity r p q))
+... | yes refl | refl
+  with Rule.match? r' (Vec.map Branch.conclusion bs) c
+... | no ¬m
+  = ⊥-elim (¬m m)
+... | yes _
+  = refl
+
+decode-encode-branches []
+  = refl
+decode-encode-branches {rs = rs} {vs = vs} (b ∷ bs)
+  with decode-branch rs vs (encode-branch b)
+  | decode-encode-branch b
+  | decode-branches rs vs (encode-branches bs)
+  | decode-encode-branches bs
+... | _ | refl | _ | refl
+  = refl
+
+decode-encode-proof
+  : {ss : Symbols}
+  → {a : ℕ}
+  → {rs : Rules ss}
+  → {r : Rule ss a}
+  → (p : Proof rs r)
+  → decode-proof rs r (encode-proof p) ≡ just p
+decode-encode-proof {rs = rs} {r = r} (proof b q)
+  with decode-branch rs (Rule.variables r) (encode-branch b)
+  | decode-encode-branch b
+... | _ | refl
+  with Branch.conclusion b ≟ (Formula.to-meta-formula (Rule.conclusion r)) frm
+... | no ¬q
+  = ⊥-elim (¬q q)
+... | yes _
+  = refl
+
+-- ### Split
+
+proof-split-function
+  : {ss : Symbols}
+  → {a : ℕ}
+  → (rs : Rules ss)
+  → (r : Rule ss a)
+  → SplitFunction Value (Proof rs r)
+proof-split-function rs r
+  = record
+  { partial-function
+    = decode-proof rs r
+  ; function
+    = encode-proof
+  ; valid
+    = decode-encode-proof
+  }
 
 -- ## Editors
 
@@ -493,7 +731,7 @@ module _
       with Rules.lookup-member rs n
     ... | nothing
       = nothing
-    ... | just (Rules.member (any r) q)
+    ... | just (Rules.member r q)
       with Formula.match? (Rule.conclusion r) (Proof.lookup p pp)
     ... | no _
       = nothing
@@ -773,36 +1011,25 @@ proof-simple-editor rs r
   $ simple-editor-map-event proof-event-stack-map
   $ proof-parent-editor rs r
 
--- ### Partial
+-- ### Main
 
-proof-base
+proof-main-editor
   : {ss : Symbols}
   → {a : ℕ}
-  → {rs : Rules ss}
-  → {r : Rule ss a}
-  → Proof rs r
-  → Maybe ⊤
-proof-base p
-  with Proof.is-complete p
-... | false
-  = nothing
-... | true
-  = just tt
-
-proof-partial-editor
-  : {ss : Symbols}
-  → {a : ℕ}
-  → Rules ss
-  → Rule ss a
-  → PartialEditor
+  → (rs : Rules ss)
+  → (r : Rule ss a)
+  → MainEditor
     ProofViewStack
     ProofEventStack
-    ⊤
-proof-partial-editor rs r
+    Value
+    (Proof rs r)
+proof-main-editor rs r
   = record
   { simple-editor
     = proof-simple-editor rs r
-  ; base
-    = proof-base
+  ; split-function
+    = proof-split-function rs r
+  ; is-complete
+    = Proof.is-complete
   }
 

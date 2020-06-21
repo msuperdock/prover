@@ -3,7 +3,7 @@ module Prover.Prelude.Vec where
 open import Prover.Prelude.Decidable
   using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (Equal; _≡_; refl; sub)
+  using (Equal; _≅_; _≡_; refl; sub)
 open import Prover.Prelude.Fin
   using (Fin; zero; suc)
 open import Prover.Prelude.Nat
@@ -146,16 +146,6 @@ module Vec where
     {A : Set}
     where
 
-    cons-eq
-      : {n : ℕ}
-      → {x₁ x₂ : A}
-      → {xs₁ xs₂ : Vec A n}
-      → x₁ ≡ x₂
-      → xs₁ ≡ xs₂
-      → x₁ ∷ xs₁ ≡ x₂ ∷ xs₂
-    cons-eq refl refl
-      = refl
-
     decidable
       : {n : ℕ}
       → Decidable A
@@ -170,6 +160,28 @@ module Vec where
       = no (λ {refl → ¬q refl})
     ... | yes refl | yes refl
       = yes refl
+
+    cons-eq
+      : {n : ℕ}
+      → {x₁ x₂ : A}
+      → {xs₁ xs₂ : Vec A n}
+      → x₁ ≡ x₂
+      → xs₁ ≡ xs₂
+      → x₁ ∷ xs₁ ≡ x₂ ∷ xs₂
+    cons-eq refl refl
+      = refl
+
+    cons-eq'
+      : {n₁ n₂ : ℕ}
+      → {x₁ x₂ : A}
+      → {xs₁ : Vec A n₁}
+      → {xs₂ : Vec A n₂}
+      → n₁ ≡ n₂
+      → x₁ ≡ x₂
+      → xs₁ ≅ xs₂
+      → x₁ ∷ xs₁ ≅ x₂ ∷ xs₂
+    cons-eq' refl
+      = cons-eq
 
   -- ### Retraction
 

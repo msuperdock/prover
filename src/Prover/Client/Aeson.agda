@@ -1,0 +1,146 @@
+module Prover.Client.Aeson where
+
+open import Prover.Prelude
+
+-- ## Types
+
+data Value
+  : Set
+  where
+
+  array
+    : List Value
+    → Value
+
+  string
+    : List Char
+    → Value
+
+  number
+    : ℕ
+    → Value
+
+  boolean
+    : Bool
+    → Value
+
+  null
+    : Value
+
+-- ## Postulates
+
+postulate
+
+  -- ### Types
+
+  ByteString
+    : Set
+
+  -- ### Functions
+
+  decode
+    : ByteString
+    → Maybe Value
+
+  encode
+    : Value
+    → ByteString
+
+-- ## Foreign
+
+-- ### Imports
+
+{-# FOREIGN GHC
+  import Data.Aeson
+    (FromJSON, ToJSON)
+  import qualified Data.Aeson as Aeson
+    (decode, encode, Value (Array, Bool, Null, Number, Object, String))
+  import Data.ByteString.Lazy
+    (ByteString)
+  import Data.Scientific
+    (floatingOrInteger, scientific)
+  import Data.Text
+    (pack, unpack)
+  import Data.Vector
+    (fromList, toList)
+#-}
+
+-- ### Definitions
+
+{-# FOREIGN GHC
+  data Value
+    = Array [Value]
+    | String [Char]
+    | Number Integer
+    | Boolean Bool
+    | Null
+
+  fromAeson
+    :: Aeson.Value
+    -> Maybe Value
+  fromAeson (Aeson.Object vs)
+    = Nothing
+  fromAeson (Aeson.Array vs)
+    = Array <$> traverse fromAeson (toList vs)
+  fromAeson (Aeson.String s)
+    = Just (String (unpack s))
+  fromAeson (Aeson.Number n)
+    = either (const Nothing) (Just . Number) (floatingOrInteger n)
+  fromAeson (Aeson.Bool b)
+    = Just (Boolean b)
+  fromAeson Aeson.Null
+    = Just Null
+
+  toAeson
+    :: Value
+    -> Aeson.Value
+  toAeson (Array vs)
+    = Aeson.Array (toAeson <$> fromList vs)
+  toAeson (String cs)
+    = Aeson.String (pack cs)
+  toAeson (Number n)
+    = Aeson.Number (scientific n 0)
+  toAeson (Boolean b)
+    = Aeson.Bool b
+  toAeson Null
+    = Aeson.Null
+
+  decode
+    :: ByteString
+    -> Maybe Value
+  decode s
+    = Aeson.decode s
+    >>= fromAeson
+
+  encode
+    :: Value
+    -> ByteString
+  encode
+    = Aeson.encode
+    . toAeson
+#-}
+
+-- ### Data
+
+{-# COMPILE GHC Value
+  = data Value
+    ( Array
+    | String
+    | Number
+    | Boolean
+    | Null
+    )
+#-}
+
+-- ### Types
+
+{-# COMPILE GHC ByteString
+  = type ByteString #-}
+
+-- ### Functions
+
+{-# COMPILE GHC decode
+  = decode #-}
+{-# COMPILE GHC encode
+  = encode #-}
+

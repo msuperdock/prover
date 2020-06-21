@@ -57,7 +57,7 @@ is-nothing?
 is-nothing? nothing
   = yes refl
 is-nothing? (just x)
-  = no (Maybe.just≢nothing x)
+  = no Maybe.just≢nothing
 
 -- ## Identifier
 

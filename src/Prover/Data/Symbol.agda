@@ -239,7 +239,7 @@ module Symbol where
   _≟_sym?
     : Decidable (Any Symbol)
   _≟_sym?
-    = Any.decidable _≟_nat _≟_sym
+    = Any.decidable Symbol _≟_nat _≟_sym
 
 -- ## Exports
 

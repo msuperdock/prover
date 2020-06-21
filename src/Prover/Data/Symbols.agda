@@ -83,6 +83,59 @@ module Symbols where
   ... | just (Collection.member (any s) p)
     = just (member s p)
 
+  lookup-member-any
+    : {ss : Symbols}
+    → {m : Member ss}
+    → {a : ℕ}
+    → (s : Symbol a)
+    → .(sym s ∈ ss)
+    → lookup-member ss (Symbol.name s) ≡ just m
+    → Equal (Any Symbol) (Any Symbol) (any s) (any (Member.symbol m))
+  lookup-member-any {ss = ss} s p _
+    with Collection.lookup-member ss (Symbol.name s)
+    | inspect (Collection.lookup-member ss) (Symbol.name s)
+  ... | just _ | [ q ]
+    with Collection.lookup-member-eq (any s) (recompute (sym s ∈? ss) p) q
+  lookup-member-any _ _ refl | _ | _ | refl
+    = refl
+
+  lookup-member-arity
+    : {ss : Symbols}
+    → {m : Member ss}
+    → {a : ℕ}
+    → (s : Symbol a)
+    → .(sym s ∈ ss)
+    → lookup-member ss (Symbol.name s) ≡ just m
+    → a ≡ Member.arity m
+  lookup-member-arity s p q
+    with lookup-member-any s p q
+  ... | refl
+    = refl
+
+  lookup-member-eq
+    : {ss : Symbols}
+    → {m : Member ss}
+    → {a : ℕ}
+    → (s : Symbol a)
+    → .(sym s ∈ ss)
+    → lookup-member ss (Symbol.name s) ≡ just m
+    → s ≅ Member.symbol m
+  lookup-member-eq s p q
+    with lookup-member-any s p q
+  ... | refl
+    = refl
+
+  lookup-member-nothing
+    : (ss : Symbols)
+    → (n : Identifier)
+    → lookup-member ss n ≡ nothing
+    → lookup ss n ≡ nothing
+  lookup-member-nothing ss n p
+    with Collection.lookup-member ss n
+    | inspect (Collection.lookup-member ss) n
+  ... | nothing | [ q ]
+    = Collection.lookup-member-nothing ss n q
+
 -- ## Exports
 
 open Symbols public

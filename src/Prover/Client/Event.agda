@@ -6,6 +6,12 @@ data SpecialEvent
   : Set
   where
 
+  quit
+    : SpecialEvent
+
+  write
+    : SpecialEvent
+
   escape
     : SpecialEvent
 
