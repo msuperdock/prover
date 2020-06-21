@@ -178,6 +178,7 @@ executable prover
                      , aeson
                      , brick
                      , bytestring
+                     , directory
                      , ieee754
                      , scientific
                      , text

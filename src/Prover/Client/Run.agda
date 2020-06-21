@@ -3,7 +3,7 @@ module Prover.Client.Run where
 open import Prover.Client
   using (Client)
 open import Prover.Client.Aeson
-  using (Value)
+  using (Value; decode; encode; is-file; read-file; write-file)
 open import Prover.Client.Brick
   using (App; AttributeMap; BrickEvent; CursorLocation; EventM; Next; Widget;
     app; attributes; continue; default-main; event-bind; event-pure;
@@ -30,6 +30,7 @@ module _
   where
 
   module FlatMainEditorRun
+    (p : String)
     (e : FlatMainEditor V E Value)
     (c : FlatClient V E)
     where
@@ -41,10 +42,14 @@ module _
       × FlatMainEditor.StatePath e s
 
     initial
-      : State
-    initial
+      : Maybe Value
+      → State
+    initial nothing
       = FlatMainEditor.initial e
       , FlatMainEditor.initial-path e
+    initial (just s)
+      = FlatMainEditor.initial-with e s
+      , FlatMainEditor.initial-path-with e s
 
     draw
       : State
@@ -64,6 +69,12 @@ module _
     cursor _ (c ∷ _)
       = just c
 
+    write
+      : State
+      → IO ⊤
+    write (s , _)
+      = write-file p (encode (FlatMainEditor.handle-save e s))
+
     handle
       : State
       → BrickEvent
@@ -81,8 +92,7 @@ module _
     ... | just (ι₂ SpecialEvent.quit)
       = halt (s , sp)
     ... | just (ι₂ SpecialEvent.write)
-      = continue (s , sp)
-      -- = event-bind (liftIO {!   !}) (const (continue (s , sp)))
+      = event-bind (liftIO (write (s , sp))) (const (continue (s , sp)))
     ... | just (ι₂ SpecialEvent.escape)
       = continue (FlatMainEditor.handle-escape e s sp)
     ... | just (ι₂ SpecialEvent.return)
@@ -107,13 +117,26 @@ module _
     app'
       = app draw cursor handle start attributes'
 
+    decode-file
+      : Bool
+      → IO (Maybe Value)
+    decode-file false
+      = IO.return nothing
+    decode-file true
+      = read-file p
+      >>= IO.return ∘ decode
+
     main
       : IO ⊤
     main
-      = IO.void (default-main app' initial)
+      = is-file p
+      >>= decode-file
+      >>= default-main app' ∘ initial
+      >>= const (IO.return tt)
 
   flat-main-editor-run
-    : FlatMainEditor V E Value
+    : String
+    → FlatMainEditor V E Value
     → FlatClient V E
     → IO ⊤
   flat-main-editor-run
@@ -125,11 +148,12 @@ main-editor-run
   : {V : ViewStack}
   → {E : EventStack}
   → {A : Set}
+  → String
   → MainEditor V E Value A
   → Client V E
   → IO ⊤
-main-editor-run e c
-  = flat-main-editor-run
+main-editor-run p e c
+  = flat-main-editor-run p
     (main-editor-flatten e)
     (client-flatten c)
 

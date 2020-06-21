@@ -234,6 +234,14 @@ record FlatMainEditor
     initial-path
       : StatePath initial
 
+    initial-with
+      : S
+      → State
+
+    initial-path-with
+      : (s : S)
+      → StatePath (initial-with s)
+
   -- #### Draw
 
   field

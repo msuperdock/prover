@@ -188,6 +188,8 @@ module ProofClient where
     = just (ι₁ ProofEvent.substitute-meta)
   handle _ (InputEvent.char 'q')
     = just (ι₂ SpecialEvent.quit)
+  handle _ (InputEvent.char 'w')
+    = just (ι₂ SpecialEvent.write)
   handle _ _
     = nothing
 
@@ -249,6 +251,7 @@ main
   : IO ⊤
 main
   = main-editor-run
+    "/data/code/prover/test.json"
     (proof-window-main-editor rules ∧-commutative)
     proof-client
 

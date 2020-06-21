@@ -10,6 +10,8 @@ open import Agda.Builtin.IO public
 
 module IO where
 
+  infixl 1 _>>=_
+
   postulate
 
     return

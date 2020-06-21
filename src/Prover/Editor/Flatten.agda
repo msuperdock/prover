@@ -2,6 +2,8 @@ module Prover.Editor.Flatten where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Unit
+  using (category-unit)
 open import Prover.Editor
   using (Editor; EventStack; MainEditor; PartialEditor; SimpleEditor;
     SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any; main-editor; 
@@ -383,17 +385,42 @@ module _
     (e : MainEditor V E S A)
     where
 
+    editor
+      : Editor V E
+        (category-unit A)
+    editor
+      = editor-unit
+        (MainEditor.simple-editor e)
+
     flat-editor
       : FlatEditor
         (view-stack-flatten V)
         (event-stack-flatten E) A
     flat-editor
-      = editor-flatten
-      $ editor-unit
-        (MainEditor.simple-editor e)
+      = editor-flatten editor
 
     open FlatEditor flat-editor public
       hiding (handle-escape; handle-return)
+
+    initial-with
+      : S
+      → State
+    initial-with s
+      with MainEditor.decode e s
+    ... | nothing
+      = initial
+    ... | just s'
+      = (s' , nothing)
+
+    initial-path-with
+      : (s : S)
+      → StatePath (initial-with s)
+    initial-path-with s
+      with MainEditor.decode e s
+    ... | nothing
+      = initial-path
+    ... | just s'
+      = Editor.initial-path editor s' Direction.up
 
     handle-escape
       : (s : State)

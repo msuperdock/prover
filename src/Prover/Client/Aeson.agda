@@ -46,6 +46,19 @@ postulate
     : Value
     → ByteString
 
+  is-file
+    : String
+    → IO Bool
+
+  read-file
+    : String
+    → IO ByteString
+
+  write-file
+    : String
+    → ByteString
+    → IO ⊤
+
 -- ## Foreign
 
 -- ### Imports
@@ -57,12 +70,16 @@ postulate
     (decode, encode, Value (Array, Bool, Null, Number, Object, String))
   import Data.ByteString.Lazy
     (ByteString)
+  import qualified Data.ByteString.Lazy as ByteString
+    (readFile, writeFile)
   import Data.Scientific
     (floatingOrInteger, scientific)
   import Data.Text
     (pack, unpack)
   import Data.Vector
     (fromList, toList)
+  import System.Directory
+    (doesFileExist)
 #-}
 
 -- ### Definitions
@@ -143,4 +160,10 @@ postulate
   = decode #-}
 {-# COMPILE GHC encode
   = encode #-}
+{-# COMPILE GHC is-file
+  = doesFileExist . unpack #-}
+{-# COMPILE GHC read-file
+  = ByteString.readFile . unpack #-}
+{-# COMPILE GHC write-file
+  = ByteString.writeFile . unpack #-}
 
