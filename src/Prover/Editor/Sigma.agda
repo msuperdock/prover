@@ -234,7 +234,7 @@ module _
     initial-path (ι₁ s₁)
       = SplitEditor.initial-path e₁ s₁
     initial-path (ι₂ (x₁ , s₂))
-      = ι₂ (Editor.initial-path (e₂ x₁) s₂)
+      = ι₁ (SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁))
 
     initial-path-with
       : (s : State)
