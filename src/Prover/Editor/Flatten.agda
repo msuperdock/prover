@@ -233,7 +233,7 @@ module _
     initial-path
       : StatePath initial
     initial-path
-      = Editor.initial-path e (Editor.initial e) Direction.up
+      = Editor.initial-path e (Editor.initial e)
 
     -- ##### Draw
 
@@ -420,7 +420,7 @@ module _
     ... | nothing
       = initial-path
     ... | just s'
-      = Editor.initial-path editor s' Direction.up
+      = Editor.initial-path editor s'
 
     handle-escape
       : (s : State)

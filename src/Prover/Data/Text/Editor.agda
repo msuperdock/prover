@@ -197,15 +197,21 @@ module TextWithSimpleBaseEditor
 
   initial-path
     : (s : State)
+    → StatePath s
+  initial-path _
+    = Fin.maximum
+
+  initial-path-with
+    : (s : State)
     → Direction
     → StatePath s
-  initial-path _ Direction.up
+  initial-path-with _ Direction.up
     = zero
-  initial-path _ Direction.down
+  initial-path-with _ Direction.down
     = zero
-  initial-path _ Direction.left
+  initial-path-with _ Direction.left
     = zero
-  initial-path _ Direction.right
+  initial-path-with _ Direction.right
     = Fin.maximum
 
   -- ##### Draw
@@ -278,7 +284,7 @@ module TextWithSimpleBaseEditor
   handle-direction-valid
     : (s : State)
     → (d : Direction)
-    → handle-direction s (initial-path s d) d ≡ nothing
+    → handle-direction s (initial-path-with s d) d ≡ nothing
   handle-direction-valid _ Direction.up
     = refl
   handle-direction-valid _ Direction.down

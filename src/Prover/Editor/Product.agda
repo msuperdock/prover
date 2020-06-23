@@ -247,14 +247,20 @@ module _
 
     initial-path
       : (s : State)
+      → StatePath s
+    initial-path (s₁ , _)
+      = ι₁ (Editor.initial-path e₁ s₁)
+
+    initial-path-with
+      : (s : State)
       → Direction
       → StatePath s
-    initial-path (s₁ , s₂) d'
+    initial-path-with (s₁ , s₂) d'
       with d' ≟ d dir
     ... | no _
-      = ι₁ (Editor.initial-path e₁ s₁ d')
+      = ι₁ (Editor.initial-path-with e₁ s₁ d')
     ... | yes _
-      = ι₂ (Editor.initial-path e₂ s₂ d')
+      = ι₂ (Editor.initial-path-with e₂ s₂ d')
 
     -- ##### Draw
 
@@ -363,7 +369,7 @@ module _
     ... | nothing | no _
       = nothing
     ... | nothing | yes _
-      = just (ι₂ (Editor.initial-path e₂ s₂ (Direction.reverse d')))
+      = just (ι₂ (Editor.initial-path-with e₂ s₂ (Direction.reverse d')))
     ... | just sp₁' | _
       = just (ι₁ sp₁')
     handle-direction (s₁ , s₂) (ι₂ sp₂) d'
@@ -372,25 +378,25 @@ module _
     ... | nothing | no _
       = nothing
     ... | nothing | yes _
-      = just (ι₁ (Editor.initial-path e₁ s₁ (Direction.reverse d')))
+      = just (ι₁ (Editor.initial-path-with e₁ s₁ (Direction.reverse d')))
     ... | just sp₂' | _
       = just (ι₂ sp₂')
 
     handle-direction-valid
       : (s : State)
       → (d' : Direction)
-      → handle-direction s (initial-path s d') d' ≡ nothing
+      → handle-direction s (initial-path-with s d') d' ≡ nothing
     handle-direction-valid _ d'
       with d' ≟ d dir
       | inspect (_≟_dir d') d
     handle-direction-valid (s₁ , _) d' | no _ | [ _ ]
-      with Editor.handle-direction e₁ s₁ (Editor.initial-path e₁ s₁ d') d'
+      with Editor.handle-direction e₁ s₁ (Editor.initial-path-with e₁ s₁ d') d'
       | Editor.handle-direction-valid e₁ s₁ d'
       | d' ≟ d dir
     handle-direction-valid _ _ _ | _ | [ refl ] | _ | refl | _
       = refl
     handle-direction-valid (_ , s₂) d' | yes refl | _
-      with Editor.handle-direction e₂ s₂ (Editor.initial-path e₂ s₂ d') d'
+      with Editor.handle-direction e₂ s₂ (Editor.initial-path-with e₂ s₂ d') d'
       | Editor.handle-direction-valid e₂ s₂ d'
       | Direction.reverse d' ≟ d dir
     ... | _ | refl | no _

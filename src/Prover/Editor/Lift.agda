@@ -182,7 +182,7 @@ module _
     -- ##### State
 
     open BaseEditor e public
-      using (initial; initial-path)
+      using (initial; initial-path; initial-path-with)
 
     StateStack
       : ViewStack

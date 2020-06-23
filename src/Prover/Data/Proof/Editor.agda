@@ -550,15 +550,21 @@ module ProofSimpleBaseEditor
 
   initial-path
     : (s : State)
+    → StatePath s
+  initial-path _
+    = stop
+
+  initial-path-with
+    : (s : State)
     → Direction
     → StatePath s
-  initial-path p Direction.up
+  initial-path-with p Direction.up
     = ProofPath.top p
-  initial-path _ Direction.down
+  initial-path-with _ Direction.down
     = stop
-  initial-path _ Direction.left
+  initial-path-with _ Direction.left
     = stop
-  initial-path _ Direction.right
+  initial-path-with _ Direction.right
     = stop
 
   -- ##### Draw
@@ -618,7 +624,7 @@ module ProofSimpleBaseEditor
   handle-direction-valid
     : (s : State)
     → (d : Direction)
-    → handle-direction s (initial-path s d) d ≡ nothing
+    → handle-direction s (initial-path-with s d) d ≡ nothing
   handle-direction-valid p Direction.up
     = ProofPath.up-top p
   handle-direction-valid _ Direction.down
