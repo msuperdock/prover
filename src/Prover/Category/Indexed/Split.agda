@@ -469,10 +469,8 @@ module Internal where
 open Internal public
   using (IndexedSplitDependentFunctor; IndexedSplitDependentFunctorSquare;
     indexed-split-dependent-functor; indexed-split-dependent-functor₀;
-    indexed-split-dependent-functor-compose;
     indexed-split-dependent-functor-square;
-    indexed-split-dependent-functor-square₀;
-    indexed-split-dependent-functor-square-compose)
+    indexed-split-dependent-functor-square₀)
 
 -- ### IndexedSplitFunctor
 
@@ -491,8 +489,6 @@ open Internal public
   using (indexed-split-functor₀; indexed-split-functor-compose)
 
 module IndexedSplitFunctor where
-
-  open Internal.IndexedSplitFunctor public
 
   open Internal public using () renaming
     ( indexed-split-functor-tail
@@ -520,11 +516,9 @@ IndexedSplitFunctorSquare
 open Internal.IndexedSplitFunctorSquare public
 
 open Internal public
-  using (indexed-split-functor-square₀; indexed-split-functor-square-compose)
+  using (indexed-split-functor-square₀)
 
 module IndexedSplitFunctorSquare where
-
-  open Internal.IndexedSplitFunctorSquare public
 
   open Internal public using () renaming
     ( indexed-split-functor-square-unpack

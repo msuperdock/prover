@@ -20,8 +20,7 @@ open import Prover.Editor.Flatten
   using (base-event-stack-flatten; base-event-stack-flatten-lift;
     base-view-stack-flatten-lift; split-editor-flatten)
 open import Prover.Editor.Lift
-  using (event-stack-lift; event-stack-map-lift; simple-editor-lift;
-    view-stack-lift)
+  using (event-stack-lift; event-stack-map-lift; simple-editor-lift)
 open import Prover.Editor.Map
   using (flat-editor-map-event; flat-editor-map-view; split-editor-map-event;
     split-editor-map-simple)
@@ -109,7 +108,7 @@ TextFlatEventStack
 -- ### State
 
 TextWithState
-  : (p : Char → Bool)
+  : (Char → Bool)
   → Set
 TextWithState p
   = Any (Vec (CharWith p))
@@ -117,7 +116,7 @@ TextWithState p
 -- ### Pure
 
 TextWithCategory
-  : (p : Char → Bool)
+  : (Char → Bool)
   → Category
 TextWithCategory p
   = category-unit (TextWith p)

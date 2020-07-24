@@ -1,10 +1,14 @@
 module Prover.Prelude.Equality where
 
+open import Agda.Builtin.Equality
+  using (refl)
 open import Prover.Prelude.Empty
   using (¬_)
 
-open import Agda.Builtin.Equality
-  using (refl) renaming (_≡_ to _≡'_)
+open Agda.Builtin.Equality using () renaming
+  ( _≡_
+    to _≡'_
+  )
 
 -- ## Definition
 
@@ -24,11 +28,19 @@ data _≅_
       : x ≅ x
 
 Equal
+  : (A : Set)
+  → A
+  → A
+  → Set
+Equal _ x₁ x₂
+  = x₁ ≅ x₂
+
+Equal'
   : (A B : Set)
   → A
   → B
   → Set
-Equal _ _ x₁ x₂
+Equal' _ _ x₁ x₂
   = x₁ ≅ x₂
 
 _≡_

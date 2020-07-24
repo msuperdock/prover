@@ -25,16 +25,6 @@ record ChildEditor
       to BaseState
     ; Arrow
       to BaseStateArrow
-    ; identity
-      to base-state-identity
-    ; compose
-      to base-state-compose
-    ; precompose
-      to base-state-precompose
-    ; postcompose
-      to base-state-postcompose
-    ; associative
-      to base-state-associative
     )
 
   open BaseEditor e using () renaming

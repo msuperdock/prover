@@ -74,10 +74,10 @@ module Internal where
     → {G : ChainFunctor D₁ D₃}
     → {H₁ : ChainFunctor C₁ D₁}
     → {H₂ : ChainFunctor C₂ D₂}
-    → (F' : IndexedFunctor C₁' C₂' F)
-    → (G' : IndexedFunctor D₁' D₃' G)
-    → (H₁' : IndexedFunctor C₁' D₁' H₁)
-    → (H₂' : IndexedFunctor C₂' D₂' H₂)
+    → IndexedFunctor C₁' C₂' F
+    → IndexedFunctor D₁' D₃' G
+    → IndexedFunctor C₁' D₁' H₁
+    → IndexedFunctor C₂' D₂' H₂
     → Set
     
   -- #### IndexedDependentCategory
@@ -1024,8 +1024,6 @@ open Internal public
 
 module IndexedCategory where
 
-  open Internal.IndexedCategory public
-
   open Internal public using () renaming
     ( indexed-category-tail
       to tail
@@ -1052,8 +1050,6 @@ open Internal public
 
 module IndexedFunctor where
 
-  open Internal.IndexedFunctor public
-
   open Internal public using () renaming
     ( indexed-functor-unpack
       to unpack
@@ -1075,11 +1071,9 @@ IndexedFunctorIdentity
 open Internal.IndexedFunctorIdentity public
 
 open Internal public
-  using (indexed-functor-identity₀; indexed-functor-identity₀-eq)
+  using (indexed-functor-identity₀)
 
 module IndexedFunctorIdentity where
-
-  open Internal.IndexedFunctorIdentity public
 
   open Internal public using () renaming
     ( indexed-functor-identity-unpack
@@ -1108,11 +1102,9 @@ IndexedFunctorCompose
 open Internal.IndexedFunctorCompose public
 
 open Internal public
-  using (indexed-functor-compose₀; indexed-functor-compose₀-eq)
+  using (indexed-functor-compose₀)
 
 module IndexedFunctorCompose where
-
-  open Internal.IndexedFunctorCompose public
 
   open Internal public using () renaming
     ( indexed-functor-compose-unpack
@@ -1133,10 +1125,10 @@ IndexedFunctorSquare
   → {G : ChainFunctor D₁ D₃}
   → {H₁ : ChainFunctor C₁ D₁}
   → {H₂ : ChainFunctor C₂ D₂}
-  → (F' : IndexedFunctor C₁' C₂' F)
-  → (G' : IndexedFunctor D₁' D₃' G)
-  → (H₁' : IndexedFunctor C₁' D₁' H₁)
-  → (H₂' : IndexedFunctor C₂' D₂' H₂)
+  → IndexedFunctor C₁' C₂' F
+  → IndexedFunctor D₁' D₃' G
+  → IndexedFunctor C₁' D₁' H₁
+  → IndexedFunctor C₂' D₂' H₂
   → Set
 IndexedFunctorSquare
   = Internal.IndexedFunctorSquare
@@ -1144,11 +1136,9 @@ IndexedFunctorSquare
 open Internal.IndexedFunctorSquare public
 
 open Internal public
-  using (indexed-functor-square₀; indexed-functor-square₀-eq)
+  using (indexed-functor-square₀)
 
 module IndexedFunctorSquare where
-
-  open Internal.IndexedFunctorSquare public
 
   open Internal public using () renaming
     ( indexed-functor-square-unpack

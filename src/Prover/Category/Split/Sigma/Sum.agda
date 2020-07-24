@@ -17,7 +17,6 @@ open import Prover.Category.Weak
   using (weak-functor-compose; weak-functor-square-compose)
 open import Prover.Category.Weak.Sigma.Maybe
   using (weak-functor-sigma-may₁; weak-functor-square-sigma-may₁)
-open import Prover.Prelude
 
 -- ## SplitFunctor
 

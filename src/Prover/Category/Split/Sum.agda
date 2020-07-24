@@ -44,10 +44,6 @@ module _
         to unbase
       ; map
         to unmap
-      ; map-identity
-        to unmap-identity
-      ; map-compose
-        to unmap-compose
       )
 
     abstract

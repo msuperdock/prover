@@ -1,9 +1,7 @@
 module Prover.Category.Indexed.Sigma.Maybe where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; Functor; FunctorCompose;
-    FunctorIdentity; FunctorSquare)
+  using (Category)
 open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)

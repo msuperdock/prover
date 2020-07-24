@@ -483,7 +483,7 @@ module _
       : {x y : Category.Object (category-sigma C₂)}
       → (f : Category.Arrow (category-sigma C₂) x y)
       → Functor.map (functor-sigma F₁₂) f ≅ Functor.map (functor-sigma F₂₂) f
-    map {x = x} {y = y@(y₁ , y₂)} (CategorySigma.arrow y₂' f₁ f₂ _)
+    map {x = x} {y = y@(y₁ , _)} (CategorySigma.arrow y₂' f₁ f₂ _)
       = CategorySigma.arrow-eq' D₂ (base x) (base y)
         (DependentFunctorEqual.base' p y₁ y₂')
         (DependentFunctorEqual.map p f₁)

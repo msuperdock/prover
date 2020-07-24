@@ -1,16 +1,12 @@
 module Prover.Category.Indexed.Simple where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (Category; FunctorCompose; FunctorIdentity; FunctorSquare)
 open import Prover.Category.Base
   using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)
-open import Prover.Category.Partial.Base
-  using (PartialFunction)
-open import Prover.Category.Partial.Base.Compose
-  using (partial-function-compose)
 open import Prover.Prelude
 
 -- ## Internal
@@ -78,10 +74,10 @@ module Internal where
     → {G : ChainFunctor D₁ D₃}
     → {H₁ : ChainFunctor C₁ D₁}
     → {H₂ : ChainFunctor C₂ D₂}
-    → (F' : IndexedSimpleFunctor C₁' C₂' F)
-    → (G' : IndexedSimpleFunctor D₁' D₃' G)
-    → (H₁' : IndexedSimpleFunctor C₁' D₁' H₁)
-    → (H₂' : IndexedSimpleFunctor C₂' D₂' H₂)
+    → IndexedSimpleFunctor C₁' C₂' F
+    → IndexedSimpleFunctor D₁' D₃' G
+    → IndexedSimpleFunctor C₁' D₁' H₁
+    → IndexedSimpleFunctor C₂' D₂' H₂
     → Set
     
   -- #### IndexedSimpleDependentCategory
@@ -690,8 +686,6 @@ open Internal public
 
 module IndexedSimpleCategory where
 
-  open Internal.IndexedSimpleCategory public
-
   open Internal public using () renaming
     ( indexed-simple-category-tail
       to tail
@@ -718,8 +712,6 @@ open Internal public
 
 module IndexedSimpleFunctor where
 
-  open Internal.IndexedSimpleFunctor public
-
   open Internal public using () renaming
     ( indexed-simple-functor-unpack
       to unpack
@@ -744,8 +736,6 @@ open Internal public
   using (indexed-simple-functor-identity₀)
 
 module IndexedSimpleFunctorIdentity where
-
-  open Internal.IndexedSimpleFunctorIdentity public
 
   open Internal public using () renaming
     ( indexed-simple-functor-identity-unpack
@@ -778,8 +768,6 @@ open Internal public
 
 module IndexedSimpleFunctorCompose where
 
-  open Internal.IndexedSimpleFunctorCompose public
-
   open Internal public using () renaming
     ( indexed-simple-functor-compose-unpack
       to unpack
@@ -799,10 +787,10 @@ IndexedSimpleFunctorSquare
   → {G : ChainFunctor D₁ D₃}
   → {H₁ : ChainFunctor C₁ D₁}
   → {H₂ : ChainFunctor C₂ D₂}
-  → (F' : IndexedSimpleFunctor C₁' C₂' F)
-  → (G' : IndexedSimpleFunctor D₁' D₃' G)
-  → (H₁' : IndexedSimpleFunctor C₁' D₁' H₁)
-  → (H₂' : IndexedSimpleFunctor C₂' D₂' H₂)
+  → IndexedSimpleFunctor C₁' C₂' F
+  → IndexedSimpleFunctor D₁' D₃' G
+  → IndexedSimpleFunctor C₁' D₁' H₁
+  → IndexedSimpleFunctor C₂' D₂' H₂
   → Set
 IndexedSimpleFunctorSquare
   = Internal.IndexedSimpleFunctorSquare
@@ -813,8 +801,6 @@ open Internal public
   using (indexed-simple-functor-square₀)
 
 module IndexedSimpleFunctorSquare where
-
-  open Internal.IndexedSimpleFunctorSquare public
 
   open Internal public using () renaming
     ( indexed-simple-functor-square-unpack

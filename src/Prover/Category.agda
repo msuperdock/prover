@@ -819,17 +819,6 @@ record DependentCategory
     = FunctorCompose.map
       (functor-compose f g)
 
-  map-compose'
-    : {x y : Category.Object C}
-    → {x' y' z' : Object x}
-    → (f : Category.Arrow C x y)
-    → (f' : Arrow x y' z')
-    → (g' : Arrow x x' y')
-    → map f (compose x f' g') ≡ compose y (map f f') (map f g')
-  map-compose' f
-    = Functor.map-compose
-      (functor f)
-
   map-compose-eq'
     : {x y : Category.Object C}
     → {x' y₁' y₂' z' : Object x}
@@ -873,7 +862,7 @@ record DependentFunctor
 
   base'
     : (x : Category.Object C)
-    → (x' : DependentCategory.Object C' x)
+    → DependentCategory.Object C' x
     → DependentCategory.Object D' (base x)
   base' x
     = Functor.base
@@ -895,17 +884,6 @@ record DependentFunctor
       ≡ DependentCategory.identity D' (base x) (base' x x')
   map-identity' x
     = Functor.map-identity
-      (functor' x)
-
-  map-compose'
-    : (x : Category.Object C)
-    → {x' y' z' : DependentCategory.Object C' x}
-    → (f : DependentCategory.Arrow C' x y' z')
-    → (g : DependentCategory.Arrow C' x x' y')
-    → map' x (DependentCategory.compose C' x f g)
-      ≡ DependentCategory.compose D' (base x) (map' x f) (map' x g)
-  map-compose' x
-    = Functor.map-compose
       (functor' x)
 
   map-compose-eq'
@@ -1124,23 +1102,6 @@ record DependentFunctorIdentity
       → FunctorIdentity
         (DependentFunctor.functor' F x)
 
-  base'
-    : (x : Category.Object C)
-    → (x' : DependentCategory.Object C' x)
-    → DependentFunctor.base' F x x' ≅ x'
-  base' x
-    = FunctorIdentity.base
-      (functor' x)
-
-  map'
-    : (x : Category.Object C)
-    → {x' y' : DependentCategory.Object C' x}
-    → (f : DependentCategory.Arrow C' x x' y')
-    → DependentFunctor.map' F x f ≅ f
-  map' x
-    = FunctorIdentity.map
-      (functor' x)
-
 -- ### Conversion
 
 module _
@@ -1209,29 +1170,6 @@ record DependentFunctorCompose
         (DependentFunctor.functor' F (DependentFunctor.base G x))
         (DependentFunctor.functor' G x)
         (DependentFunctor.functor' H x)
-
-  base'
-    : (x : Category.Object C)
-    → (x' : DependentCategory.Object C' x)
-    → DependentFunctor.base' H x x'
-    ≅ DependentFunctor.base' F
-      (DependentFunctor.base G x)
-      (DependentFunctor.base' G x x')
-  base' x
-    = FunctorCompose.base
-      (functor' x)
-
-  map'
-    : (x : Category.Object C)
-    → {x' y' : DependentCategory.Object C' x}
-    → (f : DependentCategory.Arrow C' x x' y')
-    → DependentFunctor.map' H x f
-    ≅ DependentFunctor.map' F
-      (DependentFunctor.base G x)
-      (DependentFunctor.map' G x f)
-  map' x
-    = FunctorCompose.map
-      (functor' x)
 
 -- ### Conversion
 
@@ -1309,33 +1247,6 @@ record DependentFunctorSquare
         (DependentFunctor.functor' G (DependentFunctor.base H₁ x₁))
         (DependentFunctor.functor' H₁ x₁)
         (DependentFunctor.functor' H₂ (DependentFunctor.base F x₁))
-
-  base'
-    : (x₁ : Category.Object C₁)
-    → (x₁' : DependentCategory.Object C₁' x₁)
-    → DependentFunctor.base' H₂
-      (DependentFunctor.base F x₁)
-      (DependentFunctor.base' F x₁ x₁') 
-    ≅ DependentFunctor.base' G
-      (DependentFunctor.base H₁ x₁)
-      (DependentFunctor.base' H₁ x₁ x₁')
-  base' x₁
-    = FunctorSquare.base
-      (functor' x₁)
-
-  map'
-    : (x₁ : Category.Object C₁)
-    → {x₁' y₁' : DependentCategory.Object C₁' x₁}
-    → (f₁ : DependentCategory.Arrow C₁' x₁ x₁' y₁')
-    → DependentFunctor.map' H₂
-      (DependentFunctor.base F x₁)
-      (DependentFunctor.map' F x₁ f₁)
-    ≅ DependentFunctor.map' G
-      (DependentFunctor.base H₁ x₁)
-      (DependentFunctor.map' H₁ x₁ f₁)
-  map' x₁
-    = FunctorSquare.map
-      (functor' x₁)
 
 -- ### Conversion
 

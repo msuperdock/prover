@@ -3,7 +3,7 @@ module Prover.Prelude.Retraction where
 open import Prover.Prelude.Equality
   using (_≡_; refl)
 open import Prover.Prelude.Function
-  using (_∘_; id)
+  using (_∘_)
 
 -- ## Definition
 
@@ -25,36 +25,6 @@ record Retraction
     to-from
       : (y : B)
       → to (from y) ≡ y
-
--- ## Identity
-
-module RetractionIdentity
-  (A : Set)
-  where
-
-  to
-    : A
-    → A
-  to
-    = id
-
-  from
-    : A
-    → A
-  from
-    = id
-
-  to-from
-    : (y : A)
-    → to (from y) ≡ y
-  to-from _
-    = refl
-
-retraction-identity
-  : (A : Set)
-  → Retraction A A
-retraction-identity A
-  = record {RetractionIdentity A}
 
 -- ## Compose
 

@@ -7,8 +7,7 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.Base
   using (IndexedSet)
 open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction; IndexedPartialFunction';
-    indexed-partial-function-compose)
+  using (IndexedPartialFunction; indexed-partial-function-compose)
 open import Prover.Category.Indexed.Simple
   using (IndexedSimpleCategory)
 open import Prover.Category.Indexed.Split
@@ -159,11 +158,11 @@ module _
       = indexed-simple-editor-map-view F
         (IndexedMainEditor.indexed-simple-editor e)
 
-  indexed-simple-main-editor-map-view
+  indexed-main-editor-map-view
     : ViewStackMap V W
     → IndexedMainEditor V E S C
     → IndexedMainEditor W E S C
-  indexed-simple-main-editor-map-view F e
+  indexed-main-editor-map-view F e
     = record {IndexedMainEditorMapView F e}
 
 -- ### IndexedSplitMainEditor
@@ -326,11 +325,11 @@ module _
       = indexed-simple-editor-map-event G
         (IndexedMainEditor.indexed-simple-editor e)
 
-  indexed-simple-main-editor-map-event
+  indexed-main-editor-map-event
     : EventStackMap E F
     → IndexedMainEditor V E S C
     → IndexedMainEditor V F S C
-  indexed-simple-main-editor-map-event G e
+  indexed-main-editor-map-event G e
     = record {IndexedMainEditorMapEvent G e}
 
 -- ### IndexedSplitMainEditor
@@ -365,7 +364,7 @@ module _
   indexed-split-main-editor-map-event G e
     = record {IndexedSplitMainEditorMapEvent G e}
 
--- ## Raw
+-- ## State
 
 -- ### IndexedMainEditor
 
@@ -377,7 +376,7 @@ module _
   {C : ChainCategory n}
   where
 
-  module IndexedMainEditorMapRaw
+  module IndexedMainEditorMapState
     (F : SplitFunction T S)
     (e : IndexedMainEditor V E S C)
     where
@@ -391,14 +390,14 @@ module _
       = indexed-simple-split-function-compose
         (IndexedMainEditor.indexed-simple-split-function e) F
 
-  indexed-simple-main-editor-map-raw
+  indexed-main-editor-map-state
     : SplitFunction T S
     → IndexedMainEditor V E S C
     → IndexedMainEditor V E T C
-  indexed-simple-main-editor-map-raw F e
-    = record {IndexedMainEditorMapRaw F e}
+  indexed-main-editor-map-state F e
+    = record {IndexedMainEditorMapState F e}
 
--- ### IndexedSplitMainEditor (state)
+-- ### IndexedSplitMainEditor
 
 module _
   {V : ViewStack}
@@ -409,7 +408,7 @@ module _
   {C' : IndexedCategory C}
   where
 
-  module IndexedMainEditorMapState
+  module IndexedSplitMainEditorMapState
     (F : SplitFunction T S)
     (e : IndexedSplitMainEditor V E S P C')
     where
@@ -423,14 +422,16 @@ module _
       = indexed-split-function-compose
         (IndexedSplitMainEditor.state-indexed-split-function e) F
 
-  indexed-simple-main-editor-map-state
+  indexed-split-main-editor-map-state
     : SplitFunction T S
     → IndexedSplitMainEditor V E S P C'
     → IndexedSplitMainEditor V E T P C'
-  indexed-simple-main-editor-map-state F e
-    = record {IndexedMainEditorMapState F e}
+  indexed-split-main-editor-map-state F e
+    = record {IndexedSplitMainEditorMapState F e}
 
--- ### IndexedSplitMainEditor (pure)
+-- ## Pure
+
+-- ### IndexedSplitMainEditor
 
 module _
   {V : ViewStack}
@@ -455,11 +456,11 @@ module _
       = indexed-split-function-compose
         (IndexedSplitMainEditor.pure-indexed-split-function e) F
 
-  indexed-simple-main-editor-map-pure
+  indexed-split-main-editor-map-pure
     : SplitFunction Q P
     → IndexedSplitMainEditor V E S P C'
     → IndexedSplitMainEditor V E S Q C'
-  indexed-simple-main-editor-map-pure F e
+  indexed-split-main-editor-map-pure F e
     = record {IndexedMainEditorMapPure F e}
 
 -- ## Result

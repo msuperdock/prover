@@ -2,14 +2,10 @@ module Prover.Data.Formula.Construct where
 
 open import Prover.Data.Associativity
   using (Associativity)
-open import Prover.Data.Identifier
-  using (Identifier)
 open import Prover.Data.Precedence
   using (Precedence; _<_prc)
 open import Prover.Data.Symbol
   using (Symbol; SymbolValid; symbol; tt)
-open import Prover.Data.Token
-  using (Token)
 open import Prover.Prelude
 
 open SymbolValid
@@ -348,16 +344,10 @@ module Construct where
       to left-valid
     ; construct-left-valid?
       to left-valid?
-    ; construct-left-valid-right-valid
-      to left-valid-right-valid
     ; construct-right-valid
       to right-valid
     ; construct-right-valid?
       to right-valid?
-    ; construct-right-valid-left-valid
-      to right-valid-left-valid
-    ; construct-to-pair
-      to to-pair
     )
 
 -- ### LeftSubconstruct

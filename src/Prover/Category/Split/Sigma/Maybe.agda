@@ -11,7 +11,6 @@ open import Prover.Category.Split.Maybe
   using (split-dependent-functor-maybe; split-dependent-functor-square-maybe)
 open import Prover.Category.Split.Sigma
   using (split-functor-sigma; split-functor-square-sigma)
-open import Prover.Prelude
 
 -- ## SplitFunctor
 

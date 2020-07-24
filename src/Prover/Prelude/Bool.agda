@@ -3,9 +3,9 @@ module Prover.Prelude.Bool where
 open import Prover.Prelude.Decidable
   using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Empty
-  using (⊥; ⊥-elim)
+  using (⊥)
 open import Prover.Prelude.Equality
-  using (_≡_; _≢_; refl)
+  using (_≢_; refl)
 open import Prover.Prelude.Function
   using (id)
 open import Prover.Prelude.Unit
@@ -30,17 +30,6 @@ module Bool where
 
   -- ### Interface
   
-  bool
-    : {A : Set}
-    → Bool
-    → A
-    → A
-    → A
-  bool false x _
-    = x
-  bool true _ x
-    = x
-
   not
     : Bool
     → Bool
@@ -65,7 +54,7 @@ module Bool where
     : Bool
     → Bool
     → Bool
-  false ∧ b
+  false ∧ _
     = false
   true ∧ b
     = b
@@ -122,22 +111,20 @@ module Bool where
     : {x y : Bool}
     → T (x ∧ y)
     → T x
-  ∧-elimination-left {false} p
+  ∧-elimination-left {x = false} p
     = p
-  ∧-elimination-left {true} p
+  ∧-elimination-left {x = true} _
     = tt
   
   ∧-elimination-right
     : {x y : Bool}
     → T (x ∧ y)
     → T y
-  ∧-elimination-right {false} p
-    = ⊥-elim p
-  ∧-elimination-right {true} p
+  ∧-elimination-right {x = true} p
     = p
   
 -- ## Exports
 
 open Bool public
-  using (T; _∨_; _∧_; _≟_bool; bool; not)
+  using (T; _∨_; _∧_; _≟_bool; not)
 

@@ -3,23 +3,19 @@ module Prover.Prelude.CharWith where
 open import Prover.Prelude.Any1
   using (Any₁)
 open import Prover.Prelude.Bool
-  using (Bool; T; false; true)
+  using (Bool; T; true)
 open import Prover.Prelude.Char
   using (Char)
 open import Prover.Prelude.Digit
-  using (Digit; Digits; 0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
+  using (module Digits; Digit; 0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
 open import Prover.Prelude.Empty
   using (⊥-elim)
 open import Prover.Prelude.Equality
-  using (_≡_; refl; rewrite')
-open import Prover.Prelude.Fin
-  using (suc; zero)
+  using (_≡_; refl)
 open import Prover.Prelude.Function
   using (_$_; const)
-open import Prover.Prelude.Inspect
-  using ([_]; inspect)
 open import Prover.Prelude.Maybe
-  using (Maybe; just; nothing)
+  using (just; nothing)
 open import Prover.Prelude.Nat
   using (ℕ)
 open import Prover.Prelude.Retraction
@@ -66,17 +62,6 @@ module CharWith where
   -- ### Characters
 
   open _CharWith.CharWith public
-
-  from-char
-    : (p : Char → Bool)
-    → Char
-    → Maybe (CharWith p)
-  from-char p c
-    with p c | inspect p c
-  ... | false | _
-    = nothing
-  ... | true | [ q ]
-    = just (char-with c (rewrite' T q tt))
 
   module CharWithRetraction where
   
@@ -159,10 +144,4 @@ module CharWith where
     $ Any₁.retraction 
     $ Vec.retraction
     $ retraction-digit
-
-  to-nat
-    : Any₁ (Vec (CharWith Char.is-digit))
-    → ℕ
-  to-nat
-    = Retraction.to retraction-digits
 

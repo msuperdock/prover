@@ -40,16 +40,6 @@ module _
         to State
       ; Arrow
         to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     open Editor e public
@@ -170,16 +160,6 @@ module _
         to State
       ; Arrow
         to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     open SimpleBaseEditor e public
@@ -221,16 +201,6 @@ module _
         to BaseState
       ; Arrow
         to BaseStateArrow
-      ; identity
-        to base-state-identity
-      ; compose
-        to base-state-compose
-      ; precompose
-        to base-state-precompose
-      ; postcompose
-        to base-state-postcompose
-      ; associative
-        to base-state-associative
       )
 
     open SimpleBaseEditor e using () renaming

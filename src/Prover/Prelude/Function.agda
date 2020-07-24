@@ -42,6 +42,6 @@ const
   → A
   → B
   → A
-const x y
+const x _
   = x
 

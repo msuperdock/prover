@@ -209,16 +209,6 @@ module _
         to State
       ; Arrow
         to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     -- ##### State
@@ -675,18 +665,6 @@ module _
     open Category StateCategory using () renaming
       ( Object
         to State
-      ; Arrow
-        to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     editor

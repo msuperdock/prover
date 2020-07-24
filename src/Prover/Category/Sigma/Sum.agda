@@ -12,7 +12,6 @@ open import Prover.Category.Split
 open import Prover.Category.Sum
   using (category-sum; functor-sum; functor-compose-sum; functor-identity-sum;
     functor-square-sum)
-open import Prover.Prelude
 
 -- ## Category
 

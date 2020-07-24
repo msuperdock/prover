@@ -11,7 +11,7 @@ open import Prover.Data.Rule
 open import Prover.Data.Rules
   using (Rules)
 open import Prover.Data.Symbol
-  using (Symbol; both; left; neither; right)
+  using (Symbol; both; left; neither)
 open import Prover.Data.Symbols
   using (Symbols; sym_∈?_)
 open import Prover.Data.Token
@@ -56,7 +56,7 @@ is-nothing?
   → Dec (x ≡ nothing)
 is-nothing? nothing
   = yes refl
-is-nothing? (just x)
+is-nothing? (just _)
   = no Maybe.just≢nothing
 
 -- ## Identifier
@@ -73,9 +73,9 @@ NonEmpty s
 
 identifier'
   : (n : String)
-  → {p : NonEmpty n}
+  → {_ : NonEmpty n}
   → Identifier
-identifier' n {p = p}
+identifier' n
   with String.to-vec n
 ... | any cs@(_ ∷ _)
   = any cs
@@ -197,9 +197,9 @@ symbols-insert
   : {a : ℕ}
   → (s : Symbol a)
   → (ss : Symbols)
-  → {p : True (is-nothing? (Symbols.lookup ss (Symbol.name s)))}
+  → {_ : True (is-nothing? (Symbols.lookup ss (Symbol.name s)))}
   → Symbols
-symbols-insert s ss {p = p}
+symbols-insert s ss {p}
   = Symbols.insert ss s (to-witness p)
 
 symbols
@@ -235,9 +235,9 @@ symbols
 variables-insert
   : (v : Variable)
   → (vs : Variables)
-  → {p : True (is-false? (Variables.is-member vs v))}
+  → {_ : True (is-false? (Variables.is-member vs v))}
   → Variables
-variables-insert v vs {p = p}
+variables-insert v vs {p}
   = Variables.insert vs v (to-witness p)
 
 ⟪⟫
@@ -272,68 +272,68 @@ variables-insert v vs {p = p}
 formula-variable
   : {vs : Variables}
   → (v  : Variable)
-  → {p : True (var v ∈? vs)}
+  → {_ : True (var v ∈? vs)}
   → Formula symbols vs false
-formula-variable v {p = p}
+formula-variable v {p}
   = Formula.variable' v (to-witness p)
 
 formula-symbol
   : {vs : Variables}
   → {a : ℕ}
   → (s : Symbol a)
-  → {p : True (sym s ∈? symbols)}
+  → {_ : True (sym s ∈? symbols)}
   → Vec (Formula symbols vs false) a
   → Formula symbols vs false
-formula-symbol s {p = p}
+formula-symbol s {p}
   = Formula.symbol s (to-witness p)
 
 formula₀
   : {vs : Variables}
   → (s : Symbol 0)
-  → {p : True (sym s ∈? symbols)}
+  → {_ : True (sym s ∈? symbols)}
   → Formula symbols vs false
-formula₀ s {p = p}
-  = formula-symbol s {p = p} []
+formula₀ s {p}
+  = formula-symbol s {p} []
 
 formula₁
   : {vs : Variables}
   → (s : Symbol 1)
-  → {p : True (sym s ∈? symbols)}
+  → {_ : True (sym s ∈? symbols)}
   → Formula symbols vs false
   → Formula symbols vs false
-formula₁ s {p = p} f₁
-  = formula-symbol s {p = p} (f₁ ∷ [])
+formula₁ s {p} f₁
+  = formula-symbol s {p} (f₁ ∷ [])
 
 formula₂
   : {vs : Variables}
   → (s : Symbol 2)
-  → {p : True (sym s ∈? symbols)}
+  → {_ : True (sym s ∈? symbols)}
   → Formula symbols vs false
   → Formula symbols vs false
   → Formula symbols vs false
-formula₂ s {p = p} f₁ f₂
-  = formula-symbol s {p = p} (f₁ ∷ f₂ ∷ [])
+formula₂ s {p} f₁ f₂
+  = formula-symbol s {p} (f₁ ∷ f₂ ∷ [])
 
 φ
   : {vs : Variables}
-  → {p : True (var ⟨φ⟩ ∈? vs)}
+  → {_ : True (var ⟨φ⟩ ∈? vs)}
   → Formula symbols vs false
-φ {p = p}
-  = formula-variable ⟨φ⟩ {p = p}
+φ {_} {p}
+  = formula-variable ⟨φ⟩ {p}
 
 ψ
   : {vs : Variables}
-  → {p : True (var ⟨ψ⟩ ∈? vs)}
+  → {_ : True (var ⟨ψ⟩ ∈? vs)}
   → Formula symbols vs false
-ψ {p = p}
-  = formula-variable ⟨ψ⟩ {p = p}
+ψ {_} {p}
+  = formula-variable ⟨ψ⟩ {p}
 
 Γ
   : {vs : Variables}
-  → {p : True (var ⟨Γ⟩ ∈? vs)}
+  → {_ : True (var ⟨Γ⟩ ∈? vs)}
   → Formula symbols vs false
-Γ {p = p}
-  = formula-variable ⟨Γ⟩ {p = p}
+Γ {_} {p}
+  = formula-variable ⟨Γ⟩ {p}
 
 infix 30 _formula
 infix 30 _context
@@ -533,9 +533,9 @@ rules-insert
   : {a : ℕ}
   → (r : Rule symbols a)
   → (rs : Rules symbols)
-  → {p : True (is-nothing? (Rules.lookup rs (Rule.name r)))}
+  → {_ : True (is-nothing? (Rules.lookup rs (Rule.name r)))}
   → Rules symbols
-rules-insert r rs {p = p}
+rules-insert r rs {p}
   = Rules.insert rs r (to-witness p)
 
 rules

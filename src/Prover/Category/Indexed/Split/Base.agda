@@ -199,8 +199,6 @@ open Internal public
 
 module IndexedSplitFunction where
 
-  open Internal.IndexedSplitFunction public
-
   open Internal public using () renaming
     ( indexed-split-function-tail
       to tail
@@ -223,8 +221,6 @@ open Internal public
   using (indexed-simple-split-function₀; indexed-simple-split-function-compose)
 
 module IndexedSimpleSplitFunction where
-
-  open Internal.IndexedSimpleSplitFunction public
 
   open Internal public using () renaming
     ( indexed-simple-split-function-tail

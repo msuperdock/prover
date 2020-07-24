@@ -9,7 +9,7 @@ open import Prover.Data.Formula.Construct
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Symbol
-  using (Symbol; SymbolValid; both; left; neither; right; symbol; tt)
+  using (Symbol; both; left; neither; right; symbol; tt)
 open import Prover.Data.Symbols
   using (Symbols; sym_∈_)
 open import Prover.Data.Variable
@@ -401,37 +401,6 @@ module Internal where
     formula-state-right _ (tt {f = f})
       = f
 
-    sandbox-state-update-closed
-      : (s : Any (SandboxState ss vs m))
-      → (k : Fin (sandbox-state-length s))
-      → (f : FormulaState ss vs m)
-      → (FormulaStateLeftClosed (sandbox-state-lookup s k)
-        → FormulaStateLeftClosed f)
-      → (FormulaStateRightClosed (sandbox-state-lookup s k)
-        → FormulaStateRightClosed f)
-      → s' ∈ SandboxState ss vs m (sandbox-state-length s)
-        × (SandboxStateLeftClosed s → SandboxStateLeftClosed (any s'))
-    sandbox-state-update-closed (any (singleton _)) zero f' lc _
-      = (singleton f' , lc)
-    sandbox-state-update-closed (any (cons f rc s lc)) zero f' lc' rc'
-      = (cons f' (rc' rc) s lc , lc')
-    sandbox-state-update-closed (any (cons f rc s lc)) (suc k) f' lc' rc'
-      with sandbox-state-update-closed s k f' lc' rc'
-    ... | (s' , lc'')
-      = (cons f rc (any s') (lc'' lc) , id)
-  
-    sandbox-state-update
-      : (s : Any (SandboxState ss vs m))
-      → (k : Fin (sandbox-state-length s))
-      → (f : FormulaState ss vs m)
-      → (FormulaStateLeftClosed (sandbox-state-lookup s k)
-        → FormulaStateLeftClosed f)
-      → (FormulaStateRightClosed (sandbox-state-lookup s k)
-        → FormulaStateRightClosed f)
-      → Any (SandboxState ss vs m)
-    sandbox-state-update s k f lc rc
-      = any (π₁ (sandbox-state-update-closed s k f lc rc))
-  
     -- #### Paths
 
     formula-state-path-not-left
@@ -785,16 +754,16 @@ module Internal where
     where
   
     formula-state-to-formula
-      : (f : FormulaState ss vs m)
+      : FormulaState ss vs m
       → Maybe (Formula ss vs m)
   
     sandbox-state-to-formula
-      : (s : Any (SandboxState ss vs m))
+      : Any (SandboxState ss vs m)
       → Maybe (Formula ss vs m)
   
     sandbox-state-to-formulas
       : {n : ℕ}
-      → (ss' : Vec (Any (SandboxState ss vs m)) n)
+      → Vec (Any (SandboxState ss vs m)) n
       → Maybe (Vec (Formula ss vs m) n)
   
     formula-state-to-formula hole
@@ -933,7 +902,7 @@ module Internal where
   
     formula-state-from-formulas-last (f ∷ [])
       = formula-state-from-formula f
-    formula-state-from-formulas-last (f ∷ fs@(_ ∷ _))
+    formula-state-from-formulas-last (_ ∷ fs@(_ ∷ _))
       = formula-state-from-formulas-last fs
   
     sandbox-state-from-formula f
@@ -988,7 +957,7 @@ module Internal where
       = refl
 
     formula-state-to-from-formula
-      (Formula.symbol s@(symbol neither _ _ _ _) _ fs)
+      (Formula.symbol (symbol neither _ _ _ _) _ fs)
       with sandbox-state-to-formulas (sandbox-state-from-formulas fs)
       | sandbox-state-to-from-formulas fs
     ... | _ | refl
@@ -1194,8 +1163,6 @@ open Internal.Left public
 
 module Left where
 
-  open Internal.Left public
-
   open Internal public using () renaming
     ( left-hole
       to hole
@@ -1216,8 +1183,6 @@ Right
 open Internal.Right public
 
 module Right where
-
-  open Internal.Right public
 
   open Internal public using () renaming
     ( right-hole
@@ -1277,8 +1242,6 @@ open Internal.FormulaStatePath public
 
 module FormulaStatePath where
 
-  open Internal.FormulaStatePath public
-
   open Internal public using () renaming
     ( FormulaStatePathNotLeft
       to NotLeft
@@ -1311,8 +1274,6 @@ module SandboxState where
   open Internal public using () renaming
     ( SandboxStateLeftClosed
       to LeftClosed
-    ; sandbox-state-from-formula
-      to from-formula
     ; sandbox-state-hole
       to hole
     ; sandbox-state-length
@@ -1321,8 +1282,6 @@ module SandboxState where
       to lookup
     ; sandbox-state-split-function
       to split-function
-    ; sandbox-state-to-formula
-      to to-formula
     )
 
 -- ### SandboxStatePath
@@ -1339,8 +1298,6 @@ SandboxStatePath
 open Internal.SandboxStatePath public
 
 module SandboxStatePath where
-
-  open Internal.SandboxStatePath public
 
   open Internal public using () renaming
     ( sandbox-state-path-cons

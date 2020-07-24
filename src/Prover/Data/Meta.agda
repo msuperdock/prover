@@ -1,7 +1,5 @@
 module Prover.Data.Meta where
 
-open import Prover.Data.Text
-  using (Text)
 open import Prover.Prelude
 
 -- ## Definition

@@ -35,7 +35,7 @@ module String where
     ∘ List.from-vec
 
   to-vec
-    : (s : String)
+    : String
     → Any (Vec Char)
   to-vec
     = List.to-vec

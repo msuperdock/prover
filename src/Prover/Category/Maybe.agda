@@ -159,7 +159,7 @@ module FunctorMaybeIdentity
       ≅ Functor.map (functor-identity' (category-maybe C)) f
   map nothing
     = refl
-  map (just f)
+  map (just _)
     = refl
 
 functor-maybe-identity
@@ -195,7 +195,7 @@ module _
         ≅ Functor.map (functor-compose' (functor-maybe F) (functor-maybe G)) f
     map nothing
       = refl
-    map (just f)
+    map (just _)
       = refl
 
   functor-maybe-compose

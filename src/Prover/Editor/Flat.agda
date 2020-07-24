@@ -124,7 +124,6 @@ record FlatEditor
 
   -- #### Types
 
-  open FlatViewStack V
   open FlatEventStack E
 
   -- #### State
@@ -184,12 +183,12 @@ record FlatEditor
 
     handle-escape
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Maybe (Σ State StatePath)
 
     handle-return
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → A ⊔ Σ State StatePath
 
     handle-direction
@@ -209,7 +208,6 @@ record FlatMainEditor
 
   -- #### Types
 
-  open FlatViewStack V
   open FlatEventStack E
 
   -- #### State
@@ -277,12 +275,12 @@ record FlatMainEditor
 
     handle-escape
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Σ State StatePath
 
     handle-return
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Σ State StatePath
 
     handle-direction

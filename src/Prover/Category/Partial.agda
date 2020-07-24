@@ -1,8 +1,7 @@
 module Prover.Category.Partial where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; Functor; FunctorEqual;
-    functor-identity')
+  using (Category; DependentCategory; DependentFunctor; Functor; FunctorEqual)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -47,71 +46,6 @@ record PartialFunctor
       → (g : Category.Arrow C x y)
       → map p r (Category.compose C f g)
         ≡ Category.compose D (map q r f) (map p q g)
-
--- ### Conversion
-
-module _
-  {C D : Category}
-  where
-
-  module FunctorPartial
-    (F : Functor C D)
-    where
-
-    base
-      : Category.Object C
-      → Maybe (Category.Object D)
-    base x
-      = just (Functor.base F x)
-
-    map
-      : {x y : Category.Object C}
-      → {x' y' : Category.Object D}
-      → base x ≡ just x'
-      → base y ≡ just y'
-      → Category.Arrow C x y
-      → Category.Arrow D x' y'
-    map refl refl f
-      = Functor.map F f
-
-    abstract
-
-      map-identity
-        : {x' : Category.Object D}
-        → (x : Category.Object C)
-        → (p : base x ≡ just x')
-        → map p p (Category.identity C x)
-          ≡ Category.identity D x'
-      map-identity x refl
-        = Functor.map-identity F x
-  
-      map-compose
-        : {x y z : Category.Object C}
-        → {x' y' z' : Category.Object D}
-        → (p : base x ≡ just x')
-        → (q : base y ≡ just y')
-        → (r : base z ≡ just z')
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → map p r (Category.compose C f g)
-          ≡ Category.compose D (map q r f) (map p q g)
-      map-compose refl refl refl
-        = Functor.map-compose F
-
-  functor-partial
-    : Functor C D
-    → PartialFunctor C D
-  functor-partial F
-    = record {FunctorPartial F}
-
--- ### Identity
-
-partial-functor-identity
-  : (C : Category)
-  → PartialFunctor C C
-partial-functor-identity
-  = functor-partial
-  ∘ functor-identity'
 
 -- ### Compose
 
@@ -372,7 +306,7 @@ module PartialFunctorSquare' where
     → {x₁' : Category.Object D₁}
     → (x₁ : Category.Object C₁)
     → PartialFunctor.base H₁ x₁ ≡ just x₁'
-    → Equal
+    → Equal'
       (Maybe (Category.Object D₂))
       (Maybe (Category.Object D₃))
       (PartialFunctor.base H₂ (Functor.base F x₁))
@@ -544,7 +478,7 @@ record PartialDependentFunctorSquare
     → {x₁'' : DependentCategory.Object D₁' x₁}
     → (x₁' : DependentCategory.Object C₁' x₁)
     → PartialDependentFunctor.base H₁ x₁ x₁' ≡ just x₁''
-    → Equal
+    → Equal'
       (Maybe (DependentCategory.Object D₂' (DependentFunctor.base F x₁)))
       (Maybe (DependentCategory.Object D₂' (DependentFunctor.base G x₁)))
       (PartialDependentFunctor.base H₂

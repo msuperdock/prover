@@ -328,8 +328,6 @@ module Internal where
         : FunctorIdentity
           (ChainDependentFunctor.functor F)
   
-    open FunctorIdentity functor public
-  
     field
 
       chain-functor
@@ -355,8 +353,6 @@ module Internal where
           (ChainDependentFunctor.functor G)
           (ChainDependentFunctor.functor H)
 
-    open FunctorCompose functor public
-  
     field
 
       chain-functor
@@ -386,8 +382,6 @@ module Internal where
           (ChainDependentFunctor.functor H₁)
           (ChainDependentFunctor.functor H₂)
 
-    open FunctorSquare functor public
-  
     field
   
       chain-functor
@@ -627,12 +621,15 @@ module Internal where
 open Internal public
   using (ChainDependentCategory; ChainDependentFunctor;
     ChainDependentFunctorCompose; ChainDependentFunctorIdentity;
-    ChainDependentFunctorSquare; chain-dependent-category;
-    chain-dependent-category₀; chain-dependent-functor;
-    chain-dependent-functor₀; chain-dependent-functor-compose;
-    chain-dependent-functor-compose₀; chain-dependent-functor-identity;
-    chain-dependent-functor-identity₀; chain-dependent-functor-square;
-    chain-dependent-functor-square₀)
+    ChainDependentFunctorSquare; ChainFunctorCompose; ChainFunctorIdentity;
+    ChainFunctorSquare; chain-dependent-category; chain-dependent-category₀;
+    chain-dependent-functor; chain-dependent-functor₀;
+    chain-dependent-functor-compose; chain-dependent-functor-compose₀;
+    chain-dependent-functor-identity; chain-dependent-functor-identity₀;
+    chain-dependent-functor-square; chain-dependent-functor-square₀)
+open ChainFunctorCompose public
+open ChainFunctorIdentity public
+open ChainFunctorSquare public
 
 -- ### ChainCategory
 
@@ -645,8 +642,6 @@ ChainCategory
 open Internal.ChainCategory public
 
 module ChainCategory where
-
-  open Internal.ChainCategory public
 
   open Internal public using () renaming
     ( chain-category-head
@@ -671,63 +666,8 @@ open Internal.ChainFunctor public
 
 module ChainFunctor where
   
-  open Internal.ChainFunctor public
-
   open Internal public using () renaming
     ( chain-functor-unpack
       to unpack
     )
-
--- ### ChainFunctorIdentity
-
-ChainFunctorIdentity
-  : {n : ℕ}
-  → {C₁ C₂ : ChainCategory n}
-  → ChainFunctor C₁ C₂
-  → Set
-ChainFunctorIdentity
-  = Internal.ChainFunctorIdentity
-  
-open Internal.ChainFunctorIdentity public
-
-module ChainFunctorIdentity where
-  
-  open Internal.ChainFunctorIdentity public
-
--- ### ChainFunctorCompose
-
-ChainFunctorCompose
-  : {n : ℕ}
-  → {C D E₁ E₂ : ChainCategory n}
-  → ChainFunctor D E₁
-  → ChainFunctor C D
-  → ChainFunctor C E₂
-  → Set
-ChainFunctorCompose
-  = Internal.ChainFunctorCompose
-  
-open Internal.ChainFunctorCompose public
-
-module ChainFunctorCompose where
-
-  open Internal.ChainFunctorCompose public
-
--- ### ChainFunctorSquare
-
-ChainFunctorSquare
-  : {n : ℕ}
-  → {C₁ C₂ D₁ D₂ D₃ : ChainCategory n} 
-  → ChainFunctor C₁ C₂
-  → ChainFunctor D₁ D₃
-  → ChainFunctor C₁ D₁
-  → ChainFunctor C₂ D₂
-  → Set
-ChainFunctorSquare
-  = Internal.ChainFunctorSquare
-
-open Internal.ChainFunctorSquare public
-
-module ChainFunctorSquare where
-
-  open Internal.ChainFunctorSquare public
 

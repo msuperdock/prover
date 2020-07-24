@@ -16,7 +16,7 @@ Variables
 module Variables where
 
   open FinSet public
-    using (Member; empty; insert; is-member; lookup-member; member; to-vec)
+    using (Member; empty; insert; is-member; lookup-member; member)
 
   -- ### Equality
 

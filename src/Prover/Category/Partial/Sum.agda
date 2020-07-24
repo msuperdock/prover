@@ -5,7 +5,7 @@ open import Prover.Category
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Sum
-  using (module CategorySum; module FunctorSum; category-sum; functor-sum)
+  using (module CategorySum; category-sum; functor-sum)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Prelude
@@ -189,7 +189,7 @@ module _
 
   partial-functor-square-sum₂
     : WeakFunctorSquare F₁' F₂' s
-    → (t : PartialFunctorSquare G₂ H I₁ I₂)
+    → PartialFunctorSquare G₂ H I₁ I₂
     → PartialFunctorSquare
       (functor-sum s) H
       (partial-functor-sum₂ F₁' I₁)

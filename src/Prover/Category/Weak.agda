@@ -23,10 +23,6 @@ record WeakFunctor
       to unbase
     ; map
       to unmap
-    ; map-identity
-      to unmap-identity
-    ; map-compose
-      to unmap-compose
     )
 
   field
@@ -101,10 +97,6 @@ module _
         to unbase
       ; map
         to unmap
-      ; map-identity
-        to unmap-identity
-      ; map-compose
-        to unmap-compose
       )
 
     map
@@ -194,8 +186,8 @@ module _
           (WeakFunctor.map G' (Functor.base F y') (Functor.base F z') f) g'
 
   weak-functor-compose
-    : (F' : WeakFunctor F)
-    → (G' : WeakFunctor G)
+    : WeakFunctor F
+    → WeakFunctor G
     → WeakFunctor (functor-compose' G F)
   weak-functor-compose F' G'
     = record {WeakFunctorCompose F' G'}

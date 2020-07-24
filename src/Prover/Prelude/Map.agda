@@ -1,7 +1,5 @@
 module Prover.Prelude.Map where
 
-open import Prover.Prelude.Any
-  using (Any)
 open import Prover.Prelude.Collection
   using (Collection)
 open import Prover.Prelude.Decidable
@@ -17,9 +15,7 @@ open import Prover.Prelude.Inspect
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
 open import Prover.Prelude.Sigma
-  using (Sigma; _×_; _,_; π₂)
-open import Prover.Prelude.Vec
-  using (Vec)
+  using (module Sigma; _×_; _,_; π₁)
 
 open Collection using ()
   renaming (_⊆_ to Subset)
@@ -32,7 +28,7 @@ Map
   → Decidable K
   → Set
 Map {K} V p
-  = Collection {K × V} (λ {(k , v) → k}) p
+  = Collection {K × V} π₁ p
 
 -- ## Module
 
@@ -67,7 +63,7 @@ module Map where
       with Collection.lookup m k
     ... | nothing
       = refl
-    ... | just (_ , v)
+    ... | just _
       = ⊥-elim (Maybe.just≢nothing q)
     
     empty
@@ -144,7 +140,7 @@ module Map where
       | inspect (Collection.lookup m) k
     ... | nothing | _
       = ⊥-elim (Maybe.nothing≢just q)
-    ... | just (l , v') | [ r ]
+    ... | just _ | [ r ]
       = sub just (Sigma.comma-eq
         (sym (lookup-eq m k r))
         (Maybe.just-injective q))
@@ -235,7 +231,8 @@ module Map where
     
     _⊆_
       : {V : Set}
-      → (m₁ m₂ : Map V p)
+      → Map V p
+      → Map V p
       → Set
     _⊆_ {V} m₁ m₂
       = {v : V}
@@ -300,7 +297,7 @@ module Map where
       → m₁ ⊆ m₂
       → m₂ ⊆ m₃
       → m₁ ⊆ m₃
-    ⊆-transitive m₁ m₂ m₃ p q k
+    ⊆-transitive _ _ _ p q k
       = q k
       ∘ p k
 

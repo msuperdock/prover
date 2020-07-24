@@ -16,7 +16,7 @@ module Internal where
 
   data IndexedSet
     : {n : ℕ}
-    → (C : ChainCategory n)
+    → ChainCategory n
     → Set₁
 
   -- #### IndexedDependentSet
@@ -111,7 +111,7 @@ open Internal public
 
 IndexedSet
   : {n : ℕ}
-  → (C : ChainCategory n)
+  → ChainCategory n
   → Set₁
 IndexedSet
   = Internal.IndexedSet
@@ -122,8 +122,6 @@ open Internal public
   using (indexed-set₀)
 
 module IndexedSet where
-
-  open Internal.IndexedSet public
 
   open Internal public using () renaming
     ( indexed-set-tail

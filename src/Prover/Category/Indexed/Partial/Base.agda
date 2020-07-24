@@ -174,35 +174,8 @@ open Internal public
 
 module IndexedPartialFunction where
 
-  open Internal.IndexedPartialFunction public
-
   open Internal public using () renaming
     ( indexed-partial-function-tail
-      to tail
-    )
-
--- ### IndexedPartialFunction'
-
-IndexedPartialFunction'
-  : {n : ℕ}
-  → {C : ChainCategory n}
-  → IndexedSet C
-  → IndexedSet C
-  → Set
-IndexedPartialFunction'
-  = Internal.IndexedPartialFunction'
-
-open Internal.IndexedPartialFunction' public
-
-open Internal public
-  using (indexed-partial-function₀')
-
-module IndexedPartialFunction' where
-
-  open Internal.IndexedPartialFunction' public
-
-  open Internal public using () renaming
-    ( indexed-partial-function-tail'
       to tail
     )
 

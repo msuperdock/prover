@@ -1,9 +1,7 @@
 module Prover.Category.Indexed.Sigma.Sum where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; Functor; FunctorCompose;
-    FunctorIdentity; FunctorSquare)
+  using (Category)
 open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)
@@ -29,8 +27,6 @@ open import Prover.Category.Sigma.Sum
 open import Prover.Category.Snoc
   using (chain-category-snoc; chain-dependent-category-snoc;
     chain-dependent-functor-snoc; chain-functor-snoc)
-open import Prover.Category.Split
-  using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Prelude
 
 -- ## Types

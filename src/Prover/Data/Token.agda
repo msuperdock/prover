@@ -1,9 +1,5 @@
 module Prover.Data.Token where
 
-open import Prover.Category.Split.Base
-  using (SplitFunction)
-open import Prover.Data.Text
-  using (Text)
 open import Prover.Prelude
 
 -- ## Definition
@@ -25,13 +21,6 @@ module _Token where
     → Set
   IsValid cs
     = T (is-valid cs)
-
-  is-valid?
-    : {n : ℕ}
-    → (cs : Vec Char n)
-    → Dec (IsValid cs)
-  is-valid? cs
-    = Bool.to-dec (is-valid cs)
 
   record Token
     : Set
@@ -65,7 +54,7 @@ open _Token public
 module Token where
 
   open _Token public
-    using (IsValid; token; is-valid; is-valid?)
+    using (IsValid; token)
   open _Token.Token public
 
   -- ### Interface
@@ -96,46 +85,6 @@ module Token where
   ... | yes refl
     = yes refl
   
-  -- ### Split
-  
-  token-from-text
-    : Text
-    → Maybe Token
-  token-from-text (any cs)
-    with is-valid? cs
-  ... | no _
-    = nothing
-  ... | yes v
-    = just (token cs v)
-
-  token-to-text
-    : Token
-    → Text
-  token-to-text (token cs@(_ ∷ _) _)
-    = any cs
-
-  token-from-to-text
-    : (t : Token)
-    → token-from-text (token-to-text t) ≡ just t
-  token-from-to-text (token cs@(_ ∷ _) v)
-    with is-valid? cs
-  ... | no ¬v
-    = ⊥-elim (¬v v)
-  ... | yes _
-    = refl
-
-  split-function
-    : SplitFunction Text Token
-  split-function
-    = record
-    { partial-function
-      = token-from-text
-    ; function
-      = token-to-text
-    ; valid
-      = token-from-to-text
-    }
-
 -- ## Exports
 
 open Token public

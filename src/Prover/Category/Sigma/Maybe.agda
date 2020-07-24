@@ -11,13 +11,12 @@ open import Prover.Category.Maybe
 open import Prover.Category.Sigma
   using (category-sigma; functor-compose-sigma; functor-identity-sigma;
     functor-sigma; functor-sigma₁; functor-square-sigma; functor-square-sigma₁)
-open import Prover.Prelude
 
 -- ## Category
 
 category-sigma-may
   : {C₁ : Category}
-  → (C₂ : DependentCategory C₁)
+  → DependentCategory C₁
   → Category
 category-sigma-may C₂
   = category-sigma

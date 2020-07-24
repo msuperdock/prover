@@ -3,12 +3,12 @@ module Prover.Category.Weak.Sigma.Maybe where
 open import Prover.Category
   using (Category; DependentCategory; DependentFunctor; Functor; FunctorSquare)
 open import Prover.Category.Maybe
-  using (category-maybe; dependent-category-maybe)
+  using (dependent-category-maybe)
 open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Maybe
   using (category-sigma-may; functor-sigma-may; functor-sigma-may₁;
-    functor-square-sigma-may; functor-square-sigma-may₁)
+    functor-square-sigma-may₁)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Prelude
@@ -28,10 +28,6 @@ module _
         to unbase
       ; map
         to unmap
-      ; map-identity
-        to unmap-identity
-      ; map-compose
-        to unmap-compose
       )
 
     map
@@ -89,7 +85,7 @@ module _
         ≡ Category.compose
           (category-sigma-may C₂) f
           (map x y g₁)
-      map-unmap₁ {z = (z₁ , z₂)} _ (CategorySigma.arrow _ f₁ f₂ p₂) _
+      map-unmap₁ {z = (z₁ , _)} _ (CategorySigma.arrow _ _ f₂ p₂) _
         = CategorySigma.arrow-eq
           (dependent-category-maybe C₂) refl refl
           (sym (map-unmap₁₂ z₁ p₂ f₂))

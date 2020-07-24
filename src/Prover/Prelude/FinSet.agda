@@ -29,7 +29,7 @@ FinSet p
 module FinSet where
 
   open Collection public
-    using (IsMember; Member; empty; lookup-member; member; to-vec)
+    using (IsMember; Member; empty; lookup-member; member)
 
   -- ### Interface
 
@@ -39,8 +39,8 @@ module FinSet where
     where
 
     is-member
-      : (xs : FinSet p)
-      → (x : A)
+      : FinSet p
+      → A
       → Bool
     is-member xs x
       with Collection.lookup xs x

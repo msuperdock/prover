@@ -168,5 +168,5 @@ module Rule where
 -- ## Exports
 
 open Rule public
-  using (_≟_rul; _≟_rul?)
+  using (_≟_rul?)
 

@@ -51,7 +51,7 @@ module CategoryProduct
       : {x y : Object}
       → (f : Arrow x y)
       → compose f (identity x) ≡ f
-    precompose {(x₁ , x₂)} (f₁ , f₂)
+    precompose (f₁ , f₂)
       = Sigma.comma-eq
         (Category.precompose C₁ f₁)
         (Category.precompose C₂ f₂)
@@ -60,7 +60,7 @@ module CategoryProduct
       : {x y : Object}
       → (f : Arrow x y)
       → compose (identity y) f ≡ f
-    postcompose {y = (y₁ , y₂)} (f₁ , f₂)
+    postcompose (f₁ , f₂)
       = Sigma.comma-eq
         (Category.postcompose C₁ f₁)
         (Category.postcompose C₂ f₂)

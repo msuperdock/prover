@@ -5,7 +5,7 @@ open import Prover.Category.Split.Base
 open import Prover.Client.Aeson
   using (Value)
 open import Prover.Data.Formula
-  using (Formula; frm_∈?_; _≟_frm)
+  using (Formula; _≟_frm)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent; decode-encode-formula; decode-formula; encode-formula;
   formula-split-editor)
@@ -799,7 +799,7 @@ module _
       : (s : BaseState)
       → BaseStatePath s
       → Set
-    Result p _
+    Result _ _
       = Meta × Formula ss (Rule.variables r) false
 
     flat-editor

@@ -7,7 +7,7 @@ open import Prover.Prelude.Decidable
 open import Prover.Prelude.Equality
   using (Equal; _≅_; _≡_; refl)
 open import Prover.Prelude.Nat
-  using (Nat; ℕ)
+  using (module Nat; ℕ)
 open import Prover.Prelude.Vec
   using (Vec; []; _∷_)
 
@@ -36,7 +36,7 @@ module List where
     → (A → B)
     → List A
     → List B
-  map f []
+  map _ []
     = []
   map f (x ∷ xs)
     = f x ∷ map f xs
@@ -111,7 +111,7 @@ module List where
       → {xs₁ xs₂ : List A}
       → x₁ ≡ x₂
       → xs₁ ≡ xs₂
-      → Equal (List A) (List A) (x₁ ∷ xs₁) (x₂ ∷ xs₂)
+      → Equal (List A) (x₁ ∷ xs₁) (x₂ ∷ xs₂)
     cons-eq refl refl
       = refl
 

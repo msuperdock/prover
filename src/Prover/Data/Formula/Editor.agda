@@ -270,7 +270,7 @@ module _
     = draw-path-formula f fp
   draw-path-sandbox-go (any (SandboxState.cons f _ _ _)) zero fp
     = text zero (draw-path-formula f fp)
-  draw-path-sandbox-go (any (SandboxState.cons f _ s _)) (suc k) fp
+  draw-path-sandbox-go (any (SandboxState.cons _ _ s _)) (suc k) fp
     = text (suc (suc zero)) (draw-path-sandbox-go s k fp)
 
 -- ## Encode

@@ -43,8 +43,8 @@ module _
       | PartialDependentFunctor.base F₂ y₁ y₂
       | inspect (PartialDependentFunctor.base F₂ y₁) y₂
     map {x = (_ , x₂)} {y = (y₁ , _)} refl refl
-      (CategorySigma.arrow y₂'' f₁ f₂ p₂)
-      | just x₂' | [ q₂ ] | just y₂' | [ r₂ ]
+      (CategorySigma.arrow _ f₁ f₂ p₂)
+      | just x₂' | [ q₂ ] | just _ | [ r₂ ]
       = record
       { domain
         = DependentCategory.base D₂ f₁ x₂'
@@ -185,7 +185,7 @@ module _
               (Category.compose C₁ f₁ g₁) x₂ p₂')
 
   partial-functor-sigma
-    : (F₂ : PartialDependentFunctor C₂ D₂)
+    : PartialDependentFunctor C₂ D₂
     → PartialFunctor
       (category-sigma C₂)
       (category-sigma D₂)

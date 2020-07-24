@@ -4,7 +4,6 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Base
   using (Function; FunctionCompose; FunctionIdentity)
-open import Prover.Prelude
 
 -- ## SimpleDependentCategory
 

@@ -7,8 +7,7 @@ open import Prover.Category
 open import Prover.Category.Partial
   using (PartialDependentFunctor; PartialDependentFunctorSquare; PartialFunctor;
     PartialFunctorSquare; PartialFunctorSquare'; partial-functor-compose;
-    partial-functor-identity; partial-functor-square';
-    partial-functor-square-compose)
+    partial-functor-square'; partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Prelude
@@ -72,76 +71,6 @@ record SplitFunctor
       → (p : base x ≡ just x')
       → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity D x'
 
--- ### Identity
-
-module SplitFunctorIdentity
-  (C : Category)
-  where
-
-  partial-functor
-    : PartialFunctor C C
-  partial-functor
-    = partial-functor-identity C
-
-  open PartialFunctor partial-functor
-
-  functor
-    : Functor C C
-  functor
-    = functor-identity' C
-
-  open Functor functor using () renaming
-    ( base
-      to unbase
-    ; map
-      to unmap
-    ; map-identity
-      to unmap-identity
-    ; map-compose
-      to unmap-compose
-    ; map-compose-eq
-      to unmap-compose-eq
-    )
-
-  abstract
-
-    base-unbase
-      : (x' : Category.Object C)
-      → base (unbase x') ≡ just x'
-    base-unbase _
-      = refl
-
-    map-unmap
-      : {x' y' : Category.Object C}
-      → (f' : Category.Arrow C x' y')
-      → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
-    map-unmap _
-      = refl
-
-  normalize-arrow
-    : {x' : Category.Object C}
-    → (x : Category.Object C)
-    → base x ≡ just x'
-    → Category.Arrow C x (unbase x')
-  normalize-arrow x refl
-    = Category.identity C x
-  
-  abstract
-
-    normalize-valid
-      : {x' : Category.Object C}
-      → (x : Category.Object C)
-      → (p : base x ≡ just x')
-      → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity C x'
-    normalize-valid _ refl
-      = refl
-
-split-functor-identity
-  : (C : Category)
-  → SplitFunctor C C
-split-functor-identity C
-  = record {SplitFunctorIdentity C}
-
 -- ### Compose
 
 module _
@@ -174,10 +103,6 @@ module _
         to unbase
       ; map
         to unmap
-      ; map-identity
-        to unmap-identity
-      ; map-compose
-        to unmap-compose
       )
 
     abstract
@@ -297,10 +222,6 @@ module _
         to unbase
       ; map
         to unmap
-      ; map-identity
-        to unmap-identity
-      ; map-compose
-        to unmap-compose
       )
 
     map
@@ -333,7 +254,7 @@ module _
         → (g : Category.Arrow C (unbase x') (unbase y'))
         → Category.compose D (map y' z' (unmap f')) (map x' y' g)
           ≡ Category.compose D f' (map x' y' g)
-      map-unmap₁ {y' = y'} {z' = z'} x' f' g
+      map-unmap₁ {y' = y'} x' f' g
         = sub
           (λ f → Category.compose D f (map x' y' g))
           (SplitFunctor.map-unmap F f')
@@ -345,7 +266,7 @@ module _
         → (g' : Category.Arrow D x' y')
         → Category.compose D (map y' z' f) (map x' y' (unmap g'))
           ≡ Category.compose D (map y' z' f) g'
-      map-unmap₂ {x' = x'} {y' = y'} z' f g'
+      map-unmap₂ {y' = y'} z' f g'
         = sub
           (λ g → Category.compose D (map y' z' f) g)
           (SplitFunctor.map-unmap F g')
@@ -388,8 +309,6 @@ record SplitFunctorSquare
   open FunctorSquare functor public using () renaming
     ( base
       to unbase
-    ; map
-      to unmap
     )
 
 -- ### Compose
@@ -627,24 +546,12 @@ record SplitDependentFunctor
     }
 
   open DependentFunctor dependent-functor public using () renaming
-    ( functor'
-      to functor
-    ; base'
+    ( base'
       to unbase
     ; map'
       to unmap
-    ; map-identity'
-      to unmap-identity
-    ; map-compose'
-      to unmap-compose
-    ; map-compose-eq'
-      to unmap-compose-eq
-    ; functor-square
-      to functor-square
     ; base-commutative
       to unbase-commutative
-    ; map-commutative
-      to unmap-commutative
     )
 
   base-unbase
@@ -704,8 +611,6 @@ record SplitDependentFunctorSquare
       : FunctorEqual
         (DependentFunctor.functor F)
         (DependentFunctor.functor G)
-
-  open FunctorEqual functor public
 
   field
 

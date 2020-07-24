@@ -140,9 +140,6 @@ postulate
     → S
     → IO S
 
-  empty-widget
-    : Widget
-
   event-bind
     : {A B : Set}
     → EventM A
@@ -223,49 +220,13 @@ postulate
   black
     : Color
 
-  blue
-    : Color
-
-  cyan
-    : Color
-
   green
-    : Color
-
-  magenta
-    : Color
-
-  red
-    : Color
-
-  white
-    : Color
-
-  yellow
-    : Color
-
-  bright-black
-    : Color
-
-  bright-blue
-    : Color
-
-  bright-cyan
     : Color
 
   bright-green
     : Color
 
-  bright-magenta
-    : Color
-
   bright-red
-    : Color
-
-  bright-white
-    : Color
-
-  bright-yellow
     : Color
 
 -- ## Foreign
@@ -281,8 +242,7 @@ postulate
     (BrickEvent (VtyEvent), CursorLocation, EventM, Location (Location), Next,
       Padding (Max), ViewportType (Both, Horizontal, Vertical), Widget)
   import Brick.Widgets.Core
-    (emptyWidget, hBox, padRight, showCursor, txt, vBox, viewport,
-      withDefAttr)
+    (hBox, padRight, showCursor, txt, vBox, viewport, withDefAttr)
   import Control.Monad.IO.Class
     (liftIO)
   import Data.String
@@ -290,10 +250,8 @@ postulate
   import Data.Text
     (unpack)
   import Graphics.Vty.Attributes
-    (Attr, Color, black, blue, brightBlack, brightBlue, brightCyan,
-      brightGreen, brightMagenta, brightRed, brightWhite, brightYellow, cyan,
-      defAttr, green, magenta, red, white, withBackColor, withForeColor,
-      yellow)
+    (Attr, Color, black, brightGreen, brightRed, green, withBackColor,
+      withForeColor)
   import Graphics.Vty.Input.Events
     (Event (EvKey), Key (KBS, KChar, KDel, KDown, KEnter, KEsc, KLeft, KRight,
       KUp))
@@ -415,8 +373,6 @@ postulate
   = defAttr #-}
 {-# COMPILE GHC default-main
   = \ _ -> defaultMain #-}
-{-# COMPILE GHC empty-widget
-  = emptyWidget #-}
 {-# COMPILE GHC event-bind
   = \ _ _ -> (>>=) #-}
 {-# COMPILE GHC event-pure
@@ -454,37 +410,13 @@ postulate
 
 {-# COMPILE GHC black
   = black #-}
-{-# COMPILE GHC blue
-  = blue #-}
-{-# COMPILE GHC cyan
-  = cyan #-}
 {-# COMPILE GHC green
   = green #-}
-{-# COMPILE GHC magenta
-  = magenta #-}
-{-# COMPILE GHC red
-  = red #-}
-{-# COMPILE GHC white
-  = white #-}
-{-# COMPILE GHC yellow
-  = yellow #-}
 
-{-# COMPILE GHC bright-black
-  = brightBlack #-}
-{-# COMPILE GHC bright-blue
-  = brightBlue #-}
-{-# COMPILE GHC bright-cyan
-  = brightCyan #-}
 {-# COMPILE GHC bright-green
   = brightGreen #-}
-{-# COMPILE GHC bright-magenta
-  = brightMagenta #-}
 {-# COMPILE GHC bright-red
   = brightRed #-}
-{-# COMPILE GHC bright-white
-  = brightWhite #-}
-{-# COMPILE GHC bright-yellow
-  = brightYellow #-}
 
 -- ## Attributes
 
@@ -802,12 +734,6 @@ draw-windows-with (p ∷ ps) (suc k) pp
   = draw-window-head p ∷ draw-windows-tail-with ps k pp
 
 -- ### Command
-
-draw-command
-  : Command
-  → Widget
-draw-command (command p t)
-  = horizontal-box (string p ∷ string ": " ∷ draw-plain-text t ∷ [])
 
 draw-command-with
   : (c : Command)

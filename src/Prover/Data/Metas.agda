@@ -21,7 +21,7 @@ module Metas where
     → Bool
   is-member (true ∷ _) zero
     = true
-  is-member (m ∷ ms) (suc k)
+  is-member (_ ∷ ms) (suc k)
     = is-member ms k
   is-member _ _
     = false

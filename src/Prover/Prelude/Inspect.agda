@@ -23,6 +23,6 @@ module _
     : (f : (x : A) → B x)
     → (x : A)
     → Inspect f x (f x)
-  inspect f x
+  inspect _ _
     = [ refl ]
 

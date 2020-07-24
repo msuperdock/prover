@@ -2,8 +2,6 @@ module Prover.Editor.Map where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Partial.Base
-  using (PartialFunction)
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
 open import Prover.Category.Split.Base
@@ -283,16 +281,6 @@ module _
         to State
       ; Arrow
         to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     open Editor e public
@@ -515,7 +503,7 @@ module _
   flat-editor-map-event G e
     = record {FlatEditorMapEvent G e}
 
--- ## Raw
+-- ## State
 
 -- ### MainEditor
 
@@ -525,7 +513,7 @@ module _
   {S T A : Set}
   where
 
-  module MainEditorMapRaw
+  module MainEditorMapState
     (F : SplitFunction T S)
     (e : MainEditor V E S A)
     where
@@ -539,14 +527,14 @@ module _
       = split-function-compose
         (MainEditor.split-function e) F
 
-  main-editor-map-raw
+  main-editor-map-state
     : SplitFunction T S
     → MainEditor V E S A
     → MainEditor V E T A
-  main-editor-map-raw F e
-    = record {MainEditorMapRaw F e}
+  main-editor-map-state F e
+    = record {MainEditorMapState F e}
 
--- ### SplitMainEditor (state)
+-- ### SplitMainEditor
 
 module _
   {V : ViewStack}
@@ -576,7 +564,9 @@ module _
   split-main-editor-map-state F e
     = record {SplitMainEditorMapState F e}
 
--- ### SplitMainEditor (pure)
+-- ## Pure
+
+-- ### SplitMainEditor
 
 module _
   {V : ViewStack}
@@ -735,7 +725,7 @@ module _
 
     handle-return
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → B ⊔ Σ State StatePath
     handle-return s sp
       with FlatEditor.handle-return e s sp

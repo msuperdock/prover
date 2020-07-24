@@ -38,7 +38,7 @@ indexed-partial-function-sigma-sum
     (indexed-simple-category-sigma-sum C₂' F₁)
     (indexed-set-sigma D₁' D₂')
 indexed-partial-function-sigma-sum
-  {n = zero} {C₁' = C₁'} {D₁' = D₁'} {C₂' = C₂'} {D₂' = D₂'} F₁ F₂
+  {n = zero} {C₁' = C₁'} {D₁' = D₁'} {C₂' = C₂'} {D₂' = D₂'} _ F₂
   = empty
     (partial-function-sigma-sum
       (Category.Object

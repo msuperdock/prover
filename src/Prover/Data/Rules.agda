@@ -21,7 +21,7 @@ Rules ss
 module Rules where
 
   open Collection public
-    using (empty; lookup; to-vec)
+    using (empty; lookup)
 
   -- ### Interface
 
@@ -95,7 +95,7 @@ module Rules where
       → (r : Rule ss a)
       → .(rul r ∈ rs)
       → lookup-member rs (Rule.name r) ≡ just m
-      → Equal (Any (Rule ss)) (Any (Rule ss)) (any r) (any (Member.rule m))
+      → Equal (Any (Rule ss)) (any r) (any (Member.rule m))
     lookup-member-any {rs = rs} r p _
       with Collection.lookup-member rs (Rule.name r)
       | inspect (Collection.lookup-member rs) (Rule.name r)
@@ -144,5 +144,5 @@ module Rules where
 -- ## Exports
 
 open Rules public
-  using (rul_∈_; rul_∈?_)
+  using (rul_∈_)
 

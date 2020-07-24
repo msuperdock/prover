@@ -3,7 +3,7 @@ module Prover.Data.Symbols where
 open import Prover.Data.Identifier
   using (Identifier; _≟_idn)
 open import Prover.Data.Symbol
-  using (Symbol; _≟_sym; _≟_sym?)
+  using (Symbol; _≟_sym?)
 open import Prover.Prelude
 
 -- ## Definition
@@ -18,7 +18,7 @@ Symbols
 module Symbols where
 
   open Collection public
-    using (empty; lookup; to-vec)
+    using (empty; lookup)
 
   -- ### Interface
 
@@ -90,7 +90,7 @@ module Symbols where
     → (s : Symbol a)
     → .(sym s ∈ ss)
     → lookup-member ss (Symbol.name s) ≡ just m
-    → Equal (Any Symbol) (Any Symbol) (any s) (any (Member.symbol m))
+    → Equal (Any Symbol) (any s) (any (Member.symbol m))
   lookup-member-any {ss = ss} s p _
     with Collection.lookup-member ss (Symbol.name s)
     | inspect (Collection.lookup-member ss) (Symbol.name s)

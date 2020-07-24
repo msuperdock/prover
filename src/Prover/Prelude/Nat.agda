@@ -16,11 +16,6 @@ import Agda.Builtin.Nat as Builtin
 open Builtin public using ()
   renaming (Nat to ℕ)
 
-Nat
-  : Set
-Nat
-  = ℕ
-
 open ℕ public
 
 -- ## Module
@@ -110,14 +105,13 @@ module Nat where
     → n₁ < n₂ nat
     → n₂ < n₃ nat
     → n₁ < n₃ nat
-  transitive z<s (s<s p)
+  transitive z<s (s<s _)
     = z<s
-  transitive (s<s p) (s<s q)
-    = s<s (transitive p q)
+  transitive (s<s p₁) (s<s p₂)
+    = s<s (transitive p₁ p₂)
 
 -- ## Exports
 
 open Nat public
-  using (_+_; _*_; _≟_nat; _<_nat)
-open _<_nat public
+  using (_+_; _*_; _≟_nat)
 

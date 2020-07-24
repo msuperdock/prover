@@ -28,7 +28,7 @@ module Internal where
   PlainTextPath
     : PlainText
     → Set
-  PlainTextPath (any {n} cs)
+  PlainTextPath (any {n} _)
     = Fin n
   
   data RichText

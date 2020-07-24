@@ -5,7 +5,7 @@ open import Prover.Prelude.Bool
 open import Prover.Prelude.Decidable
   using (Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (Equal; _≅_; _≡_; _≢_; refl)
+  using (Equal'; _≅_; _≡_; _≢_; refl)
 
 -- ## Definition
 
@@ -23,7 +23,11 @@ module _Maybe where
       : A
       → Maybe A
   
-  {-# COMPILE GHC Maybe = data Maybe (Nothing | Just) #-}
+  {-# COMPILE GHC Maybe = data Maybe
+    ( Nothing
+    | Just
+    )
+  #-}
 
 Maybe
   : Set
@@ -66,7 +70,7 @@ module Maybe where
     → (A → B)
     → Maybe A
     → Maybe B
-  map f nothing
+  map _ nothing
     = nothing
   map f (just x)
     = just (f x)
@@ -79,12 +83,12 @@ module Maybe where
     → Decidable (Maybe A)
   decidable _ nothing nothing
     = yes refl
-  decidable _ nothing (just y)
+  decidable _ nothing (just _)
     = no (λ ())
-  decidable _ (just x) nothing
+  decidable _ (just _) nothing
     = no (λ ())
-  decidable _≟_ (just x) (just y)
-    with x ≟ y
+  decidable _≟_ (just x₁) (just x₂)
+    with x₁ ≟ x₂
   ... | no ¬p
     = no (λ {refl → ¬p refl})
   ... | yes refl
@@ -97,7 +101,7 @@ module Maybe where
     → (P : A → B → Set)
     → x₁ ≡ x₂
     → y₁ ≡ y₂
-    → Equal (Maybe (P x₁ y₁)) (Maybe (P x₂ y₂)) nothing nothing
+    → Equal' (Maybe (P x₁ y₁)) (Maybe (P x₂ y₂)) nothing nothing
   nothing-eq₂ _ refl refl
     = refl
   
@@ -144,7 +148,7 @@ module Maybe where
     → {y₁ : B x₁}
     → {y₂ : B x₂}
     → x₁ ≡ x₂
-    → Equal
+    → Equal'
       (Maybe (B x₁))
       (Maybe (B x₂))
       (just y₁)

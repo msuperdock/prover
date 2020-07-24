@@ -45,20 +45,6 @@ module Any where
 
   open _Any.Any public
 
-  -- ### Interface
-
-  module _
-    {A : Set}
-    {B C : A → Set}
-    where
-
-    map
-      : ({x : A} → B x → C x)
-      → Any B
-      → Any C
-    map f (any y)
-      = any (f y)
-
   -- ### Equality
 
   module _
@@ -88,7 +74,7 @@ module Any where
       → {y₂ : B y₁}
       → x₁ ≡ y₁
       → x₂ ≅ y₂
-      → Equal (Any B) (Any B) (any x₂) (any y₂)
+      → Equal (Any B) (any x₂) (any y₂)
     any-eq _ refl refl 
       = refl
 

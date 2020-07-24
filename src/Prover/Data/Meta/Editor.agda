@@ -5,7 +5,7 @@ open import Prover.Data.Meta
 open import Prover.Data.Number.Editor
   using (NumberEventStack; number-partial-editor)
 open import Prover.Editor
-  using (PartialEditor; ViewStack; ViewStackMap)
+  using (PartialEditor; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseViewStack; BaseViewStackMap)
 open import Prover.Editor.Lift
@@ -41,7 +41,7 @@ module MetaBaseViewStackMap where
     → BaseViewStack.View RichTextBaseViewStack
   view (any [])
     = draw-meta-empty
-  view t@(any cs@(_ ∷ _))
+  view t@(any (_ ∷ _))
     = draw-meta t
 
   view-with

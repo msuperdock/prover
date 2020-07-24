@@ -19,7 +19,7 @@ open import Prover.Prelude.Inspect
 open import Prover.Prelude.List
   using (List; []; _∷_)
 open import Prover.Prelude.Nat
-  using (Nat; ℕ; _+_; _*_; suc; zero)
+  using (ℕ; _+_; _*_; suc; zero)
 open import Prover.Prelude.Retraction
   using (Retraction; retraction-compose)
 open import Prover.Prelude.Sigma
@@ -169,7 +169,7 @@ module Internal where
   digits-is-suc-to-nat
     : {ds₁ ds₂ : List Digit}
     → DigitsIsSuc ds₁ ds₂
-    → digits-to-nat ds₂ ≡ Nat.suc (digits-to-nat ds₁)
+    → digits-to-nat ds₂ ≡ suc (digits-to-nat ds₁)
   digits-is-suc-to-nat nil
     = refl
   digits-is-suc-to-nat (head {d₂ = d₂} p)
@@ -321,17 +321,7 @@ Digit
 open Internal public
   using (0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
 
-module Digit where
-
-  open Internal public
-    using (0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
-
 -- ### Digits
-
-Digits
-  : Set
-Digits
-  = Internal.Digits
 
 module Digits where
 

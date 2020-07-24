@@ -167,7 +167,7 @@ module _
       : (x : Category.Object (category-sum F))
       → CategorySum.object₁ G (base x)
         ≡ Functor.base H₁ (CategorySum.object₁ F x)
-    base-eq (ι₁ x₁)
+    base-eq (ι₁ _)
       = refl
     base-eq (ι₂ x₂)
       = FunctorSquare.base s x₂

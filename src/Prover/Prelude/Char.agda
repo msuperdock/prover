@@ -1,15 +1,13 @@
 module Prover.Prelude.Char where
   
 open import Prover.Prelude.Bool
-  using (Bool; T; not)
+  using (Bool; T)
 open import Prover.Prelude.Decidable
   using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Digit
   using (Digit; 0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
 open import Prover.Prelude.Equality
-  using (_≡_; from-homogeneous; refl; to-homogeneous)
-open import Prover.Prelude.Fin
-  using (suc; zero)
+  using (from-homogeneous; refl; to-homogeneous)
 open import Prover.Prelude.Function
   using (_∘_)
 open import Prover.Prelude.Maybe
@@ -124,7 +122,7 @@ module Char where
 
   is-digit-from-digit
     : (d : Digit)
-    → T (is-digit (from-digit d))
+    → IsDigit (from-digit d)
   is-digit-from-digit 0d
     = tt
   is-digit-from-digit 1d

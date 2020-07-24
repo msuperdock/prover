@@ -8,8 +8,6 @@ open import Prover.Prelude.Empty
   using (⊥-elim)
 open import Prover.Prelude.Equality
   using (_≡_; _≢_; refl; sub; sym; trans)
-open import Prover.Prelude.Function
-  using (_∘_; id)
 open import Prover.Prelude.Inspect
   using ([_]; inspect)
 open import Prover.Prelude.Maybe
@@ -111,9 +109,9 @@ module Collection where
     ... | _ | no ¬r
       = no (λ {refl → ¬r refl})
     
-    decidable q empty (insert _ _ _)
+    decidable _ empty (insert _ _ _)
       = no (λ ())
-    decidable q (insert _ _ _) empty
+    decidable _ (insert _ _ _) empty
       = no (λ ())
   
   -- ### Membership
@@ -125,14 +123,14 @@ module Collection where
     where
   
     IsMember
-      : (xs : Collection f p)
-      → (x : A)
+      : Collection f p
+      → A
       → Set
     IsMember xs x
       = lookup xs (f x) ≡ just x
     
     is-member?
-      : (q : Decidable A)
+      : Decidable A
       → (xs : Collection f p)
       → (x : A)
       → Dec (IsMember xs x)
@@ -243,18 +241,14 @@ module Collection where
       = ⊥-elim (r refl)
     
     _⊆_
-      : (xs₁ xs₂ : Collection f p)
+      : Collection f p
+      → Collection f p
       → Set
     _⊆_ xs₁ xs₂
       = {x : A}
       → (k : K)
       → lookup xs₁ k ≡ just x
       → lookup xs₂ k ≡ just x
-    
-    ⊆-empty
-      : (xs : Collection f p)
-      → empty ⊆ xs
-    ⊆-empty _ _ ()
     
     ⊆-insert
       : (xs₁ xs₂ : Collection f p)
@@ -271,18 +265,3 @@ module Collection where
     ... | _ | refl
       = ⊥-elim (Maybe.just≢nothing q)
     
-    ⊆-reflexive
-      : (xs : Collection f p)
-      → xs ⊆ xs
-    ⊆-reflexive _ _
-      = id
-    
-    ⊆-transitive
-      : (xs₁ xs₂ xs₃ : Collection f p)
-      → xs₁ ⊆ xs₂
-      → xs₂ ⊆ xs₃
-      → xs₁ ⊆ xs₃
-    ⊆-transitive _ _ _ p q k
-      = q k
-      ∘ p k
-

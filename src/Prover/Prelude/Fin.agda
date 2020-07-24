@@ -4,12 +4,10 @@ open import Prover.Prelude.Decidable
   using (Decidable; no; yes)
 open import Prover.Prelude.Equality
   using (_≡_; _≢_; refl; sub)
-open import Prover.Prelude.Function
-  using (id)
 open import Prover.Prelude.Maybe
   using (Maybe; just; maybe; nothing)
 open import Prover.Prelude.Nat
-  using (Nat; ℕ; zero; suc)
+  using (ℕ; zero; suc)
 open import Prover.Prelude.Sigma
   using (Σ; _,_)
 open import Prover.Prelude.Sum
@@ -54,7 +52,7 @@ module Fin where
     → Maybe (Fin n)
   increment {n = suc zero} zero
     = nothing
-  increment {n = suc (suc n)} zero
+  increment {n = suc (suc _)} zero
     = just (suc zero)
   increment (suc k)
     = Maybe.map suc (increment k)
@@ -67,20 +65,6 @@ module Fin where
     = nothing
   decrement (suc k)
     = just (maybe (decrement k) zero suc)
-
-  increment-def
-    : {n : ℕ}
-    → Fin n 
-    → Fin n
-  increment-def k
-    = maybe (increment k) k id
-
-  decrement-def
-    : {n : ℕ}
-    → Fin n 
-    → Fin n
-  decrement-def k
-    = maybe (decrement k) k id
 
   maximum
     : {n : ℕ}
@@ -188,7 +172,7 @@ module Fin where
     : {n : ℕ}
     → {k₁ k₂ : Fin (suc n)}
     → IsSuc k₁ k₂
-    → to-nat k₂ ≡ Nat.suc (to-nat k₁)
+    → to-nat k₂ ≡ suc (to-nat k₁)
   is-suc-to-nat zero
     = refl
   is-suc-to-nat {n = suc _} (suc n)

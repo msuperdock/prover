@@ -161,7 +161,7 @@ module _
         RightSubconstruct.reflexive)
 
   ... | complex l' r' g
-    = complex l' r' ((λ {(formula-state-modified f' q lc rc fp')
+    = complex l' r' ((λ {(formula-state-modified f' q lc _ fp')
       → formula-state-modified
         (FormulaState.symbol s p
           (left f' (rewrite' (Construct.LeftValid s) q lv)) r cs) refl lc
@@ -190,7 +190,7 @@ module _
       (right-subformula r' rc (RightSubconstruct.recursive rv rs))
 
   ... | complex l' r' g
-    = complex l' r' ((λ {(formula-state-modified f' q lc rc fp')
+    = complex l' r' ((λ {(formula-state-modified f' q _ rc fp')
       → formula-state-modified
         (FormulaState.symbol s p l
           (right f' (rewrite' (Construct.RightValid s) q rv)) cs) refl
@@ -560,7 +560,7 @@ module _
       l' = left f' (Construct.left-valid tt tt)
 
   formula-state-update-left
-    f@(FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
     f'@(FormulaState.symbol s' _ _ _ _)
     with Construct.left-valid? s (Construct.symbol s')
     | Construct.right-valid? s' (Construct.symbol s)
@@ -750,7 +750,7 @@ module _
       r' = right f' (Construct.right-valid tt tt)
 
   formula-state-update-right
-    f@(FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
     f'@(FormulaState.symbol s' _ _ _ _)
     with Construct.right-valid? s (Construct.symbol s')
     | Construct.left-valid? s' (Construct.symbol s)
@@ -1165,7 +1165,7 @@ module _
   sandbox-state-prepend
     : (s₁ : Any (SandboxState ss vs m))
     → SandboxStatePath s₁
-    → (s₂ : Any (SandboxState ss vs m))
+    → Any (SandboxState ss vs m)
     → Σ (Any (SandboxState ss vs m)) SandboxStatePath
   sandbox-state-prepend s₁ sp s₂
     with sandbox-state-combine right s₂ s₁
@@ -1176,7 +1176,7 @@ module _
   sandbox-state-append
     : (s₁ : Any (SandboxState ss vs m))
     → SandboxStatePath s₁
-    → (s₂ : Any (SandboxState ss vs m))
+    → Any (SandboxState ss vs m)
     → Σ (Any (SandboxState ss vs m)) SandboxStatePath
   sandbox-state-append s₁ sp s₂
     with sandbox-state-combine left s₁ s₂

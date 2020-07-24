@@ -5,7 +5,7 @@ open import Prover.Prelude.Bool
 open import Prover.Prelude.Decidable
   using (Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (_≡_; refl)
+  using (refl)
 
 -- ## Definition
 
@@ -45,17 +45,6 @@ module If where
     → A
   value (just x)
     = x
-
-  map
-    : {A B : Set}
-    → {b : Bool}
-    → (A → B)
-    → If A b
-    → If B b
-  map _ nothing
-    = nothing
-  map f (just x)
-    = just (f x)
 
   -- ### Equality 
 

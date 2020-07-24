@@ -3,11 +3,11 @@ module Prover.Prelude.Vec where
 open import Prover.Prelude.Decidable
   using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Equality
-  using (Equal; _≅_; _≡_; refl; sub)
+  using (_≅_; _≡_; refl)
 open import Prover.Prelude.Fin
   using (Fin; zero; suc)
 open import Prover.Prelude.Nat
-  using (Nat; ℕ; _+_; zero; suc)
+  using (ℕ; zero; suc)
 open import Prover.Prelude.Retraction
   using (Retraction)
 
@@ -231,31 +231,13 @@ module Vec where
     {A : Set}
     where
 
-    ∷-injective-head
-      : {n : ℕ}
-      → {x y : A}
-      → {xs ys : Vec A n}
-      → Equal (Vec A (suc n)) (Vec A (suc n)) (x ∷ xs) (y ∷ ys)
-      → x ≡ y
-    ∷-injective-head refl
-      = refl
-  
-    ∷-injective-tail
-      : {n : ℕ}
-      → {x y : A}
-      → {xs ys : Vec A n}
-      → Equal (Vec A (suc n)) (Vec A (suc n)) (x ∷ xs) (y ∷ ys)
-      → xs ≡ ys
-    ∷-injective-tail refl
-      = refl
-  
     snoc-init-last
       : {n : ℕ}
       → (xs : Vec A (suc n))
       → snoc (init xs) (last xs) ≡ xs
     snoc-init-last (_ ∷ [])
       = refl
-    snoc-init-last (x ∷ xs@(_ ∷ _))
+    snoc-init-last (_ ∷ xs@(_ ∷ _))
       = cons-eq refl (snoc-init-last xs)
 
     lookup-update
@@ -310,7 +292,7 @@ module Vec where
       → (xs : Vec A n)
       → (y : A)
       → Dec (IsMember xs y)
-    is-member? _ [] y
+    is-member? _ [] _
       = no (λ ())
     is-member? p (x ∷ xs) y
       with p y x | is-member? p xs y

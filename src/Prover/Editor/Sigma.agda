@@ -159,16 +159,6 @@ module _
         to State
       ; Arrow
         to StateArrow
-      ; identity
-        to state-identity
-      ; compose
-        to state-compose
-      ; precompose
-        to state-precompose
-      ; postcompose
-        to state-postcompose
-      ; associative
-        to state-associative
       )
 
     -- ##### State
@@ -233,7 +223,7 @@ module _
       → StatePath s
     initial-path (ι₁ s₁)
       = SplitEditor.initial-path e₁ s₁
-    initial-path (ι₂ (x₁ , s₂))
+    initial-path (ι₂ (x₁ , _))
       = ι₁ (SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁))
 
     initial-path-with
@@ -294,7 +284,7 @@ module _
       = SplitEditor.draw-inner-with e₁ s₁ sp₁ s₁' sp₁'
     draw-inner-with (ι₂ _) (ι₁ _) (s₁ , _ , nothing) sp₁
       = (SplitEditor.draw-with e₁ s₁ sp₁ , nothing)
-    draw-inner-with (ι₂ (x₁ , s₂)) (ι₁ sp₁) (s₁' , _ , just (sp₁' , s₁'')) sp₁''
+    draw-inner-with (ι₂ _) (ι₁ _) (s₁' , _ , just (sp₁' , s₁'')) sp₁''
       = (SplitEditor.draw-with e₁ s₁' sp₁'
         , just (SplitEditor.draw-path e₁ s₁' sp₁'
           , SplitEditor.draw-inner-with e₁ s₁' sp₁' s₁'' sp₁''))
@@ -526,7 +516,7 @@ module _
     handle-direction-valid (ι₂ _) d'
       with d' ≟ d dir
       | inspect (_≟_dir d') d
-    handle-direction-valid (ι₂ (x₁ , s₂)) d' | no _ | [ _ ]
+    handle-direction-valid (ι₂ (x₁ , _)) d' | no _ | [ _ ]
       with SplitEditor.handle-direction e₁ (SplitEditor.unbase e₁ x₁)
         (SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁) d') d'
       | SplitEditor.handle-direction-valid e₁ (SplitEditor.unbase e₁ x₁) d'
@@ -680,14 +670,6 @@ module _
   {E₁ E₂ : EventStack}
   {C₁ : Category}
   where
-
-  module SimpleEditorSigma
-    (C₂ : SimpleDependentCategory C₁)
-    (d : Direction)
-    (e₁ : SplitEditor V₁ E₁ C₁)
-    (e₂ : (x₁ : Category.Object C₁)
-      → SimpleEditor V₂ E₂ (SimpleDependentCategory.set C₂ x₁))
-    where
 
   -- Takes direction from first to second component.
   simple-editor-sigma

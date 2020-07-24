@@ -9,8 +9,8 @@ open import Prover.Prelude
 partial-function-sigma
   : {A₁ A₂ B₁ : Set}
   → (B₂ : B₁ → Set)
-  → (f₁ : PartialFunction A₁ B₁)
-  → (f₂ : (y₁ : B₁) → PartialFunction A₂ (B₂ y₁))
+  → PartialFunction A₁ B₁
+  → ((y₁ : B₁) → PartialFunction A₂ (B₂ y₁))
   → PartialFunction (A₁ × A₂) (Σ B₁ B₂)
 partial-function-sigma _ f₁ f₂ (x₁ , x₂)
   with f₁ x₁

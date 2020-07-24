@@ -238,7 +238,7 @@ module Internal where
     where
 
     proof-metas
-      : (p : Proof rs r)
+      : Proof rs r
       → Metas
     proof-metas (proof b _)
       = branch-metas b
@@ -449,7 +449,7 @@ module Internal where
       → Vec.map branch-conclusion (Vec.map (assumption {rs = rs}) fs) ≡ fs
     branch-conclusions-assumptions [] _
       = refl
-    branch-conclusions-assumptions (f ∷ fs) rs
+    branch-conclusions-assumptions (_ ∷ fs) rs
       = Vec.cons-eq refl (branch-conclusions-assumptions fs rs)
 
   -- ### Meta-substitution
@@ -573,7 +573,7 @@ module Internal where
     branch-with-infer-formula
       : {vs : Variables}
       → {a : ℕ}
-      → (ms : Metas)
+      → Metas
       → (f : Formula ss vs true)
       → (r : Rule ss a)
       → rul r ∈ rs
@@ -581,7 +581,7 @@ module Internal where
       → BranchWith rs f
     branch-with-infer-formula ms f r@(rule _ _ hs c) p (Formula.match subs q)
       with Formula.substitutes-def hs subs ms
-    ... | Formula.substitutes-def-result hs' subs' ms' p' q'
+    ... | Formula.substitutes-def-result hs' subs' _ p' q'
       = record
       { branch
         = rule r p
@@ -646,8 +646,6 @@ open Internal public
 
 module Proof where
 
-  open Internal.Proof public
-
   open Internal public using () renaming
     ( proof-assumption
       to assumption
@@ -657,8 +655,6 @@ module Proof where
       to is-complete
     ; proof-lookup
       to lookup
-    ; proof-metas
-      to metas
     ; proof-substitute-meta
       to substitute-meta
     )
@@ -676,21 +672,6 @@ BranchPath
 
 open Internal.BranchPath public
 
-module BranchPath where
-
-  open Internal.BranchPath public
-
-  open Internal public using () renaming
-    ( branch-path-down
-      to down
-    ; branch-path-top
-      to top
-    ; branch-path-up
-      to up
-    ; branch-path-up-top
-      to up-top
-    )
-
 -- ### ProofPath
 
 ProofPath
@@ -704,8 +685,6 @@ ProofPath
   = Internal.ProofPath
 
 module ProofPath where
-
-  open Internal.BranchPath public
 
   open Internal public using () renaming
     ( proof-path-down

@@ -6,8 +6,7 @@ open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Editor
   using (Editor; EventStack; MainEditor; PartialEditor; SimpleEditor;
-    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any; main-editor; 
-    split-editor-partial; split-main-editor-partial)
+    SplitEditor; ViewStack; ViewStackMap; any; split-editor-partial)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack)
 open import Prover.Editor.Flat
@@ -102,7 +101,7 @@ module BaseViewStackFlattenLift
     : (v : FlatViewStack.View (view-stack-flatten (view-stack-lift V)))
     → (vp : FlatViewStack.ViewPath (view-stack-flatten (view-stack-lift V)) v)
     → FlatViewStack.ViewPath (base-view-stack-flatten V) (view-with v vp)
-  view-path (v , nothing) vp
+  view-path (_ , nothing) vp
     = vp
 
 base-view-stack-flatten-lift
@@ -139,7 +138,7 @@ module BaseEventStackFlattenLift
     : (m : FlatEventStack.Mode (event-stack-flatten (event-stack-lift E)))
     → FlatEventStack.Event (base-event-stack-flatten E) (mode m)
     → FlatEventStack.Event (event-stack-flatten (event-stack-lift E)) m
-  event (ι₁ e)
+  event (ι₁ _)
     = id
 
 base-event-stack-flatten-lift
@@ -274,7 +273,7 @@ module _
 
     handle-escape
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Maybe (Σ State StatePath)
     handle-escape (s , nothing) sp
       with Editor.handle-escape e s sp
@@ -293,7 +292,7 @@ module _
 
     handle-return
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Category.Object C ⊔ Σ State StatePath
     handle-return (s , nothing) sp
       with Editor.handle-return e s sp
@@ -424,7 +423,7 @@ module _
 
     handle-escape
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Σ State StatePath
     handle-escape s sp
       with FlatEditor.handle-escape flat-editor s sp
@@ -435,7 +434,7 @@ module _
 
     handle-return
       : (s : State)
-      → (sp : StatePath s)
+      → StatePath s
       → Σ State StatePath
     handle-return s sp
       with FlatEditor.handle-return flat-editor s sp
