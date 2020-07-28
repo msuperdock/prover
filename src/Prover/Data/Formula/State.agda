@@ -18,6 +18,9 @@ open import Prover.Data.Variables
   using (Variables; var_∈_)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_; _!_)
+
 -- ## Internal
 
 module Internal where
@@ -686,7 +689,7 @@ module Internal where
     left-hole {s = symbol {has-left = false} _ _ _ _ _}
       = nothing tt
     left-hole {s = symbol {has-left = true} _ _ _ _ _}
-      = left hole (Construct.left-valid tt tt)
+      = left hole (Construct.left-valid tt refl)
 
     right-hole
       : {a : ℕ}
@@ -695,7 +698,7 @@ module Internal where
     right-hole {s = symbol {has-right = false} _ _ _ _ _}
       = nothing tt
     right-hole {s = symbol {has-right = true} _ _ _ _ _}
-      = right hole (Construct.right-valid tt tt)
+      = right hole (Construct.right-valid tt refl)
 
     left-force
       : {a : ℕ}
@@ -706,7 +709,7 @@ module Internal where
     left-force {s = s} hl f
       with Construct.left-valid? s (formula-state-construct f)
     ... | no _
-      = left (parens (any (singleton f))) (Construct.left-valid hl tt)
+      = left (parens (any (singleton f))) (Construct.left-valid hl refl)
     ... | yes lv
       = left f lv
   
@@ -719,7 +722,7 @@ module Internal where
     right-force {s = s} hr f
       with Construct.right-valid? s (formula-state-construct f)
     ... | no _
-      = right (parens (any (singleton f))) (Construct.right-valid hr tt)
+      = right (parens (any (singleton f))) (Construct.right-valid hr refl)
     ... | yes rv
       = right f rv
 

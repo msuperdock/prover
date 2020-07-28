@@ -1,62 +1,66 @@
 module Prover.Prelude.Collection where
 
-open import Prover.Prelude.Any
-  using (Any; any)
-open import Prover.Prelude.Decidable
-  using (Dec; Decidable; no; yes)
+open import Prover.Prelude.Bool
+  using (Bool; F; T; Unique; true)
 open import Prover.Prelude.Empty
-  using (⊥-elim)
-open import Prover.Prelude.Equality
-  using (_≡_; _≢_; refl; sub; sym; trans)
-open import Prover.Prelude.Inspect
-  using ([_]; inspect)
+  using (¬_; ⊥-elim)
+open import Prover.Prelude.Equal
+  using (Equal; _≡_; refl; rewrite₂; sub; sym; trans)
+open import Prover.Prelude.Fin
+  using (Fin; _≟_fin; suc; zero)
+open import Prover.Prelude.Function
+  using (_$_; _∘_)
+open import Prover.Prelude.List
+  using (List; Sublist)
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
-open import Prover.Prelude.Vec
-  using (Vec; []; _∷_)
+open import Prover.Prelude.Nat
+  using (ℕ)
+open import Prover.Prelude.Relation
+  using (Dec; Decidable; Injective; Relation; Symmetric; no; yes)
+open import Prover.Prelude.Sigma
+  using (Σ; _,_)
+
+open List
+  using ([]; _∷_; _!_)
 
 -- ## Definition
 
-module _Collection
-  {A K : Set}
-  where
+module _Collection where
 
-  data Collection
-    (f : A → K)
-    (p : Decidable K)
+  record Collection
+    {A : Set}
+    (R : Relation A)
     : Set
+    where
+    
+    field
+    
+      elements
+        : List A
+      
+    size
+      : ℕ
+    size
+      = List.length elements
   
-  lookup
-    : {f : A → K}
-    → {p : Decidable K}
-    → Collection f p
-    → K
-    → Maybe A
+    field
   
-  data Collection f p where
+      .valid
+        : (k₁ k₂ : Fin size)
+        → R (elements ! k₁) (elements ! k₂)
+        → k₁ ≡ k₂
 
-    empty
-      : Collection f p
-
-    insert 
-      : (xs : Collection f p)
-      → (x : A)
-      → .(lookup xs (f x) ≡ nothing {A = A})
-      → Collection f p
-  
-  lookup empty _
-    = nothing
-  lookup {f = f} {p = p} (insert xs x _) k
-    with p k (f x)
-  ... | no _
-    = lookup xs k
-  ... | yes _
-    = just x
+    valid'
+      : (k₁ k₂ : Fin size)
+      → R (elements ! k₁) (elements ! k₂)
+      → k₁ ≡ k₂
+    valid' k₁ k₂ r
+      = Decidable.recompute (k₁ ≟ k₂ fin) (valid k₁ k₂ r)
 
 Collection
-  : {A K : Set}
-  → (A → K)
-  → Decidable K
+  : {A : Set}
+  → Relation A
   → Set
 Collection
   = _Collection.Collection
@@ -67,201 +71,404 @@ module Collection where
 
   open _Collection.Collection public
 
-  open _Collection public
-    using (lookup)
-  
-  -- ### Conversion
+  -- ### Interface
+
+  find
+    : {A : Set}
+    → {R : Relation A}
+    → Collection R
+    → (A → Bool)
+    → Maybe A
+  find xs
+    = List.find
+      (elements xs)
+
+  find-nothing
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → find xs f ≡ nothing
+    → (k : Fin (size xs))
+    → F (f (elements xs ! k))
+  find-nothing xs
+    = List.find-nothing
+      (elements xs)
+
+  insert
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → Symmetric R
+    → (d : Decidable R)
+    → (x : A)
+    → find xs (Bool.from-decidable d x) ≡ nothing
+    → Collection R
+  insert xs s d x p
+    = record
+    { elements
+      = x ∷ elements xs
+    ; valid
+      = λ
+      { zero zero _
+        → refl
+      ; zero (suc k₂) r
+        → ⊥-elim (Bool.¬both
+          (find-nothing xs (Bool.from-decidable d x) p k₂)
+          (Bool.from-decidable-true d x (elements xs ! k₂) r))
+      ; (suc k₁) zero r
+        → ⊥-elim (Bool.¬both
+          (find-nothing xs (Bool.from-decidable d x) p k₁)
+          (Bool.from-decidable-true d x (elements xs ! k₁)
+            (s (elements xs ! k₁) x r)))
+      ; (suc k₁) (suc k₂) r
+        → sub suc (valid' xs k₁ k₂ r)
+      }
+    }
+
+  map
+    : {A B : Set}
+    → {R : Relation A}
+    → (S : Relation B)
+    → (f : A → B)
+    → ((x₁ x₂ : A) → S (f x₁) (f x₂) → R x₁ x₂)
+    → Collection R
+    → Collection S
+  map S f r xs
+    = record
+    { elements
+      = List.map f
+        (elements xs)
+    ; valid
+      = λ k₁ k₂
+      → valid' xs k₁ k₂
+      ∘ r (elements xs ! k₁) (elements xs ! k₂)
+      ∘ rewrite₂ S
+        (sym (List.lookup-map f (elements xs) k₁))
+        (sym (List.lookup-map f (elements xs) k₂))
+    }
+
+  -- ### Construction
 
   module _
-    {A K : Set}
-    {f : A → K}
-    {p : Decidable K}
+    {A : Set}
+    {R : Relation A}
     where
 
-    to-vec
-      : Collection f p
-      → Any (Vec A)
-    to-vec empty
-      = any []
-    to-vec (insert xs x _)
-      = any (x ∷ Any.value (to-vec xs))
+    empty
+      : Collection R
+    empty
+      = record
+      { elements
+        = []
+      ; valid
+        = λ ()
+      }
 
   -- ### Equality
 
   module _
-    {A K : Set}
-    {f : A → K}
-    {p : Decidable K}
+    {A : Set}
+    {R : Relation A}
     where
 
     decidable
-      : Decidable A
-      → Decidable (Collection f p)
-    
-    decidable _ empty empty
+      : Decidable (Equal A)
+      → Decidable (Equal (Collection R))
+    decidable d xs₁ xs₂
+      with List.decidable d (elements xs₁) (elements xs₂)
+    ... | no ¬p
+      = no λ {refl → ¬p refl}
+    ... | yes refl
       = yes refl
-    decidable q (insert xs x _) (insert ys y _)
-      with q x y | decidable q xs ys
-    ... | yes refl | yes refl
-      = yes refl
-    ... | no ¬r | _
-      = no (λ {refl → ¬r refl})
-    ... | _ | no ¬r
-      = no (λ {refl → ¬r refl})
-    
-    decidable _ empty (insert _ _ _)
-      = no (λ ())
-    decidable _ (insert _ _ _) empty
-      = no (λ ())
-  
+
   -- ### Membership
 
   module _
-    {A K : Set}
-    {f : A → K}
-    {p : Decidable K}
+    {A : Set}
+    {R : Relation A}
     where
-  
+
+    open List public
+      using (member)
+
     IsMember
-      : Collection f p
+      : Collection R
       → A
       → Set
-    IsMember xs x
-      = lookup xs (f x) ≡ just x
-    
+    IsMember xs
+      = List.IsMember
+        (elements xs)
+
     is-member?
-      : Decidable A
-      → (xs : Collection f p)
+      : (xs : Collection R)
+      → Decidable (Equal A)
       → (x : A)
       → Dec (IsMember xs x)
-    is-member? q xs x
-      = Maybe.decidable q (lookup xs (f x)) (just x)
-    
-    record Member
-      (xs : Collection f p)
-      : Set
-      where
-    
-      constructor
-        
-        member
+    is-member? xs
+      = List.is-member? (elements xs)
 
-      field
+    is-member-eq
+      : {x₁ x₂ : A}
+      → (xs : Collection R)
+      → IsMember xs x₁
+      → IsMember xs x₂
+      → R x₁ x₂
+      → x₁ ≡ x₂
+    is-member-eq xs (k₁ , p₁) (k₂ , p₂) r
+      = trans
+        (sym p₁)
+      $ trans
+        (sub (List.lookup (elements xs))
+          (valid' xs k₁ k₂
+            (rewrite₂ R p₁ p₂ r)))
+      $ p₂
 
-        value
-          : A
+    Member
+      : Collection R
+      → Set
+    Member xs
+      = List.Member
+        (elements xs)
 
-        valid
-          : IsMember xs value
-    
-    lookup-eq
-      : {x : A}
-      → (xs : Collection f p)
-      → (k : K)
-      → lookup xs k ≡ just x
-      → k ≡ f x
-    lookup-eq (insert xs x' _) k q
-      with p k (f x')
-    ... | no _ 
-      = lookup-eq xs k q
-    lookup-eq _ _ refl | yes r
-      = r
-    
-    lookup-member
-      : (xs : Collection f p)
-      → K
+    module Member where
+
+      open List.Member public
+
+    find-member
+      : (xs : Collection R)
+      → (A → Bool)
       → Maybe (Member xs)
-    lookup-member xs k
-      with lookup xs k
-      | inspect (lookup xs) k
-    ... | nothing | _
-      = nothing
-    ... | just x | [ q ]
-      = just (member x
-        (trans (sub (lookup xs) (sym (lookup-eq xs k q))) q))
-
-    lookup-member-eq
-      : {xs : Collection f p}
-      → {m : Member xs}
-      → (x : A)
-      → IsMember xs x
-      → lookup-member xs (f x) ≡ just m
-      → x ≡ Member.value m
-    lookup-member-eq {xs = xs} x _ _
-      with lookup xs (f x)
-      | inspect (lookup xs) (f x)
-    lookup-member-eq _ refl refl | just _ | [ _ ]
-      = refl
-
-    lookup-member-nothing
-      : (xs : Collection f p)
-      → (k : K)
-      → lookup-member xs k ≡ nothing
-      → lookup xs k ≡ nothing
-    lookup-member-nothing xs k q
-      with lookup xs k
-      | inspect (lookup xs) k
-    ... | nothing | _
-      = refl
-    ... | just _ | [ _ ]
-      = ⊥-elim (Maybe.just≢nothing q)
+    find-member xs
+      = List.find-member
+        (elements xs)
 
   -- ### Properties
 
+  find-true
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → find xs f ≡ just y
+    → T (f y)
+  find-true xs
+    = List.find-true
+      (elements xs)
+
+  find-is-member
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → find xs f ≡ just y
+    → IsMember xs y
+  find-is-member xs
+    = List.find-is-member
+      (elements xs)
+
+  find-¬is-member
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → (x : A)
+    → T (f x)
+    → find xs f ≡ nothing
+    → ¬ IsMember xs x
+  find-¬is-member xs
+    = List.find-¬is-member
+      (elements xs)
+
+  find-member-nothing
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → find-member xs f ≡ nothing
+    → find xs f ≡ nothing
+  find-member-nothing xs
+    = List.find-member-nothing
+      (elements xs)
+
+  find-member-just
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → {m : Member xs}
+    → (f : A → Bool)
+    → find-member xs f ≡ just m
+    → find xs f ≡ just (Member.value m)
+  find-member-just xs
+    = List.find-member-just
+      (elements xs)
+
+  find-insert
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → (s : Symmetric R)
+    → (d : Decidable R)
+    → (x : A)
+    → (p : find xs (Bool.from-decidable d x) ≡ nothing)
+    → (f : A → Bool)
+    → f x ≡ true
+    → find (insert xs s d x p) f ≡ just x
+  find-insert xs _ _ x _
+    = List.find-cons
+      (elements xs) x
+
+  find-map
+    : {A B : Set}
+    → {y : A}
+    → {R : Relation A}
+    → (S : Relation B)
+    → (f : A → B)
+    → (i : Injective R S f)
+    → (xs : Collection R)
+    → (g : B → Bool)
+    → find xs (g ∘ f) ≡ just y
+    → find (map S f i xs) g ≡ just (f y)
+  find-map _ f _ xs
+    = List.find-map f
+      (elements xs)
+
+  member-find
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → T (f y)
+    → IsMember xs y
+    → z ∈ A × find xs f ≡ just z
+  member-find xs
+    = List.member-find
+      (elements xs)
+
+  member-find-unique
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → Unique R f
+    → T (f y)
+    → IsMember xs y
+    → find xs f ≡ just y
+  member-find-unique {y = y} xs f u p m
+    with member-find xs f p m
+  ... | (z , q)
+    = trans q
+    $ sub just
+    $ is-member-eq xs
+      (find-is-member xs f q) m
+      (u z y (find-true xs f q) p)
+
+  member-find-unique'
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → {m : Member xs}
+    → (f : A → Bool)
+    → Unique R f
+    → T (f y)
+    → IsMember xs y
+    → find-member xs f ≡ just m
+    → y ≡ Member.value m
+  member-find-unique' xs f u p m q
+    = Maybe.just-injective
+    $ trans (sym (member-find-unique xs f u p m))
+    $ find-member-just xs f q
+
+  -- ### Subcollection
+
   module _
-    {A K : Set}
-    {f : A → K}
-    {p : Decidable K}
+    {A : Set}
+    {R : Relation A}
     where
 
-    lookup-insert
-      : (xs : Collection f p)
-      → (x : A)
-      → (q : lookup xs (f x) ≡ nothing)
-      → lookup (insert xs x q) (f x) ≡ just x
-    lookup-insert _ x _
-      with p (f x) (f x)
-    ... | no ¬r
-      = ⊥-elim (¬r refl)
-    ... | yes _
-      = refl
+    Subcollection
+      : Collection R
+      → Collection R
+      → Set
+    Subcollection xs₁ xs₂
+      = Sublist
+        (elements xs₁)
+        (elements xs₂)
     
-    lookup-other
-      : (xs : Collection f p)
-      → (x : A)
-      → (q : lookup xs (f x) ≡ nothing)
-      → (k : K)
-      → k ≢ f x
-      → lookup (insert xs x q) k ≡ lookup xs k
-    lookup-other _ x _ k r
-      with p k (f x)
-    ... | no _
-      = refl
-    ... | yes refl
-      = ⊥-elim (r refl)
+    infix 4 _⊆_
     
     _⊆_
-      : Collection f p
-      → Collection f p
+      : Collection R
+      → Collection R
       → Set
-    _⊆_ xs₁ xs₂
-      = {x : A}
-      → (k : K)
-      → lookup xs₁ k ≡ just x
-      → lookup xs₂ k ≡ just x
-    
-    ⊆-insert
-      : (xs₁ xs₂ : Collection f p)
-      → (x : A)
-      → (q : lookup xs₂ (f x) ≡ nothing)
+    _⊆_
+      = Subcollection
+  
+    ⊆-refl
+      : (xs : Collection R)
+      → xs ⊆ xs
+    ⊆-refl xs
+      = List.⊆-refl
+        (elements xs)
+  
+    ⊆-trans
+      : (xs₁ xs₂ xs₃ : Collection R)
       → xs₁ ⊆ xs₂
-      → xs₁ ⊆ insert xs₂ x q
-    ⊆-insert _ xs₂ x q r k s
-      with p k (f x)
-    ... | no _
-      = r k s
-    ... | yes refl
-      with lookup xs₂ k | r (f x) s
-    ... | _ | refl
-      = ⊥-elim (Maybe.just≢nothing q)
-    
+      → xs₂ ⊆ xs₃
+      → xs₁ ⊆ xs₃
+    ⊆-trans xs₁ xs₂ xs₃
+      = List.⊆-trans
+        (elements xs₁)
+        (elements xs₂)
+        (elements xs₃)
+  
+    ⊆-empty
+      : (xs : Collection R)
+      → empty ⊆ xs
+    ⊆-empty xs
+      = List.⊆-nil
+        (elements xs)
+
+    ⊆-insert
+      : (xs : Collection R)
+      → (s : Symmetric R)
+      → (d : Decidable R)
+      → (x : A)
+      → (p : find xs (Bool.from-decidable d x) ≡ nothing)
+      → xs ⊆ insert xs s d x p
+    ⊆-insert xs _ _ x _
+      = List.⊆-cons x
+        (elements xs)
+
+    ⊆-insert-left
+      : (xs₁ xs₂ : Collection R)
+      → (s : Symmetric R)
+      → (d : Decidable R)
+      → (x : A)
+      → (p : find xs₁ (Bool.from-decidable d x) ≡ nothing)
+      → IsMember xs₂ x
+      → xs₁ ⊆ xs₂
+      → insert xs₁ s d x p ⊆ xs₂
+    ⊆-insert-left xs₁ xs₂ _ _ x _
+      = List.⊆-cons-left
+        (elements xs₁)
+        (elements xs₂) x
+
+    ⊆-find
+      : {y : A}
+      → (xs₁ xs₂ : Collection R)
+      → (f : A → Bool)
+      → Unique R f
+      → xs₁ ⊆ xs₂
+      → find xs₁ f ≡ just y
+      → find xs₂ f ≡ just y
+    ⊆-find {y = y} xs₁ xs₂ f u p q₁
+      = member-find-unique xs₂ f u
+        (find-true xs₁ f q₁)
+        (p y (find-is-member xs₁ f q₁))
+

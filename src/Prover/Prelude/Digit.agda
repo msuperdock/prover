@@ -1,14 +1,10 @@
 module Prover.Prelude.Digit where
 
 open import Prover.Prelude.Any
-  using (Any; any)
-open import Prover.Prelude.Any1
-  using (Any₁)
-open import Prover.Prelude.Decidable
-  using (no; yes)
+  using (any)
 open import Prover.Prelude.Empty
   using (⊥-elim)
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (_≡_; _≢_; refl; sub; trans)
 open import Prover.Prelude.Fin
   using (Fin; _≟_fin; suc; zero)
@@ -17,9 +13,13 @@ open import Prover.Prelude.Function
 open import Prover.Prelude.Inspect
   using ([_]; inspect)
 open import Prover.Prelude.List
-  using (List; []; _∷_)
+  using (List)
+open import Prover.Prelude.List1
+  using (List₁)
 open import Prover.Prelude.Nat
   using (ℕ; _+_; _*_; suc; zero)
+open import Prover.Prelude.Relation
+  using (no; yes)
 open import Prover.Prelude.Retraction
   using (Retraction; retraction-compose)
 open import Prover.Prelude.Sigma
@@ -27,7 +27,10 @@ open import Prover.Prelude.Sigma
 open import Prover.Prelude.Sum
   using (ι₁; ι₂)
 open import Prover.Prelude.Vec
-  using (Vec; _∷_)
+  using (cons)
+
+open List
+  using ([]; _∷_)
 
 -- ## Internal
 
@@ -64,7 +67,7 @@ module Internal where
   Digits
     : Set
   Digits
-    = Any₁ (Vec Digit)
+    = List₁ Digit
 
   data Digits₁
     : Set
@@ -183,17 +186,6 @@ module Internal where
   ... | _ | refl
     = refl
 
-  -- ### Equality
-
-  digits₁-eq
-    : {ds₁ ds₂ : List Digit}
-    → .(¬p₁ : ds₁ ≢ [])
-    → .(¬p₂ : ds₂ ≢ [])
-    → ds₁ ≡ ds₂
-    → digits₁ ds₁ ¬p₁ ≡ digits₁ ds₂ ¬p₂
-  digits₁-eq _ _ refl
-    = refl
-
   -- ### Retractions
 
   module DigitsRetraction₁ where
@@ -201,8 +193,8 @@ module Internal where
     to
       : Digits
       → Digits₁
-    to (any ds@(_ ∷ _))
-      = digits₁ (List.from-vec ds) (λ ())
+    to (any ds)
+      = digits₁ (any ds) (λ ())
 
     from
       : Digits₁
@@ -210,15 +202,15 @@ module Internal where
     from (digits₁ [] ¬p)
       = ⊥-elim (¬p refl)
     from (digits₁ (d ∷ ds) _)
-      = any (d ∷ Any.value (List.to-vec ds))
+      = any (cons d ds)
 
     to-from
       : (ds : Digits₁)
       → to (from ds) ≡ ds
     to-from (digits₁ [] ¬p)
       = ⊥-elim (¬p refl)
-    to-from (digits₁ ds@(_ ∷ _) ¬p)
-      = digits₁-eq (λ ()) ¬p (List.from-to-vec ds)
+    to-from (digits₁ (_ ∷ _) _)
+      = refl
 
   digits-retraction₁
     : Retraction Digits Digits₁

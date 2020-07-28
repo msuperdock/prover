@@ -49,6 +49,11 @@ open import Prover.View.Text
   using (RichText; RichTextPath; plain; style; text)
 open import Prover.Prelude
 
+open List'
+  using ([]'; _∷'_)
+open Vec
+  using ([]; _∷_; _!_)
+
 -- ## Types
 
 -- ### View
@@ -154,11 +159,11 @@ module _
     → RichText
   
   draw-formula FormulaState.hole
-    = RichText.plain (String.to-vec "_")
+    = RichText.plain (String.to-list "_")
   draw-formula (FormulaState.parens s)
     = RichText.wrap "(" ")" (draw-sandbox s)
   draw-formula (FormulaState.meta m)
-    = draw-meta (String.to-vec (Nat.show m))
+    = draw-meta (String.to-list (Nat.show m))
   draw-formula (FormulaState.variable' (any cs) _)
     = RichText.plain (any cs)
   draw-formula (FormulaState.symbol s _ l r cs)
@@ -179,10 +184,10 @@ module _
     = draw-formula f
 
   draw-formula-center (t ∷ []) []
-    = RichText.plain (any (Token.characters t))
+    = RichText.plain (Token.characters t)
   draw-formula-center (t ∷ ts@(_ ∷ _)) (s ∷ ss)
     = RichText.texts
-    $ RichText.plain (any (Token.characters t))
+    $ RichText.plain (Token.characters t)
     ∷ draw-sandbox s
     ∷ draw-formula-center ts ss
     ∷ []
@@ -192,7 +197,7 @@ module _
   draw-sandbox (any (SandboxState.cons f _ s _))
     = RichText.texts
     $ draw-formula f
-    ∷ RichText.plain (String.to-vec "   ")
+    ∷ RichText.plain (String.to-list "   ")
     ∷ draw-sandbox s
     ∷ []
 
@@ -278,11 +283,11 @@ module _
 -- ### Pattern
 
 pattern tag-meta
-  = Value.string ('m' ∷ 'e' ∷ 't' ∷ 'a' ∷ [])
+  = Value.string ('m' ∷' []')
 pattern tag-variable
-  = Value.string ('v' ∷ 'a' ∷ 'r' ∷ 'i' ∷ 'a' ∷ 'b' ∷ 'l' ∷ 'e' ∷ [])
+  = Value.string ('v' ∷' []')
 pattern tag-symbol
-  = Value.string ('s' ∷ 'y' ∷ 'm' ∷ 'b' ∷ 'o' ∷ 'l' ∷ [])
+  = Value.string ('s' ∷' []')
 
 -- ### Encode
 
@@ -299,31 +304,31 @@ encode-formulas
   → {m : Bool}
   → {n : ℕ}
   → Vec (Formula ss vs m) n
-  → List Value
+  → List' Value
 
 encode-formula (Formula.meta m)
   = Value.array
   $ tag-meta
-  ∷ Value.number m
-  ∷ []
+  ∷' Value.number m
+  ∷' []'
 
 encode-formula (Formula.variable' v _)
   = Value.array 
   $ tag-variable
-  ∷ encode-identifier v
-  ∷ []
+  ∷' encode-identifier v
+  ∷' []'
 
 encode-formula (Formula.symbol (symbol _ n _ _ _) _ fs)
   = Value.array
   $ tag-symbol
-  ∷ encode-identifier n
-  ∷ Value.array (encode-formulas fs)
-  ∷ []
+  ∷' encode-identifier n
+  ∷' Value.array (encode-formulas fs)
+  ∷' []'
 
 encode-formulas []
-  = []
+  = []'
 encode-formulas (f ∷ fs)
-  = encode-formula f ∷ encode-formulas fs
+  = encode-formula f ∷' encode-formulas fs
 
 -- ### Decode
 
@@ -338,11 +343,11 @@ decode-formulas
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
-  → List Value
-  → Maybe (Σ ℕ (Vec (Formula ss vs m)))
+  → List' Value
+  → Maybe (List (Formula ss vs m))
 
 decode-formula _ vs _
-  (Value.array (tag-variable ∷ n ∷ []))
+  (Value.array (tag-variable ∷' n ∷' []'))
   with decode-identifier n
 ... | nothing
   = nothing
@@ -354,14 +359,14 @@ decode-formula _ vs _
   = just (Formula.variable' v p)
 
 decode-formula ss vs m
-  (Value.array (tag-symbol ∷ n ∷ Value.array fs ∷ []))
+  (Value.array (tag-symbol ∷' n ∷' Value.array fs ∷' []'))
   with decode-identifier n
   | decode-formulas ss vs m fs
 ... | nothing | _
   = nothing
 ... | _ | nothing
   = nothing
-... | just n' | just (a , fs')
+... | just n' | just (any {index = a} fs')
   with Symbols.lookup-member ss n'
 ... | nothing
   = nothing
@@ -373,23 +378,23 @@ decode-formula ss vs m
   = just (Formula.symbol s p fs')
 
 decode-formula _ _ true
-  (Value.array (tag-meta ∷ Value.number n ∷ []))
+  (Value.array (tag-meta ∷' Value.number n ∷' []'))
   = just (Formula.meta n)
 
 decode-formula _ _ _ _
   = nothing
 
-decode-formulas _ _ _ []
-  = just (zero , [])
-decode-formulas ss vs m (f ∷ fs)
+decode-formulas _ _ _ []'
+  = just (any [])
+decode-formulas ss vs m (f ∷' fs)
   with decode-formula ss vs m f
   | decode-formulas ss vs m fs
 ... | nothing | _
   = nothing
 ... | _ | nothing
   = nothing
-... | just f' | just (n , fs')
-  = just (suc n , f' ∷ fs')
+... | just f' | just (any fs')
+  = just (any (f' ∷ fs'))
 
 -- ### Valid
 
@@ -406,7 +411,7 @@ decode-encode-formulas
   → {m : Bool}
   → {n : ℕ}
   → (fs : Vec (Formula ss vs m) n)
-  → decode-formulas ss vs m (encode-formulas fs) ≡ just (n , fs)
+  → decode-formulas ss vs m (encode-formulas fs) ≡ just (any fs)
 
 decode-encode-formula
   (Formula.meta _)
@@ -433,9 +438,12 @@ decode-encode-formula {ss = ss} {vs = vs} {m = m}
   with Symbols.lookup-member ss n
   | inspect (Symbols.lookup-member ss) n
 ... | nothing | [ q ]
-  = ⊥-elim (Maybe.just≢nothing
-    (trans (sym p) (Symbols.lookup-member-nothing ss n q)))
+  = ⊥-elim (Symbols.lookup-member-nothing ss s q p)
 ... | just (Symbols.member {a'} _ _) | [ q ]
+  with a ≟ a' nat
+... | no ¬q
+  = ⊥-elim (¬q (Symbols.lookup-member-arity s p q))
+... | yes refl
   with a ≟ a' nat
   | Symbols.lookup-member-eq s p q
 ... | no ¬q | _
@@ -682,7 +690,7 @@ module FormulaSimpleChildEditorVariable
       (FormulaChildEventStack variable')
       (Result s sp)
   flat-editor _ _
-    = flat-editor-map (Variables.lookup-member vs)
+    = flat-editor-map (Variables.find-member vs)
     $ command-flat-editor "v"
 
   update

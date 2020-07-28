@@ -88,6 +88,9 @@ module Symbol where
 
   open _Symbol.Symbol public
 
+  open _Symbol public
+    using (symbol)
+
   data HasLeft
     {a : ℕ}
     : Symbol a
@@ -186,25 +189,25 @@ module Symbol where
 
   _≟_tkns
     : {n : ℕ}
-    → Decidable (Vec Token n)
+    → Decidable (Equal (Vec Token n))
   _≟_tkns
     = Vec.decidable _≟_tkn
   
   _≟_prc?
     : {b : Bool}
-    → Decidable (If Precedence b)
+    → Decidable (Equal (If Precedence b))
   _≟_prc?
     = If.decidable _≟_prc
 
   _≟_ass?
     : {b : Bool}
-    → Decidable (If Associativity b)
+    → Decidable (Equal (If Associativity b))
   _≟_ass?
     = If.decidable _≟_ass
 
   _≟_sym
     : {a : ℕ}
-    → Decidable (Symbol a)
+    → Decidable (Equal (Symbol a))
   _≟_sym
     (symbol {hl₁} {hr₁} {ca₁} v₁ n₁ ts₁ ip₁ ia₁)
     (symbol {hl₂} {hr₂} {ca₂} v₂ n₂ ts₂ ip₂ ia₂)
@@ -237,7 +240,7 @@ module Symbol where
     = yes refl
 
   _≟_sym?
-    : Decidable (Any Symbol)
+    : Decidable (Equal (Any Symbol))
   _≟_sym?
     = Any.decidable Symbol _≟_nat _≟_sym
 

@@ -1,13 +1,13 @@
 module Prover.Prelude.Fin where
 
-open import Prover.Prelude.Decidable
-  using (Decidable; no; yes)
-open import Prover.Prelude.Equality
-  using (_≡_; _≢_; refl; sub)
+open import Prover.Prelude.Equal
+  using (Equal; _≡_; _≢_; refl; sub)
 open import Prover.Prelude.Maybe
   using (Maybe; just; maybe; nothing)
 open import Prover.Prelude.Nat
   using (ℕ; zero; suc)
+open import Prover.Prelude.Relation
+  using (Decidable; no; yes)
 open import Prover.Prelude.Sigma
   using (Σ; _,_)
 open import Prover.Prelude.Sum
@@ -100,7 +100,7 @@ module Fin where
 
   _≟_fin
     : {n : ℕ}
-    → Decidable (Fin n)
+    → Decidable (Equal (Fin n))
   
   zero ≟ zero fin
     = yes refl
@@ -116,7 +116,7 @@ module Fin where
   suc _ ≟ zero fin
     = no (λ ())
 
-  -- ## Properties
+  -- ### Properties
 
   increment-maximum
     : {n : ℕ}

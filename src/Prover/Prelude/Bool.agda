@@ -1,15 +1,13 @@
 module Prover.Prelude.Bool where
 
-open import Prover.Prelude.Decidable
-  using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Empty
-  using (⊥)
-open import Prover.Prelude.Equality
-  using (_≢_; refl)
+  using (⊥; ⊥-elim)
+open import Prover.Prelude.Equal
+  using (Equal; _≡_; _≢_; refl)
 open import Prover.Prelude.Function
-  using (id)
-open import Prover.Prelude.Unit
-  using (⊤; tt)
+  using (_∘_)
+open import Prover.Prelude.Relation
+  using (Dec; Decidable; Relation; Symmetric; Transitive; no; yes)
 
 import Agda.Builtin.Bool as Builtin
 
@@ -61,14 +59,18 @@ module Bool where
   
   -- ### Conversion
 
+  F
+    : Bool
+    → Set
+  F b
+    = b ≡ false
+
   T
     : Bool
     → Set
-  T false
-    = ⊥
-  T true
-    = ⊤
-  
+  T b
+    = b ≡ true
+
   from-dec
     : {A : Set}
     → Dec A
@@ -82,14 +84,44 @@ module Bool where
     : (x : Bool)
     → Dec (T x)
   to-dec false
-    = no id
+    = no (λ ())
   to-dec true
-    = yes tt
+    = yes refl
+
+  from-dec-true
+    : {A : Set}
+    → (d : Dec A)
+    → A
+    → T (from-dec d)
+  from-dec-true (no ¬x) x
+    = ⊥-elim (¬x x)
+  from-dec-true (yes _) _
+    = refl
+
+  from-decidable
+    : {A : Set}
+    → {R : Relation A}
+    → Decidable R
+    → A
+    → A
+    → Bool
+  from-decidable d x₁ x₂
+    = from-dec (d x₁ x₂)
+
+  from-decidable-true
+    : {A : Set}
+    → {R : Relation A}
+    → (d : Decidable R)
+    → (x₁ x₂ : A)
+    → R x₁ x₂
+    → T (from-decidable d x₁ x₂)
+  from-decidable-true d x₁ x₂
+    = from-dec-true (d x₁ x₂)
 
   -- ### Equality
 
   _≟_bool
-    : Decidable Bool
+    : Decidable (Equal Bool)
   
   false ≟ false bool
     = yes refl
@@ -103,10 +135,21 @@ module Bool where
 
   -- ### Properties
   
+  false≢true
+    : false ≢ true
+  false≢true ()
+
   true≢false
     : true ≢ false
   true≢false ()
   
+  ¬both
+    : {x : Bool}
+    → F x
+    → T x
+    → ⊥
+  ¬both {x = false} _ ()
+
   ∧-elimination-left
     : {x y : Bool}
     → T (x ∧ y)
@@ -114,7 +157,7 @@ module Bool where
   ∧-elimination-left {x = false} p
     = p
   ∧-elimination-left {x = true} _
-    = tt
+    = refl
   
   ∧-elimination-right
     : {x y : Bool}
@@ -123,8 +166,56 @@ module Bool where
   ∧-elimination-right {x = true} p
     = p
   
+  -- ### Uniqueness
+
+  Unique
+    : {A : Set}
+    → Relation A
+    → (A → Bool)
+    → Set
+  Unique {A = A} R f
+    = (x₁ x₂ : A)
+    → T (f x₁)
+    → T (f x₂)
+    → R x₁ x₂
+
+  module Unique where
+
+    decidable
+      : {A : Set}
+      → {R : Relation A}
+      → Symmetric R
+      → Transitive R
+      → (d : Decidable R)
+      → (x : A)
+      → Unique R (from-decidable d x)
+    decidable s t d x x₁ x₂ p₁ p₂
+      with d x x₁ | d x x₂
+    ... | yes r₁ | yes r₂
+      = t x₁ x x₂ (s x x₁ r₁) r₂
+
+    equal
+      : {A : Set}
+      → (d : Decidable (Equal A))
+      → (x : A)
+      → Unique (Equal A) (from-decidable d x)
+    equal {A = A}
+      = decidable
+        (Symmetric.equal A)
+        (Transitive.equal A)
+
+    map
+      : {A B : Set}
+      → (f : A → B)
+      → (R : Relation B)
+      → (g : B → Bool)
+      → Unique R g
+      → Unique (Relation.map f R) (g ∘ f)
+    map f _ _ u x₁ x₂
+      = u (f x₁) (f x₂)
+
 -- ## Exports
 
 open Bool public
-  using (T; _∨_; _∧_; _≟_bool; not)
+  using (F; T; Unique; _∨_; _∧_; _≟_bool; not)
 

@@ -1,9 +1,9 @@
 module Prover.Prelude.Direction where
 
-open import Prover.Prelude.Decidable
+open import Prover.Prelude.Equal
+  using (Equal; _≢_; refl)
+open import Prover.Prelude.Relation
   using (Decidable; no; yes)
-open import Prover.Prelude.Equality
-  using (_≢_; refl)
 
 -- ## Definition
 
@@ -49,7 +49,7 @@ module Direction where
     = left
   
   _≟_dir
-    : Decidable Direction
+    : Decidable (Equal Direction)
   
   up ≟ up dir
     = yes refl

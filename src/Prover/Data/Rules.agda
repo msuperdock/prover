@@ -8,32 +8,82 @@ open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Prelude
 
+-- ## Utilities
+
+relation
+  : (ss : Symbols)
+  → Relation (Any (Rule ss))
+relation _
+  = Relation.map
+    (Rule.name ∘ Any.value)
+    (Equal Identifier)
+
+symmetric
+  : (ss : Symbols)
+  → Symmetric (relation ss)
+symmetric _
+  = Symmetric.map
+    (Rule.name ∘ Any.value)
+    (Equal Identifier)
+    (Symmetric.equal Identifier)
+
+transitive
+  : (ss : Symbols)
+  → Transitive (relation ss)
+transitive _
+  = Transitive.map
+    (Rule.name ∘ Any.value)
+    (Equal Identifier)
+    (Transitive.equal Identifier)
+
+decidable
+  : (ss : Symbols)
+  → Decidable (relation ss)
+decidable _
+  = Decidable.map
+    (Rule.name ∘ Any.value)
+    (Equal Identifier)
+    _≟_idn
+
 -- ## Definition
 
 Rules
   : Symbols
   → Set
 Rules ss
-  = Collection {A = Any (Rule ss)} (Rule.name ∘ Any.value) _≟_idn
+  = Collection {A = Any (Rule ss)} (relation ss)
 
 -- ## Module
 
 module Rules where
 
-  open Collection public
-    using (empty; lookup)
-
   -- ### Interface
 
-  insert
-    : {ss : Symbols}
-    → {a : ℕ}
-    → (rs : Rules ss)
-    → (r : Rule ss a)
-    → lookup rs (Rule.name r) ≡ nothing
-    → Rules ss
-  insert rs
-    = Collection.insert rs ∘ any
+  module _
+    {ss : Symbols}
+    where
+
+    lookup
+      : Rules ss
+      → Identifier
+      → Maybe (Any (Rule ss))
+    lookup rs n
+      = Collection.find rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+
+    insert
+      : {a : ℕ}
+      → (rs : Rules ss)
+      → (r : Rule ss a)
+      → lookup rs (Rule.name r) ≡ nothing
+      → Rules ss
+    insert rs r
+      = Collection.insert rs (symmetric ss) (decidable ss) (any r)
+
+  -- ### Construction
+
+  open Collection public
+    using (empty)
 
   -- ### Membership
 
@@ -48,14 +98,14 @@ module Rules where
       → Set
     rul r ∈ rs
       = Collection.IsMember rs (any r)
-  
+
     rul_∈?_
       : {a : ℕ}
       → (r : Rule ss a)
       → (rs : Rules ss)
       → Dec (rul r ∈ rs)
     rul r ∈? rs
-      = Collection.is-member? _≟_rul? rs (any r)
+      = Collection.is-member? rs _≟_rul? (any r)
 
     record Member
       (rs : Rules ss)
@@ -71,22 +121,41 @@ module Rules where
         {arity}
           : ℕ
 
-        rule
+        value
           : Rule ss arity
 
         is-member
-          : rul rule ∈ rs
+          : rul value ∈ rs
 
     lookup-member
       : (rs : Rules ss)
       → Identifier
       → Maybe (Member rs)
     lookup-member rs n
-      with Collection.lookup-member rs n
+      with Collection.find-member rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
     ... | nothing
       = nothing
     ... | just (Collection.member (any r) p)
       = just (member r p)
+
+    lookup-member-nothing
+      : {a : ℕ}
+      → (rs : Rules ss)
+      → (r : Rule ss a)
+      → lookup-member rs (Rule.name r) ≡ nothing
+      → ¬ rul r ∈ rs
+    lookup-member-nothing rs r@(Rule.rule n _ _ _) p
+      with Collection.find-member rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+      | inspect (Collection.find-member rs)
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+    ... | nothing | [ q ]
+      = Collection.find-¬is-member rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value) (any r)
+        (Bool.from-decidable-true _≟_idn n n refl)
+      $ Collection.find-member-nothing rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value) q
 
     lookup-member-any
       : {rs : Rules ss}
@@ -95,15 +164,20 @@ module Rules where
       → (r : Rule ss a)
       → .(rul r ∈ rs)
       → lookup-member rs (Rule.name r) ≡ just m
-      → Equal (Any (Rule ss)) (any r) (any (Member.rule m))
-    lookup-member-any {rs = rs} r p _
-      with Collection.lookup-member rs (Rule.name r)
-      | inspect (Collection.lookup-member rs) (Rule.name r)
-    ... | just _ | [ q ]
-      with Collection.lookup-member-eq (any r) (recompute (rul r ∈? rs) p) q
-    lookup-member-any _ _ refl | _ | _ | refl
-      = refl
-
+      → Equal (Any (Rule ss)) (any r) (any (Member.value m))
+    lookup-member-any {rs = rs} (Rule.rule n _ _ _) _ _
+      with Collection.find-member rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+      | inspect (Collection.find-member rs)
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+    lookup-member-any {rs = rs} r@(Rule.rule n _ _ _) p refl
+      | just _ | [ q ]
+      = Collection.member-find-unique' rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+        (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) (any r))
+        (Bool.from-decidable-true (decidable ss) (any r) (any r) refl)
+        (Decidable.recompute (rul r ∈? rs) p) q
+  
     lookup-member-arity
       : {rs : Rules ss}
       → {m : Member rs}
@@ -116,7 +190,7 @@ module Rules where
       with lookup-member-any r p q
     ... | refl
       = refl
-
+  
     lookup-member-eq
       : {rs : Rules ss}
       → {m : Member rs}
@@ -124,22 +198,11 @@ module Rules where
       → (r : Rule ss a)
       → .(rul r ∈ rs)
       → lookup-member rs (Rule.name r) ≡ just m
-      → r ≅ Member.rule m
+      → r ≅ Member.value m
     lookup-member-eq r p q
       with lookup-member-any r p q
     ... | refl
       = refl
-
-    lookup-member-nothing
-      : (rs : Rules ss)
-      → (n : Identifier)
-      → lookup-member rs n ≡ nothing
-      → lookup rs n ≡ nothing
-    lookup-member-nothing rs n p
-      with Collection.lookup-member rs n
-      | inspect (Collection.lookup-member rs) n
-    ... | nothing | [ q ]
-      = Collection.lookup-member-nothing rs n q
 
 -- ## Exports
 

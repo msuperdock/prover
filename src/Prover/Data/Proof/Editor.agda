@@ -56,6 +56,11 @@ open import Prover.View.Window
   using (Window; WindowFlatViewStack; WindowPath)
 open import Prover.Prelude
 
+open List'
+  using ([]'; _∷'_)
+open Vec
+  using ([]; _∷_; _!_)
+
 -- ## Types
 
 -- ### View
@@ -262,11 +267,9 @@ module _
 -- ### Pattern
 
 pattern tag-assumption
-  = Value.string
-    ('a' ∷ 's' ∷ 's' ∷ 'u' ∷ 'm' ∷ 'p' ∷ 't' ∷ 'i' ∷ 'o' ∷ 'n' ∷ [])
+  = Value.string ('a' ∷' []')
 pattern tag-rule
-  = Value.string
-    ('r' ∷ 'u' ∷ 'l' ∷ 'e' ∷ [])
+  = Value.string ('r' ∷' []')
 
 -- ### Encode
 
@@ -283,26 +286,26 @@ encode-branches
   → {vs : Variables}
   → {n : ℕ}
   → Vec (Branch rs vs) n
-  → List Value
+  → List' Value
 
 encode-branch (Branch.assumption c)
   = Value.array
   $ tag-assumption
-  ∷ encode-formula c
-  ∷ []
+  ∷' encode-formula c
+  ∷' []'
 
 encode-branch (Branch.rule (rule n _ _ _) _ bs c _)
   = Value.array
   $ tag-rule
-  ∷ encode-identifier n
-  ∷ Value.array (encode-branches bs)
-  ∷ encode-formula c
-  ∷ []
+  ∷' encode-identifier n
+  ∷' Value.array (encode-branches bs)
+  ∷' encode-formula c
+  ∷' []'
 
 encode-branches []
-  = []
+  = []'
 encode-branches (b ∷ bs)
-  = encode-branch b ∷ encode-branches bs
+  = encode-branch b ∷' encode-branches bs
 
 encode-proof
   : {ss : Symbols}
@@ -327,15 +330,15 @@ decode-branches
   : {ss : Symbols}
   → (rs : Rules ss)
   → (vs : Variables)
-  → List Value
-  → Maybe (Σ ℕ (Vec (Branch rs vs)))
+  → List' Value
+  → Maybe (List (Branch rs vs))
 
 decode-branch {ss = ss} _ vs
-  (Value.array (tag-assumption ∷ c ∷ []))
+  (Value.array (tag-assumption ∷' c ∷' []'))
   = Maybe.map Branch.assumption (decode-formula ss vs true c)
 
 decode-branch {ss = ss} rs vs
-  (Value.array (tag-rule ∷ n ∷ Value.array bs ∷ c ∷ []))
+  (Value.array (tag-rule ∷' n ∷' Value.array bs ∷' c ∷' []'))
   with decode-identifier n
   | decode-branches rs vs bs
   | decode-formula ss vs true c
@@ -345,7 +348,7 @@ decode-branch {ss = ss} rs vs
   = nothing
 ... | _ | _ | nothing
   = nothing
-... | just n' | just (a , bs') | just c'
+... | just n' | just (any {index = a} bs') | just c'
   with Rules.lookup-member rs n'
 ... | nothing
   = nothing
@@ -363,17 +366,17 @@ decode-branch {ss = ss} rs vs
 decode-branch _ _ _
   = nothing
 
-decode-branches _ _ []
-  = just (zero , [])
-decode-branches rs vs (p ∷ ps)
+decode-branches _ _ []'
+  = just (any [])
+decode-branches rs vs (p ∷' ps)
   with decode-branch rs vs p
   | decode-branches rs vs ps
 ... | nothing | _
   = nothing
 ... | _ | nothing
   = nothing
-... | just b | just (n , bs)
-  = just (suc n , b ∷ bs)
+... | just b | just (any bs)
+  = just (any (b ∷ bs))
 
 decode-proof
   : {ss : Symbols}
@@ -408,7 +411,7 @@ decode-encode-branches
   → {vs : Variables}
   → {n : ℕ}
   → (bs : Vec (Branch rs vs) n)
-  → decode-branches rs vs (encode-branches bs) ≡ just (n , bs)
+  → decode-branches rs vs (encode-branches bs) ≡ just (any bs)
 
 decode-encode-branch {ss = ss} {vs = vs}
   (Branch.assumption c)
@@ -429,8 +432,7 @@ decode-encode-branch {ss = ss} {rs = rs} {vs = vs}
   with Rules.lookup-member rs n
   | inspect (Rules.lookup-member rs) n
 ... | nothing | [ q ] 
-  = ⊥-elim (Maybe.just≢nothing
-    (trans (sym p) (Rules.lookup-member-nothing rs n q)))
+  = ⊥-elim (Rules.lookup-member-nothing rs r q p)
 ... | just (Rules.member {a'} r' _) | [ q ]
   with a ≟ a' nat
   | Rules.lookup-member-eq r p q

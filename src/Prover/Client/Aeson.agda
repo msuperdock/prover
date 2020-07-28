@@ -9,11 +9,11 @@ data Value
   where
 
   array
-    : List Value
+    : List' Value
     → Value
 
   string
-    : List Char
+    : List' Char
     → Value
 
   number

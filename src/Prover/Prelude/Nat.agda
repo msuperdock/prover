@@ -1,11 +1,9 @@
 module Prover.Prelude.Nat where
 
-open import Prover.Prelude.Decidable
-  using (Decidable; no; yes)
-open import Prover.Prelude.Equality
-  using (_≡_; refl)
-open import Prover.Prelude.Trichotomous
-  using (Trichotomous; equal; greater; less)
+open import Prover.Prelude.Equal
+  using (Equal; refl)
+open import Prover.Prelude.Relation
+  using (Decidable; Trichotomous; τ₁; τ₂; τ₃; no; yes)
 
 open import Agda.Builtin.String
   using (String)
@@ -45,7 +43,7 @@ module Nat where
   -- ### Equality
 
   _≟_nat
-    : Decidable ℕ
+    : Decidable (Equal ℕ)
   zero ≟ zero nat
     = yes refl
   suc n₁ ≟ suc n₂ nat
@@ -59,13 +57,6 @@ module Nat where
   suc _ ≟ zero nat
     = no (λ ())
 
-  suc-eq
-    : {n₁ n₂ : ℕ}
-    → n₁ ≡ n₂
-    → suc n₁ ≡ suc n₂
-  suc-eq refl
-    = refl
-  
   -- ### Comparison
 
   data _<_nat
@@ -86,19 +77,19 @@ module Nat where
   compare
     : Trichotomous _<_nat
   compare zero zero
-    = equal (λ ()) refl (λ ())
+    = τ₂ (λ ()) refl (λ ())
   compare zero (suc _)
-    = less z<s (λ ()) (λ ())
+    = τ₁ z<s (λ ()) (λ ())
   compare (suc _) zero
-    = greater (λ ()) (λ ()) z<s
+    = τ₃ (λ ()) (λ ()) z<s
   compare (suc m) (suc n)
     with compare m n
-  ... | less l ¬p ¬g
-    = less (s<s l) (λ {refl → ¬p refl}) (λ {(s<s g) → ¬g g})
-  ... | equal ¬l refl ¬g
-    = equal (λ {(s<s l) → ¬l l}) refl (λ {(s<s g) → ¬g g})
-  ... | greater ¬l ¬p g
-    = greater (λ {(s<s l) → ¬l l}) (λ {refl → ¬p refl}) (s<s g)
+  ... | τ₁ l ¬p ¬g
+    = τ₁ (s<s l) (λ {refl → ¬p refl}) (λ {(s<s g) → ¬g g})
+  ... | τ₂ ¬l refl ¬g
+    = τ₂ (λ {(s<s l) → ¬l l}) refl (λ {(s<s g) → ¬g g})
+  ... | τ₃ ¬l ¬p g
+    = τ₃ (λ {(s<s l) → ¬l l}) (λ {refl → ¬p refl}) (s<s g)
 
   transitive
     : {n₁ n₂ n₃ : ℕ}

@@ -2,13 +2,15 @@ module Prover.Data.Token where
 
 open import Prover.Prelude
 
+open List
+  using ([]; _∷_)
+
 -- ## Definition
 
 module _Token where
 
   is-valid
-    : {n : ℕ}
-    → Vec Char n
+    : List Char
     → Bool
   is-valid []
     = false
@@ -16,8 +18,7 @@ module _Token where
     = not (Char.is-space c) ∨ is-valid cs
 
   IsValid
-    : {n : ℕ}
-    → Vec Char n
+    : List Char
     → Set
   IsValid cs
     = T (is-valid cs)
@@ -32,14 +33,16 @@ module _Token where
 
     field
   
-      {length}
-        : ℕ
-  
       characters
-        : Vec Char length
+        : List Char
   
       .valid
         : T (is-valid characters)
+
+    length
+      : ℕ
+    length
+      = List.length characters
 
 Token
   : Set
@@ -73,13 +76,9 @@ module Token where
   -- ### Equality
   
   _≟_tkn
-    : Decidable Token
-  token {length = n₁} cs₁ _ ≟ token {length = n₂} cs₂ _ tkn
-    with n₁ ≟ n₂ nat
-  ... | no ¬p
-    = no (λ {refl → ¬p refl})
-  ... | yes refl
-    with Vec.decidable _≟_char cs₁ cs₂
+    : Decidable (Equal Token)
+  token cs₁ _ ≟ token cs₂ _ tkn
+    with List.decidable _≟_char cs₁ cs₂
   ... | no ¬p
     = no (λ {refl → ¬p refl})
   ... | yes refl

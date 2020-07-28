@@ -36,6 +36,9 @@ open import Prover.View.Window
   using (Window; WindowFlatViewStack; WindowViewStack; go)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_)
+
 -- ## Types
 
 data ProofMetaMode

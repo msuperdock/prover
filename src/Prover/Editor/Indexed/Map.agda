@@ -7,7 +7,8 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.Base
   using (IndexedSet)
 open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction; indexed-partial-function-compose)
+  using (IndexedPartialFunction; IndexedPartialFunction';
+    indexed-partial-function-compose)
 open import Prover.Category.Indexed.Simple
   using (IndexedSimpleCategory)
 open import Prover.Category.Indexed.Split

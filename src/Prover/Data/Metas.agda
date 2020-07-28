@@ -4,6 +4,9 @@ open import Prover.Data.Meta
   using (Meta)
 open import Prover.Prelude
 
+open List
+  using ([]; _∷_)
+
 -- ## Definition
 
 Metas

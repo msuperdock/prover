@@ -16,6 +16,9 @@ open import Prover.Data.Variables
   using (Variables)
 open import Prover.Prelude
 
+open Vec public
+  using ([]; _∷_; _!_)
+
 -- ## Internal
 
 module Internal where
@@ -581,7 +584,7 @@ module Internal where
       → BranchWith rs f
     branch-with-infer-formula ms f r@(rule _ _ hs c) p (Formula.match subs q)
       with Formula.substitutes-def hs subs ms
-    ... | Formula.substitutes-def-result hs' subs' _ p' q'
+    ... | Formula.substitutes-def-result {fs' = hs'} subs' _ p' q'
       = record
       { branch
         = rule r p
@@ -589,7 +592,7 @@ module Internal where
           (Rule.match subs'
             (rewrite' (λ x → Formula.substitutes hs subs' ≡ just x)
               (branch-conclusions-assumptions hs' rs) q')
-            (Formula.substitute-⊆ subs subs' c f p' q))
+            (Formula.⊆-substitute c subs subs' p' q))
       ; valid
         = refl
       }

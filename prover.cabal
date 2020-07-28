@@ -137,16 +137,14 @@ executable prover
                      , MAlonzo.Code.Prover.Editor.Unit
                      , MAlonzo.Code.Prover.Prelude
                      , MAlonzo.Code.Prover.Prelude.Any
-                     , MAlonzo.Code.Prover.Prelude.Any1
                      , MAlonzo.Code.Prover.Prelude.Bool
                      , MAlonzo.Code.Prover.Prelude.Char
                      , MAlonzo.Code.Prover.Prelude.CharWith
                      , MAlonzo.Code.Prover.Prelude.Collection
-                     , MAlonzo.Code.Prover.Prelude.Decidable
                      , MAlonzo.Code.Prover.Prelude.Digit
                      , MAlonzo.Code.Prover.Prelude.Direction
                      , MAlonzo.Code.Prover.Prelude.Empty
-                     , MAlonzo.Code.Prover.Prelude.Equality
+                     , MAlonzo.Code.Prover.Prelude.Equal
                      , MAlonzo.Code.Prover.Prelude.Fin
                      , MAlonzo.Code.Prover.Prelude.FinSet
                      , MAlonzo.Code.Prover.Prelude.Function
@@ -155,15 +153,16 @@ executable prover
                      , MAlonzo.Code.Prover.Prelude.IO
                      , MAlonzo.Code.Prover.Prelude.Level
                      , MAlonzo.Code.Prover.Prelude.List
+                     , MAlonzo.Code.Prover.Prelude.List1
                      , MAlonzo.Code.Prover.Prelude.Map
                      , MAlonzo.Code.Prover.Prelude.Maybe
                      , MAlonzo.Code.Prover.Prelude.Nat
                      , MAlonzo.Code.Prover.Prelude.Pair
+                     , MAlonzo.Code.Prover.Prelude.Relation
                      , MAlonzo.Code.Prover.Prelude.Retraction
                      , MAlonzo.Code.Prover.Prelude.Sigma
                      , MAlonzo.Code.Prover.Prelude.String
                      , MAlonzo.Code.Prover.Prelude.Sum
-                     , MAlonzo.Code.Prover.Prelude.Trichotomous
                      , MAlonzo.Code.Prover.Prelude.Unit
                      , MAlonzo.Code.Prover.Prelude.Vec
                      , MAlonzo.Code.Prover.View.Command

@@ -1,9 +1,11 @@
-module Prover.Prelude.Equality where
+module Prover.Prelude.Equal where
 
 open import Agda.Builtin.Equality
   using (refl)
 open import Prover.Prelude.Empty
   using (¬_)
+open import Prover.Prelude.Function
+  using (id)
 
 open Agda.Builtin.Equality using () renaming
   ( _≡_
@@ -92,20 +94,20 @@ sub _ refl
 
 -- ## Conversion
 
-from-homogeneous
+from-builtin
   : {A : Set}
   → {x₁ x₂ : A}
   → x₁ ≡' x₂
   → x₁ ≡ x₂
-from-homogeneous refl
+from-builtin refl
   = refl
 
-to-homogeneous
+to-builtin
   : {A : Set}
   → {x₁ x₂ : A}
   → x₁ ≡ x₂
   → x₁ ≡' x₂
-to-homogeneous refl
+to-builtin refl
   = refl
 
 -- ## Irrelevance
@@ -128,6 +130,18 @@ rewrite'
   → x₁ ≡ x₂
   → P x₂
   → P x₁
-rewrite' _ refl p
-  = p
+rewrite' _ refl
+  = id
+
+rewrite₂
+  : {A B : Set}
+  → {x₁ x₂ : A}
+  → {y₁ y₂ : B}
+  → (P : A → B → Set)
+  → x₁ ≡ x₂
+  → y₁ ≡ y₂
+  → P x₂ y₂
+  → P x₁ y₁
+rewrite₂ _ refl refl
+  = id
 

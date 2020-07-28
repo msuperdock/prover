@@ -22,6 +22,9 @@ open import Prover.Editor.Flatten
   using (main-editor-flatten)
 open import Prover.Prelude
 
+open List
+  using ([]; _∷_)
+
 -- ## FlatMainEditor
 
 module _
@@ -60,14 +63,26 @@ module _
         (FlatMainEditor.draw-path e s sp)
       ∷ []
 
-    cursor
+    draw'
       : State
-      → List CursorLocation
+      → List' Widget
+    draw' s
+      = List.to-builtin (draw s)
+
+    cursor
+      : List CursorLocation
       → Maybe CursorLocation
-    cursor _ []
+    cursor []
       = nothing
-    cursor _ (c ∷ _)
+    cursor (c ∷ _)
       = just c
+
+    cursor'
+      : State
+      → List' CursorLocation
+      → Maybe CursorLocation
+    cursor' _ cs
+      = cursor (List.from-builtin cs)
 
     write
       : State
@@ -115,7 +130,7 @@ module _
     app'
       : App State
     app'
-      = app draw cursor handle start attributes'
+      = app draw' cursor' handle start attributes'
 
     decode-file
       : Bool

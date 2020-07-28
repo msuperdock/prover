@@ -14,6 +14,9 @@ open import Prover.View.Style
   using (Style)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_; _!_)
+
 -- ## Internal
 
 module Internal where
@@ -23,13 +26,13 @@ module Internal where
   PlainText
     : Set
   PlainText
-    = Any (Vec Char)
+    = List Char
   
   PlainTextPath
     : PlainText
     → Set
-  PlainTextPath (any {n} _)
-    = Fin n
+  PlainTextPath cs
+    = Fin (List.length cs)
   
   data RichText
     : Set
@@ -78,7 +81,7 @@ module Internal where
     : String
     → RichText
   rich-text-string s
-    = RichText.plain (String.to-vec s)
+    = RichText.plain (String.to-list s)
   
   rich-text-wrap
     : String

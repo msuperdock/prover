@@ -1,7 +1,5 @@
 module Prover.Prelude.CharWith where
 
-open import Prover.Prelude.Any1
-  using (Any₁)
 open import Prover.Prelude.Bool
   using (Bool; T; true)
 open import Prover.Prelude.Char
@@ -10,20 +8,18 @@ open import Prover.Prelude.Digit
   using (module Digits; Digit; 0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
 open import Prover.Prelude.Empty
   using (⊥-elim)
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (_≡_; refl)
 open import Prover.Prelude.Function
   using (_$_; const)
+open import Prover.Prelude.List1
+  using (List₁)
 open import Prover.Prelude.Maybe
   using (just; nothing)
 open import Prover.Prelude.Nat
   using (ℕ)
 open import Prover.Prelude.Retraction
   using (Retraction; retraction-compose)
-open import Prover.Prelude.Unit
-  using (tt)
-open import Prover.Prelude.Vec
-  using (Vec)
 
 -- ## Definition
 
@@ -75,7 +71,7 @@ module CharWith where
       : Char
       → CharWith (const true)
     from c
-      = char-with c tt
+      = char-with c refl
   
     to-from
       : (c : Char)
@@ -98,7 +94,7 @@ module CharWith where
     to (char-with c p)
       with Char.to-digit c
     ... | nothing
-      = ⊥-elim p
+      = ⊥-elim (Bool.false≢true p)
     ... | just n
       = n
 
@@ -138,10 +134,9 @@ module CharWith where
     = record {CharWithRetractionDigit}
 
   retraction-digits
-    : Retraction (Any₁ (Vec (CharWith Char.is-digit))) ℕ
+    : Retraction (List₁ (CharWith Char.is-digit)) ℕ
   retraction-digits
     = retraction-compose Digits.retraction
-    $ Any₁.retraction 
-    $ Vec.retraction
+    $ List₁.retraction 
     $ retraction-digit
 

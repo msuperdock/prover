@@ -6,6 +6,9 @@ open import Prover.View.Window
   using (Window; WindowPath)
 open import Prover.Prelude
 
+open Vec
+  using (_!_)
+
 record Interface
   : Set
   where

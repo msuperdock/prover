@@ -1,6 +1,6 @@
 module Prover.Prelude.Inspect where
 
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (_≡_; refl)
 
 module _

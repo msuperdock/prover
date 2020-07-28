@@ -12,6 +12,9 @@ open import Prover.View.Line
   using (Line; LinePath)
 open import Prover.Prelude
 
+open Vec
+  using (_!_)
+
 -- ## Definitions
 
 record Window

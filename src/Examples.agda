@@ -23,6 +23,9 @@ open import Prover.Data.Variables
 open import Prover.Prelude
   hiding (_,_; _∧_)
 
+open Vec
+  using ([]; _∷_)
+
 -- ## Utilities
 
 True
@@ -65,10 +68,10 @@ NonEmpty
   : String
   → Set
 NonEmpty s
-  with String.to-vec s
-... | any []
+  with String.to-list s
+... | any Vec.nil
   = ⊥
-... | any (_ ∷ _)
+... | any (Vec.cons _ _)
   = ⊤
 
 identifier'
@@ -76,8 +79,8 @@ identifier'
   → {_ : NonEmpty n}
   → Identifier
 identifier' n
-  with String.to-vec n
-... | any cs@(_ ∷ _)
+  with String.to-list n
+... | any cs@(Vec.cons _ _)
   = any cs
 
 -- ## Symbol
@@ -87,13 +90,13 @@ postulate
 
   is-valid
     : (s : String)
-    → Token.IsValid (Any.value (String.to-vec s))
+    → Token.IsValid (String.to-list s)
 
 token'
   : String
   → Token
 token' s
-  = token (Any.value (String.to-vec s)) (is-valid s)
+  = token (String.to-list s) (is-valid s)
 
 ⟨formula⟩
   : Symbol 1

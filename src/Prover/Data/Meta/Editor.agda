@@ -19,6 +19,9 @@ open import Prover.View.Text
     RichTextBaseViewStack; RichTextViewStack; plain; style; text)
 open import Prover.Prelude
 
+open List
+  using ([]; _∷_)
+
 -- ## Draw
 
 draw-meta
@@ -39,9 +42,9 @@ module MetaBaseViewStackMap where
   view
     : BaseViewStack.View PlainTextBaseViewStack
     → BaseViewStack.View RichTextBaseViewStack
-  view (any [])
+  view []
     = draw-meta-empty
-  view t@(any (_ ∷ _))
+  view t@(_ ∷ _)
     = draw-meta t
 
   view-with
@@ -55,11 +58,11 @@ module MetaBaseViewStackMap where
     : (v : BaseViewStack.View PlainTextBaseViewStack)
     → (vp : BaseViewStack.ViewPath PlainTextBaseViewStack v)
     → BaseViewStack.ViewPath RichTextBaseViewStack (view-with v vp)
-  view-path (any []) nothing
+  view-path [] nothing
     = style (text (suc zero) (plain zero))
-  view-path (any (_ ∷ _)) nothing
+  view-path (_ ∷ _) nothing
     = style (text (suc (suc zero)) (plain zero))
-  view-path (any (_ ∷ _)) (just tp)
+  view-path (_ ∷ _) (just tp)
     = style (text (suc zero) (plain tp))
 
 meta-base-view-stack-map

@@ -2,20 +2,18 @@ module Prover.Prelude.Char where
   
 open import Prover.Prelude.Bool
   using (Bool; T)
-open import Prover.Prelude.Decidable
-  using (Dec; Decidable; no; yes)
 open import Prover.Prelude.Digit
   using (Digit; 0d; 1d; 2d; 3d; 4d; 5d; 6d; 7d; 8d; 9d)
-open import Prover.Prelude.Equality
-  using (from-homogeneous; refl; to-homogeneous)
+open import Prover.Prelude.Equal
+  using (Equal; from-builtin; refl; to-builtin)
 open import Prover.Prelude.Function
   using (_∘_)
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
 open import Prover.Prelude.Nat
   using (_≟_nat)
-open import Prover.Prelude.Unit
-  using (tt)
+open import Prover.Prelude.Relation
+  using (Dec; Decidable; no; yes)
 
 import Agda.Builtin.Char as Builtin
 import Agda.Builtin.Char.Properties as Properties
@@ -124,36 +122,36 @@ module Char where
     : (d : Digit)
     → IsDigit (from-digit d)
   is-digit-from-digit 0d
-    = tt
+    = refl
   is-digit-from-digit 1d
-    = tt
+    = refl
   is-digit-from-digit 2d
-    = tt
+    = refl
   is-digit-from-digit 3d
-    = tt
+    = refl
   is-digit-from-digit 4d
-    = tt
+    = refl
   is-digit-from-digit 5d
-    = tt
+    = refl
   is-digit-from-digit 6d
-    = tt
+    = refl
   is-digit-from-digit 7d
-    = tt
+    = refl
   is-digit-from-digit 8d
-    = tt
+    = refl
   is-digit-from-digit 9d
-    = tt
+    = refl
 
   -- ### Equality
 
   _≟_char
-    : Decidable Char
+    : Decidable (Equal Char)
   c₁ ≟ c₂ char
     with to-nat c₁ ≟ to-nat c₂ nat
   ... | no ¬p
     = no (λ {refl → ¬p refl})
   ... | yes p
-    = yes (from-homogeneous (to-nat-injective c₁ c₂ (to-homogeneous p)))
+    = yes (from-builtin (to-nat-injective c₁ c₂ (to-builtin p)))
   
 -- ## Exports
 

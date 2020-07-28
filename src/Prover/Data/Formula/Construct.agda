@@ -55,13 +55,13 @@ module Internal where
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
     with Precedence.compare p₁ p₂ | a₁ | a₂
-  ... | less _ _ _ | _ | _
+  ... | τ₁ _ _ _ | _ | _
     = true
-  ... | equal _ _ _ | Associativity.left | Associativity.left
+  ... | τ₂ _ _ _ | Associativity.left | Associativity.left
     = true
-  ... | equal _ _ _ | _ | _
+  ... | τ₂ _ _ _ | _ | _
     = false
-  ... | greater _ _ _ | _ | _
+  ... | τ₃ _ _ _ | _ | _
     = false
   
   record ConstructLeftValid
@@ -114,13 +114,13 @@ module Internal where
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
     with Precedence.compare p₁ p₂ | a₁ | a₂
-  ... | less _ _ _ | _ | _
+  ... | τ₁ _ _ _ | _ | _
     = true
-  ... | equal _ _ _ | Associativity.right | Associativity.right
+  ... | τ₂ _ _ _ | Associativity.right | Associativity.right
     = true
-  ... | equal _ _ _ | _ | _
+  ... | τ₂ _ _ _ | _ | _
     = false
-  ... | greater _ _ _ | _ | _
+  ... | τ₃ _ _ _ | _ | _
     = false
   
   record ConstructRightValid
@@ -172,28 +172,28 @@ module Internal where
     | construct-to-pair (symbol s₂)
     | construct-to-pair c
   ... | _ | _ | nothing
-    = tt
+    = refl
   ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , a₃)
     with Nat.compare p₁ p₂
     | Nat.compare p₂ p₃
     | Nat.compare p₁ p₃
-  ... | _ | _ | less _ _ _
-    = tt
-  ... | less p _ _ | less q _ _ | equal ¬r _ _
+  ... | _ | _ | τ₁ _ _ _
+    = refl
+  ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (Precedence.transitive p q))
-  ... | less p _ _ | less q _ _ | greater ¬r _ _
+  ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (Precedence.transitive p q))
-  ... | less p _ _ | equal _ q _ | equal ¬r _ _
+  ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
-  ... | less p  _ _ | equal _ q _ | greater ¬r _ _
+  ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
-  ... | equal _ p _ | less q _ _ | greater ¬r _ _
+  ... | τ₂ _ p _ | τ₁ q _ _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
-  ... | equal _ p _ | less q _ _ | equal ¬r _ _
+  ... | τ₂ _ p _ | τ₁ q _ _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
-  ... | equal _ p _ | equal _ q _ | greater _ ¬r _
+  ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
-  ... | equal _ _ _ | equal _ _ _ | equal _ _ _
+  ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
     with a₁ | a₂
   ... | Associativity.left | Associativity.left
     = rv
@@ -223,28 +223,28 @@ module Internal where
     | construct-to-pair (symbol s₂)
     | construct-to-pair c
   ... | _ | _ | nothing
-    = tt
+    = refl
   ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , a₃)
     with Nat.compare p₁ p₂
     | Nat.compare p₂ p₃
     | Nat.compare p₁ p₃
-  ... | _ | _ | less _ _ _
-    = tt
-  ... | less p _ _ | less q _ _ | equal ¬r _ _
+  ... | _ | _ | τ₁ _ _ _
+    = refl
+  ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (Precedence.transitive p q))
-  ... | less p _ _ | less q _ _ | greater ¬r _ _
+  ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (Precedence.transitive p q))
-  ... | less p _ _ | equal _ q _ | equal ¬r _ _
+  ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
-  ... | less p  _ _ | equal _ q _ | greater ¬r _ _
+  ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
-  ... | equal _ p _ | less q _ _ | greater ¬r _ _
+  ... | τ₂ _ p _ | τ₁ q _ _ | τ₃ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
-  ... | equal _ p _ | less q _ _ | equal ¬r _ _
+  ... | τ₂ _ p _ | τ₁ q _ _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
-  ... | equal _ p _ | equal _ q _ | greater _ ¬r _
+  ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
-  ... | equal _ _ _ | equal _ _ _ | equal _ _ _
+  ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
     with a₁ | a₂
   ... | Associativity.right | Associativity.right
     = lv

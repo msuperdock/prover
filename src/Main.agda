@@ -38,6 +38,9 @@ open import Prover.View.Window
   using (Window)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_)
+
 -- ## Types
 
 ProofWindowViewStack

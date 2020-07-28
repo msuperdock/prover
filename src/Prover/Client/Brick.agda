@@ -14,6 +14,9 @@ open import Prover.View.Window
   using (Window; WindowPath; go; window)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_; _!_)
+
 -- ## Types
 
 data ViewportType
@@ -110,8 +113,8 @@ postulate
 
   app
     : {S : Set}
-    → (S → List Widget)
-    → (S → List CursorLocation → Maybe CursorLocation)
+    → (S → List' Widget)
+    → (S → List' CursorLocation → Maybe CursorLocation)
     → (S → BrickEvent → EventM (Next S))
     → (S → EventM S)
     → (S → AttributeMap)
@@ -119,7 +122,7 @@ postulate
 
   attribute-map
     : Attribute
-    → List (Pair AttributeName Attribute)
+    → List' (Pair AttributeName Attribute)
     → AttributeMap
 
   attribute-name
@@ -160,8 +163,8 @@ postulate
     → S
     → EventM (Next S)
 
-  horizontal-box-list
-    : List Widget
+  horizontal-box'
+    : List' Widget
     → Widget
 
   liftIO
@@ -191,8 +194,8 @@ postulate
     : String
     → Widget
 
-  vertical-box-list
-    : List Widget
+  vertical-box'
+    : List' Widget
     → Widget
 
   viewport
@@ -250,7 +253,7 @@ postulate
   import Data.Text
     (unpack)
   import Graphics.Vty.Attributes
-    (Attr, Color, black, brightGreen, brightRed, green, withBackColor,
+    (Attr, Color, black, brightGreen, brightRed, defAttr, green, withBackColor,
       withForeColor)
   import Graphics.Vty.Input.Events
     (Event (EvKey), Key (KBS, KChar, KDel, KDown, KEnter, KEsc, KLeft, KRight,
@@ -381,7 +384,7 @@ postulate
   = fromBrickEvent #-}
 {-# COMPILE GHC halt
   = \ _ -> halt #-}
-{-# COMPILE GHC horizontal-box-list
+{-# COMPILE GHC horizontal-box'
   = hBox #-}
 {-# COMPILE GHC liftIO
   = \ _ -> liftIO #-}
@@ -395,7 +398,7 @@ postulate
   = showCursor () #-}
 {-# COMPILE GHC string
   = txt #-}
-{-# COMPILE GHC vertical-box-list
+{-# COMPILE GHC vertical-box'
   = vBox #-}
 {-# COMPILE GHC viewport
   = viewport () #-}
@@ -463,9 +466,10 @@ attribute-foreground
   = with-foreground default-attribute
 
 attribute-list
-  : List (Pair AttributeName Attribute)
+  : List' (Pair AttributeName Attribute)
 attribute-list
-  = pair attribute-complete
+  = Vec.to-builtin
+  $ pair attribute-complete
     (attribute-foreground green)
   ∷ pair attribute-highlight
     (attribute-background black)
@@ -501,15 +505,15 @@ horizontal-box
   : {n : ℕ}
   → Vec Widget n
   → Widget
-horizontal-box
-  = horizontal-box-list ∘ List.from-vec
+horizontal-box ws
+  = horizontal-box' (Vec.to-builtin ws)
 
 vertical-box
   : {n : ℕ}
   → Vec Widget n
   → Widget
-vertical-box
-  = vertical-box-list ∘ List.from-vec
+vertical-box ws
+  = vertical-box' (Vec.to-builtin ws)
 
 flag
   : Bool
@@ -565,8 +569,8 @@ draw-style Style.tree
 draw-plain-text
   : PlainText
   → Widget
-draw-plain-text (any cs)
-  = string (String.from-vec cs)
+draw-plain-text t
+  = string (String.from-list t)
 
 draw-plain-text-with
   : (t : PlainText)

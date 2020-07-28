@@ -2,10 +2,10 @@ module Prover.Prelude.Maybe where
 
 open import Prover.Prelude.Bool
   using (Bool; false; true)
-open import Prover.Prelude.Decidable
-  using (Decidable; no; yes)
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (Equal'; _≅_; _≡_; _≢_; refl)
+open import Prover.Prelude.Sigma
+  using (Σ; _,_)
 
 -- ## Definition
 
@@ -77,23 +77,6 @@ module Maybe where
 
   -- ### Equality
 
-  decidable
-    : {A : Set}
-    → Decidable A
-    → Decidable (Maybe A)
-  decidable _ nothing nothing
-    = yes refl
-  decidable _ nothing (just _)
-    = no (λ ())
-  decidable _ (just _) nothing
-    = no (λ ())
-  decidable _≟_ (just x₁) (just x₂)
-    with x₁ ≟ x₂
-  ... | no ¬p
-    = no (λ {refl → ¬p refl})
-  ... | yes refl
-    = yes refl
-
   nothing-eq₂
     : {A B : Set}
     → {x₁ x₂ : A}
@@ -156,6 +139,27 @@ module Maybe where
     → y₁ ≅ y₂
   just-injective' _ refl refl
     = refl
+
+  map-nothing
+    : {A B : Set}
+    → (f : A → B)
+    → (x : Maybe A)
+    → map f x ≡ nothing
+    → x ≡ nothing
+  map-nothing _ nothing _
+    = refl
+
+  map-just
+    : {A B : Set}
+    → {y : B}
+    → (f : A → B)
+    → (x : Maybe A)
+    → map f x ≡ just y
+    → z ∈ A
+    × p ∈ x ≡ just z
+    × f z ≡ y
+  map-just _ (just x) refl
+    = (x , refl , refl)
 
 -- ## Exports
 

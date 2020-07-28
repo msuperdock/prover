@@ -2,10 +2,10 @@ module Prover.Prelude.If where
 
 open import Prover.Prelude.Bool
   using (Bool; false; true)
-open import Prover.Prelude.Decidable
+open import Prover.Prelude.Equal
+  using (Equal; refl)
+open import Prover.Prelude.Relation
   using (Decidable; no; yes)
-open import Prover.Prelude.Equality
-  using (refl)
 
 -- ## Definition
 
@@ -51,8 +51,8 @@ module If where
   decidable
     : {A : Set}
     → {b : Bool}
-    → Decidable A
-    → Decidable (If A b)
+    → Decidable (Equal A)
+    → Decidable (Equal (If A b))
   decidable {b = false} _ nothing nothing
     = yes refl
   decidable {b = true} p (just x₁) (just x₂)

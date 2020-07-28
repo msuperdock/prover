@@ -31,7 +31,7 @@ module Associativity where
   open _Associativity.Associativity public
 
   _≟_ass
-    : Decidable Associativity
+    : Decidable (Equal Associativity)
   none ≟ none ass
     = yes refl
   left ≟ left ass

@@ -154,7 +154,7 @@ module Internal where
 -- ## Modules
 
 open Internal public
-  using (indexed-partial-function-compose)
+  using (IndexedPartialFunction'; indexed-partial-function-compose)
 
 -- ### IndexedPartialFunction
 

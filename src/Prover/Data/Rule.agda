@@ -12,6 +12,9 @@ open import Prover.Data.Variables
   using (Variables; _≟_vars)
 open import Prover.Prelude
 
+open Vec
+  using (_∷_)
+
 -- ## Definition
 
 module _Rule where
@@ -56,6 +59,9 @@ module Rule where
 
   open _Rule.Rule public
 
+  open _Rule public
+    using (rule)
+
   -- ### Equality
 
   module _
@@ -64,7 +70,7 @@ module Rule where
 
     _≟_rul
       : {a : ℕ}
-      → Decidable (Rule ss a)
+      → Decidable (Equal (Rule ss a))
     rule n₁ vs₁ hs₁ c₁ ≟ rule n₂ vs₂ hs₂ c₂ rul
       with n₁ ≟ n₂ idn
       | vs₁ ≟ vs₂ vars
@@ -85,7 +91,7 @@ module Rule where
       = yes refl
     
     _≟_rul?
-      : Decidable (Any (Rule ss))
+      : Decidable (Equal (Any (Rule ss)))
     _≟_rul?
       = Any.decidable (Rule ss) _≟_nat _≟_rul
 
@@ -133,15 +139,15 @@ module Rule where
       { substitutions
         = subs
       ; hypotheses-valid
-        = Formula.substitutes-to-substitutes c hs subs f fs p
+        = Formula.substitutes-to-substitutes c hs subs p
       ; conclusion-valid
-        = Formula.substitutes-to-substitute c hs subs f fs p
+        = Formula.substitutes-to-substitute c hs subs p
       }
 
     ... | Formula.no p
       = no (λ {(match subs q r)
         → p (Formula.matches-with subs (Map.⊆-empty subs)
-          (Formula.substitutes-recursive c hs subs f fs r q))})
+          (Formula.substitutes-recursive c hs subs r q))})
   
     substitute-meta-match
       : {r : Rule ss a}
@@ -154,15 +160,15 @@ module Rule where
         (Formula.substitutes-meta fs m f')
         (Formula.substitute-meta f m f')
     substitute-meta-match
-      {r = rule _ _ hs c} {fs = fs} {m = m} {f' = f'} {f = f}
+      {r = rule _ _ hs c} {m = m} {f' = f'}
       (match subs p q)
       = record
       { substitutions
         = Formula.substitute-meta-substitutions subs m f'
       ; hypotheses-valid
-        = Formula.substitutes-substitute-meta-substitutions hs subs m f' fs p
+        = Formula.substitutes-substitute-meta-substitutions hs subs m f' p
       ; conclusion-valid
-        = Formula.substitute-substitute-meta-substitutions c subs m f' f q
+        = Formula.substitute-substitute-meta-substitutions c subs m f' q
       }
   
 -- ## Exports

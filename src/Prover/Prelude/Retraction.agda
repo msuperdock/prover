@@ -1,6 +1,6 @@
 module Prover.Prelude.Retraction where
 
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (_≡_; refl)
 open import Prover.Prelude.Function
   using (_∘_)

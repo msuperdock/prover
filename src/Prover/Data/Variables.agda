@@ -9,23 +9,40 @@ open import Prover.Prelude
 Variables
   : Set
 Variables
-  = FinSet _≟_var
+  = FinSet Variable
 
 -- ## Module
 
 module Variables where
 
-  open FinSet public
-    using (Member; empty; insert; is-member; lookup-member; member)
+  -- ### Interface
 
-  -- ### Equality
+  is-member
+    : Variables
+    → Variable
+    → Bool
+  is-member vs
+    = FinSet.is-member vs _≟_var
 
-  _≟_vars
-    : Decidable Variables
-  _≟_vars
-    = FinSet.decidable
-  
+  insert
+    : (vs : Variables)
+    → (v : Variable)
+    → is-member vs v ≡ false
+    → Variables
+  insert vs
+    = FinSet.insert vs _≟_var
+
+  -- ### Construction
+
+  empty
+    : Variables
+  empty
+    = FinSet.empty
+
   -- ### Membership
+
+  open FinSet public
+    using (Member; member)
 
   var_∈_
     : Variable
@@ -39,10 +56,22 @@ module Variables where
     → (vs : Variables)
     → Dec (var v ∈ vs)
   var v ∈? vs
-    = FinSet.is-member? vs v
+    = FinSet.is-member? vs _≟_var v
+
+  _≟_vars
+    : Decidable (Equal Variables)
+  _≟_vars
+    = FinSet.decidable _≟_var
+
+  find-member
+    : (vs : Variables)
+    → Variable
+    → Maybe (Member vs)
+  find-member vs
+    = FinSet.find-member vs _≟_var
 
 -- ## Exports
 
 open Variables public
-  using (_≟_vars; var_∈_; var_∈?_)
+  using (var_∈_; var_∈?_; _≟_vars)
 

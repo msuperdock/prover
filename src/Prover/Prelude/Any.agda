@@ -1,9 +1,9 @@
 module Prover.Prelude.Any where
 
-open import Prover.Prelude.Decidable
+open import Prover.Prelude.Equal
+  using (Equal; _≡_; refl)
+open import Prover.Prelude.Relation
   using (Decidable; no; yes)
-open import Prover.Prelude.Equality
-  using (Equal; _≅_; _≡_; refl)
 open import Prover.Prelude.Retraction
   using (Retraction)
 
@@ -53,9 +53,9 @@ module Any where
 
     decidable
       : (B : A → Set)
-      → Decidable A
-      → ({x : A} → Decidable (B x))
-      → Decidable (Any B)
+      → Decidable (Equal A)
+      → ({x : A} → Decidable (Equal (B x)))
+      → Decidable (Equal (Any B))
     decidable _ p q (any {x₁} y₁) (any {x₂} y₂)
       with p x₁ x₂
     ... | no ¬r
@@ -67,17 +67,6 @@ module Any where
     ... | yes refl
       = yes refl
 
-    any-eq
-      : (B : A → Set)
-      → {x₁ y₁ : A}
-      → {x₂ : B x₁}
-      → {y₂ : B y₁}
-      → x₁ ≡ y₁
-      → x₂ ≅ y₂
-      → Equal (Any B) (any x₂) (any y₂)
-    any-eq _ refl refl 
-      = refl
-
   -- ### Retraction
 
   module _
@@ -88,33 +77,33 @@ module Any where
     module AnyRetraction
       {A : Set}
       {B C : A → Set}
-      (f : (x : A) → Retraction (B x) (C x))
+      (F : (x : A) → Retraction (B x) (C x))
       where
   
       to
         : Any B
         → Any C
       to (any {x} y)
-        = any (Retraction.to (f x) y)
+        = any (Retraction.to (F x) y)
   
       from
         : Any C
         → Any B
       from (any {x} z)
-        = any (Retraction.from (f x) z)
+        = any (Retraction.from (F x) z)
   
       to-from
         : (z : Any C)
         → to (from z) ≡ z
       to-from (any {x} z)
-        with Retraction.to (f x) (Retraction.from (f x) z)
-        | Retraction.to-from (f x) z
+        with Retraction.to (F x) (Retraction.from (F x) z)
+        | Retraction.to-from (F x) z
       ... | _ | refl
         = refl
   
     retraction
       : ((x : A) → Retraction (B x) (C x))
       → Retraction (Any B) (Any C)
-    retraction f
-      = record {AnyRetraction f}
+    retraction F
+      = record {AnyRetraction F}
 

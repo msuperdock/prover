@@ -7,20 +7,20 @@ open import Prover.Prelude
 Text
   : Set
 Text
-  = Any₁ (Vec Char)
+  = List₁ Char
 
 TextWith
   : (Char → Bool)
   → Set
 TextWith p
-  = Any₁ (Vec (CharWith p))
+  = List₁ (CharWith p)
 
 -- ## Module
 
 module Text where
 
   _≟_txt
-    : Decidable Text
+    : Decidable (Equal Text)
   _≟_txt
     = Any.decidable
       (λ n → Vec Char (suc n))
@@ -32,9 +32,7 @@ module Text where
       (TextWith (const true))
       Text
   retraction
-    = Any₁.retraction
-      (Vec.retraction
-        CharWith.retraction)
+    = List₁.retraction CharWith.retraction
 
 open Text public
   using (_≟_txt)

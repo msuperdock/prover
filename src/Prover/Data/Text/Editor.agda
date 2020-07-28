@@ -32,6 +32,9 @@ open import Prover.View.Text
   using (PlainTextBaseViewStack; PlainTextFlatViewStack; PlainTextViewStack)
 open import Prover.Prelude
 
+open Vec
+  using ([]; _∷_)
+
 -- ## Types
 
 -- ### Event
@@ -134,19 +137,15 @@ encode-text
   : Text
   → Value
 encode-text (any cs)
-  = Value.string (List.from-vec cs)
+  = Value.string (Vec.to-builtin cs)
 
 -- ### Decode
 
 decode-text
   : Value
   → Maybe Text
-decode-text (Value.string cs)
-  with List.to-vec cs
-... | any []
-  = nothing
-... | any cs'@(_ ∷ _)
-  = just (any cs')
+decode-text (Value.string (cons c cs))
+  = just (any (cons c (List.from-builtin cs)))
 decode-text _
   = nothing
 
@@ -155,10 +154,10 @@ decode-text _
 decode-encode-text
   : (t : Text)
   → decode-text (encode-text t) ≡ just t
-decode-encode-text (any cs)
-  with List.to-vec (List.from-vec cs)
-  | List.to-from-vec cs
-... | any (_ ∷ _) | refl
+decode-encode-text (any (cons c cs))
+  with List.from-builtin (List.to-builtin cs)
+  | List.from-builtin-to-builtin cs
+... | _ | refl
   = refl
 
 -- ## Editors
@@ -179,7 +178,7 @@ module TextWithSimpleBaseEditor
   State
     : Set
   State
-    = Any (Vec (CharWith p))
+    = List (CharWith p)
 
   -- ##### State
 
@@ -381,7 +380,7 @@ module TextBaseEventStackMap where
   event _ delete-next
     = delete-next
   event _ (insert c)
-    = insert (char-with c tt)
+    = insert (char-with c refl)
 
 text-base-event-stack-map
   : BaseEventStackMap

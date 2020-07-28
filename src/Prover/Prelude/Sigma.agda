@@ -1,6 +1,6 @@
 module Prover.Prelude.Sigma where
 
-open import Prover.Prelude.Equality
+open import Prover.Prelude.Equal
   using (_≅_; _≡_; refl)
 open import Prover.Prelude.Level
   using (Level; lmax)
@@ -35,6 +35,8 @@ open Builtin public using () renaming
 
 module Sigma where
 
+  -- ### Interface
+
   infixr 2 _×_
 
   _×_
@@ -43,6 +45,17 @@ module Sigma where
     → Set
   A₁ × A₂
     = _ ∈ A₁ × A₂
+
+  map
+    : {A₁ : Set}
+    → {A₂ B₂ : A₁ → Set}
+    → ((x₁ : A₁) → A₂ x₁ → B₂ x₁)
+    → Σ A₁ A₂
+    → Σ A₁ B₂
+  map f (x₁ , x₂)
+    = (x₁ , f x₁ x₂)
+
+  -- ### Equality
 
   comma-eq
     : {A₁ : Set}

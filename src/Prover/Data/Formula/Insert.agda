@@ -15,13 +15,16 @@ open import Prover.Data.Variables
   using (Variables; var_∈_)
 open import Prover.Prelude
 
+open Vec
+  using (_!_)
+
+-- #### Split
+
 module _
   {ss : Symbols}
   {vs : Variables}
   {m : Bool}
   where
-
-  -- #### Split
 
   data LeftSubformula
     (f : FormulaState ss vs m)
@@ -291,7 +294,13 @@ module _
   ... | complex l r g
     = (l , r , (λ {(sandbox-state-modified s _ sp) → (s , sp)}) ∘ g)
 
-  -- #### Update
+-- #### Update
+
+module _
+  {ss : Symbols}
+  {vs : Variables}
+  {m : Bool}
+  where
 
   formula-state-path-map-left
     : {a : ℕ}
@@ -380,11 +389,11 @@ module _
   formula-state-path-cat-left tt g _ (left fp)
     = g fp
   formula-state-path-cat-left _ _ h fp@stop
-    = h fp tt
+    = h fp refl
   formula-state-path-cat-left _ _ h fp@(right _)
-    = h fp tt
+    = h fp refl
   formula-state-path-cat-left _ _ h fp@(center _ _)
-    = h fp tt
+    = h fp refl
   
   formula-state-path-cat-right
     : {A : Set}
@@ -397,11 +406,11 @@ module _
   formula-state-path-cat-right tt g _ (right fp)
     = g fp
   formula-state-path-cat-right _ _ h fp@stop
-    = h fp tt
+    = h fp refl
   formula-state-path-cat-right _ _ h fp@(left _)
-    = h fp tt
+    = h fp refl
   formula-state-path-cat-right _ _ h fp@(center _ _)
-    = h fp tt
+    = h fp refl
 
   left-valid-sum
     : {a a' : ℕ}
@@ -497,7 +506,7 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt tt)
+      l' = left f' (Construct.left-valid tt refl)
 
   formula-state-update-left
     (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
@@ -517,7 +526,7 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt tt)
+      l' = left f' (Construct.left-valid tt refl)
 
   formula-state-update-left
     (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
@@ -537,7 +546,7 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt tt)
+      l' = left f' (Construct.left-valid tt refl)
 
   formula-state-update-left
     (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
@@ -557,7 +566,7 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt tt)
+      l' = left f' (Construct.left-valid tt refl)
 
   formula-state-update-left
     (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
@@ -572,7 +581,7 @@ module _
     ; construct-valid
       = ι₂ refl
     ; left-closed
-      = const tt
+      = const refl
     ; right-closed
       = FormulaState.right-closed-equal s p l l' r cs cs
     ; map-left
@@ -583,7 +592,7 @@ module _
     where
       l' = left
         (FormulaState.parens (any (SandboxState.singleton f')))
-        (Construct.left-valid tt tt)
+        (Construct.left-valid tt refl)
   
   ... | yes lv | _
     = record
@@ -687,7 +696,7 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt tt)
+      r' = right f' (Construct.right-valid tt refl)
 
   formula-state-update-right
     (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
@@ -707,7 +716,7 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt tt)
+      r' = right f' (Construct.right-valid tt refl)
 
   formula-state-update-right
     (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
@@ -727,7 +736,7 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt tt)
+      r' = right f' (Construct.right-valid tt refl)
 
   formula-state-update-right
     (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
@@ -747,7 +756,7 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt tt)
+      r' = right f' (Construct.right-valid tt refl)
 
   formula-state-update-right
     (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
@@ -762,7 +771,7 @@ module _
     ; construct-valid
       = ι₂ refl
     ; right-closed
-      = const tt
+      = const refl
     ; left-closed
       = FormulaState.left-closed-equal s p l r r' cs cs
     ; map-right
@@ -773,7 +782,7 @@ module _
     where
       r' = right
         (FormulaState.parens (any (SandboxState.singleton f')))
-        (Construct.right-valid tt tt)
+        (Construct.right-valid tt refl)
   
   ... | yes rv | _
     = record
@@ -817,7 +826,13 @@ module _
     where
       l'' = left f''' (left-valid-sum s s' f'' f''' q lv lv')
 
-  -- #### Insert
+-- #### Insert
+
+module _
+  {ss : Symbols}
+  {vs : Variables}
+  {m : Bool}
+  where
 
   record FormulaStateSeparated
     (f₁ f₂ : FormulaState ss vs m)
@@ -899,13 +914,13 @@ module _
     → FormulaState.LeftClosed f ⊔ FormulaStateCombined f' f
 
   formula-state-insert-left (FormulaState.parens _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-left (FormulaState.meta _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-left (FormulaState.variable' _ _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-left (FormulaState.symbol _ _ (nothing _) _ _) _
-    = ι₁ tt
+    = ι₁ refl
 
   formula-state-insert-left FormulaState.hole f'
     = ι₂
@@ -950,13 +965,13 @@ module _
     → FormulaState.RightClosed f ⊔ FormulaStateCombined f f'
 
   formula-state-insert-right (FormulaState.parens _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-right (FormulaState.meta _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-right (FormulaState.variable' _ _) _
-    = ι₁ tt
+    = ι₁ refl
   formula-state-insert-right (FormulaState.symbol _ _ _ (nothing _) _) _
-    = ι₁ tt
+    = ι₁ refl
 
   formula-state-insert-right FormulaState.hole f'
     = ι₂
