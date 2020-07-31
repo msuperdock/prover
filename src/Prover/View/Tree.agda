@@ -1,7 +1,7 @@
 module Prover.View.Tree where
 
 open import Prover.View.Line
-  using (Line)
+  using (Line; line)
 open import Prover.View.Style
   using (Style)
 open import Prover.View.Text
@@ -59,7 +59,7 @@ indent-line
   : PlainText
   → Line
   → Line
-indent-line t (Line.line s t')
+indent-line t (line s t')
   = record
   { status
     = s
@@ -135,11 +135,11 @@ draw-trees-with
   → TreePath (ts ! k)
   → List (List Line)
 
-draw-tree-with (leaf (Line.line s t)) stop
-  = Line.line s (RichText.style Style.highlight t) ∷' []'
-draw-tree-with (node ts (Line.line s t)) stop
+draw-tree-with (leaf (line s t)) stop
+  = line s (RichText.style Style.highlight t) ∷' []'
+draw-tree-with (node ts (line s t)) stop
   = List.snoc (indent-trees (draw-trees ts))
-    (Line.line s (RichText.style Style.highlight t))
+    (line s (RichText.style Style.highlight t))
 draw-tree-with (node ts l) (go k tp)
   = List.snoc (indent-trees (draw-trees-with ts k tp)) l
 

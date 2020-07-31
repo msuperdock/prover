@@ -3,3 +3,4 @@ let
 
 in
   (pkgs.haskellPackages.callPackage ./default.nix {}).env
+

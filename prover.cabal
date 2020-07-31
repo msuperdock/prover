@@ -185,3 +185,4 @@ executable prover
                      , vty
   default-language:    Haskell2010
   ghc-options:         -threaded -Wno-overlapping-patterns
+

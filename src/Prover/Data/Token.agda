@@ -57,21 +57,28 @@ open _Token public
 module Token where
 
   open _Token public
-    using (IsValid; token)
+    using (IsValid; is-valid; token)
   open _Token.Token public
 
   -- ### Interface
+
+  index'
+    : (cs : List Char)
+    → .(T (is-valid cs))
+    → Fin (List.length cs)
+  index' (c ∷ cs) p
+    with Char.is-space c
+  ... | false
+    = zero
+  ... | true
+    = suc (index' cs p)
 
   -- The first non-space index.
   index
     : (t : Token)
     → Fin (length t)
-  index (token (c ∷ cs) v)
-    with Char.is-space c
-  ... | false
-    = zero
-  ... | true
-    = suc (index (token cs v))
+  index (token cs p)
+    = index' cs p
 
   -- ### Equality
   

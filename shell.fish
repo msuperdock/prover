@@ -26,8 +26,9 @@ function build-agda
   with-dir /data/code/prover/src agda \
     --compile \
     --ghc-dont-call-ghc \
-    --include-path=. \
+    --local-interfaces \
     --no-libraries \
+    --include-path=. \
     $main \
     $file
 end
@@ -53,3 +54,4 @@ function run
 
   with-dir /data/code/prover cabal new-run
 end
+
