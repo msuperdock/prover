@@ -18,6 +18,8 @@ open import Prover.Editor
   using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
 open import Prover.Function.Indexed
   using (IndexedSet)
+open import Prover.Function.Indexed.Bool
+  using (IndexedSimpleBoolFunction)
 open import Prover.Function.Indexed.Partial
   using (IndexedPartialFunction)
 open import Prover.Function.Indexed.Split
@@ -300,6 +302,9 @@ record IndexedMainEditor
 
     indexed-simple-split-function
       : IndexedSimpleSplitFunction S StateSimpleCategory
+
+    indexed-simple-bool-function
+      : IndexedSimpleBoolFunction StateSimpleCategory
 
 -- ## IndexedSplitMainEditor
 
