@@ -91,7 +91,7 @@ module Map where
     lookup-just xs d k p
       with Maybe.map-just π₂
         (Collection.find xs (Bool.from-decidable d k ∘ π₁)) p
-    ... | ((l , y) , q , refl)
+    ... | ((l , _) , q , refl)
       with d k l | Collection.find-true xs (Bool.from-decidable d k ∘ π₁) q
     ... | yes refl | _
       = q

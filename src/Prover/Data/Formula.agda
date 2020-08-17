@@ -507,7 +507,7 @@ module Formula where
     ⊆-substitute (symbol _ _ fs) subs subs' p q
       with substitutes fs subs
       | inspect (substitutes fs) subs
-    ... | just fs' | [ r ]
+    ... | just _ | [ r ]
       with substitutes fs subs'
       | ⊆-substitutes fs subs subs' p r
     ... | _ | refl
@@ -520,7 +520,7 @@ module Formula where
       | inspect (substitute f) subs
       | substitutes fs subs
       | inspect (substitutes fs) subs
-    ... | just f'' | [ r ] | just fs'' | [ rs ]
+    ... | just _ | [ r ] | just _ | [ rs ]
       with substitute f subs'
       | ⊆-substitute f subs subs' p r
       | substitutes fs subs'
@@ -717,7 +717,7 @@ module Formula where
       with substitutes fs subs
       | inspect (substitutes fs) subs
     substitute-substitute-meta-substitutions (symbol _ _ fs) subs m f'' refl
-      | just fs' | [ p ]
+      | just _ | [ p ]
       with substitutes fs (substitute-meta-substitutions subs m f'')
       | substitutes-substitute-meta-substitutions fs subs m f'' p
     ... | _ | refl
@@ -957,7 +957,7 @@ module Formula where
       → (fs' : Vec (Formula ss vs' true) n)
       → MatchesWith? subs fs fs'
     
-    match-with? subs (variable' v p) f
+    match-with? subs (variable' v _) f
       with Map.lookup subs _≟_var v
       | inspect (Map.lookup subs _≟_var) v 
     
@@ -986,7 +986,7 @@ module Formula where
       = no (λ {(match-with subs _ r)
         → (¬substitute-symbol-variable s p fs subs v q r)})
     
-    match-with? subs (symbol {a = a} s p fs) (symbol {a = a'} s' p' fs')
+    match-with? subs (symbol {a = a} s p fs) (symbol {a = a'} s' _ fs')
       with a ≟ a' nat
     
     ... | no ¬p

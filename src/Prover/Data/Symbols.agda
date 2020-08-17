@@ -130,7 +130,7 @@ module Symbols where
     → (s : Symbol a)
     → lookup-member ss (Symbol.name s) ≡ nothing
     → ¬ sym s ∈ ss
-  lookup-member-nothing ss s@(Symbol.symbol _ n _ _ _) p
+  lookup-member-nothing ss s@(Symbol.symbol _ n _ _ _) _
     with Collection.find-member ss
       (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
     | inspect (Collection.find-member ss)

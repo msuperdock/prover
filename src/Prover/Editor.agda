@@ -4,7 +4,7 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Split
   using (SplitFunctor)
-open import Prover.Category.Split.Base
+open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Prelude
 

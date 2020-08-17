@@ -180,7 +180,7 @@ module Internal where
     | Fin.is-suc-to-nat p
   ... | _ | refl
     = refl
-  digits-is-suc-to-nat {ds₁ = _ ∷ ds₁} {ds₂ = _ ∷ ds₂} (tail p)
+  digits-is-suc-to-nat {ds₂ = _ ∷ ds₂} (tail p)
     with digits-to-nat ds₂
     | digits-is-suc-to-nat p
   ... | _ | refl

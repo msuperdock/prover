@@ -4,21 +4,10 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory)
-open import Prover.Category.Indexed.Base
-  using (IndexedSet)
-open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction; IndexedPartialFunction';
-    indexed-partial-function-compose)
 open import Prover.Category.Indexed.Simple
   using (IndexedSimpleCategory)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor; indexed-split-functor-compose)
-open import Prover.Category.Indexed.Split.Base
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction;
-    indexed-simple-split-function-compose; indexed-split-function-compose;
-    indexed-split-function-compose')
-open import Prover.Category.Split.Base
-  using (SplitFunction)
 open import Prover.Editor
   using (EventStack; EventStackMap; ViewStack; ViewStackMap)
 open import Prover.Editor.Indexed
@@ -29,6 +18,17 @@ open import Prover.Editor.Indexed
 open import Prover.Editor.Map
   using (editor-map-event; editor-map-view; simple-editor-map-event;
     simple-editor-map-view)
+open import Prover.Function.Indexed
+  using (IndexedSet)
+open import Prover.Function.Indexed.Partial
+  using (IndexedPartialFunction; IndexedPartialFunction';
+    indexed-partial-function-compose)
+open import Prover.Function.Indexed.Split
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction;
+    indexed-simple-split-function-compose; indexed-split-function-compose;
+    indexed-split-function-compose')
+open import Prover.Function.Split
+  using (SplitFunction)
 open import Prover.Prelude
 
 -- ## View

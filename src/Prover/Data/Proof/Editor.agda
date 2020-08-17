@@ -1,7 +1,5 @@
 module Prover.Data.Proof.Editor where
 
-open import Prover.Category.Split.Base
-  using (SplitFunction)
 open import Prover.Client.Aeson
   using (Value)
 open import Prover.Data.Formula
@@ -44,6 +42,8 @@ open import Prover.Editor.Map
   using (flat-editor-map; simple-editor-map-event; simple-editor-map-view)
 open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
+open import Prover.Function.Split
+  using (SplitFunction)
 open import Prover.View.Command
   using (Command; CommandFlatViewStack; CommandPath)
 open import Prover.View.Line

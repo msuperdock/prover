@@ -237,7 +237,7 @@ module _
       | inspect (PartialFunctor.base J₁) x₁
       | PartialFunctor.base J₁ y₁
       | inspect (PartialFunctor.base J₁) y₁
-    ... | just x₁' | [ p₁ ] | just y₁' | [ q₁ ]
+    ... | just _ | [ p₁ ] | just _ | [ q₁ ]
       with PartialFunctor.base J₂ (Functor.base F x₁)
       | inspect (PartialFunctor.base J₂) (Functor.base F x₁)
       | PartialFunctorSquare.base t x₁ p₁

@@ -1,7 +1,5 @@
 module Prover.Data.Formula.State where
 
-open import Prover.Category.Split.Base
-  using (SplitFunction)
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Construct
@@ -16,6 +14,8 @@ open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
   using (Variables; var_∈_)
+open import Prover.Function.Split
+  using (SplitFunction)
 open import Prover.Prelude
 
 open Vec

@@ -4,14 +4,6 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀; indexed-dependent-category₀)
-open import Prover.Category.Indexed.Base
-  using (IndexedSet)
-open import Prover.Category.Indexed.Base.Sigma
-  using (indexed-set-sigma)
-open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction)
-open import Prover.Category.Indexed.Partial.Base.Sigma.Sum
-  using (indexed-partial-function-sigma-sum)
 open import Prover.Category.Indexed.Sigma.Maybe
   using (indexed-category-sigma-may)
 open import Prover.Category.Indexed.Sigma.Sum
@@ -22,13 +14,6 @@ open import Prover.Category.Indexed.Simple.Sigma.Sum
   using (indexed-simple-category-sigma-sum)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
-open import Prover.Category.Indexed.Split.Base
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
-open import Prover.Category.Indexed.Split.Base.Sigma.Maybe
-  using (indexed-split-function-sigma-may)
-open import Prover.Category.Indexed.Split.Base.Sigma.Sum
-  using (indexed-simple-split-function-sigma-sum;
-    indexed-split-function-sigma-sum)
 open import Prover.Category.Indexed.Split.Sigma.Sum
   using (indexed-split-functor-sigma-sum)
 open import Prover.Category.Snoc
@@ -45,6 +30,21 @@ open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.Sigma
   using (editor-sigma; event-stack-sigma; view-stack-sigma)
+open import Prover.Function.Indexed
+  using (IndexedSet)
+open import Prover.Function.Indexed.Partial
+  using (IndexedPartialFunction)
+open import Prover.Function.Indexed.Partial.Sigma.Sum
+  using (indexed-partial-function-sigma-sum)
+open import Prover.Function.Indexed.Sigma
+  using (indexed-set-sigma)
+open import Prover.Function.Indexed.Split
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+open import Prover.Function.Indexed.Split.Sigma.Maybe
+  using (indexed-split-function-sigma-may)
+open import Prover.Function.Indexed.Split.Sigma.Sum
+  using (indexed-simple-split-function-sigma-sum;
+    indexed-split-function-sigma-sum)
 open import Prover.Prelude
 
 -- ## IndexedEditor

@@ -2,8 +2,6 @@ module Prover.Data.Number.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Split.Base
-  using (split-function-from-retraction)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -18,6 +16,8 @@ open import Prover.Editor.Lift
   using (event-stack-lift)
 open import Prover.Editor.Map
   using (split-editor-map)
+open import Prover.Function.Split
+  using (split-function-from-retraction)
 open import Prover.View.Text
   using (PlainTextViewStack)
 open import Prover.Prelude

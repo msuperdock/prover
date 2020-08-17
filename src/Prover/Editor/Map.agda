@@ -4,10 +4,6 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Split
   using (SplitFunctor; split-functor-compose)
-open import Prover.Category.Split.Base
-  using (SplitFunction; split-functor-base)
-open import Prover.Category.Split.Base.Compose
-  using (split-function-compose)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -19,6 +15,10 @@ open import Prover.Editor
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatEventStackMap; FlatViewStack;
     FlatViewStackMap; flat-view-stack-map-compose)
+open import Prover.Function.Split
+  using (SplitFunction; split-functor-base)
+open import Prover.Function.Split.Compose
+  using (split-function-compose)
 open import Prover.Prelude
 
 -- ## View

@@ -4,14 +4,6 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory)
-open import Prover.Category.Indexed.Base
-  using (IndexedSet)
-open import Prover.Category.Indexed.Base.Product
-  using (indexed-set-product)
-open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction)
-open import Prover.Category.Indexed.Partial.Base.Product
-  using (indexed-partial-function-product)
 open import Prover.Category.Indexed.Product
   using (indexed-category-product)
 open import Prover.Category.Indexed.Simple
@@ -20,10 +12,6 @@ open import Prover.Category.Indexed.Simple.Product
   using (indexed-simple-category-product)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor)
-open import Prover.Category.Indexed.Split.Base
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
-open import Prover.Category.Indexed.Split.Base.Product
-  using (indexed-simple-split-function-product; indexed-split-function-product)
 open import Prover.Category.Indexed.Split.Product
   using (indexed-split-functor-product)
 open import Prover.Editor
@@ -36,6 +24,18 @@ open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.Product
   using (event-stack-product; view-stack-product; editor-product)
+open import Prover.Function.Indexed
+  using (IndexedSet)
+open import Prover.Function.Indexed.Partial
+  using (IndexedPartialFunction)
+open import Prover.Function.Indexed.Partial.Product
+  using (indexed-partial-function-product)
+open import Prover.Function.Indexed.Product
+  using (indexed-set-product)
+open import Prover.Function.Indexed.Split
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+open import Prover.Function.Indexed.Split.Product
+  using (indexed-simple-split-function-product; indexed-split-function-product)
 open import Prover.Prelude
 
 -- ## IndexedEditor

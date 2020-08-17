@@ -6,22 +6,22 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀)
-open import Prover.Category.Indexed.Base
-  using (IndexedSet)
-open import Prover.Category.Indexed.Partial.Base
-  using (IndexedPartialFunction)
 open import Prover.Category.Indexed.Simple
   using (IndexedSimpleCategory; indexed-simple-category₀)
 open import Prover.Category.Indexed.Simple.Convert
   using (indexed-category-simple)
 open import Prover.Category.Indexed.Split
   using (IndexedSplitFunctor; indexed-split-functor₀)
-open import Prover.Category.Indexed.Split.Base
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
 open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Editor
   using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
+open import Prover.Function.Indexed
+  using (IndexedSet)
+open import Prover.Function.Indexed.Partial
+  using (IndexedPartialFunction)
+open import Prover.Function.Indexed.Split
+  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
 open import Prover.Prelude
 
 -- ## IndexedEditor

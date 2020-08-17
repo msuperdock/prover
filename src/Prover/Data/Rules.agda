@@ -145,7 +145,7 @@ module Rules where
       → (r : Rule ss a)
       → lookup-member rs (Rule.name r) ≡ nothing
       → ¬ rul r ∈ rs
-    lookup-member-nothing rs r@(Rule.rule n _ _ _) p
+    lookup-member-nothing rs r@(Rule.rule n _ _ _) _
       with Collection.find-member rs
         (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
       | inspect (Collection.find-member rs)

@@ -4,10 +4,10 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Partial
   using (PartialFunctor)
-open import Prover.Category.Partial.Base
-  using (PartialFunction)
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Prelude
 
 -- ## PartialFunctor

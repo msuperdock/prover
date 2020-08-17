@@ -562,7 +562,7 @@ module Vec where
     → find xs f ≡ nothing
   find-member-nothing [] _ _
     = refl
-  find-member-nothing (x ∷ xs) f p
+  find-member-nothing (x ∷ xs) f _
     with f x
     | find-member xs f
     | inspect (find-member xs) f

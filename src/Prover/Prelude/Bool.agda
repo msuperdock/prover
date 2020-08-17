@@ -189,7 +189,7 @@ module Bool where
       → (d : Decidable R)
       → (x : A)
       → Unique R (from-decidable d x)
-    decidable s t d x x₁ x₂ p₁ p₂
+    decidable s t d x x₁ x₂ _ _
       with d x x₁ | d x x₂
     ... | yes r₁ | yes r₂
       = t x₁ x x₂ (s x x₁ r₁) r₂

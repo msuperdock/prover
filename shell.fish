@@ -1,3 +1,7 @@
+function agda-unused $argv
+  command agda-unused --root /data/code/prover/src
+end
+
 function echo-space $argv
   echo; echo $argv; echo
 end

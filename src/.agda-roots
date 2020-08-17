@@ -1,0 +1,68 @@
+Main
+- main
+
+Prover.Editor
+- split-editor-partial
+- split-main-editor-partial
+- split-main-editor-unmain
+
+Prover.Editor.Indexed.Map
+- indexed-main-editor-map-event
+- indexed-main-editor-map-state
+- indexed-main-editor-map-view
+- indexed-partial-editor-map
+- indexed-partial-editor-map-event
+- indexed-partial-editor-map-view
+- indexed-split-editor-map
+- indexed-split-editor-map-event
+- indexed-split-editor-map-view
+- indexed-split-main-editor-map
+- indexed-split-main-editor-map-event
+- indexed-split-main-editor-map-pure
+- indexed-split-main-editor-map-state
+- indexed-split-main-editor-map-view
+
+Prover.Editor.Indexed.Product
+- indexed-main-editor-product
+- indexed-partial-editor-product
+- indexed-split-editor-product
+- indexed-split-main-editor-product
+
+Prover.Editor.Indexed.Sigma
+- indexed-main-editor-sigma
+- indexed-partial-editor-sigma
+- indexed-split-editor-sigma
+- indexed-split-main-editor-sigma
+
+Prover.Editor.Map
+- flat-editor-map
+- flat-editor-map-event
+- flat-editor-map-view
+- main-editor-map-event
+- main-editor-map-state
+- main-editor-map-view
+- main-editor-map-view-with
+- partial-editor-map
+- partial-editor-map-event
+- partial-editor-map-view
+- partial-editor-map-view-with
+- split-editor-map
+- split-editor-map-event
+- split-editor-map-view
+- split-editor-map-view-with
+- split-main-editor-map
+- split-main-editor-map-event
+- split-main-editor-map-pure
+- split-main-editor-map-state
+- split-main-editor-map-view
+- split-main-editor-map-view-with
+
+Prover.Editor.Product
+- main-editor-product
+- partial-editor-product
+- split-editor-product
+- split-main-editor-product
+
+Prover.Editor.Sigma
+- main-editor-sigma
+

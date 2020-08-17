@@ -8,13 +8,13 @@ open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Category.Split.Product
   using (split-functor-product)
-open import Prover.Category.Split.Base
-  using (SplitFunction)
-open import Prover.Category.Split.Base.Product
-  using (split-function-product)
 open import Prover.Editor
   using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
     SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any)
+open import Prover.Function.Split
+  using (SplitFunction)
+open import Prover.Function.Split.Product
+  using (split-function-product)
 open import Prover.Prelude
 
 -- ## Stacks

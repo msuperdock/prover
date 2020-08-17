@@ -3,10 +3,10 @@ module Prover.Category.Unit where
 open import Prover.Category
   using (Category; DependentCategory; Functor; FunctorCompose; FunctorIdentity;
     FunctorSquare)
-open import Prover.Category.Base
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Category.Simple
   using (SimpleDependentCategory)
+open import Prover.Function
+  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Prelude
 
 -- ## Category

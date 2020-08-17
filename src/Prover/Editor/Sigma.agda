@@ -8,10 +8,6 @@ open import Prover.Category.Sigma.Sum
   using (category-sigma-sum)
 open import Prover.Category.Simple
   using (SimpleDependentCategory)
-open import Prover.Category.Split.Base
-  using (SplitFunction)
-open import Prover.Category.Split.Base.Sigma.Sum
-  using (split-function-sigma-sum)
 open import Prover.Category.Sum
   using (module CategorySum)
 open import Prover.Category.Unit
@@ -21,6 +17,10 @@ open import Prover.Editor
     SplitMainEditor; ViewStack; ViewStackMap; any; split-main-editor-unmain)
 open import Prover.Editor.Unit
   using (editor-unit)
+open import Prover.Function.Split
+  using (SplitFunction)
+open import Prover.Function.Split.Sigma.Sum
+  using (split-function-sigma-sum)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -542,7 +542,7 @@ module _
       → Σ (StateInner s sp) (StateInnerPath s sp)
     handle-inner (ι₁ s₁) sp₁ s₁' sp₁' e₁'
       = SplitEditor.handle-inner e₁ s₁ sp₁ s₁' sp₁' e₁'
-    handle-inner (ι₂ (x₁ , _)) (ι₁ _) (s₁ , f₁ , nothing) sp₁ e₁'
+    handle-inner (ι₂ _) (ι₁ _) (s₁ , f₁ , nothing) sp₁ e₁'
       with SplitEditor.handle e₁ s₁ sp₁ e₁'
     ... | ι₁ (s₁' , sp₁' , f₁')
       = ((s₁' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁')

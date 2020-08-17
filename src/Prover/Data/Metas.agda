@@ -18,17 +18,6 @@ Metas
 
 module Metas where
 
-  is-member
-    : Metas
-    → Meta
-    → Bool
-  is-member (true ∷ _) zero
-    = true
-  is-member (_ ∷ ms) (suc k)
-    = is-member ms k
-  is-member _ _
-    = false
-  
   empty
     : Metas
   empty

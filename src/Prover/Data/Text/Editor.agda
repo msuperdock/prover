@@ -2,8 +2,6 @@ module Prover.Data.Text.Editor where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Split.Base
-  using (SplitFunction; split-function-from-retraction)
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Client.Aeson
@@ -26,6 +24,8 @@ open import Prover.Editor.Map
     split-editor-map-simple)
 open import Prover.Editor.Unit
   using (split-editor-unit)
+open import Prover.Function.Split
+  using (SplitFunction; split-function-from-retraction)
 open import Prover.View.Command
   using (CommandFlatViewStack; command)
 open import Prover.View.Text
@@ -154,7 +154,7 @@ decode-text _
 decode-encode-text
   : (t : Text)
   → decode-text (encode-text t) ≡ just t
-decode-encode-text (any (cons c cs))
+decode-encode-text (any (cons _ cs))
   with List.from-builtin (List.to-builtin cs)
   | List.from-builtin-to-builtin cs
 ... | _ | refl

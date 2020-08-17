@@ -4,8 +4,6 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Split
   using (SplitFunctor)
-open import Prover.Category.Split.Base
-  using (SplitFunction)
 open import Prover.Category.Split.Unit
   using (split-functor-unit)
 open import Prover.Category.Unit
@@ -18,6 +16,8 @@ open import Prover.Editor.Child
   using (ChildEditor; SimpleChildEditor)
 open import Prover.Editor.Flat
   using (FlatEventStack; FlatViewStack)
+open import Prover.Function.Split
+  using (SplitFunction)
 open import Prover.Prelude
 
 -- ## Editor

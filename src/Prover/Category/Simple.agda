@@ -2,7 +2,7 @@ module Prover.Category.Simple where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Base
+open import Prover.Function
   using (Function; FunctionCompose; FunctionIdentity)
 
 -- ## SimpleDependentCategory

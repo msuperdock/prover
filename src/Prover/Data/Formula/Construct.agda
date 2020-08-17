@@ -173,7 +173,7 @@ module Internal where
     | construct-to-pair c
   ... | _ | _ | nothing
     = refl
-  ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , a₃)
+  ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , _)
     with Nat.compare p₁ p₂
     | Nat.compare p₂ p₃
     | Nat.compare p₁ p₃
@@ -224,7 +224,7 @@ module Internal where
     | construct-to-pair c
   ... | _ | _ | nothing
     = refl
-  ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , a₃)
+  ... | just (p₁ , a₁) | just (p₂ , a₂) | just (p₃ , _)
     with Nat.compare p₁ p₂
     | Nat.compare p₂ p₃
     | Nat.compare p₁ p₃

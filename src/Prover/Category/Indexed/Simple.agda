@@ -2,11 +2,11 @@ module Prover.Category.Indexed.Simple where
 
 open import Prover.Category
   using (Category; FunctorCompose; FunctorIdentity; FunctorSquare)
-open import Prover.Category.Base
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Category.Chain
   using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
     ChainFunctor)
+open import Prover.Function
+  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Prelude
 
 -- ## Internal
