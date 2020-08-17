@@ -11,5 +11,6 @@ mkDerivation {
     aeson base brick bytestring directory ieee754 scientific text
     vector vty
   ];
+  description = "A simple interactive theorem prover";
   license = stdenv.lib.licenses.mit;
 }
