@@ -48,11 +48,13 @@ Prover.Editor.Map
 - partial-editor-map-view-with
 - split-editor-map
 - split-editor-map-event
+- split-editor-map-simple
 - split-editor-map-view
 - split-editor-map-view-with
 - split-main-editor-map
 - split-main-editor-map-event
 - split-main-editor-map-pure
+- split-main-editor-map-simple
 - split-main-editor-map-state
 - split-main-editor-map-view
 - split-main-editor-map-view-with

@@ -707,6 +707,17 @@ module _
   split-main-editor-map F e
     = record {SplitMainEditorMap F e}
 
+split-main-editor-map-simple
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {A B : Set}
+  → SplitFunction A B
+  → SplitMainEditor V E S P (category-unit A)
+  → SplitMainEditor V E S P (category-unit B)
+split-main-editor-map-simple F
+  = split-main-editor-map (split-functor-unit F)
+
 -- ### FlatEditor
 
 module _
