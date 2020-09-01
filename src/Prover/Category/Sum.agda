@@ -648,11 +648,10 @@ functor-identity-sum
     (functor-sum s)
 functor-identity-sum {F = F} s p₁ p₂
   = functor-identity-from-equal
-  $ functor-trans
-    (functor-equal-sum s
-      (functor-square-identity' F)
-      (functor-identity-to-equal p₁)
-      (functor-identity-to-equal p₂))
+  $ functor-trans (functor-equal-sum s
+    (functor-square-identity' F)
+    (functor-identity-to-equal p₁)
+    (functor-identity-to-equal p₂))
   $ functor-sum-identity F
 
 -- ## FunctorCompose
@@ -679,11 +678,12 @@ functor-compose-sum
     (functor-sum u)
 functor-compose-sum s t u p₁ p₂
   = functor-compose-from-equal
-  $ functor-trans
-    (functor-equal-sum u
-      (functor-square-compose' s t)
-      (functor-compose-to-equal p₁)
-      (functor-compose-to-equal p₂))
+    (functor-sum s)
+    (functor-sum t)
+  $ functor-trans (functor-equal-sum u
+    (functor-square-compose' s t)
+    (functor-compose-to-equal p₁)
+    (functor-compose-to-equal p₂))
   $ functor-sum-compose s t
 
 -- ## FunctorSquare
@@ -715,14 +715,17 @@ functor-square-sum
     (functor-sum u₂)
 functor-square-sum s t u₁ u₂ p₁ p₂
   = functor-square-from-equal
+    (functor-sum s)
+    (functor-sum t)
+    (functor-sum u₁)
+    (functor-sum u₂)
   $ functor-trans (functor-sym
     (functor-sum-compose u₂ s))
-  $ functor-trans
-    (functor-equal-sum
-      (functor-square-compose' u₂ s)
-      (functor-square-compose' t u₁)
-      (functor-square-to-equal p₁)
-      (functor-square-to-equal p₂))
+  $ functor-trans (functor-equal-sum
+    (functor-square-compose' u₂ s)
+    (functor-square-compose' t u₁)
+    (functor-square-to-equal p₁)
+    (functor-square-to-equal p₂))
   $ functor-sum-compose t u₁
 
 -- ## FunctorSquare₂

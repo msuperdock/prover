@@ -512,8 +512,8 @@ module Internal where
       with formula-state-path-left fp
     formula-state-path-left {f = symbol _ _ _ _ []} _ | nothing
       = just stop
-    formula-state-path-left {f = symbol _ _ _ _ (_ ∷ _)} _ | nothing
-      = just (center Fin.maximum end)
+    formula-state-path-left {f = symbol _ _ _ _ (_ ∷ cs)} _ | nothing
+      = just (center (Fin.maximum (Vec.length cs)) end)
     ... | just fp'
       = just (right fp')
 
@@ -529,8 +529,8 @@ module Internal where
 
     sandbox-state-path-left {s = any (singleton _)} end
       = just (go zero formula-state-path-rightmost)
-    sandbox-state-path-left {s = any (cons _ _ _ _)} end
-      = just (go Fin.maximum formula-state-path-rightmost)
+    sandbox-state-path-left {s = any {suc n} (cons _ _ _ _)} end
+      = just (go (Fin.maximum n) formula-state-path-rightmost)
     sandbox-state-path-left (go k fp)
       with formula-state-path-left fp
       | Fin.decrement k

@@ -18,12 +18,14 @@ open import Prover.Editor
   using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
 open import Prover.Function.Indexed
   using (IndexedSet)
-open import Prover.Function.Indexed.Bool
+open import Prover.Function.Indexed.Simple.Bool
   using (IndexedSimpleBoolFunction)
-open import Prover.Function.Indexed.Partial
-  using (IndexedPartialFunction)
+open import Prover.Function.Indexed.Simple.Partial
+  using (IndexedSimplePartialFunction)
 open import Prover.Function.Indexed.Split
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+  using (IndexedSplitFunction)
+open import Prover.Function.Indexed.Simple.Split
+  using (IndexedSimpleSplitFunction)
 open import Prover.Prelude
 
 -- ## IndexedEditor
@@ -155,20 +157,16 @@ record IndexedPartialEditor
   : Set₁
   where
 
-  constructor
-
-    indexed-partial-editor
-
   field
   
-    {StateSimpleCategory}
+    StateSimpleCategory
       : IndexedSimpleCategory C
 
     indexed-simple-editor
       : IndexedSimpleEditor V E StateSimpleCategory
 
-    indexed-partial-function
-      : IndexedPartialFunction StateSimpleCategory C'
+    indexed-simple-partial-function
+      : IndexedSimplePartialFunction StateSimpleCategory C'
 
 -- ## IndexedSplitEditor
 
@@ -183,13 +181,9 @@ record IndexedSplitEditor
   : Set₁
   where
 
-  constructor
-
-    indexed-split-editor
-
   field
 
-    {StateCategory}
+    StateCategory
       : IndexedCategory C
 
     indexed-editor
@@ -288,13 +282,9 @@ record IndexedMainEditor
   : Set₁
   where
 
-  constructor
-  
-    indexed-main-editor
-
   field
 
-    {StateSimpleCategory}
+    StateSimpleCategory
       : IndexedSimpleCategory C
 
     indexed-simple-editor
@@ -321,13 +311,9 @@ record IndexedSplitMainEditor
   : Set₁
   where
 
-  constructor
-
-    indexed-split-main-editor
-
   field
 
-    {StateCategory}
+    StateCategory
       : IndexedCategory C
 
     indexed-editor

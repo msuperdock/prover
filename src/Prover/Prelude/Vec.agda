@@ -7,9 +7,9 @@ open import Prover.Prelude.Bool
 open import Prover.Prelude.Empty
   using (¬_; ⊥-elim)
 open import Prover.Prelude.Equal
-  using (Equal; _≡_; refl; sym; trans)
+  using (Equal; _≡_; _≢_; refl; sub; sym; trans)
 open import Prover.Prelude.Fin
-  using (Fin; zero; suc)
+  using (Fin; _<_fin; s<s; z<s; zero; suc)
 open import Prover.Prelude.Function
   using (_∘_; id)
 open import Prover.Prelude.Inspect
@@ -96,6 +96,14 @@ module Vec where
   last (_ ∷ xs@(_ ∷ _))
     = last xs
 
+  length
+    : {A : Set}
+    → {n : ℕ}
+    → Vec A n
+    → ℕ
+  length {n = n} _
+    = n
+
   lookup
     : {A : Set}
     → {n : ℕ}
@@ -151,6 +159,17 @@ module Vec where
   delete (x ∷ xs@(_ ∷ _)) (suc k)
     = x ∷ delete xs k
 
+  swap
+    : {A : Set}
+    → {n : ℕ}
+    → Vec A (suc n)
+    → Fin n
+    → Vec A (suc n)
+  swap (x ∷ y ∷ xs) zero
+    = y ∷ x ∷ xs
+  swap (x ∷ xs) (suc k)
+    = x ∷ swap xs k
+
   map
     : {A B : Set}
     → {n : ℕ}
@@ -161,6 +180,24 @@ module Vec where
     = []
   map f (x ∷ xs)
     = f x ∷ map f xs
+
+  map-maybe
+    : {A B : Set}
+    → {n : ℕ}
+    → (A → Maybe B)
+    → Vec A n
+    → Maybe (Vec B n)
+  map-maybe _ []
+    = just []
+  map-maybe f (x ∷ xs)
+    with f x
+    | map-maybe f xs
+  ... | nothing | _
+    = nothing
+  ... | _ | nothing
+    = nothing
+  ... | just y | just ys
+    = just (y ∷ ys)
 
   -- ### Construction
 
@@ -335,6 +372,160 @@ module Vec where
   lookup-update (_ ∷ xs) (suc k) y
     = lookup-update xs k y
 
+  lookup-update-other
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → (k l : Fin n)
+    → (y : A)
+    → k ≢ l
+    → update xs k y ! l ≡ xs ! l
+  lookup-update-other (_ ∷ _) zero zero _ ¬p
+    = ⊥-elim (¬p refl)
+  lookup-update-other (_ ∷ _) zero (suc _) _ _
+    = refl
+  lookup-update-other (_ ∷ _) (suc _) zero _ _
+    = refl
+  lookup-update-other (_ ∷ xs) (suc k) (suc l) y ¬p
+    = lookup-update-other xs k l y (¬p ∘ sub suc)
+
+  lookup-insert
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → (k : Fin (suc n))
+    → (y : A)
+    → insert xs k y ! k ≡ y
+  lookup-insert _ zero _
+    = refl
+  lookup-insert (_ ∷ xs) (suc k) y
+    = lookup-insert xs k y
+
+  lookup-insert-less
+    : {A : Set}
+    → {n : ℕ}
+    → {k : Fin (suc n)}
+    → (xs : Vec A n)
+    → (y : A)
+    → (l : Fin n)
+    → Fin.lift l < k fin
+    → insert xs k y ! Fin.lift l ≡ xs ! l
+  lookup-insert-less (_ ∷ _) _ zero z<s
+    = refl
+  lookup-insert-less (_ ∷ xs) y (suc l) (s<s p)
+    = lookup-insert-less xs y l p
+
+  lookup-insert-¬less
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → (k : Fin (suc n)) 
+    → (y : A)
+    → (l : Fin n)
+    → ¬ Fin.lift l < k fin
+    → insert xs k y ! suc l ≡ xs ! l
+  lookup-insert-¬less _ zero _ _ _
+    = refl
+  lookup-insert-¬less _ (suc _) _ zero ¬p
+    = ⊥-elim (¬p z<s)
+  lookup-insert-¬less (_ ∷ xs) (suc k) y (suc l) ¬p
+    = lookup-insert-¬less xs k y l (¬p ∘ s<s)
+
+  lookup-delete-less
+    : {A : Set}
+    → {n : ℕ}
+    → {k l : Fin (suc n)}
+    → {l' : Fin n}
+    → (xs : Vec A (suc n))
+    → Fin.drop l ≡ just l'
+    → l < k fin
+    → delete xs k ! l' ≡ xs ! l
+  lookup-delete-less (_ ∷ _ ∷ _) refl z<s
+    = refl
+  lookup-delete-less {l = suc l} (_ ∷ _ ∷ _) _ _
+    with Fin.drop l | inspect Fin.drop l
+  lookup-delete-less (_ ∷ xs@(_ ∷ _)) refl (s<s p) | just _ | [ q ]
+    = lookup-delete-less xs q p
+
+  lookup-delete-¬less
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A (suc n))
+    → (k : Fin (suc n))
+    → (l : Fin n)
+    → ¬ suc l < k fin
+    → suc l ≢ k
+    → delete xs k ! l ≡ xs ! suc l
+  lookup-delete-¬less (_ ∷ _) zero _ _ _
+    = refl
+  lookup-delete-¬less _ (suc zero) zero _ ¬q
+    = ⊥-elim (¬q refl)
+  lookup-delete-¬less _ (suc (suc _)) zero ¬p _
+    = ⊥-elim (¬p (s<s z<s))
+  lookup-delete-¬less (_ ∷ xs@(_ ∷ _)) (suc k) (suc l) ¬p ¬q
+    = lookup-delete-¬less xs k l (¬p ∘ s<s) (¬q ∘ sub suc)
+
+  lookup-swap₁
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A (suc n))
+    → (k : Fin n)
+    → swap xs k ! Fin.lift k ≡ xs ! suc k
+  lookup-swap₁ (_ ∷ _ ∷ _) zero
+    = refl
+  lookup-swap₁ (_ ∷ xs@(_ ∷ _)) (suc k)
+    = lookup-swap₁ xs k
+
+  lookup-swap₂
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A (suc n))
+    → (k : Fin n)
+    → swap xs k ! suc k ≡ xs ! Fin.lift k
+  lookup-swap₂ (_ ∷ _ ∷ _) zero
+    = refl
+  lookup-swap₂ (_ ∷ xs@(_ ∷ _)) (suc k)
+    = lookup-swap₂ xs k
+
+  lookup-swap₂'
+    : {A : Set}
+    → {n : ℕ}
+    → {k : Fin n}
+    → (xs : Vec A (suc n))
+    → (k' : Fin (suc n))
+    → Fin.drop k' ≡ just k
+    → swap xs k ! suc k ≡ xs ! k'
+  lookup-swap₂' {k = k} xs k' p
+    with Fin.drop-just k' p
+  ... | refl
+    = lookup-swap₂ xs k
+
+  lookup-swap-less
+    : {A : Set}
+    → {n : ℕ}
+    → {l : Fin (suc n)}
+    → (xs : Vec A (suc n))
+    → (k : Fin n)
+    → l < Fin.lift k fin
+    → swap xs k ! l ≡ xs ! l
+  lookup-swap-less (_ ∷ _ ∷ _) (suc _) z<s
+    = refl
+  lookup-swap-less (_ ∷ xs@(_ ∷ _)) (suc k) (s<s p)
+    = lookup-swap-less xs k p
+
+  lookup-swap-greater
+    : {A : Set}
+    → {n : ℕ}
+    → {k : Fin n}
+    → {l : Fin (suc n)}
+    → (xs : Vec A (suc n))
+    → suc k < l fin
+    → swap xs k ! l ≡ xs ! l
+  lookup-swap-greater (_ ∷ _ ∷ _) (s<s z<s)
+    = refl
+  lookup-swap-greater (_ ∷ xs@(_ ∷ _)) (s<s p@(s<s _))
+    = lookup-swap-greater xs p
+
   lookup-map
     : {A B : Set}
     → {n : ℕ}
@@ -346,6 +537,79 @@ module Vec where
     = refl
   lookup-map f (_ ∷ xs) (suc k)
     = lookup-map f xs k
+
+  lookup-map-maybe
+    : {A B : Set}
+    → {n : ℕ}
+    → {ys : Vec B n}
+    → (f : A → Maybe B)
+    → (xs : Vec A n)
+    → map-maybe f xs ≡ just ys
+    → (k : Fin n)
+    → f (xs ! k) ≡ just (ys ! k)
+  lookup-map-maybe f (x ∷ xs) _ zero
+    with f x
+    | map-maybe f xs
+  lookup-map-maybe _ _ refl _ | just _ | just _
+    = refl
+  lookup-map-maybe f (x ∷ xs) _ (suc _)
+    with f x
+    | map-maybe f xs
+    | inspect (map-maybe f) xs
+  lookup-map-maybe f (_ ∷ xs) refl (suc k) | just _ | just _ | [ p ]
+    = lookup-map-maybe f xs p k
+
+  lookup-map-maybe'
+    : {A B : Set}
+    → {n : ℕ}
+    → (f : A → Maybe B)
+    → (xs : Vec A n)
+    → (ys : Vec B n)
+    → ((k : Fin n) → f (xs ! k) ≡ just (ys ! k))
+    → map-maybe f xs ≡ just ys
+  lookup-map-maybe' _ [] [] _
+    = refl
+  lookup-map-maybe' f (x ∷ xs) (_ ∷ ys) p
+    with f x
+    | p zero
+    | map-maybe f xs
+    | lookup-map-maybe' f xs ys (p ∘ suc)
+  ... | _ | refl | _ | refl
+    = refl
+
+  map-eq
+    : {A B : Set}
+    → {n : ℕ}
+    → (f₁ f₂ : A → B)
+    → ((x : A) → f₁ x ≡ f₂ x)
+    → (xs : Vec A n)
+    → map f₁ xs ≡ map f₂ xs
+  map-eq _ _ _ []
+    = refl
+  map-eq f₁ f₂ p (x ∷ xs)
+    = cons-eq (p x) (map-eq f₁ f₂ p xs)
+
+  map-identity
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → map id xs ≡ xs
+  map-identity []
+    = refl
+  map-identity (_ ∷ xs)
+    = cons-eq refl (map-identity xs)
+
+  map-compose
+    : {A B C : Set}
+    → {n : ℕ}
+    → (f : B → C)
+    → (g : A → B)
+    → (xs : Vec A n)
+    → map (f ∘ g) xs ≡ map f (map g xs)
+  map-compose _ _ []
+    = refl
+  map-compose f g (_ ∷ xs)
+    = cons-eq refl (map-compose f g xs)
 
   map-update
     : {A B : Set}

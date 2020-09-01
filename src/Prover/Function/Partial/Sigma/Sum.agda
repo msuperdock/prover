@@ -1,22 +1,22 @@
 module Prover.Function.Partial.Sigma.Sum where
 
 open import Prover.Function.Partial
-  using (PartialDependentFunction; PartialFunction)
+  using (PartialFunction)
 open import Prover.Prelude
 
 -- ## PartialFunction
 
 partial-function-sigma-sum
-  : (A₁ B₁ : Set)
-  → (A₂ B₂ : B₁ → Set)
-  → PartialDependentFunction A₂ B₂
-  → PartialFunction (A₁ ⊔ Σ B₁ A₂) (Σ B₁ B₂)
-partial-function-sigma-sum _ _ _ _ _ (ι₁ _)
+  : {A₁₁ A₂₁ : Set}
+  → (A₂₂ B₂₂ : A₂₁ → Set)
+  → ((x₂₁ : A₂₁) → PartialFunction (A₂₂ x₂₁) (B₂₂ x₂₁))
+  → PartialFunction (A₁₁ ⊔ Σ A₂₁ A₂₂) (Σ A₂₁ B₂₂)
+partial-function-sigma-sum _ _ _ (ι₁ _)
   = nothing
-partial-function-sigma-sum _ _ _ _ f₂ (ι₂ (y₁ , x₂))
-  with f₂ y₁ x₂
+partial-function-sigma-sum _ _ f₂₂ (ι₂ (x₂₁ , x₂₂))
+  with f₂₂ x₂₁ x₂₂
 ... | nothing
   = nothing
-... | just y₂
-  = just (y₁ , y₂)
+... | just y₂₂
+  = just (x₂₁ , y₂₂)
 

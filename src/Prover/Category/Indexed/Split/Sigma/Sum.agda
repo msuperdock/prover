@@ -10,8 +10,8 @@ open import Prover.Category.Indexed
     IndexedFunctor; indexed-category₀; indexed-dependent-category₀;
     indexed-dependent-functor₀; indexed-functor₀)
 open import Prover.Category.Indexed.Sigma.Maybe
-  using (indexed-category-sigma-may; indexed-dependent-category-sigma-may;
-    indexed-dependent-functor-sigma-may; indexed-functor-sigma-may)
+  using (indexed-category-sigma-maybe; indexed-dependent-category-sigma-maybe;
+    indexed-dependent-functor-sigma-maybe; indexed-functor-sigma-maybe)
 open import Prover.Category.Indexed.Sigma.Sum
   using (indexed-category-sigma-sum; indexed-dependent-category-sigma-sum;
     indexed-dependent-functor-sigma-sum; indexed-functor-sigma-sum)
@@ -42,7 +42,7 @@ indexed-split-functor-sigma-sum
   → IndexedSplitFunctor C₂' D₂'
   → IndexedSplitFunctor
     (indexed-category-sigma-sum C₂' F₁)
-    (indexed-category-sigma-may D₁' D₂')
+    (indexed-category-sigma-maybe D₁' D₂')
 
 -- ### IndexedSplitFunctorSquare
 
@@ -66,7 +66,7 @@ indexed-split-functor-square-sigma-sum
   → IndexedSplitFunctorSquare F₂' G₂' H₁₂ H₂₂
   → IndexedSplitFunctorSquare
     (indexed-functor-sigma-sum F₂' s₁)
-    (indexed-functor-sigma-may G₁' G₂')
+    (indexed-functor-sigma-maybe G₁' G₂')
     (indexed-split-functor-sigma-sum H₁₁ H₁₂)
     (indexed-split-functor-sigma-sum H₂₁ H₂₂)
 
@@ -83,7 +83,7 @@ indexed-split-dependent-functor-sigma-sum
   → IndexedSplitDependentFunctor C₂'' D₂''
   → IndexedSplitDependentFunctor
     (indexed-dependent-category-sigma-sum C₂'' F₁)
-    (indexed-dependent-category-sigma-may D₁'' D₂'')
+    (indexed-dependent-category-sigma-maybe D₁'' D₂'')
 
 -- ### IndexedSplitDependentFunctorSquare
 
@@ -113,7 +113,7 @@ indexed-split-dependent-functor-square-sigma-sum
   → IndexedSplitDependentFunctorSquare F₂' G₂' H₁₂ H₂₂
   → IndexedSplitDependentFunctorSquare
     (indexed-dependent-functor-sigma-sum F₂' s₁)
-    (indexed-dependent-functor-sigma-may G₁' G₂')
+    (indexed-dependent-functor-sigma-maybe G₁' G₂')
     (indexed-split-dependent-functor-sigma-sum H₁₁ H₁₂)
     (indexed-split-dependent-functor-sigma-sum H₂₁ H₂₂)
 

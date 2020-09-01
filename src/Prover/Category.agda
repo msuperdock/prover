@@ -60,18 +60,40 @@ record Category
     : {x₁ x₂ y₁ y₂ : Object}
     → (p : x₁ ≡ x₂)
     → (q : y₁ ≡ y₂)
-    → (f₂ : Arrow x₂ y₂)
-    → arrow p q f₂ ≅ f₂
+    → (f : Arrow x₂ y₂)
+    → arrow p q f ≅ f
   arrow-eq refl refl _
     = refl
 
+  identity-eq
+    : {x₁ x₂ : Object}
+    → x₁ ≡ x₂
+    → identity x₁ ≅ identity x₂
+  identity-eq refl
+    = refl
+
   compose-eq
+    : {x₁ x₂ y₁ y₂ z₁ z₂ : Object}
+    → {f₁ : Arrow y₁ z₁}
+    → {f₂ : Arrow y₂ z₂}
+    → {g₁ : Arrow x₁ y₁}
+    → {g₂ : Arrow x₂ y₂}
+    → x₁ ≡ x₂
+    → y₁ ≡ y₂
+    → z₁ ≡ z₂
+    → f₁ ≅ f₂
+    → g₁ ≅ g₂
+    → compose f₁ g₁ ≅ compose f₂ g₂
+  compose-eq refl refl refl refl refl
+    = refl
+
+  compose-eq'
     : {x y₁ y₂ z : Object}
     → y₁ ≡ y₂
     → Arrow y₂ z
     → Arrow x y₁
     → Arrow x z
-  compose-eq refl
+  compose-eq' refl
     = compose
 
 -- ## Functor
@@ -106,14 +128,25 @@ record Functor
       → (g : Category.Arrow C x y)
       → map (Category.compose C f g) ≡ Category.compose D (map f) (map g)
 
+  map-eq
+    : {x₁ x₂ y₁ y₂ : Category.Object C}
+    → {f₁ : Category.Arrow C x₁ y₁}
+    → {f₂ : Category.Arrow C x₂ y₂}
+    → x₁ ≡ x₂
+    → y₁ ≡ y₂
+    → f₁ ≅ f₂
+    → map f₁ ≅ map f₂
+  map-eq refl refl refl
+    = refl
+
   map-compose-eq
     : {x y₁ y₂ z : Category.Object C}
     → (p : y₁ ≡ y₂)
     → (q : base y₁ ≡ base y₂)
     → (f : Category.Arrow C y₂ z)
     → (g : Category.Arrow C x y₁)
-    → map (Category.compose-eq C p f g)
-      ≡ Category.compose-eq D q (map f) (map g)
+    → map (Category.compose-eq' C p f g)
+      ≡ Category.compose-eq' D q (map f) (map g)
   map-compose-eq refl refl
     = map-compose
 
@@ -357,21 +390,22 @@ record FunctorIdentity
       → (f₁ : Category.Arrow C₁ x₁ y₁)
       → Functor.map F f₁ ≅ f₁
 
--- ### Conversion
+-- ### Equality
 
 module _
   {C₁ C₂ : Category}
-  {F : Functor C₁ C₂}
   where
 
   functor-identity-to-equal
-    : FunctorIdentity F
+    : {F : Functor C₁ C₂}
+    → FunctorIdentity F
     → FunctorEqual F (functor-identity' C₁)
   functor-identity-to-equal p
     = record {FunctorIdentity p}
   
   functor-identity-from-equal
-    : FunctorEqual F (functor-identity' C₁)
+    : {F : Functor C₁ C₂}
+    → FunctorEqual F (functor-identity' C₁)
     → FunctorIdentity F
   functor-identity-from-equal p
     = record {FunctorEqual p}
@@ -399,25 +433,28 @@ record FunctorCompose
       → (f : Category.Arrow C x y)
       → Functor.map H f ≅ Functor.map F (Functor.map G f)
 
--- ### Conversion
+-- ### Equality
 
 module _
   {C D E₁ E₂ : Category}
-  {F : Functor D E₁}
-  {G : Functor C D}
-  {H : Functor C E₂}
   where
 
   functor-compose-to-equal
-    : FunctorCompose F G H
+    : {F : Functor D E₁}
+    → {G : Functor C D}
+    → {H : Functor C E₂}
+    → FunctorCompose F G H
     → FunctorEqual H (functor-compose' F G)
   functor-compose-to-equal p
     = record {FunctorCompose p}
   
   functor-compose-from-equal
-    : FunctorEqual H (functor-compose' F G)
+    : (F : Functor D E₁)
+    → (G : Functor C D)
+    → {H : Functor C E₂}
+    → FunctorEqual H (functor-compose' F G)
     → FunctorCompose F G H
-  functor-compose-from-equal p
+  functor-compose-from-equal _ _ p
     = record {FunctorEqual p}
 
 -- ## FunctorSquare
@@ -446,26 +483,30 @@ record FunctorSquare
       → Functor.map H₂ (Functor.map F f₁)
         ≅ Functor.map G (Functor.map H₁ f₁)
 
--- ### Conversion
+-- ### Equality
 
 module _
   {C₁ C₂ D₁ D₂ D₃ : Category}
-  {F : Functor C₁ C₂}
-  {G : Functor D₁ D₃}
-  {H₁ : Functor C₁ D₁}
-  {H₂ : Functor C₂ D₂}
   where
 
   functor-square-to-equal
-    : FunctorSquare F G H₁ H₂
+    : {F : Functor C₁ C₂}
+    → {G : Functor D₁ D₃}
+    → {H₁ : Functor C₁ D₁}
+    → {H₂ : Functor C₂ D₂}
+    → FunctorSquare F G H₁ H₂
     → FunctorEqual (functor-compose' H₂ F) (functor-compose' G H₁)
   functor-square-to-equal s
     = record {FunctorSquare s}
   
   functor-square-from-equal
-    : FunctorEqual (functor-compose' H₂ F) (functor-compose' G H₁)
+    : (F : Functor C₁ C₂)
+    → (G : Functor D₁ D₃)
+    → (H₁ : Functor C₁ D₁)
+    → (H₂ : Functor C₂ D₂)
+    → FunctorEqual (functor-compose' H₂ F) (functor-compose' G H₁)
     → FunctorSquare F G H₁ H₂
-  functor-square-from-equal p
+  functor-square-from-equal _ _ _ _ p
     = record {FunctorEqual p}
 
 -- ### Transpose
@@ -684,7 +725,7 @@ record DependentCategory
     → Arrow x x' y₁'
     → Arrow x x' z'
   compose-eq x
-    = Category.compose-eq
+    = Category.compose-eq'
       (category x)
 
   precompose

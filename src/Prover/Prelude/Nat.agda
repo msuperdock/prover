@@ -66,8 +66,8 @@ module Nat where
     where
   
     z<s
-      : {n : ℕ}
-      → zero < suc n nat
+      : {n₂ : ℕ}
+      → zero < suc n₂ nat
   
     s<s
       : {n₁ n₂ : ℕ}
@@ -91,15 +91,15 @@ module Nat where
   ... | τ₃ ¬l ¬p g
     = τ₃ (λ {(s<s l) → ¬l l}) (λ {refl → ¬p refl}) (s<s g)
 
-  transitive
+  <-trans
     : {n₁ n₂ n₃ : ℕ}
     → n₁ < n₂ nat
     → n₂ < n₃ nat
     → n₁ < n₃ nat
-  transitive z<s (s<s _)
+  <-trans z<s (s<s _)
     = z<s
-  transitive (s<s p₁) (s<s p₂)
-    = s<s (transitive p₁ p₂)
+  <-trans (s<s p₁) (s<s p₂)
+    = s<s (<-trans p₁ p₂)
 
 -- ## Exports
 

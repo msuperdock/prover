@@ -5,8 +5,9 @@ open import Prover.Category
     DependentFunctorIdentity; DependentFunctorSquare; Functor; FunctorCompose;
     FunctorIdentity; FunctorSquare; functor-compose'; functor-square-compose)
 open import Prover.Category.Sigma.Maybe
-  using (functor-compose-sigma-may; functor-identity-sigma-may;
-    functor-sigma-may₁; functor-square-sigma-may; functor-square-sigma-may₁)
+  using (functor-compose-sigma-maybe; functor-identity-sigma-maybe;
+    functor-sigma-maybe₁; functor-square-sigma-maybe;
+    functor-square-sigma-maybe₁)
 open import Prover.Category.Split
   using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Category.Sum
@@ -24,7 +25,7 @@ category-sigma-sum C₂₂ F₁
   = category-sum
     (functor-compose'
       (SplitFunctor.functor F₁)
-      (functor-sigma-may₁ C₂₂))
+      (functor-sigma-maybe₁ C₂₂))
 
 -- ## Functor
 
@@ -44,7 +45,7 @@ functor-sigma-sum H₂₂ s₁
   = functor-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
-      (functor-square-sigma-may₁ H₂₂))
+      (functor-square-sigma-maybe₁ H₂₂))
 
 -- ## FunctorIdentity
 
@@ -63,8 +64,8 @@ functor-identity-sigma-sum {G₂₂ = G₂₂} s₁ p₁₁ p₂₂
   = functor-identity-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
-      (functor-square-sigma-may₁ G₂₂)) p₁₁
-    (functor-identity-sigma-may {F₂ = G₂₂} p₂₂)
+      (functor-square-sigma-maybe₁ G₂₂)) p₁₁
+    (functor-identity-sigma-maybe {F₂ = G₂₂} p₂₂)
 
 -- ## FunctorCompose
 
@@ -95,14 +96,14 @@ functor-compose-sigma-sum {L₂₂ = L₂₂} {M₂₂ = M₂₂} {N₂₂ = N�
   = functor-compose-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
-      (functor-square-sigma-may₁ L₂₂))
+      (functor-square-sigma-maybe₁ L₂₂))
     (functor-square-compose
       (SplitFunctorSquare.functor t₁)
-      (functor-square-sigma-may₁ M₂₂))
+      (functor-square-sigma-maybe₁ M₂₂))
     (functor-square-compose
       (SplitFunctorSquare.functor u₁)
-      (functor-square-sigma-may₁ N₂₂)) p₁₁
-    (functor-compose-sigma-may {F₂ = L₂₂} {G₂ = M₂₂} {H₂ = N₂₂} p₂₂)
+      (functor-square-sigma-maybe₁ N₂₂)) p₁₁
+    (functor-compose-sigma-maybe {F₂ = L₂₂} {G₂ = M₂₂} {H₂ = N₂₂} p₂₂)
 
 -- ## FunctorSquare
 
@@ -140,16 +141,16 @@ functor-square-sigma-sum
   = functor-square-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
-      (functor-square-sigma-may₁ H₂₂))
+      (functor-square-sigma-maybe₁ H₂₂))
     (functor-square-compose
       (SplitFunctorSquare.functor t₁)
-      (functor-square-sigma-may₁ I₂₂))
+      (functor-square-sigma-maybe₁ I₂₂))
     (functor-square-compose
       (SplitFunctorSquare.functor u₁₁)
-      (functor-square-sigma-may₁ J₁₂₂))
+      (functor-square-sigma-maybe₁ J₁₂₂))
     (functor-square-compose
       (SplitFunctorSquare.functor u₂₁)
-      (functor-square-sigma-may₁ J₂₂₂)) v₁₁
-    (functor-square-sigma-may
+      (functor-square-sigma-maybe₁ J₂₂₂)) v₁₁
+    (functor-square-sigma-maybe
       {F₂ = H₂₂} {G₂ = I₂₂} {H₁₂ = J₁₂₂} {H₂₂ = J₂₂₂} v₂₂)
 

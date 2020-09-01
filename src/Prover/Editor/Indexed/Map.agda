@@ -20,12 +20,13 @@ open import Prover.Editor.Map
     simple-editor-map-view)
 open import Prover.Function.Indexed
   using (IndexedSet)
-open import Prover.Function.Indexed.Partial
-  using (IndexedPartialFunction; IndexedPartialFunction';
-    indexed-partial-function-compose)
+open import Prover.Function.Indexed.Simple.Partial
+  using (IndexedSimplePartialFunction; IndexedSimplePartialFunction';
+    indexed-simple-partial-function-compose)
+open import Prover.Function.Indexed.Simple.Split
+  using (IndexedSimpleSplitFunction; indexed-simple-split-function-compose)
 open import Prover.Function.Indexed.Split
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction;
-    indexed-simple-split-function-compose; indexed-split-function-compose;
+  using (IndexedSplitFunction; indexed-split-function-compose;
     indexed-split-function-compose')
 open import Prover.Function.Split
   using (SplitFunction)
@@ -477,21 +478,21 @@ module _
   where
 
   module IndexedPartialEditorMap
-    (F : IndexedPartialFunction' C' D')
+    (F : IndexedSimplePartialFunction' C' D')
     (e : IndexedPartialEditor V E C')
     where
 
     open IndexedPartialEditor e public
-      hiding (indexed-partial-function)
+      hiding (indexed-simple-partial-function)
 
-    indexed-partial-function
-      : IndexedPartialFunction StateSimpleCategory D'
-    indexed-partial-function
-      = indexed-partial-function-compose F
-        (IndexedPartialEditor.indexed-partial-function e)
+    indexed-simple-partial-function
+      : IndexedSimplePartialFunction StateSimpleCategory D'
+    indexed-simple-partial-function
+      = indexed-simple-partial-function-compose F
+        (IndexedPartialEditor.indexed-simple-partial-function e)
 
   indexed-partial-editor-map
-    : IndexedPartialFunction' C' D'
+    : IndexedSimplePartialFunction' C' D'
     → IndexedPartialEditor V E C'
     → IndexedPartialEditor V E D'
   indexed-partial-editor-map F e

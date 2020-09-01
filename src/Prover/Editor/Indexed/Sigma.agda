@@ -5,7 +5,7 @@ open import Prover.Category.Chain
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀; indexed-dependent-category₀)
 open import Prover.Category.Indexed.Sigma.Maybe
-  using (indexed-category-sigma-may)
+  using (indexed-category-sigma-maybe)
 open import Prover.Category.Indexed.Sigma.Sum
   using (indexed-category-sigma-sum)
 open import Prover.Category.Indexed.Simple
@@ -32,19 +32,26 @@ open import Prover.Editor.Sigma
   using (editor-sigma; event-stack-sigma; view-stack-sigma)
 open import Prover.Function.Indexed
   using (IndexedSet)
-open import Prover.Function.Indexed.Partial
-  using (IndexedPartialFunction)
-open import Prover.Function.Indexed.Partial.Sigma.Sum
-  using (indexed-partial-function-sigma-sum)
 open import Prover.Function.Indexed.Sigma
   using (indexed-set-sigma)
+open import Prover.Function.Indexed.Simple.Bool
+  using (IndexedSimpleBoolFunction)
+open import Prover.Function.Indexed.Simple.Bool.Sigma.Sum
+  using (indexed-simple-bool-function-sigma-sum)
+open import Prover.Function.Indexed.Simple.Partial
+  using (IndexedSimplePartialFunction)
+open import Prover.Function.Indexed.Simple.Partial.Sigma.Sum
+  using (indexed-simple-partial-function-sigma-sum)
+open import Prover.Function.Indexed.Simple.Split
+  using (IndexedSimpleSplitFunction)
+open import Prover.Function.Indexed.Simple.Split.Sigma.Sum
+  using (indexed-simple-split-function-sigma-sum)
 open import Prover.Function.Indexed.Split
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+  using (IndexedSplitFunction)
 open import Prover.Function.Indexed.Split.Sigma.Maybe
-  using (indexed-split-function-sigma-may)
+  using (indexed-split-function-sigma-maybe)
 open import Prover.Function.Indexed.Split.Sigma.Sum
-  using (indexed-simple-split-function-sigma-sum;
-    indexed-split-function-sigma-sum)
+  using (indexed-split-function-sigma-sum)
 open import Prover.Prelude
 
 -- ## IndexedEditor
@@ -136,14 +143,14 @@ module _
       = indexed-simple-editor-sigma d e₁
         (IndexedPartialEditor.indexed-simple-editor e₂)
 
-    indexed-partial-function
-      : IndexedPartialFunction
+    indexed-simple-partial-function
+      : IndexedSimplePartialFunction
         StateSimpleCategory
         (indexed-set-sigma C₁' C₂')
-    indexed-partial-function
-      = indexed-partial-function-sigma-sum
+    indexed-simple-partial-function
+      = indexed-simple-partial-function-sigma-sum
         (IndexedSplitEditor.indexed-split-functor e₁)
-        (IndexedPartialEditor.indexed-partial-function e₂)
+        (IndexedPartialEditor.indexed-simple-partial-function e₂)
 
   -- Takes direction from first to second component.
   indexed-partial-editor-sigma
@@ -193,7 +200,7 @@ module _
     indexed-split-functor
       : IndexedSplitFunctor
         StateCategory
-        (indexed-category-sigma-may C₁' C₂')
+        (indexed-category-sigma-maybe C₁' C₂')
     indexed-split-functor
       = indexed-split-functor-sigma-sum
         (IndexedSplitEditor.indexed-split-functor e₁)
@@ -207,7 +214,7 @@ module _
     → IndexedSplitEditor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
-      (indexed-category-sigma-may C₁' C₂')
+      (indexed-category-sigma-maybe C₁' C₂')
   indexed-split-editor-sigma d e₁ e₂
     = record {IndexedSplitEditorSigma d e₁ e₂}
 
@@ -255,6 +262,14 @@ module _
         (IndexedSplitMainEditor.state-indexed-split-function e₁)
         (IndexedSplitMainEditor.pure-indexed-split-function e₁)
         (IndexedMainEditor.indexed-simple-split-function e₂)
+
+    indexed-simple-bool-function
+      : IndexedSimpleBoolFunction
+        StateSimpleCategory
+    indexed-simple-bool-function
+      = indexed-simple-bool-function-sigma-sum
+        (IndexedSplitMainEditor.indexed-split-functor e₁)
+        (IndexedMainEditor.indexed-simple-bool-function e₂)
 
   -- Takes direction from first to second component.
   indexed-main-editor-sigma
@@ -317,16 +332,16 @@ module _
     pure-indexed-split-function
       : IndexedSplitFunction
         (P₁ × P₂)
-        (indexed-category-sigma-may C₁' C₂')
+        (indexed-category-sigma-maybe C₁' C₂')
     pure-indexed-split-function
-      = indexed-split-function-sigma-may
+      = indexed-split-function-sigma-maybe
         (IndexedSplitMainEditor.pure-indexed-split-function e₁)
         (IndexedSplitMainEditor.pure-indexed-split-function e₂)
 
     indexed-split-functor
       : IndexedSplitFunctor
         StateCategory
-        (indexed-category-sigma-may C₁' C₂')
+        (indexed-category-sigma-maybe C₁' C₂')
     indexed-split-functor
       = indexed-split-functor-sigma-sum
         (IndexedSplitMainEditor.indexed-split-functor e₁)
@@ -342,7 +357,7 @@ module _
       (event-stack-sigma E₁ E₂)
       (S₁ ⊔ P₁ × S₂)
       (P₁ × P₂)
-      (indexed-category-sigma-may C₁' C₂')
+      (indexed-category-sigma-maybe C₁' C₂')
   indexed-split-main-editor-sigma d e₁ e₂
     = record {IndexedSplitMainEditorSigma d e₁ e₂}
 

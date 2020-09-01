@@ -7,15 +7,15 @@ open import Prover.Prelude.Bool
 open import Prover.Prelude.Empty
   using (¬_)
 open import Prover.Prelude.Equal
-  using (Equal; _≡_; refl)
+  using (Equal; _≡_; _≢_; refl; sub)
 open import Prover.Prelude.Fin
-  using (Fin)
+  using (Fin; _<_fin; suc)
 open import Prover.Prelude.Function
-  using (_∘_)
+  using (_∘_; id)
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
 open import Prover.Prelude.Nat
-  using (ℕ; _≟_nat)
+  using (ℕ; _≟_nat; suc)
 open import Prover.Prelude.Relation
   using (Dec; Decidable)
 open import Prover.Prelude.Sigma
@@ -78,8 +78,8 @@ module List where
     : {A : Set}
     → List A
     → ℕ
-  length (any {n} _)
-    = n
+  length (any xs)
+    = Vec.length xs
   
   lookup
     : {A : Set}
@@ -97,6 +97,41 @@ module List where
   _!_
     = lookup
   
+  update
+    : {A : Set}
+    → (xs : List A)
+    → Fin (length xs)
+    → A
+    → List A
+  update (any xs) k x
+    = any (Vec.update xs k x)
+
+  insert
+    : {A : Set}
+    → (xs : List A)
+    → Fin (suc (length xs))
+    → A
+    → List A
+  insert (any xs) k x
+    = any (Vec.insert xs k x)
+
+  delete
+    : {A : Set}
+    → (xs : List A)
+    → Fin (length xs)
+    → List A
+  delete (any {suc _} xs) k
+    = any (Vec.delete xs k)
+
+  swap
+    : {A : Set}
+    → A
+    → (xs : List A)
+    → Fin (length xs)
+    → List A
+  swap x xs k
+    = any (Vec.swap (cons x xs) k)
+
   map
     : {A B : Set}
     → (A → B)
@@ -104,6 +139,14 @@ module List where
     → List B
   map f (any xs)
     = any (Vec.map f xs)
+
+  map-maybe
+    : {A B : Set}
+    → (A → Maybe B)
+    → List A
+    → Maybe (List B)
+  map-maybe f (any xs)
+    = Maybe.map any (Vec.map-maybe f xs)
 
   append
     : {A : Set}
@@ -216,6 +259,131 @@ module List where
 
   -- ### Properties
 
+  lookup-update
+    : {A : Set}
+    → (xs : List A)
+    → (k : Fin (length xs))
+    → (y : A)
+    → update xs k y ! k ≡ y
+  lookup-update (any xs)
+    = Vec.lookup-update xs
+
+  lookup-update-other
+    : {A : Set}
+    → (xs : List A)
+    → (k l : Fin (length xs))
+    → (y : A)
+    → k ≢ l
+    → update xs k y ! l ≡ xs ! l
+  lookup-update-other (any xs)
+    = Vec.lookup-update-other xs
+
+  lookup-insert
+    : {A : Set}
+    → (xs : List A)
+    → (k : Fin (suc (length xs)))
+    → (y : A)
+    → insert xs k y ! k ≡ y
+  lookup-insert (any xs)
+    = Vec.lookup-insert xs
+
+  lookup-insert-less
+    : {A : Set}
+    → (xs : List A)
+    → {k : Fin (suc (length xs))}
+    → (y : A)
+    → (l : Fin (length xs))
+    → Fin.lift l < k fin
+    → insert xs k y ! Fin.lift l ≡ xs ! l
+  lookup-insert-less (any xs)
+    = Vec.lookup-insert-less xs
+
+  lookup-insert-¬less
+    : {A : Set}
+    → (xs : List A)
+    → (k : Fin (suc (length xs))) 
+    → (y : A)
+    → (l : Fin (length xs))
+    → ¬ Fin.lift l < k fin
+    → insert xs k y ! suc l ≡ xs ! l
+  lookup-insert-¬less (any xs)
+    = Vec.lookup-insert-¬less xs
+
+  lookup-delete-less
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → {k l : Fin (length (x ∷ xs))}
+    → {l' : Fin (length (delete (x ∷ xs) k))}
+    → Fin.drop l ≡ just l'
+    → l < k fin
+    → delete (x ∷ xs) k ! l' ≡ (x ∷ xs) ! l
+  lookup-delete-less x xs
+    = Vec.lookup-delete-less (cons x xs)
+
+  lookup-delete-¬less
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → (k : Fin (length (x ∷ xs)))
+    → (l : Fin (length (delete (x ∷ xs) k)))
+    → ¬ suc l < k fin
+    → suc l ≢ k
+    → delete (x ∷ xs) k ! l ≡ (x ∷ xs) ! suc l
+  lookup-delete-¬less x xs
+    = Vec.lookup-delete-¬less (cons x xs)
+
+  lookup-swap₁
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → (k : Fin (length xs))
+    → swap x xs k ! Fin.lift k ≡ (x ∷ xs) ! suc k
+  lookup-swap₁ x xs
+    = Vec.lookup-swap₁ (cons x xs)
+
+  lookup-swap₂
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → (k : Fin (length xs))
+    → swap x xs k ! suc k ≡ (x ∷ xs) ! Fin.lift k
+  lookup-swap₂ x xs
+    = Vec.lookup-swap₂ (cons x xs)
+
+  lookup-swap₂'
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → {k : Fin (length xs)}
+    → (k' : Fin (length (x ∷ xs)))
+    → Fin.drop k' ≡ just k
+    → swap x xs k ! suc k ≡ (x ∷ xs) ! k'
+  lookup-swap₂' x xs
+    = Vec.lookup-swap₂' (cons x xs)
+
+  lookup-swap-less
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → (k : Fin (length xs)) 
+    → {l : Fin (length (x ∷ xs))}
+    → l < Fin.lift k fin
+    → swap x xs k ! l ≡ (x ∷ xs) ! l
+  lookup-swap-less x xs k
+    = Vec.lookup-swap-less (cons x xs) k
+
+  lookup-swap-greater
+    : {A : Set}
+    → (x : A)
+    → (xs : List A)
+    → {k : Fin (length xs)}
+    → {l : Fin (length (x ∷ xs))}
+    → suc k < l fin
+    → swap x xs k ! l ≡ (x ∷ xs) ! l
+  lookup-swap-greater x xs
+    = Vec.lookup-swap-greater (cons x xs)
+
   lookup-map
     : {A B : Set}
     → (f : A → B)
@@ -224,6 +392,31 @@ module List where
     → map f xs ! k ≡ f (xs ! k)
   lookup-map f (any xs)
     = Vec.lookup-map f xs
+
+  map-eq
+    : {A B : Set}
+    → (f₁ f₂ : A → B)
+    → ((x : A) → f₁ x ≡ f₂ x)
+    → (xs : List A)
+    → map f₁ xs ≡ map f₂ xs
+  map-eq f₁ f₂ p (any xs)
+    = sub any (Vec.map-eq f₁ f₂ p xs)
+
+  map-identity
+    : {A : Set}
+    → (xs : List A)
+    → map id xs ≡ xs
+  map-identity (any xs)
+    = sub any (Vec.map-identity xs)
+
+  map-compose
+    : {A B C : Set}
+    → (f : B → C)
+    → (g : A → B)
+    → (xs : List A)
+    → map (f ∘ g) xs ≡ map f (map g xs)
+  map-compose f g (any xs)
+    = sub any (Vec.map-compose f g xs)
 
   -- ### Sublist
 

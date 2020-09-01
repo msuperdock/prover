@@ -255,7 +255,8 @@ functor-identity-maybe
     (functor-maybe F)
 functor-identity-maybe {C = C} p
   = functor-identity-from-equal
-  $ functor-trans (functor-equal-maybe (functor-identity-to-equal p))
+  $ functor-trans (functor-equal-maybe
+    (functor-identity-to-equal p))
   $ functor-maybe-identity C
 
 functor-identity-maybe-eq
@@ -284,7 +285,10 @@ functor-compose-maybe
     (functor-maybe H)
 functor-compose-maybe {F = F} {G = G} p
   = functor-compose-from-equal
-  $ functor-trans (functor-equal-maybe (functor-compose-to-equal p))
+    (functor-maybe F)
+    (functor-maybe G)
+  $ functor-trans (functor-equal-maybe
+    (functor-compose-to-equal p))
   $ functor-maybe-compose F G
 
 functor-compose-maybe-eq
@@ -320,8 +324,14 @@ functor-square-maybe
     (functor-maybe H₂)
 functor-square-maybe {F = F} {G = G} {H₁ = H₁} {H₂ = H₂} s
   = functor-square-from-equal
-  $ functor-trans (functor-sym (functor-maybe-compose H₂ F))
-  $ functor-trans (functor-equal-maybe (functor-square-to-equal s))
+    (functor-maybe F)
+    (functor-maybe G)
+    (functor-maybe H₁)
+    (functor-maybe H₂)
+  $ functor-trans (functor-sym
+    (functor-maybe-compose H₂ F))
+  $ functor-trans (functor-equal-maybe
+    (functor-square-to-equal s))
   $ functor-maybe-compose G H₁
 
 functor-square-maybe-eq

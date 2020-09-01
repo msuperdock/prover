@@ -16,8 +16,9 @@ open import Prover.Category.Indexed
     indexed-dependent-functor-identity; indexed-dependent-functor-identity₀;
     indexed-dependent-functor-square; indexed-dependent-functor-square₀; sigma)
 open import Prover.Category.Sigma.Maybe
-  using (category-sigma-may; functor-compose-sigma-may;
-    functor-identity-sigma-may; functor-sigma-may; functor-square-sigma-may)
+  using (category-sigma-maybe; functor-compose-sigma-maybe;
+    functor-identity-sigma-maybe; functor-sigma-maybe;
+    functor-square-sigma-maybe)
 open import Prover.Category.Snoc
   using (chain-category-snoc; chain-dependent-category-snoc;
     chain-dependent-functor-snoc; chain-functor-snoc)
@@ -27,7 +28,7 @@ open import Prover.Prelude
 
 -- ### IndexedCategory
 
-indexed-category-sigma-may
+indexed-category-sigma-maybe
   : {n : ℕ}
   → {C : ChainCategory n}
   → (C₁' : IndexedCategory C)
@@ -37,7 +38,7 @@ indexed-category-sigma-may
 
 -- ### IndexedFunctor
 
-indexed-functor-sigma-may
+indexed-functor-sigma-maybe
   : {n : ℕ}
   → {C D : ChainCategory n}
   → {C₁' : IndexedCategory C}
@@ -51,12 +52,12 @@ indexed-functor-sigma-may
   → IndexedFunctor C₂' D₂'
     (chain-functor-snoc F₁')
   → IndexedFunctor
-    (indexed-category-sigma-may C₁' C₂')
-    (indexed-category-sigma-may D₁' D₂') F
+    (indexed-category-sigma-maybe C₁' C₂')
+    (indexed-category-sigma-maybe D₁' D₂') F
 
 -- ### IndexedFunctorIdentity
 
-indexed-functor-identity-sigma-may
+indexed-functor-identity-sigma-maybe
   : {n : ℕ}
   → {C : ChainCategory n}
   → {C₁' : IndexedCategory C}
@@ -68,9 +69,9 @@ indexed-functor-identity-sigma-may
     (chain-functor-snoc F₁')}
   → IndexedFunctorIdentity F₂'
   → IndexedFunctorIdentity
-    (indexed-functor-sigma-may F₁' F₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
 
-indexed-functor-identity-sigma-may-eq
+indexed-functor-identity-sigma-maybe-eq
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -85,11 +86,11 @@ indexed-functor-identity-sigma-may-eq
   → x₂ ≡ x₁
   → IndexedFunctorIdentity F₂'
   → IndexedFunctorIdentity
-    (indexed-functor-sigma-may F₁' F₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
 
 -- ### IndexedFunctorCompose
 
-indexed-functor-compose-sigma-may
+indexed-functor-compose-sigma-maybe
   : {n : ℕ}
   → {C D E : ChainCategory n}
   → {C₁' : IndexedCategory C}
@@ -115,11 +116,11 @@ indexed-functor-compose-sigma-may
     (chain-functor-snoc H₁')}
   → IndexedFunctorCompose F₂' G₂' H₂'
   → IndexedFunctorCompose
-    (indexed-functor-sigma-may F₁' F₂')
-    (indexed-functor-sigma-may G₁' G₂')
-    (indexed-functor-sigma-may H₁' H₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
+    (indexed-functor-sigma-maybe G₁' G₂')
+    (indexed-functor-sigma-maybe H₁' H₂')
 
-indexed-functor-compose-sigma-may-eq
+indexed-functor-compose-sigma-maybe-eq
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -143,13 +144,13 @@ indexed-functor-compose-sigma-may-eq
   → x₂ ≡ x₁
   → IndexedFunctorCompose F₂' G₂' H₂'
   → IndexedFunctorCompose
-    (indexed-functor-sigma-may F₁' F₂')
-    (indexed-functor-sigma-may G₁' G₂')
-    (indexed-functor-sigma-may H₁' H₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
+    (indexed-functor-sigma-maybe G₁' G₂')
+    (indexed-functor-sigma-maybe H₁' H₂')
 
 -- ### IndexedFunctorSquare
 
-indexed-functor-square-sigma-may
+indexed-functor-square-sigma-maybe
   : {n : ℕ}
   → {C₁ C₂ D₁ D₂ : ChainCategory n}
   → {C₁₁' : IndexedCategory C₁}
@@ -182,12 +183,12 @@ indexed-functor-square-sigma-may
     (chain-functor-snoc H₂₁')}
   → IndexedFunctorSquare F₂' G₂' H₁₂' H₂₂'
   → IndexedFunctorSquare
-    (indexed-functor-sigma-may F₁' F₂')
-    (indexed-functor-sigma-may G₁' G₂')
-    (indexed-functor-sigma-may H₁₁' H₁₂')
-    (indexed-functor-sigma-may H₂₁' H₂₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
+    (indexed-functor-sigma-maybe G₁' G₂')
+    (indexed-functor-sigma-maybe H₁₁' H₁₂')
+    (indexed-functor-sigma-maybe H₂₁' H₂₂')
 
-indexed-functor-square-sigma-may-eq
+indexed-functor-square-sigma-maybe-eq
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -216,14 +217,14 @@ indexed-functor-square-sigma-may-eq
   → x₂ ≡ x₁
   → IndexedFunctorSquare F₂' G₂' H₁₂' H₂₂'
   → IndexedFunctorSquare
-    (indexed-functor-sigma-may F₁' F₂')
-    (indexed-functor-sigma-may G₁' G₂')
-    (indexed-functor-sigma-may H₁₁' H₁₂')
-    (indexed-functor-sigma-may H₂₁' H₂₂')
+    (indexed-functor-sigma-maybe F₁' F₂')
+    (indexed-functor-sigma-maybe G₁' G₂')
+    (indexed-functor-sigma-maybe H₁₁' H₁₂')
+    (indexed-functor-sigma-maybe H₂₁' H₂₂')
 
 -- ### IndexedDependentCategory
 
-indexed-dependent-category-sigma-may
+indexed-dependent-category-sigma-maybe
   : {n : ℕ}
   → {C : Category}
   → {C' : ChainDependentCategory C n}
@@ -234,7 +235,7 @@ indexed-dependent-category-sigma-may
 
 -- ### IndexedDependentFunctor
 
-indexed-dependent-functor-sigma-may
+indexed-dependent-functor-sigma-maybe
   : {n : ℕ}
   → {C D : Category}
   → {C' : ChainDependentCategory C n}
@@ -250,12 +251,12 @@ indexed-dependent-functor-sigma-may
   → IndexedDependentFunctor C₂'' D₂''
     (chain-dependent-functor-snoc F₁')
   → IndexedDependentFunctor
-    (indexed-dependent-category-sigma-may C₁'' C₂'')
-    (indexed-dependent-category-sigma-may D₁'' D₂'') F
+    (indexed-dependent-category-sigma-maybe C₁'' C₂'')
+    (indexed-dependent-category-sigma-maybe D₁'' D₂'') F
 
 -- ### IndexedDependentFunctorIdentity
 
-indexed-dependent-functor-identity-sigma-may
+indexed-dependent-functor-identity-sigma-maybe
   : {n : ℕ}
   → {C : Category}
   → {C' : ChainDependentCategory C n}
@@ -268,11 +269,11 @@ indexed-dependent-functor-identity-sigma-may
     (chain-dependent-functor-snoc F₁')}
   → IndexedDependentFunctorIdentity F₂'
   → IndexedDependentFunctorIdentity
-    (indexed-dependent-functor-sigma-may F₁' F₂')
+    (indexed-dependent-functor-sigma-maybe F₁' F₂')
 
 -- ### IndexedDependentFunctorCompose
 
-indexed-dependent-functor-compose-sigma-may
+indexed-dependent-functor-compose-sigma-maybe
   : {n : ℕ}
   → {C D E : Category}
   → {C' : ChainDependentCategory C n}
@@ -301,13 +302,13 @@ indexed-dependent-functor-compose-sigma-may
     (chain-dependent-functor-snoc H₁')}
   → IndexedDependentFunctorCompose F₂' G₂' H₂'
   → IndexedDependentFunctorCompose
-    (indexed-dependent-functor-sigma-may F₁' F₂')
-    (indexed-dependent-functor-sigma-may G₁' G₂')
-    (indexed-dependent-functor-sigma-may H₁' H₂')
+    (indexed-dependent-functor-sigma-maybe F₁' F₂')
+    (indexed-dependent-functor-sigma-maybe G₁' G₂')
+    (indexed-dependent-functor-sigma-maybe H₁' H₂')
 
 -- ### IndexedDependentFunctorSquare
 
-indexed-dependent-functor-square-sigma-may
+indexed-dependent-functor-square-sigma-maybe
   : {n : ℕ}
   → {C₁ C₂ D₁ D₂ : Category}
   → {C₁' : ChainDependentCategory C₁ n}
@@ -344,37 +345,37 @@ indexed-dependent-functor-square-sigma-may
     (chain-dependent-functor-snoc H₂₁')}
   → IndexedDependentFunctorSquare F₂' G₂' H₁₂' H₂₂'
   → IndexedDependentFunctorSquare
-    (indexed-dependent-functor-sigma-may F₁' F₂')
-    (indexed-dependent-functor-sigma-may G₁' G₂')
-    (indexed-dependent-functor-sigma-may H₁₁' H₁₂')
-    (indexed-dependent-functor-sigma-may H₂₁' H₂₂')
+    (indexed-dependent-functor-sigma-maybe F₁' F₂')
+    (indexed-dependent-functor-sigma-maybe G₁' G₂')
+    (indexed-dependent-functor-sigma-maybe H₁₁' H₁₂')
+    (indexed-dependent-functor-sigma-maybe H₂₁' H₂₂')
 
 -- ## Definitions
 
 -- ### IndexedCategory
 
-indexed-category-sigma-may
+indexed-category-sigma-maybe
   {n = zero} C₁' C₂'
   = empty
-    (category-sigma-may
+    (category-sigma-maybe
       {C₁ = indexed-category₀ C₁'}
       (indexed-dependent-category₀
         (IndexedCategory.unpack C₂')))
-indexed-category-sigma-may
+indexed-category-sigma-maybe
   {n = suc _} C₁' C₂'
   = sigma
-    (indexed-dependent-category-sigma-may
+    (indexed-dependent-category-sigma-maybe
       (IndexedCategory.unpack C₁')
       (IndexedCategory.unpack C₂'))
 
 -- ### IndexedFunctor
 
-indexed-functor-sigma-may
+indexed-functor-sigma-maybe
   {n = zero}
   {C₁' = C₁'} {D₁' = D₁'}
   {C₂' = C₂'} {D₂' = D₂'} _ F₂'
   = empty
-    (functor-sigma-may
+    (functor-sigma-maybe
       {C₁ = indexed-category₀ C₁'}
       {D₁ = indexed-category₀ D₁'}
       {C₂ = indexed-dependent-category₀
@@ -383,22 +384,22 @@ indexed-functor-sigma-may
         (IndexedCategory.unpack D₂')}
       (indexed-dependent-functor₀
         (IndexedFunctor.unpack F₂')))
-indexed-functor-sigma-may
+indexed-functor-sigma-maybe
   {n = suc _} F₁' F₂'
   = sigma
-    (indexed-dependent-functor-sigma-may
+    (indexed-dependent-functor-sigma-maybe
       (IndexedFunctor.unpack F₁')
       (IndexedFunctor.unpack F₂'))
 
 -- ### IndexedFunctorIdentity
 
-indexed-functor-identity-sigma-may
+indexed-functor-identity-sigma-maybe
   {n = zero}
   {C₁' = C₁'}
   {C₂' = C₂'} _
   {F₂' = F₂'} p₂
   = empty
-    (functor-identity-sigma-may
+    (functor-identity-sigma-maybe
       {C₁ = indexed-category₀ C₁'}
       {C₂ = indexed-dependent-category₀
         (IndexedCategory.unpack C₂')}
@@ -406,25 +407,25 @@ indexed-functor-identity-sigma-may
         (IndexedFunctor.unpack F₂')}
       (indexed-dependent-functor-identity₀
         (IndexedFunctorIdentity.unpack p₂)))
-indexed-functor-identity-sigma-may
+indexed-functor-identity-sigma-maybe
   {n = suc _} F₁' p₂
   = sigma
-    (indexed-dependent-functor-identity-sigma-may
+    (indexed-dependent-functor-identity-sigma-maybe
       (IndexedFunctor.unpack F₁')
       (IndexedFunctorIdentity.unpack p₂))
 
-indexed-functor-identity-sigma-may-eq _ _ _ F₁' refl
-  = indexed-functor-identity-sigma-may F₁'
+indexed-functor-identity-sigma-maybe-eq _ _ _ F₁' refl
+  = indexed-functor-identity-sigma-maybe F₁'
 
 -- ### IndexedFunctorCompose
 
-indexed-functor-compose-sigma-may
+indexed-functor-compose-sigma-maybe
   {n = zero}
   {C₁' = C₁'} {D₁' = D₁'} {E₁' = E₁'}
   {C₂' = C₂'} {D₂' = D₂'} {E₂' = E₂'} _ _ _
   {F₂' = F₂'} {G₂' = G₂'} {H₂' = H₂'} p₂
   = empty
-    (functor-compose-sigma-may
+    (functor-compose-sigma-maybe
       {C₁ = indexed-category₀ C₁'}
       {D₁ = indexed-category₀ D₁'}
       {E₁ = indexed-category₀ E₁'}
@@ -442,27 +443,27 @@ indexed-functor-compose-sigma-may
         (IndexedFunctor.unpack H₂')}
       (indexed-dependent-functor-compose₀
         (IndexedFunctorCompose.unpack p₂)))
-indexed-functor-compose-sigma-may
+indexed-functor-compose-sigma-maybe
   {n = suc _} F₁' G₁' H₁' p₂
   = sigma
-    (indexed-dependent-functor-compose-sigma-may
+    (indexed-dependent-functor-compose-sigma-maybe
       (IndexedFunctor.unpack F₁')
       (IndexedFunctor.unpack G₁')
       (IndexedFunctor.unpack H₁')
       (IndexedFunctorCompose.unpack p₂))
 
-indexed-functor-compose-sigma-may-eq _ _ _ F₁' G₁' H₁' refl
-  = indexed-functor-compose-sigma-may F₁' G₁' H₁'
+indexed-functor-compose-sigma-maybe-eq _ _ _ F₁' G₁' H₁' refl
+  = indexed-functor-compose-sigma-maybe F₁' G₁' H₁'
 
 -- ### IndexedFunctorSquare
 
-indexed-functor-square-sigma-may
+indexed-functor-square-sigma-maybe
   {n = zero}
   {C₁₁' = C₁₁'} {C₂₁' = C₂₁'} {D₁₁' = D₁₁'} {D₂₁' = D₂₁'}
   {C₁₂' = C₁₂'} {C₂₂' = C₂₂'} {D₁₂' = D₁₂'} {D₂₂' = D₂₂'} _ _ _ _
   {F₂' = F₂'} {G₂' = G₂'} {H₁₂' = H₁₂'} {H₂₂' = H₂₂'} s₂
   = empty
-    (functor-square-sigma-may
+    (functor-square-sigma-maybe
       {C₁₁ = indexed-category₀ C₁₁'}
       {C₂₁ = indexed-category₀ C₂₁'}
       {D₁₁ = indexed-category₀ D₁₁'}
@@ -485,34 +486,34 @@ indexed-functor-square-sigma-may
         (IndexedFunctor.unpack H₂₂')}
       (indexed-dependent-functor-square₀
         (IndexedFunctorSquare.unpack s₂)))
-indexed-functor-square-sigma-may
+indexed-functor-square-sigma-maybe
   {n = suc _} F₁' G₁' H₁₁' H₂₁' s₂
   = sigma
-    (indexed-dependent-functor-square-sigma-may
+    (indexed-dependent-functor-square-sigma-maybe
       (IndexedFunctor.unpack F₁')
       (IndexedFunctor.unpack G₁')
       (IndexedFunctor.unpack H₁₁')
       (IndexedFunctor.unpack H₂₁')
       (IndexedFunctorSquare.unpack s₂))
 
-indexed-functor-square-sigma-may-eq _ _ _ F₁' G₁' H₁₁' H₂₁' refl
-  = indexed-functor-square-sigma-may F₁' G₁' H₁₁' H₂₁'
+indexed-functor-square-sigma-maybe-eq _ _ _ F₁' G₁' H₁₁' H₂₁' refl
+  = indexed-functor-square-sigma-maybe F₁' G₁' H₁₁' H₂₁'
 
 -- ### IndexedDependentCategory
 
-indexed-dependent-category-sigma-may
+indexed-dependent-category-sigma-maybe
   {C = C} C₁'' C₂''
   = indexed-dependent-category
-    (λ x → indexed-category-sigma-may
+    (λ x → indexed-category-sigma-maybe
       (IndexedDependentCategory.indexed-category C₁'' x)
       (IndexedDependentCategory.indexed-category C₂'' x))
-    (λ f → indexed-functor-sigma-may
+    (λ f → indexed-functor-sigma-maybe
       (IndexedDependentCategory.indexed-functor C₁'' f)
       (IndexedDependentCategory.indexed-functor C₂'' f))
-    (λ x → indexed-functor-identity-sigma-may
+    (λ x → indexed-functor-identity-sigma-maybe
       (IndexedDependentCategory.indexed-functor C₁'' (Category.identity C x))
       (IndexedDependentCategory.indexed-functor-identity C₂'' x))
-    (λ f g → indexed-functor-compose-sigma-may
+    (λ f g → indexed-functor-compose-sigma-maybe
       (IndexedDependentCategory.indexed-functor C₁'' f)
       (IndexedDependentCategory.indexed-functor C₁'' g)
       (IndexedDependentCategory.indexed-functor C₁'' (Category.compose C f g))
@@ -520,13 +521,13 @@ indexed-dependent-category-sigma-may
 
 -- ### IndexedDependentFunctor
 
-indexed-dependent-functor-sigma-may
+indexed-dependent-functor-sigma-maybe
   {C₁'' = C₁''} {D₁'' = D₁''} {F = F} F₁' F₂'
   = indexed-dependent-functor
-    (λ x → indexed-functor-sigma-may
+    (λ x → indexed-functor-sigma-maybe
       (IndexedDependentFunctor.indexed-functor F₁' x)
       (IndexedDependentFunctor.indexed-functor F₂' x))
-    (λ {x = x} {y = y} f → indexed-functor-square-sigma-may
+    (λ {x = x} {y = y} f → indexed-functor-square-sigma-maybe
       (IndexedDependentCategory.indexed-functor C₁'' f)
       (IndexedDependentCategory.indexed-functor D₁''
         (ChainDependentFunctor.map F f))
@@ -536,11 +537,11 @@ indexed-dependent-functor-sigma-may
 
 -- ### IndexedDependentFunctorIdentity
 
-indexed-dependent-functor-identity-sigma-may
+indexed-dependent-functor-identity-sigma-maybe
   {C' = C'} {C₁'' = C₁''} {C₂'' = C₂''} F₁' p₂
   = indexed-dependent-functor-identity
     (IndexedDependentFunctorIdentity.functor p₂)
-    (λ x → indexed-functor-identity-sigma-may-eq
+    (λ x → indexed-functor-identity-sigma-maybe-eq
       (ChainDependentCategory.chain-category C')
       (IndexedDependentCategory.indexed-category C₁'')
       (IndexedDependentCategory.indexed-category C₂'')
@@ -550,11 +551,11 @@ indexed-dependent-functor-identity-sigma-may
 
 -- ### IndexedDependentFunctorCompose
 
-indexed-dependent-functor-compose-sigma-may
+indexed-dependent-functor-compose-sigma-maybe
   {E' = E'} {E₁'' = E₁''} {E₂'' = E₂''} {G = G} F₁' G₁' H₁' p₂
   = indexed-dependent-functor-compose
     (IndexedDependentFunctorCompose.functor p₂)
-    (λ x → indexed-functor-compose-sigma-may-eq
+    (λ x → indexed-functor-compose-sigma-maybe-eq
       (ChainDependentCategory.chain-category E')
       (IndexedDependentCategory.indexed-category E₁'')
       (IndexedDependentCategory.indexed-category E₂'')
@@ -567,12 +568,12 @@ indexed-dependent-functor-compose-sigma-may
 
 -- ### IndexedDependentFunctorSquare
 
-indexed-dependent-functor-square-sigma-may
+indexed-dependent-functor-square-sigma-maybe
   {D₂' = D₂'} {D₂₁'' = D₂₁''} {D₂₂'' = D₂₂''} {F = F} {H₁ = H₁}
   F₁' G₁' H₁₁' H₂₁' s₂
   = indexed-dependent-functor-square
     (IndexedDependentFunctorSquare.functor s₂)
-    (λ x₁ → indexed-functor-square-sigma-may-eq
+    (λ x₁ → indexed-functor-square-sigma-maybe-eq
       (ChainDependentCategory.chain-category D₂')
       (IndexedDependentCategory.indexed-category D₂₁'')
       (IndexedDependentCategory.indexed-category D₂₂'')

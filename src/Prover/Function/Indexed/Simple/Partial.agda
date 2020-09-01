@@ -1,4 +1,4 @@
-module Prover.Function.Indexed.Partial where
+module Prover.Function.Indexed.Simple.Partial where
 
 open import Prover.Category
   using (Category)
@@ -20,9 +20,9 @@ module Internal where
 
   -- ### Definitions
 
-  -- #### IndexedPartialFunction
+  -- #### IndexedSimplePartialFunction
 
-  data IndexedPartialFunction
+  data IndexedSimplePartialFunction
     : {n : ℕ}
     → {C : ChainCategory n}
     → IndexedSimpleCategory C
@@ -37,7 +37,7 @@ module Internal where
       → PartialFunction
         (indexed-simple-category₀ C')
         (indexed-set₀ D')
-      → IndexedPartialFunction C' D'
+      → IndexedSimplePartialFunction C' D'
   
     sigma
       : {n : ℕ}
@@ -45,14 +45,14 @@ module Internal where
       → {C' : IndexedSimpleCategory C}
       → {D' : IndexedSet C}
       → ((x : Category.Object (ChainCategory.head C))
-        → IndexedPartialFunction
+        → IndexedSimplePartialFunction
           (IndexedSimpleCategory.tail C' x)
           (IndexedSet.tail D' x))
-      → IndexedPartialFunction C' D'
+      → IndexedSimplePartialFunction C' D'
   
-  -- #### IndexedPartialFunction'
+  -- #### IndexedSimplePartialFunction'
   
-  data IndexedPartialFunction'
+  data IndexedSimplePartialFunction'
     : {n : ℕ}
     → {C : ChainCategory n}
     → IndexedSet C
@@ -66,116 +66,116 @@ module Internal where
       → PartialFunction
         (indexed-set₀ C')
         (indexed-set₀ D')
-      → IndexedPartialFunction' C' D'
+      → IndexedSimplePartialFunction' C' D'
   
     sigma
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' D' : IndexedSet C}
       → ((x : Category.Object (ChainCategory.head C))
-        → IndexedPartialFunction'
+        → IndexedSimplePartialFunction'
           (IndexedSet.tail C' x)
           (IndexedSet.tail D' x))
-      → IndexedPartialFunction' C' D'
+      → IndexedSimplePartialFunction' C' D'
   
   -- ### Interface
   
-  -- #### IndexedPartialFunction
+  -- #### IndexedSimplePartialFunction
 
-  indexed-partial-function₀
+  indexed-simple-partial-function₀
     : {C : ChainCategory zero}
     → {C' : IndexedSimpleCategory C}
     → {D' : IndexedSet C}
-    → IndexedPartialFunction C' D'
+    → IndexedSimplePartialFunction C' D'
     → PartialFunction
       (indexed-simple-category₀ C')
       (indexed-set₀ D')
-  indexed-partial-function₀ (empty f)
+  indexed-simple-partial-function₀ (empty f)
     = f
   
-  indexed-partial-function-tail
+  indexed-simple-partial-function-tail
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' : IndexedSimpleCategory C}
     → {D' : IndexedSet C}
-    → IndexedPartialFunction C' D'
+    → IndexedSimplePartialFunction C' D'
     → (x : Category.Object (ChainCategory.head C))
-    → IndexedPartialFunction
+    → IndexedSimplePartialFunction
       (IndexedSimpleCategory.tail C' x)
       (IndexedSet.tail D' x)
-  indexed-partial-function-tail (sigma F)
+  indexed-simple-partial-function-tail (sigma F)
     = F
 
-  -- #### IndexedPartialFunction'
+  -- #### IndexedSimplePartialFunction'
   
-  indexed-partial-function₀'
+  indexed-simple-partial-function₀'
     : {C : ChainCategory zero}
     → {C' D' : IndexedSet C}
-    → IndexedPartialFunction' C' D'
+    → IndexedSimplePartialFunction' C' D'
     → PartialFunction
       (indexed-set₀ C')
       (indexed-set₀ D')
-  indexed-partial-function₀' (empty f)
+  indexed-simple-partial-function₀' (empty f)
     = f
   
-  indexed-partial-function-tail'
+  indexed-simple-partial-function-tail'
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' D' : IndexedSet C}
-    → IndexedPartialFunction' C' D'
+    → IndexedSimplePartialFunction' C' D'
     → (x : Category.Object (ChainCategory.head C))
-    → IndexedPartialFunction'
+    → IndexedSimplePartialFunction'
       (IndexedSet.tail C' x)
       (IndexedSet.tail D' x)
-  indexed-partial-function-tail' (sigma F)
+  indexed-simple-partial-function-tail' (sigma F)
     = F
 
   -- ### Compose
 
-  indexed-partial-function-compose
+  indexed-simple-partial-function-compose
     : {n : ℕ}
     → {C : ChainCategory n}
     → {C' : IndexedSimpleCategory C}
     → {D' E' : IndexedSet C}
-    → IndexedPartialFunction' D' E'
-    → IndexedPartialFunction C' D'
-    → IndexedPartialFunction C' E'
-  indexed-partial-function-compose {n = zero} F G
+    → IndexedSimplePartialFunction' D' E'
+    → IndexedSimplePartialFunction C' D'
+    → IndexedSimplePartialFunction C' E'
+  indexed-simple-partial-function-compose {n = zero} F G
     = empty
       (partial-function-compose
-        (indexed-partial-function₀' F)
-        (indexed-partial-function₀ G))
-  indexed-partial-function-compose {n = suc _} F G
+        (indexed-simple-partial-function₀' F)
+        (indexed-simple-partial-function₀ G))
+  indexed-simple-partial-function-compose {n = suc _} F G
     = sigma
-      (λ x → indexed-partial-function-compose
-        (indexed-partial-function-tail' F x)
-        (indexed-partial-function-tail G x))
+      (λ x → indexed-simple-partial-function-compose
+        (indexed-simple-partial-function-tail' F x)
+        (indexed-simple-partial-function-tail G x))
 
 -- ## Modules
 
 open Internal public
-  using (IndexedPartialFunction'; indexed-partial-function-compose)
+  using (IndexedSimplePartialFunction'; indexed-simple-partial-function-compose)
 
--- ### IndexedPartialFunction
+-- ### IndexedSimplePartialFunction
 
-IndexedPartialFunction
+IndexedSimplePartialFunction
   : {n : ℕ}
   → {C : ChainCategory n}
   → IndexedSimpleCategory C
   → IndexedSet C
   → Set
-IndexedPartialFunction
-  = Internal.IndexedPartialFunction
+IndexedSimplePartialFunction
+  = Internal.IndexedSimplePartialFunction
 
-open Internal.IndexedPartialFunction public
+open Internal.IndexedSimplePartialFunction public
 
 open Internal public
-  using (indexed-partial-function₀)
+  using (indexed-simple-partial-function₀)
 
-module IndexedPartialFunction where
+module IndexedSimplePartialFunction where
 
   open Internal public using () renaming
-    ( indexed-partial-function-tail
+    ( indexed-simple-partial-function-tail
       to tail
     )
 

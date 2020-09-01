@@ -32,7 +32,7 @@ open import Prover.View.Text
   using (PlainTextBaseViewStack; PlainTextFlatViewStack; PlainTextViewStack)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_)
 
 -- ## Types
@@ -114,7 +114,7 @@ TextWithState
   : (Char → Bool)
   → Set
 TextWithState p
-  = Any (Vec (CharWith p))
+  = List (CharWith p)
 
 -- ### Pure
 
@@ -136,8 +136,8 @@ TextCategory
 encode-text
   : Text
   → Value
-encode-text (any cs)
-  = Value.string (Vec.to-builtin cs)
+encode-text (c ∷ cs)
+  = Value.string (List.to-builtin (c ∷ cs))
 
 -- ### Decode
 
@@ -145,7 +145,7 @@ decode-text
   : Value
   → Maybe Text
 decode-text (Value.string (cons c cs))
-  = just (any (cons c (List.from-builtin cs)))
+  = just (c ∷ List.from-builtin cs)
 decode-text _
   = nothing
 
@@ -154,11 +154,8 @@ decode-text _
 decode-encode-text
   : (t : Text)
   → decode-text (encode-text t) ≡ just t
-decode-encode-text (any (cons _ cs))
-  with List.from-builtin (List.to-builtin cs)
-  | List.from-builtin-to-builtin cs
-... | _ | refl
-  = refl
+decode-encode-text (c ∷ cs)
+  = sub (λ x → just (c ∷ x)) (List.from-builtin-to-builtin cs)
 
 -- ## Editors
 
@@ -185,19 +182,19 @@ module TextWithSimpleBaseEditor
   StatePath
     : State
     → Set
-  StatePath (any {n} _)
-    = Fin (suc n)
+  StatePath cs
+    = Fin (suc (List.length cs))
 
   initial
     : State
   initial
-    = any []
+    = []
 
   initial-path
     : (s : State)
     → StatePath s
-  initial-path _
-    = Fin.maximum
+  initial-path cs
+    = Fin.maximum (List.length cs)
 
   initial-path-with
     : (s : State)
@@ -209,16 +206,16 @@ module TextWithSimpleBaseEditor
     = zero
   initial-path-with _ Direction.left
     = zero
-  initial-path-with _ Direction.right
-    = Fin.maximum
+  initial-path-with cs Direction.right
+    = Fin.maximum (List.length cs)
 
   -- ##### Draw
 
   draw
     : State
     → View
-  draw (any cs)
-    = any (Vec.map CharWith.char cs)
+  draw
+    = List.map CharWith.char
 
   draw-with
     : (s : State)
@@ -250,20 +247,20 @@ module TextWithSimpleBaseEditor
     → (sp : StatePath s)
     → Event (mode s sp)
     → Σ State StatePath
-  handle (any cs) zero delete-previous
-    = (any cs , zero)
-  handle (any cs@(_ ∷ _)) (suc k) delete-previous
-    = (any (Vec.delete cs k) , k)
-  handle (any []) _ delete-next
-    = (any [] , zero)
-  handle (any (_ ∷ cs)) zero delete-next
-    = (any cs , zero)
-  handle (any (c ∷ cs)) (suc k) delete-next
-    with handle (any cs) k delete-next
-  ... | ((any cs') , k')
-    = (any (c ∷ cs') , suc k')
-  handle (any cs) k (insert c)
-    = (any (Vec.insert cs k c) , suc k)
+  handle cs zero delete-previous
+    = (cs , zero)
+  handle cs@(_ ∷ _) (suc k) delete-previous
+    = (List.delete cs k , k)
+  handle [] _ delete-next
+    = ([] , zero)
+  handle (_ ∷ cs) zero delete-next
+    = (cs , zero)
+  handle (c ∷ cs) (suc k) delete-next
+    with handle cs k delete-next
+  ... | (cs' , k')
+    = (c ∷ cs' , suc k')
+  handle cs k (insert c)
+    = (List.insert cs k c , suc k)
 
   handle-direction
     : (s : State)
@@ -289,8 +286,8 @@ module TextWithSimpleBaseEditor
     = refl
   handle-direction-valid _ Direction.left
     = refl
-  handle-direction-valid _ Direction.right
-    = Fin.increment-maximum
+  handle-direction-valid cs Direction.right
+    = Fin.increment-maximum (List.length cs)
 
 -- #### Function
 
@@ -326,21 +323,21 @@ module TextWithSplitFunction
   partial-function
     : TextWithState p
     → Maybe (TextWith p)
-  partial-function (any [])
+  partial-function []
     = nothing
-  partial-function (any cs@(_ ∷ _))
-    = just (any cs)
+  partial-function (c ∷ cs)
+    = just (c ∷ cs)
 
   function
     : TextWith p
     → TextWithState p
-  function (any cs)
-    = any cs
+  function (c ∷ cs)
+    = c ∷ cs
 
   valid
     : (t : TextWith p)
     → partial-function (function t) ≡ just t
-  valid (any (_ ∷ _))
+  valid (_ ∷ _)
     = refl
 
 text-with-split-function
@@ -430,8 +427,8 @@ module CommandFlatStackMap
     : (v : FlatViewStack.View PlainTextFlatViewStack)
     → FlatViewStack.ViewPath PlainTextFlatViewStack v
     → FlatViewStack.View CommandFlatViewStack
-  view-with (any cs) nothing
-    = command p (any (Vec.snoc cs ' '))
+  view-with cs nothing
+    = command p (List.snoc cs ' ')
   view-with t (just _)
     = command p t
 
@@ -439,8 +436,8 @@ module CommandFlatStackMap
     : (v : FlatViewStack.View PlainTextFlatViewStack)
     → (vp : FlatViewStack.ViewPath PlainTextFlatViewStack v)
     → FlatViewStack.ViewPath CommandFlatViewStack (view-with v vp)
-  view-path _ nothing
-    = Fin.maximum
+  view-path cs nothing
+    = Fin.maximum (List.length cs)
   view-path _ (just k)
     = k
 

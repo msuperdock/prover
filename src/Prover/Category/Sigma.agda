@@ -314,10 +314,9 @@ module _
         = CategorySigma.arrow-eq D₂
           (DependentFunctor.base-commutative F₂ f₁ y₂')
           (DependentFunctor.map-compose F₂ f₁ g₁)
-        $ trans
-          (DependentFunctor.map-compose-eq' F₂ z₁ p₂
-            (sub (DependentFunctor.base' F₂ z₁) p₂) f₂
-              (DependentCategory.map C₂ f₁ g₂))
+        $ trans (DependentFunctor.map-compose-eq' F₂ z₁ p₂
+          (sub (DependentFunctor.base' F₂ z₁) p₂) f₂
+            (DependentCategory.map C₂ f₁ g₂))
         $ map-compose₂
           (DependentFunctor.base F₂ z₁)
           (sub (DependentFunctor.base' F₂ z₁) p₂)
@@ -508,7 +507,8 @@ functor-identity-sigma
     (functor-sigma F₂)
 functor-identity-sigma {C₂ = C₂} p
   = functor-identity-from-equal
-  $ functor-trans (functor-equal-sigma (dependent-functor-identity-to-equal p))
+  $ functor-trans (functor-equal-sigma
+    (dependent-functor-identity-to-equal p))
   $ functor-sigma-identity C₂
 
 -- ## FunctorCompose
@@ -528,7 +528,10 @@ functor-compose-sigma
     (functor-sigma H₂)
 functor-compose-sigma {F₂ = F₂} {G₂ = G₂} p
   = functor-compose-from-equal
-  $ functor-trans (functor-equal-sigma (dependent-functor-compose-to-equal p))
+    (functor-sigma F₂)
+    (functor-sigma G₂)
+  $ functor-trans (functor-equal-sigma
+    (dependent-functor-compose-to-equal p))
   $ functor-sigma-compose F₂ G₂
 
 -- ## FunctorSquare
@@ -551,8 +554,14 @@ functor-square-sigma
     (functor-sigma H₂₂)
 functor-square-sigma {F₂ = F₂} {G₂ = G₂} {H₁₂ = H₁₂} {H₂₂ = H₂₂} s
   = functor-square-from-equal
-  $ functor-trans (functor-sym (functor-sigma-compose H₂₂ F₂))
-  $ functor-trans (functor-equal-sigma (dependent-functor-square-to-equal s))
+    (functor-sigma F₂)
+    (functor-sigma G₂)
+    (functor-sigma H₁₂)
+    (functor-sigma H₂₂)
+  $ functor-trans (functor-sym
+    (functor-sigma-compose H₂₂ F₂))
+  $ functor-trans (functor-equal-sigma
+    (dependent-functor-square-to-equal s))
   $ functor-sigma-compose G₂ H₁₂
 
 -- ## FunctorSquare₁

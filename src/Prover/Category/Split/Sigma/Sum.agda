@@ -3,20 +3,20 @@ module Prover.Category.Split.Sigma.Sum where
 open import Prover.Category
   using (Category; DependentCategory; DependentFunctor; Functor)
 open import Prover.Category.Sigma.Maybe
-  using (category-sigma-may; functor-sigma-may)
+  using (category-sigma-maybe; functor-sigma-maybe)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum; functor-sigma-sum)
 open import Prover.Category.Split
   using (SplitDependentFunctor; SplitDependentFunctorSquare; SplitFunctor;
     SplitFunctorSquare; split-functor-weak; split-functor-square-weak)
 open import Prover.Category.Split.Sigma.Maybe
-  using (split-functor-sigma-may; split-functor-square-sigma-may)
+  using (split-functor-sigma-maybe; split-functor-square-sigma-maybe)
 open import Prover.Category.Split.Sum
   using (split-functor-sum₂; split-functor-square-sum₂)
 open import Prover.Category.Weak
   using (weak-functor-compose; weak-functor-square-compose)
 open import Prover.Category.Weak.Sigma.Maybe
-  using (weak-functor-sigma-may₁; weak-functor-square-sigma-may₁)
+  using (weak-functor-sigma-maybe₁; weak-functor-square-sigma-maybe₁)
 
 -- ## SplitFunctor
 
@@ -27,13 +27,13 @@ split-functor-sigma-sum
   → SplitDependentFunctor C₂ D₂
   → SplitFunctor
     (category-sigma-sum C₂ F₁)
-    (category-sigma-may D₂)
+    (category-sigma-maybe D₂)
 split-functor-sigma-sum {C₂ = C₂} F₁ F₂
   = split-functor-sum₂
     (weak-functor-compose
-      (weak-functor-sigma-may₁ C₂)
+      (weak-functor-sigma-maybe₁ C₂)
       (split-functor-weak F₁))
-    (split-functor-sigma-may F₂)
+    (split-functor-sigma-maybe F₂)
 
 -- ## SplitFunctorSquare
 
@@ -52,13 +52,13 @@ split-functor-square-sigma-sum
   → SplitDependentFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
     (functor-sigma-sum {C₂₂ = C₁₂} {D₂₂ = C₂₂} F₂ s₁)
-    (functor-sigma-may G₂)
+    (functor-sigma-maybe G₂)
     (split-functor-sigma-sum {C₂ = C₁₂} {D₂ = D₁₂} H₁₁ H₁₂)
     (split-functor-sigma-sum {C₂ = C₂₂} {D₂ = D₂₂} H₂₁ H₂₂)
 split-functor-square-sigma-sum {F₂ = F₂} s₁ s₂
   = split-functor-square-sum₂
     (weak-functor-square-compose
-      (weak-functor-square-sigma-may₁ F₂)
+      (weak-functor-square-sigma-maybe₁ F₂)
       (split-functor-square-weak s₁))
-    (split-functor-square-sigma-may s₂)
+    (split-functor-square-sigma-maybe s₂)
 

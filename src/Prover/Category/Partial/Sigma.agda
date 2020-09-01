@@ -231,8 +231,8 @@ module _
 
     map-eq
       : {x₁ y₁ : Category.Object (category-sigma C₁₂)}
-      → {x₁' y₁' : Category.Object (category-sigma D₁₂)}
       → {x₂ y₂ : Category.Object (category-sigma C₂₂)}
+      → {x₁' y₁' : Category.Object (category-sigma D₁₂)}
       → {x₂' y₂' : Category.Object (category-sigma D₂₂)}
       → {f₂ : Category.Arrow (category-sigma C₂₂) x₂ y₂}
       → (p₁ : PartialFunctor.base (partial-functor-sigma H₁₂) x₁ ≡ just x₁')

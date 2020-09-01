@@ -11,6 +11,10 @@ open import Prover.Category.Split.Product
 open import Prover.Editor
   using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
     SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any)
+open import Prover.Function.Bool
+  using (BoolFunction)
+open import Prover.Function.Bool.Product
+  using (bool-function-product)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Function.Split.Product
@@ -611,13 +615,6 @@ module _
         (MainEditor.simple-editor e₁)
         (MainEditor.simple-editor e₂)
 
-    is-complete
-      : A₁ × A₂
-      → Bool
-    is-complete (s₁ , s₂)
-      = MainEditor.is-complete e₁ s₁
-      ∧ MainEditor.is-complete e₂ s₂
-
     split-function
       : SplitFunction
         (S₁ × S₂)
@@ -626,6 +623,14 @@ module _
       = split-function-product
         (MainEditor.split-function e₁)
         (MainEditor.split-function e₂)
+
+    bool-function
+      : BoolFunction
+        (A₁ × A₂)
+    bool-function
+      = bool-function-product
+        (MainEditor.bool-function e₁)
+        (MainEditor.bool-function e₂)
 
   -- Takes direction from first to second component.
   main-editor-product

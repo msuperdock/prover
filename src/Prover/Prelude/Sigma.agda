@@ -60,13 +60,26 @@ module Sigma where
   comma-eq
     : {A₁ : Set}
     → {A₂ : A₁ → Set}
-    → {x₁ y₁ : A₁}
-    → {x₂ : A₂ x₁}
-    → {y₂ : A₂ y₁}
-    → x₁ ≡ y₁
-    → x₂ ≅ y₂
-    → (x₁ , x₂) ≡ (y₁ , y₂)
+    → {x₁₁ x₂₁ : A₁}
+    → {x₁₂ : A₂ x₁₁}
+    → {x₂₂ : A₂ x₂₁}
+    → x₁₁ ≡ x₂₁
+    → x₁₂ ≅ x₂₂
+    → (x₁₁ , x₁₂) ≡ (x₂₁ , x₂₂)
   comma-eq refl refl
+    = refl
+
+  -- ### Properties
+
+  comma-injective₁
+    : {A₁ : Set}
+    → {A₂ : A₁ → Set}
+    → {x₁₁ x₂₁ : A₁}
+    → {x₁₂ : A₂ x₁₁}
+    → {x₂₂ : A₂ x₂₁}
+    → (x₁₁ , x₁₂) ≡ (x₂₁ , x₂₂)
+    → x₁₁ ≡ x₂₁
+  comma-injective₁ refl
     = refl
 
 -- ## Exports

@@ -18,7 +18,7 @@ open import Prover.Prelude.Equal public
   using (Equal; Equal'; _≅_; _≡_; _≢_; irrelevant; rewrite'; refl; sub; sym;
     trans)
 open import Prover.Prelude.Fin public
-  using (Fin; zero; suc)
+  using (Fin; _≟_fin; zero; suc)
 open import Prover.Prelude.FinSet public
   using (FinSet)
 open import Prover.Prelude.Function public
@@ -47,6 +47,8 @@ open import Prover.Prelude.Retraction public
   using (Retraction)
 open import Prover.Prelude.Sigma public
   using (module Sigma; Σ; _,_; _×_; π₁; π₂)
+open import Prover.Prelude.Setoid public
+  using (Setoid; SetoidIsomorphism)
 open import Prover.Prelude.String public
   using (String)
 open import Prover.Prelude.Sum public
@@ -54,5 +56,5 @@ open import Prover.Prelude.Sum public
 open import Prover.Prelude.Unit public
   using (⊤; tt)
 open import Prover.Prelude.Vec public
-  using (Vec; cons)
+  using (Vec; cons; nil)
 

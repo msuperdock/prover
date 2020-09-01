@@ -3,7 +3,7 @@ module Prover.Category.Split.Sigma.Maybe where
 open import Prover.Category
   using (Category; DependentCategory; DependentFunctor)
 open import Prover.Category.Sigma.Maybe
-  using (category-sigma-may; functor-sigma-may)
+  using (category-sigma-maybe; functor-sigma-maybe)
 open import Prover.Category.Split
   using (SplitDependentFunctor; SplitDependentFunctorSquare; SplitFunctor;
     SplitFunctorSquare)
@@ -14,20 +14,20 @@ open import Prover.Category.Split.Sigma
 
 -- ## SplitFunctor
 
-split-functor-sigma-may
+split-functor-sigma-maybe
   : {C₁ : Category}
   → {C₂ D₂ : DependentCategory C₁}
   → SplitDependentFunctor C₂ D₂
   → SplitFunctor
-    (category-sigma-may C₂)
-    (category-sigma-may D₂)
-split-functor-sigma-may F₂
+    (category-sigma-maybe C₂)
+    (category-sigma-maybe D₂)
+split-functor-sigma-maybe F₂
   = split-functor-sigma
     (split-dependent-functor-maybe F₂)
 
 -- ## SplitFunctorSquare
 
-split-functor-square-sigma-may
+split-functor-square-sigma-maybe
   : {C₁₁ C₂₁ : Category}
   → {C₁₂ D₁₂ : DependentCategory C₁₁}
   → {C₂₂ D₂₂ : DependentCategory C₂₁}
@@ -37,11 +37,11 @@ split-functor-square-sigma-may
   → {H₂₂ : SplitDependentFunctor C₂₂ D₂₂}
   → SplitDependentFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
-    (functor-sigma-may F₂)
-    (functor-sigma-may G₂)
-    (split-functor-sigma-may H₁₂)
-    (split-functor-sigma-may H₂₂)
-split-functor-square-sigma-may s₂
+    (functor-sigma-maybe F₂)
+    (functor-sigma-maybe G₂)
+    (split-functor-sigma-maybe H₁₂)
+    (split-functor-sigma-maybe H₂₂)
+split-functor-square-sigma-maybe s₂
   = split-functor-square-sigma
     (split-dependent-functor-square-maybe s₂)
 

@@ -175,7 +175,7 @@ module _
       : SimpleEditor W E A
     simple-editor
       = simple-editor-map-view-with
-        (λ s → F (MainEditor.is-complete e s))
+        (λ s → F (MainEditor.bool-function e s))
         (MainEditor.simple-editor e)
 
   main-editor-map-view-with
@@ -213,7 +213,7 @@ module _
       : Editor W E StateCategory
     editor
       = editor-map-view-with
-        (λ s → F (SplitMainEditor.is-complete e s))
+        (λ s → F (SplitMainEditor.bool-function e s))
         (SplitMainEditor.editor e)
 
   split-main-editor-map-view-with

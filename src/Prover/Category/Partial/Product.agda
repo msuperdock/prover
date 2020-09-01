@@ -67,7 +67,8 @@ module _
         | inspect (PartialFunctor.base F₁) x₁
         | PartialFunctor.base F₂ x₂
         | inspect (PartialFunctor.base F₂) x₂
-      map-identity (x₁ , x₂) refl | just _ | [ p₁ ] | just _ | [ p₂ ]
+      map-identity (x₁ , x₂) refl
+        | just _ | [ p₁ ] | just _ | [ p₂ ]
         = Sigma.comma-eq
           (PartialFunctor.map-identity F₁ x₁ p₁)
           (PartialFunctor.map-identity F₂ x₂ p₂)
@@ -143,7 +144,8 @@ module _
       | inspect (PartialFunctor.base H₁₁) x₁₁
       | PartialFunctor.base H₁₂ x₁₂
       | inspect (PartialFunctor.base H₁₂) x₁₂
-    base (x₁₁ , x₁₂) refl | just _ | [ p₁ ] | just _ | [ p₂ ]
+    base (x₁₁ , x₁₂) refl
+      | just _ | [ p₁ ] | just _ | [ p₂ ]
       with PartialFunctor.base H₂₁ (Functor.base F₁ x₁₁)
       | PartialFunctorSquare.base s₁ x₁₁ p₁
       | PartialFunctor.base H₂₂ (Functor.base F₂ x₁₂)
@@ -159,8 +161,7 @@ module _
       → (q₁ : PartialFunctor.base (partial-functor-product H₁₁ H₁₂) y₁
         ≡ just y₁')
       → (f₁ : Category.Arrow (category-product C₁₁ C₁₂) x₁ y₁)
-      → PartialFunctor.map
-        (partial-functor-product H₂₁ H₂₂)
+      → PartialFunctor.map (partial-functor-product H₂₁ H₂₂)
         (base x₁ p₁)
         (base y₁ q₁)
         (Functor.map (functor-product F₁ F₂) f₁)
@@ -193,9 +194,9 @@ module _
     ... | just _ | [ p₂₁ ] | refl | just _ | [ p₂₂ ] | refl
       | just _ | [ q₂₁ ] | refl | just _ | [ q₂₂ ] | refl
       with PartialFunctor.map H₂₁ p₂₁ q₂₁ (Functor.map F₁ f₁₁)
-      | PartialFunctorSquare.map-eq s₁ p₁₁ q₁₁ p₂₁ q₂₁ f₁₁
+      | PartialFunctorSquare.map' s₁ p₁₁ q₁₁ p₂₁ q₂₁ f₁₁
       | PartialFunctor.map H₂₂ p₂₂ q₂₂ (Functor.map F₂ f₁₂)
-      | PartialFunctorSquare.map-eq s₂ p₁₂ q₁₂ p₂₂ q₂₂ f₁₂
+      | PartialFunctorSquare.map' s₂ p₁₂ q₁₂ p₂₂ q₂₂ f₁₂
     ... | _ | refl | _ | refl
       = refl
 

@@ -14,7 +14,7 @@ Precedence
 module Precedence where
 
   open Nat public
-    using (compare; transitive)
+    using (compare; <-trans)
 
   open Nat public using () renaming
     ( _≟_nat

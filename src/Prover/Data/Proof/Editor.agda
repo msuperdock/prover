@@ -108,7 +108,7 @@ ProofViewStack
 ProofViewStack
   = record
   { View
-    = Any (Vec Line)
+    = List Line
   ; ViewPath
     = λ _ → ⊤
   ; ViewInner
@@ -248,7 +248,7 @@ module _
 
   draw-proof
     : Proof rs r
-    → Any (Vec Line)
+    → List Line
   draw-proof (proof b _)
     = draw-tree
       (draw-branch (Rule.hypotheses r) b)
@@ -256,7 +256,7 @@ module _
   draw-proof-with
     : (p : Proof rs r)
     → ProofPath p
-    → Any (Vec Line)
+    → List Line
   draw-proof-with (proof b _) bp
     = draw-tree-with
       (draw-branch (Rule.hypotheses r) b)
@@ -501,7 +501,7 @@ ProofBaseViewStack
 ProofBaseViewStack
   = record
   { View
-    = Any (Vec Line)
+    = List Line
   ; ViewPath
     = λ _ → ⊤
   }
@@ -1037,7 +1037,7 @@ proof-main-editor rs r
     = proof-simple-editor rs r
   ; split-function
     = proof-split-function rs r
-  ; is-complete
+  ; bool-function
     = Proof.is-complete
   }
 

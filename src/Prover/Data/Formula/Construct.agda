@@ -180,9 +180,9 @@ module Internal where
   ... | _ | _ | τ₁ _ _ _
     = refl
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (Precedence.transitive p q))
+    = ⊥-elim (¬r (Precedence.<-trans p q))
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (Precedence.transitive p q))
+    = ⊥-elim (¬r (Precedence.<-trans p q))
   ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
   ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _
@@ -231,9 +231,9 @@ module Internal where
   ... | _ | _ | τ₁ _ _ _
     = refl
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (Precedence.transitive p q))
+    = ⊥-elim (¬r (Precedence.<-trans p q))
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (Precedence.transitive p q))
+    = ⊥-elim (¬r (Precedence.<-trans p q))
   ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
     = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
   ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _

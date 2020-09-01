@@ -4,6 +4,8 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Split
   using (SplitFunctor)
+open import Prover.Function.Bool
+  using (BoolFunction)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Prelude
@@ -270,6 +272,13 @@ record Editor
     initial-path
       : (s : State)
       → StatePath s
+
+  initial-path'
+    : StatePath initial
+  initial-path'
+    = initial-path initial
+
+  field
 
     -- The initial path when entering from the given direction.
     initial-path-with
@@ -545,9 +554,8 @@ record MainEditor
 
   field
 
-    is-complete
-      : A
-      → Bool
+    bool-function
+      : BoolFunction A
 
 -- ### SplitMainEditor
 
@@ -601,12 +609,6 @@ record SplitMainEditor
       : SplitFunctor StateCategory C
 
   open SplitFunctor split-functor public
-
-  is-complete
-    : State
-    → Bool
-  is-complete s
-    = Maybe.is-just (base s)
 
   draw-pure
     : Category.Object C

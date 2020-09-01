@@ -26,16 +26,24 @@ open import Prover.Editor.Product
   using (event-stack-product; view-stack-product; editor-product)
 open import Prover.Function.Indexed
   using (IndexedSet)
-open import Prover.Function.Indexed.Partial
-  using (IndexedPartialFunction)
-open import Prover.Function.Indexed.Partial.Product
-  using (indexed-partial-function-product)
+open import Prover.Function.Indexed.Simple.Bool
+  using (IndexedSimpleBoolFunction)
+open import Prover.Function.Indexed.Simple.Bool.Product
+  using (indexed-simple-bool-function-product)
+open import Prover.Function.Indexed.Simple.Partial
+  using (IndexedSimplePartialFunction)
+open import Prover.Function.Indexed.Simple.Partial.Product
+  using (indexed-simple-partial-function-product)
+open import Prover.Function.Indexed.Simple.Split
+  using (IndexedSimpleSplitFunction)
+open import Prover.Function.Indexed.Simple.Split.Product
+  using (indexed-simple-split-function-product)
 open import Prover.Function.Indexed.Product
   using (indexed-set-product)
 open import Prover.Function.Indexed.Split
-  using (IndexedSimpleSplitFunction; IndexedSplitFunction)
+  using (IndexedSplitFunction)
 open import Prover.Function.Indexed.Split.Product
-  using (indexed-simple-split-function-product; indexed-split-function-product)
+  using (indexed-split-function-product)
 open import Prover.Prelude
 
 -- ## IndexedEditor
@@ -120,14 +128,14 @@ module _
         (IndexedPartialEditor.indexed-simple-editor e₁)
         (IndexedPartialEditor.indexed-simple-editor e₂)
 
-    indexed-partial-function
-      : IndexedPartialFunction
+    indexed-simple-partial-function
+      : IndexedSimplePartialFunction
         StateSimpleCategory
         (indexed-set-product C₁' C₂')
-    indexed-partial-function
-      = indexed-partial-function-product
-        (IndexedPartialEditor.indexed-partial-function e₁)
-        (IndexedPartialEditor.indexed-partial-function e₂)
+    indexed-simple-partial-function
+      = indexed-simple-partial-function-product
+        (IndexedPartialEditor.indexed-simple-partial-function e₁)
+        (IndexedPartialEditor.indexed-simple-partial-function e₂)
 
   -- Takes direction from first to second component.
   indexed-partial-editor-product
@@ -188,7 +196,7 @@ module _
     : Direction
     → IndexedSplitEditor V₁ E₁ C₁'
     → IndexedSplitEditor V₂ E₂ C₂'
-    → IndexedSplitEditor
+   → IndexedSplitEditor
       (view-stack-product V₁ V₂)
       (event-stack-product E₁ E₂)
       (indexed-category-product C₁' C₂')
@@ -236,6 +244,14 @@ module _
       = indexed-simple-split-function-product
         (IndexedMainEditor.indexed-simple-split-function e₁)
         (IndexedMainEditor.indexed-simple-split-function e₂)
+
+    indexed-simple-bool-function
+      : IndexedSimpleBoolFunction
+        StateSimpleCategory
+    indexed-simple-bool-function
+      = indexed-simple-bool-function-product
+        (IndexedMainEditor.indexed-simple-bool-function e₁)
+        (IndexedMainEditor.indexed-simple-bool-function e₂)
 
   -- Takes direction from first to second component.
   indexed-main-editor-product

@@ -289,8 +289,8 @@ module Internal where
       = nothing
     branch-path-up {b = rule _ _ [] _ _} stop
       = nothing
-    branch-path-up {b = rule _ _ (_ ∷ _) _ _} stop
-      = just (go Fin.maximum stop)
+    branch-path-up {b = rule {a = suc a} _ _ (_ ∷ _) _ _} stop
+      = just (go (Fin.maximum a) stop)
     branch-path-up (go k bp)
       with branch-path-up bp
       | Fin.decrement k

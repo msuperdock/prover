@@ -17,6 +17,10 @@ open import Prover.Editor
     SplitMainEditor; ViewStack; ViewStackMap; any; split-main-editor-unmain)
 open import Prover.Editor.Unit
   using (editor-unit)
+open import Prover.Function.Bool
+  using (BoolFunction)
+open import Prover.Function.Bool.Sigma.Sum
+  using (bool-function-sigma-sum)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Function.Split.Sigma.Sum
@@ -448,7 +452,7 @@ module _
       = nothing
     ... | nothing | just x₁ | [ p₁ ]
       = just (ι₁ (ι₂ (x₁ , Editor.initial (e₂ x₁))
-        , ι₂ (Editor.initial-path (e₂ x₁) (Editor.initial (e₂ x₁)))
+        , ι₂ (Editor.initial-path' (e₂ x₁))
         , CategorySum.arrow₁ (SplitEditor.normalize-arrow e₁ s₁ p₁)))
     ... | just (ι₁ (s₁' , sp₁' , f₁)) | _ | _
       = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
@@ -728,18 +732,18 @@ module _
         State
     split-function
       = split-function-sigma-sum
-        (λ x₁ → SimpleDependentCategory.set C₂ x₁)
+        (SimpleDependentCategory.set C₂)
         (SplitMainEditor.state-split-function e₁)
         (SplitMainEditor.pure-split-function e₁)
         (λ x₁ → MainEditor.split-function (e₂ x₁))
 
-    is-complete
-      : State
-      → Bool
-    is-complete (ι₁ _)
-      = false
-    is-complete (ι₂ (x₁ , s₂))
-      = MainEditor.is-complete (e₂ x₁) s₂
+    bool-function
+      : BoolFunction
+        State
+    bool-function
+      = bool-function-sigma-sum
+        (SimpleDependentCategory.set C₂)
+        (λ x₁ → MainEditor.bool-function (e₂ x₁))
 
   -- Takes direction from first to second component.
   main-editor-sigma

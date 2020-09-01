@@ -7,7 +7,7 @@ open import Prover.Category.Chain
 open import Prover.Category.Indexed
   using (IndexedCategory; indexed-category₀)
 open import Prover.Category.Indexed.Sigma.Maybe
-  using (indexed-category-sigma-may)
+  using (indexed-category-sigma-maybe)
 open import Prover.Category.Snoc
   using (chain-category-snoc)
 open import Prover.Function.Indexed.Split
@@ -18,7 +18,7 @@ open import Prover.Prelude
 
 -- ## IndexedSplitFunction
 
-indexed-split-function-sigma-may
+indexed-split-function-sigma-maybe
   : {A₁ A₂ : Set}
   → {n : ℕ}
   → {C : ChainCategory n}
@@ -28,8 +28,8 @@ indexed-split-function-sigma-may
   → IndexedSplitFunction A₂ C₂'
   → IndexedSplitFunction
     (A₁ × A₂)
-    (indexed-category-sigma-may C₁' C₂')
-indexed-split-function-sigma-may {n = zero} {C₂' = C₂'} F₁ F₂
+    (indexed-category-sigma-maybe C₁' C₂')
+indexed-split-function-sigma-maybe {n = zero} {C₂' = C₂'} F₁ F₂
   = empty
     (split-function-sigma
       (λ x₁ → Category.Object (indexed-category₀
@@ -37,9 +37,9 @@ indexed-split-function-sigma-may {n = zero} {C₂' = C₂'} F₁ F₂
       (indexed-split-function₀ F₁)
       (λ x₁ → indexed-split-function₀
         (IndexedSplitFunction.tail F₂ x₁)))
-indexed-split-function-sigma-may {n = suc _} F₁ F₂
+indexed-split-function-sigma-maybe {n = suc _} F₁ F₂
   = sigma
-    (λ x → indexed-split-function-sigma-may
+    (λ x → indexed-split-function-sigma-maybe
       (IndexedSplitFunction.tail F₁ x)
       (IndexedSplitFunction.tail F₂ x))
 
