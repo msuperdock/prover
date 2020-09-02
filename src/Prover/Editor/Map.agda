@@ -15,6 +15,10 @@ open import Prover.Editor
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatEventStackMap; FlatViewStack;
     FlatViewStackMap; flat-view-stack-map-compose)
+open import Prover.Function.Partial
+  using (PartialFunction)
+open import Prover.Function.Partial.Compose
+  using (partial-function-compose)
 open import Prover.Function.Split
   using (SplitFunction; split-functor-base)
 open import Prover.Function.Split.Compose
@@ -101,7 +105,7 @@ module _
       : SimpleEditor W E State
     simple-editor
       = simple-editor-map-view-with
-        (λ s → F (PartialEditor.is-complete e s))
+        (λ s → F (PartialEditor.bool-function e s))
         (PartialEditor.simple-editor e)
 
   partial-editor-map-view-with
@@ -138,7 +142,7 @@ module _
       : Editor W E StateCategory
     editor
       = editor-map-view-with
-        (λ s → F (SplitEditor.is-complete e s))
+        (λ s → F (SplitEditor.bool-function e s))
         (SplitEditor.editor e)
 
   split-editor-map-view-with
@@ -607,25 +611,21 @@ module _
   where
 
   module PartialEditorMap
-    (f : A → Maybe B)
+    (f : PartialFunction A B)
     (e : PartialEditor V E A)
     where
 
     open PartialEditor e public
-      hiding (base)
+      hiding (partial-function)
 
-    base
-      : State
-      → Maybe B
-    base s
-      with PartialEditor.base e s
-    ... | nothing
-      = nothing
-    ... | just x
-      = f x
+    partial-function
+      : PartialFunction State B
+    partial-function
+      = partial-function-compose f 
+        (PartialEditor.partial-function e)
 
   partial-editor-map
-    : (A → Maybe B)
+    : PartialFunction A B
     → PartialEditor V E A
     → PartialEditor V E B
   partial-editor-map f e

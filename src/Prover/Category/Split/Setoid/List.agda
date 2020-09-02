@@ -76,12 +76,12 @@ module _
         = refl
 
       base-unbase
-        : (x' : SetoidCategory.Object (setoid-category-list D))
-        → base (unbase x') ≡ just x'
-      base-unbase (any x')
+        : (xs' : SetoidCategory.Object (setoid-category-list D))
+        → base (unbase xs') ≡ just xs'
+      base-unbase (any xs')
         with Vec.map-maybe (SplitFunctor.base F)
-          (Vec.map (SplitFunctor.unbase F) x')
-        | base-unbase' x'
+          (Vec.map (SplitFunctor.unbase F) xs')
+        | base-unbase' xs'
       ... | _ | refl
         = refl
 
@@ -127,12 +127,12 @@ module _
           q' = Vec.lookup-map (SplitFunctor.unbase F) ys' l
 
       map-unmap
-        : {x' y' : SetoidCategory.Object (setoid-category-list D)}
-        → (f' : SetoidCategory.Arrow (setoid-category-list D) x' y')
+        : {xs' ys' : SetoidCategory.Object (setoid-category-list D)}
+        → (fs' : SetoidCategory.Arrow (setoid-category-list D) xs' ys')
         → SetoidCategory.ArrowEqual (setoid-category-list D)
-          (map (base-unbase x') (base-unbase y') (unmap f')) f'
-      map-unmap f'
-        = SetoidCategoryList.arrow-equal (map-unmap' f')
+          (map (base-unbase xs') (base-unbase ys') (unmap fs')) fs'
+      map-unmap fs'
+        = SetoidCategoryList.arrow-equal (map-unmap' fs')
 
       normalize-lookup'
         : {n : ℕ}
@@ -197,16 +197,16 @@ module _
         = refl
 
       normalize-arrow
-        : {x' : SetoidCategory.Object (setoid-category-list D)}
-        → (x : SetoidCategory.Object (setoid-category-list C))
-        → base x ≡ just x'
-        → SetoidCategory.Arrow (setoid-category-list C) x (unbase x')
-      normalize-arrow x p
+        : {xs' : SetoidCategory.Object (setoid-category-list D)}
+        → (xs : SetoidCategory.Object (setoid-category-list C))
+        → base xs ≡ just xs'
+        → SetoidCategory.Arrow (setoid-category-list C) xs (unbase xs')
+      normalize-arrow xs p
         = record
         { lookup
-          = normalize-lookup x p
+          = normalize-lookup xs p
         ; injective
-          = normalize-injective x p
+          = normalize-injective xs p
         }
 
       normalize-valid'
@@ -245,12 +245,12 @@ module _
           q = Vec.lookup-map-maybe (SplitFunctor.base F) xs p k
 
       normalize-valid
-        : {x' : SetoidCategory.Object (setoid-category-list D)}
-        → (x : SetoidCategory.Object (setoid-category-list C))
-        → (p : base x ≡ just x')
+        : {xs' : SetoidCategory.Object (setoid-category-list D)}
+        → (xs : SetoidCategory.Object (setoid-category-list C))
+        → (p : base xs ≡ just xs')
         → SetoidCategory.ArrowEqual (setoid-category-list D)
-          (map p (base-unbase x') (normalize-arrow x p))
-          (SetoidCategory.identity (setoid-category-list D) x')
+          (map p (base-unbase xs') (normalize-arrow xs p))
+          (SetoidCategory.identity (setoid-category-list D) xs')
       normalize-valid xs p
         = SetoidCategoryList.arrow-equal (normalize-valid' xs p)
 

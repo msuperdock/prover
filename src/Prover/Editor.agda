@@ -6,6 +6,8 @@ open import Prover.Category.Split
   using (SplitFunctor)
 open import Prover.Function.Bool
   using (BoolFunction)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Prelude
@@ -422,15 +424,13 @@ record PartialEditor
     simple-editor 
       : SimpleEditor V E State
 
-    base
-      : State
-      → Maybe A
+    partial-function
+      : PartialFunction State A
 
-  is-complete
-    : State
-    → Bool
-  is-complete s
-    = Maybe.is-just (base s)
+  bool-function
+    : BoolFunction State
+  bool-function
+    = PartialFunction.bool-function partial-function
 
 -- ### SplitEditor
 
@@ -483,12 +483,6 @@ record SplitEditor
 
   open SplitFunctor split-functor public
 
-  is-complete
-    : State
-    → Bool
-  is-complete s
-    = Maybe.is-just (base s)
-
   draw-pure
     : Category.Object C
     → ViewStack.View V
@@ -507,8 +501,12 @@ module _
     (e : SplitEditor V E C)
     where
 
-    open SplitEditor e public
-      using (State; base)
+    open SplitEditor e public using () renaming
+      ( State
+        to State
+      ; base
+        to partial-function
+      )
 
     simple-editor 
       : SimpleEditor V E State
@@ -671,8 +669,12 @@ module _
     (e : SplitMainEditor V E S P C)
     where
 
-    open SplitMainEditor e public
-      using (State; base)
+    open SplitMainEditor e public using () renaming
+      ( State
+        to State
+      ; base
+        to partial-function
+      )
 
     simple-editor
       : SimpleEditor V E State

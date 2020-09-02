@@ -176,7 +176,7 @@ module Rules where
         (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
         (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) (any r))
         (Bool.from-decidable-true (decidable ss) (any r) (any r) refl)
-        (Decidable.recompute (rul r ∈? rs) p) q
+        (Dec.recompute (rul r ∈? rs) p) q
   
     lookup-member-arity
       : {rs : Rules ss}

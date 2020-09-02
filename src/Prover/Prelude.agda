@@ -9,7 +9,7 @@ open import Prover.Prelude.Char public
 open import Prover.Prelude.CharWith public
   using (CharWith; char-with)
 open import Prover.Prelude.Collection public
-  using (Collection)
+  using (Collection; collection)
 open import Prover.Prelude.Direction public
   using (Direction; _≟_dir)
 open import Prover.Prelude.Empty public

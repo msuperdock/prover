@@ -4,6 +4,8 @@ open import Prover.Prelude.Empty
   using (¬_; ⊥-elim)
 open import Prover.Prelude.Equal
   using (Equal; _≡_; _≢_; refl; sub)
+open import Prover.Prelude.Function
+  using (_∘_)
 open import Prover.Prelude.Inspect
   using (inspect; [_])
 open import Prover.Prelude.Maybe
@@ -11,7 +13,7 @@ open import Prover.Prelude.Maybe
 open import Prover.Prelude.Nat
   using (ℕ; zero; suc)
 open import Prover.Prelude.Relation
-  using (Decidable; Trichotomous; τ₁; τ₂; τ₃; no; yes)
+  using (Dec; Decidable; Trichotomous; τ₁; τ₂; τ₃; no; yes)
 open import Prover.Prelude.Sigma
   using (Σ; _,_)
 open import Prover.Prelude.Sum
@@ -216,6 +218,25 @@ module Fin where
     → ¬ k' < suc k fin
   <-¬suc {k = suc _} (s<s p) (s<s q)
     = <-¬suc p q
+
+  -- ### Decidability
+
+  dec
+    : {n : ℕ}
+    → (P : Fin n → Set)
+    → ((k : Fin n) → Dec (P k))
+    → Dec ((k : Fin n) → P k)
+  dec {n = zero} _ _
+    = yes (λ ())
+  dec {n = suc _} P p
+    with p zero
+    | dec (P ∘ suc) (p ∘ suc)
+  ... | no ¬q | _
+    = no (λ f → ¬q (f zero))
+  ... | _ | no ¬f
+    = no (λ f → ¬f (f ∘ suc))
+  ... | yes q | yes f
+    = yes (λ {zero → q; (suc k) → f k})
 
   -- ### Properties
 

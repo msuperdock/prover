@@ -354,7 +354,7 @@ partial-editor-flatten
     (view-stack-flatten V)
     (event-stack-flatten E) A
 partial-editor-flatten e
-  = flat-editor-map (PartialEditor.base e)
+  = flat-editor-map (PartialEditor.partial-function e)
   $ simple-editor-flatten (PartialEditor.simple-editor e)
 
 -- ### SplitEditor

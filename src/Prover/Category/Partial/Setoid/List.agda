@@ -88,18 +88,18 @@ module _
         = SetoidCategoryList.Arrow.injective f k₁ k₂ p₁ p₂
 
     map
-      : {x y : SetoidCategory.Object (setoid-category-list C)}
-      → {x' y' : SetoidCategory.Object (setoid-category-list D)}
-      → base x ≡ just x'
-      → base y ≡ just y'
-      → SetoidCategory.Arrow (setoid-category-list C) x y
-      → SetoidCategory.Arrow (setoid-category-list D) x' y'
-    map p q f
+      : {xs ys : SetoidCategory.Object (setoid-category-list C)}
+      → {xs' ys' : SetoidCategory.Object (setoid-category-list D)}
+      → base xs ≡ just xs'
+      → base ys ≡ just ys'
+      → SetoidCategory.Arrow (setoid-category-list C) xs ys
+      → SetoidCategory.Arrow (setoid-category-list D) xs' ys'
+    map p q fs
       = record
       { lookup
-        = map-lookup p q f
+        = map-lookup p q fs
       ; injective
-        = map-injective p q f
+        = map-injective p q fs
       }
 
     abstract
@@ -118,25 +118,25 @@ module _
         | inspect (Vec.map-maybe (PartialFunctor.base F)) xs
         | Vec.map-maybe (PartialFunctor.base F) ys
         | inspect (Vec.map-maybe (PartialFunctor.base F)) ys
-      map-eq' {fs₁ = fs₁} {fs₂ = fs₂} refl refl f k
+      map-eq' {fs₁ = fs₁} {fs₂ = fs₂} refl refl p k
         | just _ | [ _ ] | just _ | [ _ ]
         with SetoidCategoryList.Arrow.lookup fs₁ k
         | SetoidCategoryList.Arrow.lookup fs₂ k
-        | SetoidCategoryList.ArrowEqual.lookup f k
+        | SetoidCategoryList.ArrowEqual.lookup p k
       ... | _ | _ | refl
         = refl
 
       map-eq
-        : {x y : SetoidCategory.Object (setoid-category-list C)}
-        → {x' y' : SetoidCategory.Object (setoid-category-list D)}
-        → {f₁ f₂ : SetoidCategory.Arrow (setoid-category-list C) x y}
-        → (p : base x ≡ just x')
-        → (q : base y ≡ just y')
-        → SetoidCategory.ArrowEqual (setoid-category-list C) f₁ f₂
+        : {xs ys : SetoidCategory.Object (setoid-category-list C)}
+        → {xs' ys' : SetoidCategory.Object (setoid-category-list D)}
+        → {fs₁ fs₂ : SetoidCategory.Arrow (setoid-category-list C) xs ys}
+        → (p : base xs ≡ just xs')
+        → (q : base ys ≡ just ys')
+        → SetoidCategory.ArrowEqual (setoid-category-list C) fs₁ fs₂
         → SetoidCategory.ArrowEqual (setoid-category-list D)
-          (map p q f₁) (map p q f₂)
-      map-eq p q f
-        = SetoidCategoryList.arrow-equal (map-eq' p q f)
+          (map p q fs₁) (map p q fs₂)
+      map-eq p q r
+        = SetoidCategoryList.arrow-equal (map-eq' p q r)
 
       map-identity'
         : {xs' : SetoidCategory.Object (setoid-category-list D)}
@@ -156,14 +156,14 @@ module _
           (Vec.lookup-map-maybe (PartialFunctor.base F) xs p k)
 
       map-identity
-        : {x' : SetoidCategory.Object (setoid-category-list D)}
-        → (x : SetoidCategory.Object (setoid-category-list C))
-        → (p : base x ≡ just x')
+        : {xs' : SetoidCategory.Object (setoid-category-list D)}
+        → (xs : SetoidCategory.Object (setoid-category-list C))
+        → (p : base xs ≡ just xs')
         → SetoidCategory.ArrowEqual (setoid-category-list D)
-          (map p p (SetoidCategory.identity (setoid-category-list C) x))
-          (SetoidCategory.identity (setoid-category-list D) x')
-      map-identity x p
-        = SetoidCategoryList.arrow-equal (map-identity' x p)
+          (map p p (SetoidCategory.identity (setoid-category-list C) xs))
+          (SetoidCategory.identity (setoid-category-list D) xs')
+      map-identity xs p
+        = SetoidCategoryList.arrow-equal (map-identity' xs p)
 
       map-compose'
         : {xs ys zs : SetoidCategory.Object (setoid-category-list C)}
@@ -244,19 +244,19 @@ module _
           (Vec.lookup-map-maybe (PartialFunctor.base F) zs r m) f g
 
       map-compose
-        : {x y z : SetoidCategory.Object (setoid-category-list C)}
-        → {x' y' z' : SetoidCategory.Object (setoid-category-list D)}
-        → (p : base x ≡ just x')
-        → (q : base y ≡ just y')
-        → (r : base z ≡ just z')
-        → (f : SetoidCategory.Arrow (setoid-category-list C) y z)
-        → (g : SetoidCategory.Arrow (setoid-category-list C) x y)
+        : {xs ys zs : SetoidCategory.Object (setoid-category-list C)}
+        → {xs' ys' zs' : SetoidCategory.Object (setoid-category-list D)}
+        → (p : base xs ≡ just xs')
+        → (q : base ys ≡ just ys')
+        → (r : base zs ≡ just zs')
+        → (fs : SetoidCategory.Arrow (setoid-category-list C) ys zs)
+        → (gs : SetoidCategory.Arrow (setoid-category-list C) xs ys)
         → SetoidCategory.ArrowEqual (setoid-category-list D)
-          (map p r (SetoidCategory.compose (setoid-category-list C) f g))
+          (map p r (SetoidCategory.compose (setoid-category-list C) fs gs))
           (SetoidCategory.compose (setoid-category-list D)
-            (map q r f) (map p q g))
-      map-compose p q r f g
-        = SetoidCategoryList.arrow-equal (map-compose' p q r f g)
+            (map q r fs) (map p q gs))
+      map-compose p q r fs gs
+        = SetoidCategoryList.arrow-equal (map-compose' p q r fs gs)
 
   partial-setoid-functor-list
     : PartialFunctor C D
@@ -381,22 +381,22 @@ module _
           (Vec.map (Functor.base F) ys₁) q₂ l) f₁
 
     map
-      : {x₁ y₁ : SetoidCategory.Object (setoid-category-list C₁)}
-      → {x₁' y₁' : SetoidCategory.Object (setoid-category-list D₁)}
-      → (p₁ : PartialSetoidFunctor.base (partial-setoid-functor-list H₁) x₁
-        ≡ just x₁')
-      → (q₁ : PartialSetoidFunctor.base (partial-setoid-functor-list H₁) y₁
-        ≡ just y₁')
-      → (f₁ : SetoidCategory.Arrow (setoid-category-list C₁) x₁ y₁)
+      : {xs₁ ys₁ : SetoidCategory.Object (setoid-category-list C₁)}
+      → {xs₁' ys₁' : SetoidCategory.Object (setoid-category-list D₁)}
+      → (p₁ : PartialSetoidFunctor.base (partial-setoid-functor-list H₁) xs₁
+        ≡ just xs₁')
+      → (q₁ : PartialSetoidFunctor.base (partial-setoid-functor-list H₁) ys₁
+        ≡ just ys₁')
+      → (fs₁ : SetoidCategory.Arrow (setoid-category-list C₁) xs₁ ys₁)
       → SetoidCategory.ArrowEqual (setoid-category-list D₂)
         (PartialSetoidFunctor.map (partial-setoid-functor-list H₂)
-          (base x₁ p₁)
-          (base y₁ q₁)
-          (SetoidFunctor.map (setoid-functor-list F) f₁))
+          (base xs₁ p₁)
+          (base ys₁ q₁)
+          (SetoidFunctor.map (setoid-functor-list F) fs₁))
         (SetoidFunctor.map (setoid-functor-list G)
-          (PartialSetoidFunctor.map (partial-setoid-functor-list H₁) p₁ q₁ f₁))
-    map p₁ q₁ f₁
-      = SetoidCategoryList.arrow-equal (map' p₁ q₁ f₁)
+          (PartialSetoidFunctor.map (partial-setoid-functor-list H₁) p₁ q₁ fs₁))
+    map p₁ q₁ fs₁
+      = SetoidCategoryList.arrow-equal (map' p₁ q₁ fs₁)
 
   partial-setoid-functor-square-list
     : PartialFunctorSquare F G H₁ H₂

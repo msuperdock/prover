@@ -15,6 +15,10 @@ open import Prover.Function.Bool
   using (BoolFunction)
 open import Prover.Function.Bool.Product
   using (bool-function-product)
+open import Prover.Function.Partial
+  using (PartialFunction)
+open import Prover.Function.Partial.Product
+  using (partial-function-product)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Function.Split.Product
@@ -514,18 +518,14 @@ module _
         (PartialEditor.simple-editor e₁)
         (PartialEditor.simple-editor e₂)
 
-    base
-      : State
-      → Maybe (A₁ × A₂)
-    base (s₁ , s₂)
-      with PartialEditor.base e₁ s₁
-      | PartialEditor.base e₂ s₂
-    ... | nothing | _
-      = nothing
-    ... | _ | nothing
-      = nothing
-    ... | just x₁ | just x₂
-      = just (x₁ , x₂)
+    partial-function
+      : PartialFunction
+        State
+        (A₁ × A₂)
+    partial-function
+      = partial-function-product
+        (PartialEditor.partial-function e₁)
+        (PartialEditor.partial-function e₂)
 
   -- Takes direction from first to second component.
   partial-editor-product

@@ -94,7 +94,7 @@ module CategoryList
         → lookup k₂ ≡ just (l , f₂)
         → k₁ ≡ k₂
       injective' k₁ k₂ p₁ p₂
-        = Decidable.recompute (k₁ ≟ k₂ fin) (injective k₁ k₂ p₁ p₂)
+        = Dec.recompute (k₁ ≟ k₂ fin) (injective k₁ k₂ p₁ p₂)
 
   arrow-eq
     : {xs ys : Object}
@@ -292,8 +292,6 @@ category-list C
     (CategoryList.ArrowIsomorphism C)
 
 -- ## Functor
-
--- ### Function
 
 functor-list
   : {C D : Category}

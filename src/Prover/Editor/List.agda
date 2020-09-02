@@ -15,6 +15,10 @@ open import Prover.Function.Bool
   using (BoolFunction)
 open import Prover.Function.Bool.List
   using (bool-function-list)
+open import Prover.Function.Partial
+  using (PartialFunction)
+open import Prover.Function.Partial.List
+  using (partial-function-list)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Function.Split.List
@@ -575,20 +579,13 @@ module _
       = simple-editor-list d
         (PartialEditor.simple-editor e)
 
-    base
-      : State
-      → Maybe (List A)
-    base []
-      = just []
-    base (s ∷ ss)
-      with PartialEditor.base e s
-      | base ss
-    ... | nothing | _
-      = nothing
-    ... | _ | nothing
-      = nothing
-    ... | just x | just xs
-      = just (x ∷ xs)
+    partial-function
+      : PartialFunction
+        State
+        (List A)
+    partial-function
+      = partial-function-list
+        (PartialEditor.partial-function e)
 
   -- Takes direction from earlier to later elements.
   partial-editor-list

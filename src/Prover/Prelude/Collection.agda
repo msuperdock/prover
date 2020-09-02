@@ -34,6 +34,10 @@ module _Collection where
     : Set
     where
     
+    constructor
+
+      collection
+
     field
     
       elements
@@ -56,7 +60,7 @@ module _Collection where
       → R (elements ! k₁) (elements ! k₂)
       → k₁ ≡ k₂
     valid' k₁ k₂ r
-      = Decidable.recompute (k₁ ≟ k₂ fin) (valid k₁ k₂ r)
+      = Dec.recompute (k₁ ≟ k₂ fin) (valid k₁ k₂ r)
 
 Collection
   : {A : Set}
@@ -64,6 +68,9 @@ Collection
   → Set
 Collection
   = _Collection.Collection
+
+open _Collection public
+  using (collection)
 
 -- ## Module
 
@@ -150,20 +157,79 @@ module Collection where
 
   -- ### Construction
 
-  module _
-    {A : Set}
-    {R : Relation A}
-    where
+  empty
+    : {A : Set}
+    → {R : Relation A}
+    → Collection R
+  empty
+    = record
+    { elements
+      = []
+    ; valid
+      = λ ()
+    }
 
-    empty
-      : Collection R
-    empty
-      = record
-      { elements
-        = []
-      ; valid
-        = λ ()
-      }
+  -- ### Conversion
+
+  from-list'
+    : {A : Set}
+    → (R : Relation A)
+    → Decidable R
+    → (xs : List A)
+    → Dec ((k₁ k₂ : Fin (List.length xs))
+      → R (xs ! k₁) (xs ! k₂)
+      → k₁ ≡ k₂)
+  from-list' R d xs
+    = Fin.dec (λ (k₁ : Fin (List.length xs))
+      → (k₂ : Fin (List.length xs))
+      → R (xs ! k₁) (xs ! k₂)
+      → k₁ ≡ k₂)
+    $ λ (k₁ : Fin (List.length xs))
+      → Fin.dec (λ (k₂ : Fin (List.length xs))
+      → R (xs ! k₁) (xs ! k₂)
+      → k₁ ≡ k₂)
+    $ λ k₂ → Dec.function
+      (d (xs ! k₁) (xs ! k₂))
+      (k₁ ≟ k₂ fin)
+
+  from-list
+    : {A : Set}
+    → (R : Relation A)
+    → Decidable R
+    → List A
+    → Maybe (Collection R)
+  from-list R d xs
+    with from-list' R d xs
+  ... | no _
+    = nothing
+  ... | yes f
+    = just (collection xs f)
+
+  from-list-eq
+    : {A : Set}
+    → {R : Relation A}
+    → {xs' : Collection R}
+    → (d : Decidable R)
+    → (xs : List A)
+    → from-list R d xs ≡ just xs'
+    → elements xs' ≡ xs
+  from-list-eq {R = R} d xs _
+    with from-list' R d xs
+  from-list-eq _ _ refl | yes _
+    = refl
+
+  from-list-elements
+    : {A : Set}
+    → {R : Relation A}
+    → (d : Decidable R)
+    → (xs : Collection R)
+    → from-list R d (elements xs) ≡ just xs
+  from-list-elements {R = R} d (collection xs p)
+    with from-list' R d xs
+  ... | no ¬p
+    = ⊥-elim (¬p p)
+  ... | yes _
+    = refl
 
   -- ### Equality
 

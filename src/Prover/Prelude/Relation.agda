@@ -4,6 +4,8 @@ open import Prover.Prelude.Empty
   using (¬_; ⊥-elim)
 open import Prover.Prelude.Equal
   using (Equal; _≡_; sym; trans)
+open import Prover.Prelude.Function
+  using (const)
 
 -- ## Relation
 
@@ -84,17 +86,51 @@ module Transitive where
 
 -- ## Decidable
 
-data Dec
-  (P : Set)
-  : Set
-  where
+module _Dec where
 
-  yes
-    : P
+  data Dec
+    (P : Set)
+    : Set
+    where
+
+    yes
+      : P
+      → Dec P
+    no
+      : ¬ P
+      → Dec P
+
+Dec
+  : Set
+  → Set
+Dec
+  = _Dec.Dec
+
+open _Dec.Dec public
+
+module Dec where
+
+  recompute
+    : {A : Set}
+    → Dec A
+    → .A
+    → A
+  recompute (no ¬p) p
+    = ⊥-elim (¬p p)
+  recompute (yes p) _
+    = p
+
+  function
+    : {P Q : Set}
     → Dec P
-  no
-    : ¬ P
-    → Dec P
+    → Dec Q
+    → Dec (P → Q)
+  function (no ¬p) _
+    = yes (λ p → ⊥-elim (¬p p))
+  function (yes p) (no ¬q)
+    = no (λ f → ¬q (f p))
+  function _ (yes q)
+    = yes (const q)
 
 Decidable
   : {A : Set}
@@ -114,16 +150,6 @@ module Decidable where
     → Decidable (Relation.map f R)
   map f _ d x₁ x₂
     = d (f x₁) (f x₂)
-
-  recompute
-    : {A : Set}
-    → Dec A
-    → .A
-    → A
-  recompute (no ¬p) p
-    = ⊥-elim (¬p p)
-  recompute (yes p) _
-    = p
 
 -- ## Trichotomous
 

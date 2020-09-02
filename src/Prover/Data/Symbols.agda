@@ -161,7 +161,7 @@ module Symbols where
       (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
       (Unique.decidable symmetric transitive decidable (any s))
       (Bool.from-decidable-true decidable (any s) (any s) refl)
-      (Decidable.recompute (sym s ∈? ss) p) q
+      (Dec.recompute (sym s ∈? ss) p) q
 
   lookup-member-arity
     : {ss : Symbols}
