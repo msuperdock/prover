@@ -15,7 +15,7 @@ open import Prover.Category.Snoc
 open import Prover.Function.Bool.Sigma.Sum
   using (bool-function-sigma-sum)
 open import Prover.Function.Indexed.Simple.Bool
-  using (IndexedSimpleBoolFunction; empty; indexed-simple-bool-function₀; sigma)
+  using (IndexedSimpleBoolFunction; cons; indexed-simple-bool-function₀; nil)
 open import Prover.Prelude
 
 indexed-simple-bool-function-sigma-sum
@@ -26,15 +26,17 @@ indexed-simple-bool-function-sigma-sum
   → (F₁ : IndexedSplitFunctor C₁₁' C₂₁')
   → IndexedSimpleBoolFunction C₂₂'
   → IndexedSimpleBoolFunction (indexed-simple-category-sigma-sum C₂₂' F₁)
-indexed-simple-bool-function-sigma-sum {n = zero} {C₂₂' = C₂₂'} _ G₂₂
-  = empty
+indexed-simple-bool-function-sigma-sum
+  {n = zero} {C₂₂' = C₂₂'} _ G₂₂
+  = nil
     (bool-function-sigma-sum
       (λ x₂₁ → indexed-simple-category₀
         (IndexedSimpleCategory.tail C₂₂' x₂₁))
       (λ x₂₁ → indexed-simple-bool-function₀
         (IndexedSimpleBoolFunction.tail G₂₂ x₂₁)))
-indexed-simple-bool-function-sigma-sum {n = suc _} F₁ G₂₂
-  = sigma
+indexed-simple-bool-function-sigma-sum
+  {n = suc _} F₁ G₂₂
+  = cons
     (λ x → indexed-simple-bool-function-sigma-sum
       (IndexedSplitFunctor.tail F₁ x)
       (IndexedSimpleBoolFunction.tail G₂₂ x))

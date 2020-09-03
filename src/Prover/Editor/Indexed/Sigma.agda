@@ -3,7 +3,7 @@ module Prover.Editor.Indexed.Sigma where
 open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
-  using (IndexedCategory; indexed-category₀; indexed-dependent-category₀)
+  using (IndexedCategory; indexed-category₁)
 open import Prover.Category.Indexed.Sigma.Maybe
   using (indexed-category-sigma-maybe)
 open import Prover.Category.Indexed.Sigma.Sum
@@ -22,10 +22,10 @@ open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Editor.Indexed
   using (IndexedEditor; IndexedMainEditor; IndexedPartialEditor;
-    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
+    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; cons;
     indexed-editor₀; indexed-editor-simple; indexed-editor-tail;
     indexed-split-editor₀; indexed-split-editor-tail;
-    indexed-split-main-editor-unmain; sigma)
+    indexed-split-main-editor-unmain; nil)
 open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.Sigma
@@ -72,17 +72,17 @@ indexed-editor-sigma
     (event-stack-sigma E₁ E₂)
     (indexed-category-sigma-sum C₂'
       (IndexedSplitEditor.indexed-split-functor e₁))
-indexed-editor-sigma {n = zero} {C₁' = C₁'} {C₂' = C₂'} d e₁ e₂
-  = empty
+indexed-editor-sigma
+  {n = zero} {C₂' = C₂'} d e₁ e₂
+  = nil
     (editor-sigma
-      {C₁ = indexed-category₀ C₁'}
-      (indexed-dependent-category₀
-        (IndexedCategory.unpack C₂')) d
+      (indexed-category₁ C₂') d
       (indexed-split-editor₀ e₁)
       (λ x → indexed-editor₀
         (indexed-editor-tail e₂ x)))
-indexed-editor-sigma {n = suc _} d e₁ e₂
-  = sigma
+indexed-editor-sigma
+  {n = suc _} d e₁ e₂
+  = cons
     (λ x → indexed-editor-sigma d
       (indexed-split-editor-tail e₁ x)
       (indexed-editor-tail e₂ x))

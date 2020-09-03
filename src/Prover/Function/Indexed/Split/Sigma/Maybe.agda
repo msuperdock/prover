@@ -11,7 +11,7 @@ open import Prover.Category.Indexed.Sigma.Maybe
 open import Prover.Category.Snoc
   using (chain-category-snoc)
 open import Prover.Function.Indexed.Split
-  using (IndexedSplitFunction; empty; indexed-split-function₀; sigma)
+  using (IndexedSplitFunction; cons; indexed-split-function₀; nil)
 open import Prover.Function.Split.Sigma
   using (split-function-sigma)
 open import Prover.Prelude
@@ -29,16 +29,18 @@ indexed-split-function-sigma-maybe
   → IndexedSplitFunction
     (A₁ × A₂)
     (indexed-category-sigma-maybe C₁' C₂')
-indexed-split-function-sigma-maybe {n = zero} {C₂' = C₂'} F₁ F₂
-  = empty
+indexed-split-function-sigma-maybe
+  {n = zero} {C₂' = C₂'} F₁ F₂
+  = nil
     (split-function-sigma
       (λ x₁ → Category.Object (indexed-category₀
         (IndexedCategory.tail C₂' x₁)))
       (indexed-split-function₀ F₁)
       (λ x₁ → indexed-split-function₀
         (IndexedSplitFunction.tail F₂ x₁)))
-indexed-split-function-sigma-maybe {n = suc _} F₁ F₂
-  = sigma
+indexed-split-function-sigma-maybe
+  {n = suc _} F₁ F₂
+  = cons
     (λ x → indexed-split-function-sigma-maybe
       (IndexedSplitFunction.tail F₁ x)
       (IndexedSplitFunction.tail F₂ x))

@@ -1,11 +1,9 @@
 module Prover.Function.Indexed.Simple.Partial.Sigma.Sum where
 
-open import Prover.Category
-  using (Category)
 open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Indexed
-  using (IndexedCategory; indexed-category₀)
+  using (IndexedCategory)
 open import Prover.Category.Indexed.Simple
   using (IndexedSimpleCategory; indexed-simple-category₀)
 open import Prover.Category.Indexed.Simple.Sigma.Sum
@@ -17,8 +15,8 @@ open import Prover.Category.Snoc
 open import Prover.Function.Indexed
   using (IndexedSet; indexed-set₀)
 open import Prover.Function.Indexed.Simple.Partial
-  using (IndexedSimplePartialFunction; empty; indexed-simple-partial-function₀;
-    sigma)
+  using (IndexedSimplePartialFunction; cons; indexed-simple-partial-function₀;
+    nil)
 open import Prover.Function.Indexed.Sigma
   using (indexed-set-sigma)
 open import Prover.Function.Partial.Sigma.Sum
@@ -39,13 +37,9 @@ indexed-simple-partial-function-sigma-sum
     (indexed-simple-category-sigma-sum C₂' F₁)
     (indexed-set-sigma D₁' D₂')
 indexed-simple-partial-function-sigma-sum
-  {n = zero} {C₁' = C₁'} {D₁' = D₁'} {C₂' = C₂'} {D₂' = D₂'} _ F₂
-  = empty
+  {n = zero} {C₂' = C₂'} {D₂' = D₂'} _ F₂
+  = nil
     (partial-function-sigma-sum
-      {A₁₁ = Category.Object
-        (indexed-category₀ C₁')}
-      {A₂₁ = Category.Object
-        (indexed-category₀ D₁')}
       (λ y₁ → indexed-simple-category₀
         (IndexedSimpleCategory.tail C₂' y₁))
       (λ y₁ → indexed-set₀
@@ -54,7 +48,7 @@ indexed-simple-partial-function-sigma-sum
         (IndexedSimplePartialFunction.tail F₂ y₁)))
 indexed-simple-partial-function-sigma-sum
   {n = suc _} F₁ F₂
-  = sigma
+  = cons
     (λ x → indexed-simple-partial-function-sigma-sum
       (IndexedSplitFunctor.tail F₁ x)
       (IndexedSimplePartialFunction.tail F₂ x))

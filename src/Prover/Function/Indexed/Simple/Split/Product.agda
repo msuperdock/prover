@@ -7,8 +7,7 @@ open import Prover.Category.Indexed.Simple
 open import Prover.Category.Indexed.Simple.Product
   using (indexed-simple-category-product)
 open import Prover.Function.Indexed.Simple.Split
-  using (IndexedSimpleSplitFunction; empty; indexed-simple-split-function₀;
-    sigma)
+  using (IndexedSimpleSplitFunction; cons; indexed-simple-split-function₀; nil)
 open import Prover.Function.Split.Product
   using (split-function-product)
 open import Prover.Prelude
@@ -25,13 +24,15 @@ indexed-simple-split-function-product
   → IndexedSimpleSplitFunction
     (A₁ × A₂)
     (indexed-simple-category-product C₁' C₂')
-indexed-simple-split-function-product {n = zero} F₁ F₂
-  = empty
+indexed-simple-split-function-product
+  {n = zero} F₁ F₂
+  = nil
     (split-function-product
       (indexed-simple-split-function₀ F₁)
       (indexed-simple-split-function₀ F₂))
-indexed-simple-split-function-product {n = suc _} F₁ F₂
-  = sigma
+indexed-simple-split-function-product
+  {n = suc _} F₁ F₂
+  = cons
     (λ x → indexed-simple-split-function-product 
       (IndexedSimpleSplitFunction.tail F₁ x)
       (IndexedSimpleSplitFunction.tail F₂ x))

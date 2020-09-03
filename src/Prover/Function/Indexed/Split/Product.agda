@@ -7,7 +7,7 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.Product
   using (indexed-category-product)
 open import Prover.Function.Indexed.Split
-  using (IndexedSplitFunction; empty; indexed-split-function₀; sigma)
+  using (IndexedSplitFunction; cons; indexed-split-function₀; nil)
 open import Prover.Function.Split.Product
   using (split-function-product)
 open import Prover.Prelude
@@ -25,12 +25,12 @@ indexed-split-function-product
     (A₁ × A₂)
     (indexed-category-product C₁' C₂')
 indexed-split-function-product {n = zero} F₁ F₂
-  = empty
+  = nil
     (split-function-product
       (indexed-split-function₀ F₁)
       (indexed-split-function₀ F₂))
 indexed-split-function-product {n = suc _} F₁ F₂
-  = sigma
+  = cons
     (λ x → indexed-split-function-product 
       (IndexedSplitFunction.tail F₁ x)
       (IndexedSplitFunction.tail F₂ x))

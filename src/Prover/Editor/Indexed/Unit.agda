@@ -9,8 +9,8 @@ open import Prover.Category.Indexed.Unit
 open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Editor.Indexed
-  using (IndexedEditor; IndexedSimpleEditor; empty; indexed-simple-editor₀;
-    indexed-simple-editor-tail; sigma)
+  using (IndexedEditor; IndexedSimpleEditor; cons; indexed-simple-editor₀;
+    indexed-simple-editor-tail; nil)
 open import Prover.Editor.Unit
   using (editor-unit)
 open import Prover.Prelude
@@ -26,8 +26,14 @@ indexed-editor-unit
   → IndexedSimpleEditor V E C'
   → IndexedEditor V E
     (indexed-category-unit C')
-indexed-editor-unit {n = zero} e
-  = empty (editor-unit (indexed-simple-editor₀ e))
-indexed-editor-unit {n = suc _} e
-  = sigma (λ x → indexed-editor-unit (indexed-simple-editor-tail e x))
+indexed-editor-unit
+  {n = zero} e
+  = nil
+    (editor-unit
+      (indexed-simple-editor₀ e))
+indexed-editor-unit
+  {n = suc _} e
+  = cons
+    (λ x → indexed-editor-unit
+      (indexed-simple-editor-tail e x))
 

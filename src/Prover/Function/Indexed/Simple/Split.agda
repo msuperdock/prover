@@ -26,14 +26,14 @@ module Internal where
     → Set
     where
   
-    empty
+    nil
       : {A : Set}
       → {C : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → SplitFunction A (indexed-simple-category₀ C')
       → IndexedSimpleSplitFunction A C'
   
-    sigma
+    cons
       : {n : ℕ}
       → {A : Set}
       → {C : ChainCategory (suc n)}
@@ -50,7 +50,7 @@ module Internal where
     → {C' : IndexedSimpleCategory C}
     → IndexedSimpleSplitFunction A C'
     → SplitFunction A (indexed-simple-category₀ C')
-  indexed-simple-split-function₀ (empty F)
+  indexed-simple-split-function₀ (nil F)
     = F
   
   indexed-simple-split-function-tail
@@ -61,7 +61,7 @@ module Internal where
     → IndexedSimpleSplitFunction A C'
     → (x : Category.Object (ChainCategory.head C))
     → IndexedSimpleSplitFunction A (IndexedSimpleCategory.tail C' x)
-  indexed-simple-split-function-tail (sigma F)
+  indexed-simple-split-function-tail (cons F)
     = F
 
   -- ### Compose
@@ -74,12 +74,14 @@ module Internal where
     → IndexedSimpleSplitFunction B C'
     → SplitFunction A B
     → IndexedSimpleSplitFunction A C'
-  indexed-simple-split-function-compose {n = zero} F G
-    = empty
+  indexed-simple-split-function-compose
+    {n = zero} F G
+    = nil
       (split-function-compose
         (indexed-simple-split-function₀ F) G)
-  indexed-simple-split-function-compose {n = suc _} F G
-    = sigma
+  indexed-simple-split-function-compose
+    {n = suc _} F G
+    = cons
       (λ x → indexed-simple-split-function-compose
         (indexed-simple-split-function-tail F x) G)
 

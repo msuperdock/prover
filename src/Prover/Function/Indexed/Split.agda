@@ -28,14 +28,14 @@ module Internal where
     → Set
     where
   
-    empty
+    nil
       : {A : Set}
       → {C : ChainCategory zero}
       → {C' : IndexedCategory C}
       → SplitFunction A (Category.Object (indexed-category₀ C'))
       → IndexedSplitFunction A C'
   
-    sigma
+    cons
       : {n : ℕ}
       → {A : Set}
       → {C : ChainCategory (suc n)}
@@ -52,7 +52,7 @@ module Internal where
     → {C' : IndexedCategory C}
     → IndexedSplitFunction A C'
     → SplitFunction A (Category.Object (indexed-category₀ C'))
-  indexed-split-function₀ (empty F)
+  indexed-split-function₀ (nil F)
     = F
 
   indexed-split-function-tail
@@ -63,7 +63,7 @@ module Internal where
     → IndexedSplitFunction A C'
     → (x : Category.Object (ChainCategory.head C))
     → IndexedSplitFunction A (IndexedCategory.tail C' x)
-  indexed-split-function-tail (sigma F)
+  indexed-split-function-tail (cons F)
     = F
 
   -- ### Compose
@@ -76,12 +76,14 @@ module Internal where
     → IndexedSplitFunction B C'
     → SplitFunction A B
     → IndexedSplitFunction A C'
-  indexed-split-function-compose {n = zero} F G
-    = empty
+  indexed-split-function-compose
+    {n = zero} F G
+    = nil
       (split-function-compose
         (indexed-split-function₀ F) G)
-  indexed-split-function-compose {n = suc _} F G
-    = sigma
+  indexed-split-function-compose
+    {n = suc _} F G
+    = cons
       (λ x → indexed-split-function-compose
         (indexed-split-function-tail F x) G)
 
@@ -93,14 +95,16 @@ module Internal where
     → IndexedSplitFunctor C' D'
     → IndexedSplitFunction A C'
     → IndexedSplitFunction A D'
-  indexed-split-function-compose' {n = zero} F G
-    = empty
+  indexed-split-function-compose'
+    {n = zero} F G
+    = nil
       (split-function-compose
         (split-functor-base
           (indexed-split-functor₀ F))
         (indexed-split-function₀ G))
-  indexed-split-function-compose' {n = suc _} F G
-    = sigma
+  indexed-split-function-compose'
+    {n = suc _} F G
+    = cons
       (λ x → indexed-split-function-compose'
         (IndexedSplitFunctor.tail F x)
         (indexed-split-function-tail G x))

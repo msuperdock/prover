@@ -13,7 +13,7 @@ open import Prover.Category.Indexed.Split
 open import Prover.Category.Snoc
   using (chain-category-snoc)
 open import Prover.Function.Indexed.Split
-  using (IndexedSplitFunction; empty; indexed-split-function₀; sigma)
+  using (IndexedSplitFunction; cons; indexed-split-function₀; nil)
 open import Prover.Function.Split.Sigma.Sum
   using (split-function-sigma-sum)
 open import Prover.Prelude
@@ -33,8 +33,9 @@ indexed-split-function-sigma-sum
   → IndexedSplitFunction
     (A₁₁ ⊔ A₂₁ × A₂₂)
     (indexed-category-sigma-sum C₂₂' F₁)
-indexed-split-function-sigma-sum {n = zero} {C₂₂' = C₂₂'} _ G₁₁ G₂₁ G₂₂
-  = empty
+indexed-split-function-sigma-sum
+  {n = zero} {C₂₂' = C₂₂'} _ G₁₁ G₂₁ G₂₂
+  = nil
     (split-function-sigma-sum
       (λ x₂₁ → Category.Object (indexed-category₀
         (IndexedCategory.tail C₂₂' x₂₁)))
@@ -42,8 +43,9 @@ indexed-split-function-sigma-sum {n = zero} {C₂₂' = C₂₂'} _ G₁₁ G₂
       (indexed-split-function₀ G₂₁)
       (λ x₂₁ → indexed-split-function₀
         (IndexedSplitFunction.tail G₂₂ x₂₁)))
-indexed-split-function-sigma-sum {n = suc _} F₁ G₁₁ G₂₁ G₂₂
-  = sigma
+indexed-split-function-sigma-sum
+  {n = suc _} F₁ G₁₁ G₂₁ G₂₂
+  = cons
     (λ x → indexed-split-function-sigma-sum
       (IndexedSplitFunctor.tail F₁ x)
       (IndexedSplitFunction.tail G₁₁ x)

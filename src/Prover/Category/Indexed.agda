@@ -5,8 +5,7 @@ open import Prover.Category
     DependentFunctorIdentity; DependentFunctorSquare; Functor; FunctorCompose;
     FunctorIdentity; FunctorSquare)
 open import Prover.Category.Chain
-  using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
-    ChainFunctor)
+  using (ChainCategory; ChainFunctor)
 open import Prover.Prelude
 
 -- ## Internal
@@ -80,97 +79,56 @@ module Internal where
     → IndexedFunctor C₂' D₂' H₂
     → Set
     
-  -- #### IndexedDependentCategory
-  
-  record IndexedDependentCategory
-    {n : ℕ}
-    {C : Category}
-    (C' : ChainDependentCategory C n)
-    : Set₁
-    
-  -- #### IndexedDependentFunctor
-  
-  record IndexedDependentFunctor
-    {n : ℕ}
-    {C D : Category}
-    {C' : ChainDependentCategory C n}
-    {D' : ChainDependentCategory D n}
-    (C'' : IndexedDependentCategory C')
-    (D'' : IndexedDependentCategory D')
-    (F : ChainDependentFunctor C' D')
-    : Set
-    
-  -- #### IndexedDependentFunctorIdentity
-  
-  record IndexedDependentFunctorIdentity
-    {n : ℕ}
-    {C : Category}
-    {C' : ChainDependentCategory C n}
-    {C'' : IndexedDependentCategory C'}
-    {F : ChainDependentFunctor C' C'}
-    (F' : IndexedDependentFunctor C'' C'' F)
-    : Set
-    
-  -- #### IndexedDependentFunctorCompose
-  
-  record IndexedDependentFunctorCompose
-    {n : ℕ}
-    {C D E : Category}
-    {C' : ChainDependentCategory C n}
-    {D' : ChainDependentCategory D n}
-    {E' : ChainDependentCategory E n}
-    {C'' : IndexedDependentCategory C'}
-    {D'' : IndexedDependentCategory D'}
-    {E'' : IndexedDependentCategory E'}
-    {F : ChainDependentFunctor D' E'}
-    {G : ChainDependentFunctor C' D'}
-    {H : ChainDependentFunctor C' E'}
-    (F' : IndexedDependentFunctor D'' E'' F)
-    (G' : IndexedDependentFunctor C'' D'' G)
-    (H' : IndexedDependentFunctor C'' E'' H)
-    : Set
-  
-  -- #### IndexedDependentFunctorSquare
-  
-  record IndexedDependentFunctorSquare
-    {n : ℕ}
-    {C₁ C₂ D₁ D₂ : Category}
-    {C₁' : ChainDependentCategory C₁ n}
-    {C₂' : ChainDependentCategory C₂ n}
-    {D₁' : ChainDependentCategory D₁ n}
-    {D₂' : ChainDependentCategory D₂ n}
-    {C₁'' : IndexedDependentCategory C₁'}
-    {C₂'' : IndexedDependentCategory C₂'}
-    {D₁'' : IndexedDependentCategory D₁'}
-    {D₂'' : IndexedDependentCategory D₂'}
-    {F : ChainDependentFunctor C₁' C₂'}
-    {G : ChainDependentFunctor D₁' D₂'}
-    {H₁ : ChainDependentFunctor C₁' D₁'}
-    {H₂ : ChainDependentFunctor C₂' D₂'}
-    (F' : IndexedDependentFunctor C₁'' C₂'' F)
-    (G' : IndexedDependentFunctor D₁'' D₂'' G)
-    (H₁' : IndexedDependentFunctor C₁'' D₁'' H₁)
-    (H₂' : IndexedDependentFunctor C₂'' D₂'' H₂)
-    : Set
-    
   -- ### Interface
-  
+
   -- #### IndexedCategory
-  
+
   indexed-category₀
     : {C : ChainCategory zero}
     → IndexedCategory C
     → Category
-  
-  indexed-category-unpack
+
+  indexed-category-tail
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → IndexedCategory C
-    → IndexedDependentCategory
-      (ChainCategory.unpack C)
+    → (x : ChainCategory.Object C)
+    → IndexedCategory
+      (ChainCategory.tail C x)
+
+  indexed-category-indexed-functor
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedCategory C)
+    → {x y : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C x y)
+    → IndexedFunctor
+      (indexed-category-tail C' x)
+      (indexed-category-tail C' y)
+      (ChainCategory.chain-functor C f)
+
+  indexed-category-indexed-functor-identity
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedCategory C)
+    → (x : ChainCategory.Object C)
+    → IndexedFunctorIdentity
+      (indexed-category-indexed-functor C' (ChainCategory.identity C x))
+
+  indexed-category-indexed-functor-compose
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedCategory C)
+    → {x y z : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C y z)
+    → (g : ChainCategory.Arrow C x y)
+    → IndexedFunctorCompose
+      (indexed-category-indexed-functor C' f)
+      (indexed-category-indexed-functor C' g)
+      (indexed-category-indexed-functor C' (ChainCategory.compose C f g))
 
   -- #### IndexedFunctor
-  
+
   indexed-functor₀
     : {C D : ChainCategory zero}
     → {C' : IndexedCategory C}
@@ -180,19 +138,35 @@ module Internal where
     → Functor
       (indexed-category₀ C')
       (indexed-category₀ D')
-  
-  indexed-functor-unpack
+
+  indexed-functor-tail
     : {n : ℕ}
     → {C D : ChainCategory (suc n)}
     → {C' : IndexedCategory C}
     → {D' : IndexedCategory D}
     → {F : ChainFunctor C D}
     → IndexedFunctor C' D' F
-    → IndexedDependentFunctor
-      (indexed-category-unpack C')
-      (indexed-category-unpack D')
-      (ChainFunctor.unpack F)
-  
+    → (x : ChainCategory.Object C)
+    → IndexedFunctor
+      (indexed-category-tail C' x)
+      (indexed-category-tail D' (ChainFunctor.base F x))
+      (ChainFunctor.tail F x)
+
+  indexed-functor-indexed-functor-square
+    : {n : ℕ}
+    → {C D : ChainCategory (suc n)}
+    → {C' : IndexedCategory C}
+    → {D' : IndexedCategory D}
+    → {F : ChainFunctor C D}
+    → (F' : IndexedFunctor C' D' F)
+    → {x y : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C x y)
+    → IndexedFunctorSquare
+      (indexed-category-indexed-functor C' f)
+      (indexed-category-indexed-functor D' (ChainFunctor.map F f))
+      (indexed-functor-tail F' x)
+      (indexed-functor-tail F' y)
+
   -- #### IndexedFunctorIdentity
 
   indexed-functor-identity₀
@@ -216,18 +190,39 @@ module Internal where
     → FunctorIdentity
       (indexed-functor₀ F')
 
-  indexed-functor-identity-unpack
+  indexed-functor-identity-head
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' : IndexedCategory C}
     → {F : ChainFunctor C C}
     → {F' : IndexedFunctor C' C' F}
     → IndexedFunctorIdentity F'
-    → IndexedDependentFunctorIdentity
-      (indexed-functor-unpack F')
+    → FunctorIdentity
+      (ChainFunctor.head F)
+
+  indexed-functor-identity-base
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → {C' : IndexedCategory C}
+    → {F : ChainFunctor C C}
+    → {F' : IndexedFunctor C' C' F}
+    → IndexedFunctorIdentity F'
+    → (x : ChainCategory.Object C)
+    → ChainFunctor.base F x ≡ x
+
+  indexed-functor-identity-tail
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → {C' : IndexedCategory C}
+    → {F : ChainFunctor C C}
+    → {F' : IndexedFunctor C' C' F}
+    → IndexedFunctorIdentity F'
+    → (x : ChainCategory.Object C)
+    → IndexedFunctorIdentity
+      (indexed-functor-tail F' x)
 
   -- #### IndexedFunctorCompose
-
+  
   indexed-functor-compose₀
     : {C D E : ChainCategory zero}
     → {C' : IndexedCategory C}
@@ -266,7 +261,7 @@ module Internal where
       (indexed-functor₀ G')
       (indexed-functor₀ H')
 
-  indexed-functor-compose-unpack
+  indexed-functor-compose-head
     : {n : ℕ}
     → {C D E : ChainCategory (suc n)}
     → {C' : IndexedCategory C}
@@ -279,10 +274,45 @@ module Internal where
     → {G' : IndexedFunctor C' D' G}
     → {H' : IndexedFunctor C' E' H}
     → IndexedFunctorCompose F' G' H'
-    → IndexedDependentFunctorCompose
-      (indexed-functor-unpack F')
-      (indexed-functor-unpack G')
-      (indexed-functor-unpack H')
+    → FunctorCompose
+      (ChainFunctor.head F)
+      (ChainFunctor.head G)
+      (ChainFunctor.head H)
+
+  indexed-functor-compose-base
+    : {n : ℕ}
+    → {C D E : ChainCategory (suc n)}
+    → {C' : IndexedCategory C}
+    → {D' : IndexedCategory D}
+    → {E' : IndexedCategory E}
+    → {F : ChainFunctor D E}
+    → {G : ChainFunctor C D}
+    → {H : ChainFunctor C E}
+    → {F' : IndexedFunctor D' E' F}
+    → {G' : IndexedFunctor C' D' G}
+    → {H' : IndexedFunctor C' E' H}
+    → IndexedFunctorCompose F' G' H'
+    → (x : ChainCategory.Object C)
+    → ChainFunctor.base H x ≡ ChainFunctor.base F (ChainFunctor.base G x)
+
+  indexed-functor-compose-tail
+    : {n : ℕ}
+    → {C D E : ChainCategory (suc n)}
+    → {C' : IndexedCategory C}
+    → {D' : IndexedCategory D}
+    → {E' : IndexedCategory E}
+    → {F : ChainFunctor D E}
+    → {G : ChainFunctor C D}
+    → {H : ChainFunctor C E}
+    → {F' : IndexedFunctor D' E' F}
+    → {G' : IndexedFunctor C' D' G}
+    → {H' : IndexedFunctor C' E' H}
+    → IndexedFunctorCompose F' G' H'
+    → (x : ChainCategory.Object C)
+    → IndexedFunctorCompose
+      (indexed-functor-tail F' (ChainFunctor.base G x))
+      (indexed-functor-tail G' x)
+      (indexed-functor-tail H' x)
 
   -- #### IndexedFunctorSquare
 
@@ -332,7 +362,7 @@ module Internal where
       (indexed-functor₀ H₁')
       (indexed-functor₀ H₂')
 
-  indexed-functor-square-unpack
+  indexed-functor-square-head
     : {n : ℕ}
     → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
     → {C₁' : IndexedCategory C₁}
@@ -348,11 +378,54 @@ module Internal where
     → {H₁' : IndexedFunctor C₁' D₁' H₁}
     → {H₂' : IndexedFunctor C₂' D₂' H₂}
     → IndexedFunctorSquare F' G' H₁' H₂'
-    → IndexedDependentFunctorSquare
-      (indexed-functor-unpack F')
-      (indexed-functor-unpack G')
-      (indexed-functor-unpack H₁')
-      (indexed-functor-unpack H₂')
+    → FunctorSquare
+      (ChainFunctor.head F)
+      (ChainFunctor.head G)
+      (ChainFunctor.head H₁)
+      (ChainFunctor.head H₂)
+
+  indexed-functor-square-base
+    : {n : ℕ}
+    → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
+    → {C₁' : IndexedCategory C₁}
+    → {C₂' : IndexedCategory C₂}
+    → {D₁' : IndexedCategory D₁}
+    → {D₂' : IndexedCategory D₂}
+    → {F : ChainFunctor C₁ C₂}
+    → {G : ChainFunctor D₁ D₂}
+    → {H₁ : ChainFunctor C₁ D₁}
+    → {H₂ : ChainFunctor C₂ D₂}
+    → {F' : IndexedFunctor C₁' C₂' F}
+    → {G' : IndexedFunctor D₁' D₂' G}
+    → {H₁' : IndexedFunctor C₁' D₁' H₁}
+    → {H₂' : IndexedFunctor C₂' D₂' H₂}
+    → IndexedFunctorSquare F' G' H₁' H₂'
+    → (x₁ : ChainCategory.Object C₁)
+    → ChainFunctor.base H₂ (ChainFunctor.base F x₁)
+      ≡ ChainFunctor.base G (ChainFunctor.base H₁ x₁)
+
+  indexed-functor-square-tail
+    : {n : ℕ}
+    → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
+    → {C₁' : IndexedCategory C₁}
+    → {C₂' : IndexedCategory C₂}
+    → {D₁' : IndexedCategory D₁}
+    → {D₂' : IndexedCategory D₂}
+    → {F : ChainFunctor C₁ C₂}
+    → {G : ChainFunctor D₁ D₂}
+    → {H₁ : ChainFunctor C₁ D₁}
+    → {H₂ : ChainFunctor C₂ D₂}
+    → {F' : IndexedFunctor C₁' C₂' F}
+    → {G' : IndexedFunctor D₁' D₂' G}
+    → {H₁' : IndexedFunctor C₁' D₁' H₁}
+    → {H₂' : IndexedFunctor C₂' D₂' H₂}
+    → IndexedFunctorSquare F' G' H₁' H₂'
+    → (x₁ : ChainCategory.Object C₁)
+    → IndexedFunctorSquare
+      (indexed-functor-tail F' x₁)
+      (indexed-functor-tail G' (ChainFunctor.base H₁ x₁))
+      (indexed-functor-tail H₁' x₁)
+      (indexed-functor-tail H₂' (ChainFunctor.base F x₁))
 
   -- ### Definitions
   
@@ -360,29 +433,51 @@ module Internal where
   
   data IndexedCategory where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → Category
       → IndexedCategory C
 
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
-      → IndexedDependentCategory
-        (ChainCategory.unpack C)
+      → (C' : (x : ChainCategory.Object C)
+        → IndexedCategory
+          (ChainCategory.tail C x))
+      → (F : {x y : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C x y)
+        → IndexedFunctor (C' x) (C' y)
+          (ChainCategory.chain-functor C f))
+      → ((x : ChainCategory.Object C)
+        → IndexedFunctorIdentity
+          (F (ChainCategory.identity C x)))
+      → ({x y z : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C y z)
+        → (g : ChainCategory.Arrow C x y)
+        → IndexedFunctorCompose (F f) (F g)
+          (F (ChainCategory.compose C f g)))
       → IndexedCategory C
   
-  indexed-category₀ (empty C)
-    = C
+  indexed-category₀ (nil C')
+    = C'
 
-  indexed-category-unpack (sigma C)
-    = C
-  
+  indexed-category-tail (cons C' _ _ _)
+    = C'
+
+  indexed-category-indexed-functor (cons _ F _ _)
+    = F
+
+  indexed-category-indexed-functor-identity (cons _ _ p _)
+    = p
+
+  indexed-category-indexed-functor-compose (cons _ _ _ p)
+    = p
+
   -- #### IndexedFunctor
   
   data IndexedFunctor where
   
-    empty
+    nil
       : {C D : ChainCategory zero}
       → {C' : IndexedCategory C}
       → {D' : IndexedCategory D}
@@ -391,30 +486,41 @@ module Internal where
         (indexed-category₀ C')
         (indexed-category₀ D')
       → IndexedFunctor C' D' F
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C D : ChainCategory (suc n)}
       → {C' : IndexedCategory C}
       → {D' : IndexedCategory D}
       → {F : ChainFunctor C D}
-      → IndexedDependentFunctor
-        (indexed-category-unpack C')
-        (indexed-category-unpack D')
-        (ChainFunctor.unpack F)
+      → (F' : (x : ChainCategory.Object C)
+        → IndexedFunctor
+          (indexed-category-tail C' x)
+          (indexed-category-tail D' (ChainFunctor.base F x))
+          (ChainFunctor.tail F x))
+      → ({x y : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C x y)
+        → IndexedFunctorSquare
+          (indexed-category-indexed-functor C' f)
+          (indexed-category-indexed-functor D' (ChainFunctor.map F f))
+          (F' x)
+          (F' y))
       → IndexedFunctor C' D' F
   
-  indexed-functor₀ (empty F)
-    = F
-  
-  indexed-functor-unpack (sigma F)
-    = F
-  
+  indexed-functor₀ (nil F')
+    = F'
+
+  indexed-functor-tail (cons F' _)
+    = F'
+
+  indexed-functor-indexed-functor-square (cons _ s)
+    = s
+
   -- #### IndexedFunctorIdentity
   
   data IndexedFunctorIdentity where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → {C' : IndexedCategory C}
       → {F : ChainFunctor C C}
@@ -423,30 +529,40 @@ module Internal where
         (indexed-functor₀ F')
       → IndexedFunctorIdentity F'
 
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' : IndexedCategory C}
       → {F : ChainFunctor C C}
       → {F' : IndexedFunctor C' C' F}
-      → IndexedDependentFunctorIdentity
-        (indexed-functor-unpack F')
+      → FunctorIdentity
+        (ChainFunctor.head F)
+      → ((x : ChainCategory.Object C)
+        → IndexedFunctorIdentity
+          (indexed-functor-tail F' x))
       → IndexedFunctorIdentity F'
-  
-  indexed-functor-identity₀ (empty p)
+
+  indexed-functor-identity₀ (nil p)
     = p
 
   indexed-functor-identity₀-eq _ _ refl
     = indexed-functor-identity₀
 
-  indexed-functor-identity-unpack (sigma p)
+  indexed-functor-identity-head (cons p _)
+    = p
+
+  indexed-functor-identity-base p
+    = FunctorIdentity.base
+      (indexed-functor-identity-head p)
+
+  indexed-functor-identity-tail (cons _ p)
     = p
 
   -- #### IndexedFunctorCompose
   
   data IndexedFunctorCompose where
   
-    empty
+    nil
       : {C D E : ChainCategory zero}
       → {C' : IndexedCategory C}
       → {D' : IndexedCategory D}
@@ -462,8 +578,8 @@ module Internal where
         (indexed-functor₀ G')
         (indexed-functor₀ H')
       → IndexedFunctorCompose F' G' H'
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C D E : ChainCategory (suc n)}
       → {C' : IndexedCategory C}
@@ -475,26 +591,38 @@ module Internal where
       → {F' : IndexedFunctor D' E' F}
       → {G' : IndexedFunctor C' D' G}
       → {H' : IndexedFunctor C' E' H}
-      → IndexedDependentFunctorCompose
-        (indexed-functor-unpack F')
-        (indexed-functor-unpack G')
-        (indexed-functor-unpack H')
+      → FunctorCompose
+        (ChainFunctor.head F)
+        (ChainFunctor.head G)
+        (ChainFunctor.head H)
+      → ((x : ChainCategory.Object C)
+        → IndexedFunctorCompose
+          (indexed-functor-tail F' (ChainFunctor.base G x))
+          (indexed-functor-tail G' x)
+          (indexed-functor-tail H' x))
       → IndexedFunctorCompose F' G' H'
-  
-  indexed-functor-compose₀ (empty p)
+
+  indexed-functor-compose₀ (nil p)
     = p
 
   indexed-functor-compose₀-eq _ _ refl
     = indexed-functor-compose₀
 
-  indexed-functor-compose-unpack (sigma p)
+  indexed-functor-compose-head (cons p _)
+    = p
+
+  indexed-functor-compose-base p
+    = FunctorCompose.base
+      (indexed-functor-compose-head p)
+
+  indexed-functor-compose-tail (cons _ p)
     = p
 
   -- #### IndexedFunctorSquare
   
   data IndexedFunctorSquare where
   
-    empty
+    nil
       : {C₁ C₂ D₁ D₂ : ChainCategory zero}
       → {C₁' : IndexedCategory C₁}
       → {C₂' : IndexedCategory C₂}
@@ -514,8 +642,8 @@ module Internal where
         (indexed-functor₀ H₁')
         (indexed-functor₀ H₂')
       → IndexedFunctorSquare F' G' H₁' H₂'
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
       → {C₁' : IndexedCategory C₁}
@@ -530,483 +658,291 @@ module Internal where
       → {G' : IndexedFunctor D₁' D₂' G}
       → {H₁' : IndexedFunctor C₁' D₁' H₁}
       → {H₂' : IndexedFunctor C₂' D₂' H₂}
-      → IndexedDependentFunctorSquare
-        (indexed-functor-unpack F')
-        (indexed-functor-unpack G')
-        (indexed-functor-unpack H₁')
-        (indexed-functor-unpack H₂')
+      → FunctorSquare
+        (ChainFunctor.head F)
+        (ChainFunctor.head G)
+        (ChainFunctor.head H₁)
+        (ChainFunctor.head H₂)
+      → ((x₁ : ChainCategory.Object C₁)
+        → IndexedFunctorSquare
+          (indexed-functor-tail F' x₁)
+          (indexed-functor-tail G' (ChainFunctor.base H₁ x₁))
+          (indexed-functor-tail H₁' x₁)
+          (indexed-functor-tail H₂' (ChainFunctor.base F x₁)))
       → IndexedFunctorSquare F' G' H₁' H₂'
-  
-  indexed-functor-square₀ (empty s)
+
+  indexed-functor-square₀ (nil s)
     = s
 
   indexed-functor-square₀-eq _ _ refl
     = indexed-functor-square₀
 
-  indexed-functor-square-unpack (sigma s)
+  indexed-functor-square-head (cons s _)
     = s
 
-  -- #### IndexedDependentCategory
-  
-  record IndexedDependentCategory
-    {_ C} C'
-    where
+  indexed-functor-square-base s
+    = FunctorSquare.base
+      (indexed-functor-square-head s)
 
-    inductive
-
-    no-eta-equality
-
-    constructor
-      
-      indexed-dependent-category
-
-    field
-
-      indexed-category
-        : (x : Category.Object C)
-        → IndexedCategory
-          (ChainDependentCategory.chain-category C' x)
-
-      indexed-functor
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → IndexedFunctor
-          (indexed-category x)
-          (indexed-category y)
-          (ChainDependentCategory.chain-functor C' f)
-
-      indexed-functor-identity
-        : (x : Category.Object C)
-        → IndexedFunctorIdentity
-          (indexed-functor (Category.identity C x))
-  
-      indexed-functor-compose
-        : {x y z : Category.Object C}
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → IndexedFunctorCompose
-          (indexed-functor f)
-          (indexed-functor g)
-          (indexed-functor (Category.compose C f g))
-  
-  -- #### IndexedDependentFunctor
-  
-  record IndexedDependentFunctor
-    {_ C} C'' D'' F
-    where
-
-    inductive
-
-    no-eta-equality
-
-    constructor
-
-      indexed-dependent-functor
-
-    field
-
-      indexed-functor
-        : (x : Category.Object C)
-        → IndexedFunctor
-          (IndexedDependentCategory.indexed-category C'' x)
-          (IndexedDependentCategory.indexed-category D''
-            (ChainDependentFunctor.base F x))
-          (ChainDependentFunctor.chain-functor F x)
-
-      indexed-functor-square
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → IndexedFunctorSquare
-          (IndexedDependentCategory.indexed-functor C'' f)
-          (IndexedDependentCategory.indexed-functor D''
-            (ChainDependentFunctor.map F f))
-          (indexed-functor x)
-          (indexed-functor y)
-  
-  -- #### IndexedDependentFunctorIdentity
-  
-  record IndexedDependentFunctorIdentity
-    {_ C _ _ F} F'
-    where
-
-    inductive
-
-    constructor
-
-      indexed-dependent-functor-identity
-
-    field
-
-      functor
-        : FunctorIdentity
-          (ChainDependentFunctor.functor F)
-  
-    open FunctorIdentity functor public
-  
-    field
-  
-      indexed-functor
-        : (x : Category.Object C)
-        → IndexedFunctorIdentity
-          (IndexedDependentFunctor.indexed-functor F' x)
-  
-  -- #### IndexedDependentFunctorCompose
-  
-  record IndexedDependentFunctorCompose
-    {_ C _ _ _ _ _ _ _ _ F G H} F' G' H'
-    where
-
-    inductive
-
-    constructor
-
-      indexed-dependent-functor-compose
-
-    field
-
-      functor
-        : FunctorCompose
-          (ChainDependentFunctor.functor F)
-          (ChainDependentFunctor.functor G)
-          (ChainDependentFunctor.functor H)
-  
-    open FunctorCompose functor public
-  
-    field
-  
-      indexed-functor
-        : (x : Category.Object C)
-        → IndexedFunctorCompose
-          (IndexedDependentFunctor.indexed-functor F'
-            (ChainDependentFunctor.base G x))
-          (IndexedDependentFunctor.indexed-functor G' x)
-          (IndexedDependentFunctor.indexed-functor H' x)
-  
-  -- #### IndexedDependentFunctorSquare
-
-  record IndexedDependentFunctorSquare
-    {_ C₁ _ _ _ _ _ _ _ _ _ _ _ F G H₁ H₂} F' G' H₁' H₂'
-    where
-
-    inductive
-
-    constructor
-
-      indexed-dependent-functor-square
-
-    field
-
-      functor
-        : FunctorSquare
-          (ChainDependentFunctor.functor F)
-          (ChainDependentFunctor.functor G)
-          (ChainDependentFunctor.functor H₁)
-          (ChainDependentFunctor.functor H₂)
-  
-    open FunctorSquare functor public
-  
-    field
-  
-      indexed-functor
-        : (x₁ : Category.Object C₁)
-        → IndexedFunctorSquare
-          (IndexedDependentFunctor.indexed-functor F' x₁)
-          (IndexedDependentFunctor.indexed-functor G'
-            (ChainDependentFunctor.base H₁ x₁))
-          (IndexedDependentFunctor.indexed-functor H₁' x₁)
-          (IndexedDependentFunctor.indexed-functor H₂'
-            (ChainDependentFunctor.base F x₁))
+  indexed-functor-square-tail (cons _ s)
+    = s
 
   -- ### Destruction
 
-  -- #### IndexedDependentCategory
+  -- #### IndexedCategory
 
   module _
-    {C : Category}
-    {C' : ChainDependentCategory C zero}
+    {C : ChainCategory (suc zero)}
     where
-  
-    module IndexedDependentCategory₀
-      (C'' : IndexedDependentCategory C')
+
+    module IndexedCategory₁
+      (C' : IndexedCategory C)
       where
-    
+
       category
-        : Category.Object C
+        : Category.Object (ChainCategory.head C)
         → Category
       category x
         = indexed-category₀
-          (IndexedDependentCategory.indexed-category C'' x)
-  
+          (indexed-category-tail C' x)
+
       functor
-        : {x y : Category.Object C}
-        → Category.Arrow C x y
+        : {x y : Category.Object (ChainCategory.head C)}
+        → Category.Arrow (ChainCategory.head C) x y
         → Functor
           (category x)
           (category y)
       functor f
         = indexed-functor₀
-          (IndexedDependentCategory.indexed-functor C'' f)
-  
+          (indexed-category-indexed-functor C' f)
+
       abstract
 
         functor-identity
-          : (x : Category.Object C)
+          : (x : Category.Object (ChainCategory.head C))
           → FunctorIdentity
-            (functor (Category.identity C x))
+            (functor (Category.identity (ChainCategory.head C) x))
         functor-identity x
           = indexed-functor-identity₀
-            (IndexedDependentCategory.indexed-functor-identity C'' x)
-    
+            (indexed-category-indexed-functor-identity C' x)
+
         functor-compose
-          : {x y z : Category.Object C}
-          → (f : Category.Arrow C y z)
-          → (g : Category.Arrow C x y)
+          : {x y z : Category.Object (ChainCategory.head C)}
+          → (f : Category.Arrow (ChainCategory.head C) y z)
+          → (g : Category.Arrow (ChainCategory.head C) x y)
           → FunctorCompose
             (functor f)
             (functor g)
-            (functor (Category.compose C f g))
+            (functor (Category.compose (ChainCategory.head C) f g))
         functor-compose f g
           = indexed-functor-compose₀
-            (IndexedDependentCategory.indexed-functor-compose C'' f g)
-  
-    indexed-dependent-category₀
-      : IndexedDependentCategory C'
-      → DependentCategory C
-    indexed-dependent-category₀ C''
-      = record {IndexedDependentCategory₀ C''}
-  
-  -- #### IndexedDependentFunctor
-  
+            (indexed-category-indexed-functor-compose C' f g)
+
+    indexed-category₁
+      : IndexedCategory C
+      → DependentCategory
+        (ChainCategory.head C)
+    indexed-category₁ C'
+      = record {IndexedCategory₁ C'}
+
+  -- #### IndexedFunctor
+
   module _
-    {C D : Category}
-    {C' : ChainDependentCategory C zero}
-    {D' : ChainDependentCategory D zero}
-    {C'' : IndexedDependentCategory C'}
-    {D'' : IndexedDependentCategory D'}
-    {F : ChainDependentFunctor C' D'}
+    {C D : ChainCategory (suc zero)}
+    {C' : IndexedCategory C}
+    {D' : IndexedCategory D}
+    {F : ChainFunctor C D}
     where
-  
-    module IndexedDependentFunctor₀
-      (F' : IndexedDependentFunctor C'' D'' F)
+
+    module IndexedFunctor₁
+      (F' : IndexedFunctor C' D' F)
       where
-  
+
       functor
-        : Functor C D
+        : Functor
+          (ChainCategory.head C)
+          (ChainCategory.head D)
       functor
-        = ChainDependentFunctor.functor F
-  
+        = ChainFunctor.head F
+
       open Functor functor
-  
+
       functor'
-        : (x : Category.Object C)
+        : (x : Category.Object (ChainCategory.head C))
         → Functor
-          (DependentCategory.category
-            (indexed-dependent-category₀ C'') x)
-          (DependentCategory.category
-            (indexed-dependent-category₀ D'') (base x))
+          (DependentCategory.category (indexed-category₁ C') x)
+          (DependentCategory.category (indexed-category₁ D') (base x))
       functor' x
         = indexed-functor₀
-          (IndexedDependentFunctor.indexed-functor F' x)
-  
+          (indexed-functor-tail F' x)
+
       abstract
 
         functor-square
-          : {x y : Category.Object C}
-          → (f : Category.Arrow C x y)
+          : {x y : Category.Object (ChainCategory.head C)}
+          → (f : Category.Arrow (ChainCategory.head C) x y)
           → FunctorSquare
-            (DependentCategory.functor
-              (indexed-dependent-category₀ C'') f)
-            (DependentCategory.functor
-              (indexed-dependent-category₀ D'') (map f))
+            (DependentCategory.functor (indexed-category₁ C') f)
+            (DependentCategory.functor (indexed-category₁ D') (map f))
             (functor' x)
             (functor' y)
         functor-square f
           = indexed-functor-square₀
-            (IndexedDependentFunctor.indexed-functor-square F' f)
-  
-    indexed-dependent-functor₀
-      : IndexedDependentFunctor C'' D'' F
+            (indexed-functor-indexed-functor-square F' f)
+
+    indexed-functor₁
+      : IndexedFunctor C' D' F
       → DependentFunctor
-        (indexed-dependent-category₀ C'')
-        (indexed-dependent-category₀ D'')
-    indexed-dependent-functor₀ F'
-      = record {IndexedDependentFunctor₀ F'}
-  
-  -- #### IndexedDependentFunctorIdentity
-  
+        (indexed-category₁ C')
+        (indexed-category₁ D')
+    indexed-functor₁ F'
+      = record {IndexedFunctor₁ F'}
+
+  -- #### IndexedFunctorIdentity
+
   module _
-    {C : Category}
-    {C' : ChainDependentCategory C zero}
-    {C'' : IndexedDependentCategory C'}
-    {F : ChainDependentFunctor C' C'}
-    {F' : IndexedDependentFunctor C'' C'' F}
+    {C : ChainCategory (suc zero)}
+    {C' : IndexedCategory C}
+    {F : ChainFunctor C C}
+    {F' : IndexedFunctor C' C' F}
     where
 
-    module IndexedDependentFunctorIdentity₀
-      (p : IndexedDependentFunctorIdentity F')
+    module IndexedFunctorIdentity₁
+      (p : IndexedFunctorIdentity F')
       where
 
       functor
         : FunctorIdentity
-          (DependentFunctor.functor (indexed-dependent-functor₀ F'))
+          (DependentFunctor.functor (indexed-functor₁ F'))
       functor
-        = IndexedDependentFunctorIdentity.functor p
+        = indexed-functor-identity-head p
           
       functor'
-        : (x : Category.Object C)
+        : (x : Category.Object (ChainCategory.head C))
         → FunctorIdentity
-          (DependentFunctor.functor' (indexed-dependent-functor₀ F') x)
+          (DependentFunctor.functor' (indexed-functor₁ F') x)
       functor' x
         = indexed-functor-identity₀-eq
-          (ChainDependentCategory.chain-category C')
-          (IndexedDependentCategory.indexed-category C'')
-          (IndexedDependentFunctorIdentity.base p x)
-          (IndexedDependentFunctorIdentity.indexed-functor p x)
+          (ChainCategory.tail C)
+          (indexed-category-tail C')
+          (indexed-functor-identity-base p x)
+          (indexed-functor-identity-tail p x)
 
-    indexed-dependent-functor-identity₀
-      : IndexedDependentFunctorIdentity F'
+    indexed-functor-identity₁
+      : IndexedFunctorIdentity F'
       → DependentFunctorIdentity
-        (indexed-dependent-functor₀ F')
-    indexed-dependent-functor-identity₀ p
-      = record {IndexedDependentFunctorIdentity₀ p}
+        (indexed-functor₁ F')
+    indexed-functor-identity₁ p
+      = record {IndexedFunctorIdentity₁ p}
 
-  -- #### IndexedDependentFunctorCompose
-  
+  -- #### IndexedFunctorCompose
+
   module _
-    {C D E : Category}
-    {C' : ChainDependentCategory C zero}
-    {D' : ChainDependentCategory D zero}
-    {E' : ChainDependentCategory E zero}
-    {C'' : IndexedDependentCategory C'}
-    {D'' : IndexedDependentCategory D'}
-    {E'' : IndexedDependentCategory E'}
-    {F : ChainDependentFunctor D' E'}
-    {G : ChainDependentFunctor C' D'}
-    {H : ChainDependentFunctor C' E'}
-    {F' : IndexedDependentFunctor D'' E'' F}
-    {G' : IndexedDependentFunctor C'' D'' G}
-    {H' : IndexedDependentFunctor C'' E'' H}
+    {C D E : ChainCategory (suc zero)}
+    {C' : IndexedCategory C}
+    {D' : IndexedCategory D}
+    {E' : IndexedCategory E}
+    {F : ChainFunctor D E}
+    {G : ChainFunctor C D}
+    {H : ChainFunctor C E}
+    {F' : IndexedFunctor D' E' F}
+    {G' : IndexedFunctor C' D' G}
+    {H' : IndexedFunctor C' E' H}
     where
 
-    module IndexedDependentFunctorCompose₀
-      (p : IndexedDependentFunctorCompose F' G' H')
+    module IndexedFunctorCompose₁
+      (p : IndexedFunctorCompose F' G' H')
       where
 
       functor
         : FunctorCompose
-          (DependentFunctor.functor (indexed-dependent-functor₀ F'))
-          (DependentFunctor.functor (indexed-dependent-functor₀ G'))
-          (DependentFunctor.functor (indexed-dependent-functor₀ H'))
+          (DependentFunctor.functor (indexed-functor₁ F'))
+          (DependentFunctor.functor (indexed-functor₁ G'))
+          (DependentFunctor.functor (indexed-functor₁ H'))
       functor
-        = IndexedDependentFunctorCompose.functor p
-  
+        = indexed-functor-compose-head p
+
       functor'
-        : (x : Category.Object C)
+        : (x : Category.Object (ChainCategory.head C))
         → FunctorCompose
-          (DependentFunctor.functor' (indexed-dependent-functor₀ F')
-            (DependentFunctor.base (indexed-dependent-functor₀ G') x))
-          (DependentFunctor.functor' (indexed-dependent-functor₀ G') x)
-          (DependentFunctor.functor' (indexed-dependent-functor₀ H') x)
+          (DependentFunctor.functor' (indexed-functor₁ F')
+            (DependentFunctor.base (indexed-functor₁ G') x))
+          (DependentFunctor.functor' (indexed-functor₁ G') x)
+          (DependentFunctor.functor' (indexed-functor₁ H') x)
       functor' x
         = indexed-functor-compose₀-eq
-          (ChainDependentCategory.chain-category E')
-          (IndexedDependentCategory.indexed-category E'')
-          (IndexedDependentFunctorCompose.base p x)
-          (IndexedDependentFunctorCompose.indexed-functor p x)
+          (ChainCategory.tail E)
+          (indexed-category-tail E')
+          (indexed-functor-compose-base p x)
+          (indexed-functor-compose-tail p x)
 
-    indexed-dependent-functor-compose₀
-      : IndexedDependentFunctorCompose F' G' H'
+    indexed-functor-compose₁
+      : IndexedFunctorCompose F' G' H'
       → DependentFunctorCompose
-        (indexed-dependent-functor₀ F')
-        (indexed-dependent-functor₀ G')
-        (indexed-dependent-functor₀ H')
-    indexed-dependent-functor-compose₀ p
-      = record {IndexedDependentFunctorCompose₀ p}
+        (indexed-functor₁ F')
+        (indexed-functor₁ G')
+        (indexed-functor₁ H')
+    indexed-functor-compose₁ p
+      = record {IndexedFunctorCompose₁ p}
 
-  -- #### IndexedDependentFunctorSquare
-  
+  -- #### IndexedFunctorSquare
+
   module _
-    {C₁ C₂ D₁ D₂ : Category}
-    {C₁' : ChainDependentCategory C₁ zero}
-    {C₂' : ChainDependentCategory C₂ zero}
-    {D₁' : ChainDependentCategory D₁ zero}
-    {D₂' : ChainDependentCategory D₂ zero}
-    {C₁'' : IndexedDependentCategory C₁'}
-    {C₂'' : IndexedDependentCategory C₂'}
-    {D₁'' : IndexedDependentCategory D₁'}
-    {D₂'' : IndexedDependentCategory D₂'}
-    {F : ChainDependentFunctor C₁' C₂'}
-    {G : ChainDependentFunctor D₁' D₂'}
-    {H₁ : ChainDependentFunctor C₁' D₁'}
-    {H₂ : ChainDependentFunctor C₂' D₂'}
-    {F' : IndexedDependentFunctor C₁'' C₂'' F}
-    {G' : IndexedDependentFunctor D₁'' D₂'' G}
-    {H₁' : IndexedDependentFunctor C₁'' D₁'' H₁}
-    {H₂' : IndexedDependentFunctor C₂'' D₂'' H₂}
+    {C₁ C₂ D₁ D₂ : ChainCategory (suc zero)}
+    {C₁' : IndexedCategory C₁}
+    {C₂' : IndexedCategory C₂}
+    {D₁' : IndexedCategory D₁}
+    {D₂' : IndexedCategory D₂}
+    {F : ChainFunctor C₁ C₂}
+    {G : ChainFunctor D₁ D₂}
+    {H₁ : ChainFunctor C₁ D₁}
+    {H₂ : ChainFunctor C₂ D₂}
+    {F' : IndexedFunctor C₁' C₂' F}
+    {G' : IndexedFunctor D₁' D₂' G}
+    {H₁' : IndexedFunctor C₁' D₁' H₁}
+    {H₂' : IndexedFunctor C₂' D₂' H₂}
     where
 
-    module IndexedDependentFunctorSquare₀
-      (s : IndexedDependentFunctorSquare F' G' H₁' H₂')
+    module IndexedFunctorSquare₁
+      (s : IndexedFunctorSquare F' G' H₁' H₂')
       where
 
       functor
         : FunctorSquare
-          (DependentFunctor.functor (indexed-dependent-functor₀ F'))
-          (DependentFunctor.functor (indexed-dependent-functor₀ G'))
-          (DependentFunctor.functor (indexed-dependent-functor₀ H₁'))
-          (DependentFunctor.functor (indexed-dependent-functor₀ H₂'))
+          (DependentFunctor.functor (indexed-functor₁ F'))
+          (DependentFunctor.functor (indexed-functor₁ G'))
+          (DependentFunctor.functor (indexed-functor₁ H₁'))
+          (DependentFunctor.functor (indexed-functor₁ H₂'))
       functor
-        = IndexedDependentFunctorSquare.functor s
-  
+        = indexed-functor-square-head s
+
       functor'
-        : (x₁ : Category.Object C₁)
+        : (x₁ : Category.Object (ChainCategory.head C₁))
         → FunctorSquare
-          (DependentFunctor.functor' (indexed-dependent-functor₀ F') x₁)
-          (DependentFunctor.functor' (indexed-dependent-functor₀ G')
-            (DependentFunctor.base (indexed-dependent-functor₀ H₁') x₁))
-          (DependentFunctor.functor' (indexed-dependent-functor₀ H₁') x₁)
-          (DependentFunctor.functor' (indexed-dependent-functor₀ H₂')
-            (DependentFunctor.base (indexed-dependent-functor₀ F') x₁))
+          (DependentFunctor.functor' (indexed-functor₁ F') x₁)
+          (DependentFunctor.functor' (indexed-functor₁ G')
+            (DependentFunctor.base (indexed-functor₁ H₁') x₁))
+          (DependentFunctor.functor' (indexed-functor₁ H₁') x₁)
+          (DependentFunctor.functor' (indexed-functor₁ H₂')
+            (DependentFunctor.base (indexed-functor₁ F') x₁))
       functor' x₁
         = indexed-functor-square₀-eq
-          (ChainDependentCategory.chain-category D₂')
-          (IndexedDependentCategory.indexed-category D₂'')
-          (IndexedDependentFunctorSquare.base s x₁)
-          (IndexedDependentFunctorSquare.indexed-functor s x₁)
+          (ChainCategory.tail D₂)
+          (indexed-category-tail D₂')
+          (indexed-functor-square-base s x₁)
+          (indexed-functor-square-tail s x₁)
 
-    indexed-dependent-functor-square₀
-      : IndexedDependentFunctorSquare F' G' H₁' H₂'
+    indexed-functor-square₁
+      : IndexedFunctorSquare F' G' H₁' H₂'
       → DependentFunctorSquare
-        (indexed-dependent-functor₀ F')
-        (indexed-dependent-functor₀ G')
-        (indexed-dependent-functor₀ H₁')
-        (indexed-dependent-functor₀ H₂')
-    indexed-dependent-functor-square₀ s
-      = record {IndexedDependentFunctorSquare₀ s}
-
-  -- ### Tail
-
-  indexed-category-tail
-    : {n : ℕ}
-    → {C : ChainCategory (suc n)}
-    → IndexedCategory C
-    → (x : Category.Object (ChainCategory.head C))
-    → IndexedCategory (ChainCategory.tail C x)
-  indexed-category-tail C' x
-    = IndexedDependentCategory.indexed-category
-      (indexed-category-unpack C') x
+        (indexed-functor₁ F')
+        (indexed-functor₁ G')
+        (indexed-functor₁ H₁')
+        (indexed-functor₁ H₂')
+    indexed-functor-square₁ s
+      = record {IndexedFunctorSquare₁ s}
 
 -- ## Modules
-
-open Internal public
-  using (IndexedDependentCategory; IndexedDependentFunctor;
-    IndexedDependentFunctorCompose; IndexedDependentFunctorIdentity;
-    IndexedDependentFunctorSquare; indexed-dependent-category;
-    indexed-dependent-category₀; indexed-dependent-functor;
-    indexed-dependent-functor₀; indexed-dependent-functor-compose;
-    indexed-dependent-functor-compose₀; indexed-dependent-functor-identity;
-    indexed-dependent-functor-identity₀; indexed-dependent-functor-square;
-    indexed-dependent-functor-square₀)
 
 -- ### IndexedCategory
 
@@ -1016,19 +952,23 @@ IndexedCategory
   → Set₁
 IndexedCategory
   = Internal.IndexedCategory
-  
+
 open Internal.IndexedCategory public
 
 open Internal public
-  using (indexed-category₀)
+  using (indexed-category₀; indexed-category₁)
 
 module IndexedCategory where
 
   open Internal public using () renaming
     ( indexed-category-tail
       to tail
-    ; indexed-category-unpack
-      to unpack
+    ; indexed-category-indexed-functor
+      to indexed-functor
+    ; indexed-category-indexed-functor-compose
+      to indexed-functor-compose
+    ; indexed-category-indexed-functor-identity
+      to indexed-functor-identity
     )
 
 -- ### IndexedFunctor
@@ -1046,13 +986,15 @@ IndexedFunctor
 open Internal.IndexedFunctor public
 
 open Internal public
-  using (indexed-functor₀)
+  using (indexed-functor₀; indexed-functor₁)
 
 module IndexedFunctor where
 
   open Internal public using () renaming
-    ( indexed-functor-unpack
-      to unpack
+    ( indexed-functor-tail
+      to tail
+    ; indexed-functor-indexed-functor-square
+      to indexed-functor-square
     )
 
 -- ### IndexedFunctorIdentity
@@ -1071,13 +1013,17 @@ IndexedFunctorIdentity
 open Internal.IndexedFunctorIdentity public
 
 open Internal public
-  using (indexed-functor-identity₀)
+  using (indexed-functor-identity₀; indexed-functor-identity₁)
 
 module IndexedFunctorIdentity where
 
   open Internal public using () renaming
-    ( indexed-functor-identity-unpack
-      to unpack
+    ( indexed-functor-identity-base
+      to base
+    ; indexed-functor-identity-head
+      to head
+    ; indexed-functor-identity-tail
+      to tail
     )
 
 -- ### IndexedFunctorCompose
@@ -1102,13 +1048,17 @@ IndexedFunctorCompose
 open Internal.IndexedFunctorCompose public
 
 open Internal public
-  using (indexed-functor-compose₀)
+  using (indexed-functor-compose₀; indexed-functor-compose₁)
 
 module IndexedFunctorCompose where
 
   open Internal public using () renaming
-    ( indexed-functor-compose-unpack
-      to unpack
+    ( indexed-functor-compose-base
+      to base
+    ; indexed-functor-compose-head
+      to head
+    ; indexed-functor-compose-tail
+      to tail
     )
 
 -- ### IndexedFunctorSquare
@@ -1136,12 +1086,16 @@ IndexedFunctorSquare
 open Internal.IndexedFunctorSquare public
 
 open Internal public
-  using (indexed-functor-square₀)
+  using (indexed-functor-square₀; indexed-functor-square₁)
 
 module IndexedFunctorSquare where
 
   open Internal public using () renaming
-    ( indexed-functor-square-unpack
-      to unpack
+    ( indexed-functor-square-base
+      to base
+    ; indexed-functor-square-head
+      to head
+    ; indexed-functor-square-tail
+      to tail
     )
 

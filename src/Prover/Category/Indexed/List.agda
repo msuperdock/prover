@@ -1,20 +1,12 @@
 module Prover.Category.Indexed.List where
 
-open import Prover.Category
-  using (Category)
 open import Prover.Category.Chain
-  using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
-    ChainFunctor)
+  using (ChainCategory; ChainFunctor)
 open import Prover.Category.Indexed
-  using (IndexedCategory; IndexedDependentCategory; IndexedDependentFunctor;
-    IndexedDependentFunctorCompose; IndexedDependentFunctorIdentity;
-    IndexedDependentFunctorSquare; IndexedFunctor; IndexedFunctorCompose;
-    IndexedFunctorIdentity; IndexedFunctorSquare; empty; indexed-category₀;
-    indexed-dependent-category; indexed-dependent-functor;
-    indexed-dependent-functor-compose; indexed-dependent-functor-identity;
-    indexed-dependent-functor-square; indexed-functor₀;
-    indexed-functor-compose₀; indexed-functor-identity₀;
-    indexed-functor-square₀; sigma)
+  using (IndexedCategory; IndexedFunctor; IndexedFunctorCompose;
+    IndexedFunctorIdentity; IndexedFunctorSquare; cons; indexed-category₀;
+    indexed-functor₀; indexed-functor-compose₀; indexed-functor-identity₀;
+    indexed-functor-square₀; nil)
 open import Prover.Category.List
   using (category-list; functor-compose-list; functor-identity-list;
     functor-list; functor-square-list)
@@ -160,141 +152,58 @@ indexed-functor-square-list-eq
     (indexed-functor-list H₁')
     (indexed-functor-list H₂')
 
--- ### IndexedDependentCategory
-
-indexed-dependent-category-list
-  : {n : ℕ}
-  → {C : Category}
-  → {C' : ChainDependentCategory C n}
-  → IndexedDependentCategory C'
-  → IndexedDependentCategory C'
-
--- ### IndexedDependentFunctor
-
-indexed-dependent-functor-list
-  : {n : ℕ}
-  → {C D : Category}
-  → {C' : ChainDependentCategory C n}
-  → {D' : ChainDependentCategory D n}
-  → {C'' : IndexedDependentCategory C'}
-  → {D'' : IndexedDependentCategory D'}
-  → {F : ChainDependentFunctor C' D'}
-  → IndexedDependentFunctor C'' D'' F
-  → IndexedDependentFunctor
-    (indexed-dependent-category-list C'')
-    (indexed-dependent-category-list D'') F
-
--- ### IndexedDependentFunctorIdentity
-
-indexed-dependent-functor-identity-list
-  : {n : ℕ}
-  → {C : Category}
-  → {C' : ChainDependentCategory C n}
-  → {C'' : IndexedDependentCategory C'}
-  → {F : ChainDependentFunctor C' C'}
-  → {F' : IndexedDependentFunctor C'' C'' F}
-  → IndexedDependentFunctorIdentity F'
-  → IndexedDependentFunctorIdentity
-    (indexed-dependent-functor-list F')
-
--- ### IndexedDependentFunctorCompose
-
-indexed-dependent-functor-compose-list
-  : {n : ℕ}
-  → {C D E : Category}
-  → {C' : ChainDependentCategory C n}
-  → {D' : ChainDependentCategory D n}
-  → {E' : ChainDependentCategory E n}
-  → {C'' : IndexedDependentCategory C'}
-  → {D'' : IndexedDependentCategory D'}
-  → {E'' : IndexedDependentCategory E'}
-  → {F : ChainDependentFunctor D' E'}
-  → {G : ChainDependentFunctor C' D'}
-  → {H : ChainDependentFunctor C' E'}
-  → {F' : IndexedDependentFunctor D'' E'' F}
-  → {G' : IndexedDependentFunctor C'' D'' G}
-  → {H' : IndexedDependentFunctor C'' E'' H}
-  → IndexedDependentFunctorCompose F' G' H'
-  → IndexedDependentFunctorCompose
-    (indexed-dependent-functor-list F')
-    (indexed-dependent-functor-list G')
-    (indexed-dependent-functor-list H')
-
--- ### IndexedDependentFunctorSquare
-
-indexed-dependent-functor-square-list
-  : {n : ℕ}
-  → {C₁ C₂ D₁ D₂ : Category}
-  → {C₁' : ChainDependentCategory C₁ n}
-  → {C₂' : ChainDependentCategory C₂ n}
-  → {D₁' : ChainDependentCategory D₁ n}
-  → {D₂' : ChainDependentCategory D₂ n}
-  → {C₁'' : IndexedDependentCategory C₁'}
-  → {C₂'' : IndexedDependentCategory C₂'}
-  → {D₁'' : IndexedDependentCategory D₁'}
-  → {D₂'' : IndexedDependentCategory D₂'}
-  → {F : ChainDependentFunctor C₁' C₂'}
-  → {G : ChainDependentFunctor D₁' D₂'}
-  → {H₁ : ChainDependentFunctor C₁' D₁'}
-  → {H₂ : ChainDependentFunctor C₂' D₂'}
-  → {F' : IndexedDependentFunctor C₁'' C₂'' F}
-  → {G' : IndexedDependentFunctor D₁'' D₂'' G}
-  → {H₁' : IndexedDependentFunctor C₁'' D₁'' H₁}
-  → {H₂' : IndexedDependentFunctor C₂'' D₂'' H₂}
-  → IndexedDependentFunctorSquare F' G' H₁' H₂'
-  → IndexedDependentFunctorSquare
-    (indexed-dependent-functor-list F')
-    (indexed-dependent-functor-list G')
-    (indexed-dependent-functor-list H₁')
-    (indexed-dependent-functor-list H₂')
-
 -- ## Definitions
 
 -- ### IndexedCategory
 
 indexed-category-list
   {n = zero} C'
-  = empty
+  = nil
     (category-list
       (indexed-category₀ C'))
 indexed-category-list
   {n = suc _} C'
-  = sigma
-    (indexed-dependent-category-list
-      (IndexedCategory.unpack C'))
+  = cons
+    (λ x → indexed-category-list
+      (IndexedCategory.tail C' x))
+    (λ f → indexed-functor-list
+      (IndexedCategory.indexed-functor C' f))
+    (λ x → indexed-functor-identity-list
+      (IndexedCategory.indexed-functor-identity C' x))
+    (λ f g → indexed-functor-compose-list
+      (IndexedCategory.indexed-functor-compose C' f g))
 
 -- ### IndexedFunctor
 
 indexed-functor-list
-  {n = zero}
-  {C' = C'} {D' = D'} F'
-  = empty
+  {n = zero} F'
+  = nil
     (functor-list
-      {C = indexed-category₀ C'}
-      {D = indexed-category₀ D'}
       (indexed-functor₀ F'))
 indexed-functor-list
   {n = suc _} F'
-  = sigma
-    (indexed-dependent-functor-list
-      (IndexedFunctor.unpack F'))
+  = cons
+    (λ x → indexed-functor-list
+      (IndexedFunctor.tail F' x))
+    (λ f → indexed-functor-square-list
+      (IndexedFunctor.indexed-functor-square F' f))
 
 -- ### IndexedFunctorIdentity
 
 indexed-functor-identity-list
-  {n = zero}
-  {C' = C'}
-  {F' = F'} p
-  = empty
+  {n = zero} p
+  = nil
     (functor-identity-list
-      {C = indexed-category₀ C'}
-      {F = indexed-functor₀ F'}
       (indexed-functor-identity₀ p))
 indexed-functor-identity-list
-  {n = suc _} p
-  = sigma
-    (indexed-dependent-functor-identity-list
-      (IndexedFunctorIdentity.unpack p))
+  {n = suc _} {C = C} {C' = C'} p
+  = cons
+    (IndexedFunctorIdentity.head p)
+    (λ x → indexed-functor-identity-list-eq
+      (ChainCategory.tail C)
+      (IndexedCategory.tail C')
+      (IndexedFunctorIdentity.base p x)
+      (IndexedFunctorIdentity.tail p x))
 
 indexed-functor-identity-list-eq _ _ refl
   = indexed-functor-identity-list
@@ -302,23 +211,19 @@ indexed-functor-identity-list-eq _ _ refl
 -- ### IndexedFunctorCompose
 
 indexed-functor-compose-list
-  {n = zero}
-  {C' = C'} {D' = D'} {E' = E'}
-  {F' = F'} {G' = G'} {H' = H'} p
-  = empty
+  {n = zero} p
+  = nil
     (functor-compose-list
-      {C = indexed-category₀ C'}
-      {D = indexed-category₀ D'}
-      {E = indexed-category₀ E'}
-      {F = indexed-functor₀ F'}
-      {G = indexed-functor₀ G'}
-      {H = indexed-functor₀ H'}
       (indexed-functor-compose₀ p))
 indexed-functor-compose-list
-  {n = suc _} p
-  = sigma
-    (indexed-dependent-functor-compose-list
-      (IndexedFunctorCompose.unpack p))
+  {n = suc _} {E = E} {E' = E'} p
+  = cons
+    (IndexedFunctorCompose.head p)
+    (λ x → indexed-functor-compose-list-eq
+      (ChainCategory.tail E)
+      (IndexedCategory.tail E')
+      (IndexedFunctorCompose.base p x)
+      (IndexedFunctorCompose.tail p x))
 
 indexed-functor-compose-list-eq _ _ refl
   = indexed-functor-compose-list
@@ -326,84 +231,20 @@ indexed-functor-compose-list-eq _ _ refl
 -- ### IndexedFunctorSquare
 
 indexed-functor-square-list
-  {n = zero}
-  {C₁' = C₁'} {C₂' = C₂'} {D₁' = D₁'} {D₂' = D₂'}
-  {F' = F'} {G' = G'} {H₁' = H₁'} {H₂' = H₂'} s
-  = empty
+  {n = zero} s
+  = nil
     (functor-square-list
-      {C₁ = indexed-category₀ C₁'}
-      {C₂ = indexed-category₀ C₂'}
-      {D₁ = indexed-category₀ D₁'}
-      {D₂ = indexed-category₀ D₂'}
-      {F = indexed-functor₀ F'}
-      {G = indexed-functor₀ G'}
-      {H₁ = indexed-functor₀ H₁'}
-      {H₂ = indexed-functor₀ H₂'}
       (indexed-functor-square₀ s))
 indexed-functor-square-list
-  {n = suc _} s
-  = sigma
-    (indexed-dependent-functor-square-list
-      (IndexedFunctorSquare.unpack s))
+  {n = suc _} {D₂ = D₂} {D₂' = D₂'} s
+  = cons
+    (IndexedFunctorSquare.head s)
+    (λ x₁ → indexed-functor-square-list-eq
+      (ChainCategory.tail D₂)
+      (IndexedCategory.tail D₂')
+      (IndexedFunctorSquare.base s x₁)
+      (IndexedFunctorSquare.tail s x₁))
 
 indexed-functor-square-list-eq _ _ refl
   = indexed-functor-square-list
-
--- ### IndexedDependentCategory
-
-indexed-dependent-category-list C''
-  = indexed-dependent-category
-    (λ x → indexed-category-list
-      (IndexedDependentCategory.indexed-category C'' x))
-    (λ f → indexed-functor-list
-      (IndexedDependentCategory.indexed-functor C'' f))
-    (λ x → indexed-functor-identity-list
-      (IndexedDependentCategory.indexed-functor-identity C'' x))
-    (λ f g → indexed-functor-compose-list
-      (IndexedDependentCategory.indexed-functor-compose C'' f g))
-
--- ### IndexedDependentFunctor
-
-indexed-dependent-functor-list F'
-  = indexed-dependent-functor
-    (λ x → indexed-functor-list
-      (IndexedDependentFunctor.indexed-functor F' x))
-    (λ f → indexed-functor-square-list
-      (IndexedDependentFunctor.indexed-functor-square F' f))
-
--- ### IndexedDependentFunctorIdentity
-
-indexed-dependent-functor-identity-list
-  {C' = C'} {C'' = C''} p
-  = indexed-dependent-functor-identity
-    (IndexedDependentFunctorIdentity.functor p)
-    (λ x → indexed-functor-identity-list-eq
-      (ChainDependentCategory.chain-category C')
-      (IndexedDependentCategory.indexed-category C'')
-      (IndexedDependentFunctorIdentity.base p x)
-      (IndexedDependentFunctorIdentity.indexed-functor p x))
-
--- ### IndexedDependentFunctorCompose
-
-indexed-dependent-functor-compose-list
-  {E' = E'} {E'' = E''} p
-  = indexed-dependent-functor-compose
-    (IndexedDependentFunctorCompose.functor p)
-    (λ x → indexed-functor-compose-list-eq
-      (ChainDependentCategory.chain-category E')
-      (IndexedDependentCategory.indexed-category E'')
-      (IndexedDependentFunctorCompose.base p x)
-      (IndexedDependentFunctorCompose.indexed-functor p x))
-
--- ### IndexedDependentFunctorSquare
-
-indexed-dependent-functor-square-list
-  {D₂' = D₂'} {D₂'' = D₂''} s
-  = indexed-dependent-functor-square
-    (IndexedDependentFunctorSquare.functor s)
-    (λ x → indexed-functor-square-list-eq
-      (ChainDependentCategory.chain-category D₂')
-      (IndexedDependentCategory.indexed-category D₂'')
-      (IndexedDependentFunctorSquare.base s x)
-      (IndexedDependentFunctorSquare.indexed-functor s x))
 

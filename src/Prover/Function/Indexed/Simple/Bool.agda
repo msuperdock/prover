@@ -23,13 +23,13 @@ module Internal where
     → Set
     where
 
-    empty
+    nil
       : {C : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → BoolFunction (indexed-simple-category₀ C')
       → IndexedSimpleBoolFunction C'
 
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' : IndexedSimpleCategory C}
@@ -44,7 +44,7 @@ module Internal where
     → {C' : IndexedSimpleCategory C}
     → IndexedSimpleBoolFunction C'
     → BoolFunction (indexed-simple-category₀ C')
-  indexed-simple-bool-function₀ (empty f)
+  indexed-simple-bool-function₀ (nil f)
     = f
 
   indexed-simple-bool-function-tail
@@ -55,7 +55,7 @@ module Internal where
     → (x : Category.Object (ChainCategory.head C))
     → IndexedSimpleBoolFunction
       (IndexedSimpleCategory.tail C' x)
-  indexed-simple-bool-function-tail (sigma F)
+  indexed-simple-bool-function-tail (cons F)
     = F
 
 -- ## Modules

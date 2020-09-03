@@ -9,7 +9,7 @@ open import Prover.Category.Indexed.Simple.Product
 open import Prover.Function.Bool.Product
   using (bool-function-product)
 open import Prover.Function.Indexed.Simple.Bool
-  using (IndexedSimpleBoolFunction; empty; indexed-simple-bool-function₀; sigma)
+  using (IndexedSimpleBoolFunction; cons; indexed-simple-bool-function₀; nil)
 open import Prover.Prelude
 
 -- ## IndexedSimpleBoolFunction
@@ -22,13 +22,15 @@ indexed-simple-bool-function-product
   → IndexedSimpleBoolFunction C₂'
   → IndexedSimpleBoolFunction
     (indexed-simple-category-product C₁' C₂')
-indexed-simple-bool-function-product {n = zero} F₁ F₂
-  = empty
+indexed-simple-bool-function-product
+  {n = zero} F₁ F₂
+  = nil
     (bool-function-product
       (indexed-simple-bool-function₀ F₁)
       (indexed-simple-bool-function₀ F₂))
-indexed-simple-bool-function-product {n = suc _} F₁ F₂
-  = sigma
+indexed-simple-bool-function-product
+  {n = suc _} F₁ F₂
+  = cons
     (λ x → indexed-simple-bool-function-product
       (IndexedSimpleBoolFunction.tail F₁ x)
       (IndexedSimpleBoolFunction.tail F₂ x))

@@ -18,8 +18,8 @@ open import Prover.Editor
   using (EventStack; ViewStack)
 open import Prover.Editor.Indexed
   using (IndexedEditor; IndexedMainEditor; IndexedPartialEditor;
-    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
-    indexed-editor₀; indexed-editor-simple; indexed-editor-tail; sigma)
+    IndexedSimpleEditor; IndexedSplitEditor; IndexedSplitMainEditor; cons;
+    indexed-editor₀; indexed-editor-simple; indexed-editor-tail; nil)
 open import Prover.Editor.Indexed.Unit
   using (indexed-editor-unit)
 open import Prover.Editor.List
@@ -61,12 +61,14 @@ indexed-editor-list
     (view-stack-list V)
     (event-stack-list E)
     (indexed-category-list C')
-indexed-editor-list {n = zero} d e
-  = empty
+indexed-editor-list
+  {n = zero} d e
+  = nil
     (editor-list d
       (indexed-editor₀ e))
-indexed-editor-list {n = suc _} d e
-  = sigma
+indexed-editor-list
+  {n = suc _} d e
+  = cons
     (λ x → indexed-editor-list d
       (indexed-editor-tail e x))
 

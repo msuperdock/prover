@@ -7,7 +7,7 @@ open import Prover.Category.Indexed
 open import Prover.Category.Indexed.List
   using (indexed-category-list)
 open import Prover.Function.Indexed.Split
-  using (IndexedSplitFunction; empty; indexed-split-function₀; sigma)
+  using (IndexedSplitFunction; cons; indexed-split-function₀; nil)
 open import Prover.Function.Split.List
   using (split-function-list)
 open import Prover.Prelude
@@ -23,12 +23,14 @@ indexed-split-function-list
   → IndexedSplitFunction
     (List A)
     (indexed-category-list C')
-indexed-split-function-list {n = zero} F
-  = empty
+indexed-split-function-list
+  {n = zero} F
+  = nil
     (split-function-list
       (indexed-split-function₀ F))
-indexed-split-function-list {n = suc _} F
-  = sigma
+indexed-split-function-list
+  {n = suc _} F
+  = cons
     (λ x → indexed-split-function-list
       (IndexedSplitFunction.tail F x))
 

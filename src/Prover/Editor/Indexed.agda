@@ -41,13 +41,13 @@ data IndexedEditor
   → Set₁
   where
 
-  empty
+  nil
     : {C : ChainCategory zero}
     → {C' : IndexedCategory C}
     → Editor V E (indexed-category₀ C')
     → IndexedEditor V E C'
 
-  sigma
+  cons
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' : IndexedCategory C}
@@ -64,7 +64,7 @@ indexed-editor₀
   → {C' : IndexedCategory C}
   → IndexedEditor V E C'
   → Editor V E (indexed-category₀ C')
-indexed-editor₀ (empty e)
+indexed-editor₀ (nil e)
   = e
 
 indexed-editor-tail
@@ -76,7 +76,7 @@ indexed-editor-tail
   → IndexedEditor V E C'
   → (x : Category.Object (ChainCategory.head C))
   → IndexedEditor V E (IndexedCategory.tail C' x)
-indexed-editor-tail (sigma e)
+indexed-editor-tail (cons e)
   = e
 
 -- ## IndexedSimpleEditor
@@ -92,13 +92,13 @@ data IndexedSimpleEditor
   → Set₁
   where
 
-  empty
+  nil
     : {C : ChainCategory zero}
     → {A : IndexedSimpleCategory C}
     → SimpleEditor V E (indexed-simple-category₀ A)
     → IndexedSimpleEditor V E A
 
-  sigma
+  cons
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {A : IndexedSimpleCategory C}
@@ -115,7 +115,7 @@ indexed-simple-editor₀
   → {A : IndexedSimpleCategory C}
   → IndexedSimpleEditor V E A
   → SimpleEditor V E (indexed-simple-category₀ A)
-indexed-simple-editor₀ (empty e)
+indexed-simple-editor₀ (nil e)
   = e
 
 indexed-simple-editor-tail
@@ -127,7 +127,7 @@ indexed-simple-editor-tail
   → IndexedSimpleEditor V E A
   → (x : Category.Object (ChainCategory.head C))
   → IndexedSimpleEditor V E (IndexedSimpleCategory.tail A x)
-indexed-simple-editor-tail (sigma e)
+indexed-simple-editor-tail (cons e)
   = e
 
 -- ### Conversion
@@ -141,10 +141,16 @@ indexed-editor-simple
   → IndexedEditor V E C'
   → IndexedSimpleEditor V E
     (indexed-category-simple C')
-indexed-editor-simple {n = zero} e
-  = empty (any (indexed-editor₀ e))
-indexed-editor-simple {n = suc _} e
-  = sigma (λ x → indexed-editor-simple (indexed-editor-tail e x))
+indexed-editor-simple
+  {n = zero} e
+  = nil
+    (any
+      (indexed-editor₀ e))
+indexed-editor-simple
+  {n = suc _} e
+  = cons
+    (λ x → indexed-editor-simple
+      (indexed-editor-tail e x))
 
 -- ## IndexedPartialEditor
 

@@ -12,9 +12,9 @@ open import Prover.Editor
   using (EventStack; EventStackMap; ViewStack; ViewStackMap)
 open import Prover.Editor.Indexed
   using (IndexedEditor; IndexedPartialEditor; IndexedSimpleEditor;
-    IndexedMainEditor; IndexedSplitEditor; IndexedSplitMainEditor; empty;
+    IndexedMainEditor; IndexedSplitEditor; IndexedSplitMainEditor; cons;
     indexed-editor₀; indexed-editor-tail; indexed-simple-editor₀;
-    indexed-simple-editor-tail; sigma)
+    indexed-simple-editor-tail; nil)
 open import Prover.Editor.Map
   using (editor-map-event; editor-map-view; simple-editor-map-event;
     simple-editor-map-view)
@@ -45,12 +45,14 @@ indexed-editor-map-view
   → ViewStackMap V W
   → IndexedEditor V E C'
   → IndexedEditor W E C'
-indexed-editor-map-view {n = zero} F e
-  = empty
+indexed-editor-map-view
+  {n = zero} F e
+  = nil
     (editor-map-view F
       (indexed-editor₀ e))
-indexed-editor-map-view {n = suc _} F e
-  = sigma
+indexed-editor-map-view
+  {n = suc _} F e
+  = cons
     (λ x → indexed-editor-map-view F
       (indexed-editor-tail e x))
 
@@ -65,12 +67,14 @@ indexed-simple-editor-map-view
   → ViewStackMap V W
   → IndexedSimpleEditor V E C'
   → IndexedSimpleEditor W E C'
-indexed-simple-editor-map-view {n = zero} F e
-  = empty
+indexed-simple-editor-map-view
+  {n = zero} F e
+  = nil
     (simple-editor-map-view F
       (indexed-simple-editor₀ e))
-indexed-simple-editor-map-view {n = suc _} F e
-  = sigma
+indexed-simple-editor-map-view
+  {n = suc _} F e
+  = cons
     (λ x → indexed-simple-editor-map-view F
       (indexed-simple-editor-tail e x))
 
@@ -212,12 +216,14 @@ indexed-editor-map-event
   → EventStackMap E F
   → IndexedEditor V E C'
   → IndexedEditor V F C'
-indexed-editor-map-event {n = zero} F e
-  = empty
+indexed-editor-map-event
+  {n = zero} F e
+  = nil
     (editor-map-event F
       (indexed-editor₀ e))
-indexed-editor-map-event {n = suc _} F e
-  = sigma
+indexed-editor-map-event
+  {n = suc _} F e
+  = cons
     (λ x → indexed-editor-map-event F
       (indexed-editor-tail e x))
 
@@ -232,12 +238,14 @@ indexed-simple-editor-map-event
   → EventStackMap E F
   → IndexedSimpleEditor V E C'
   → IndexedSimpleEditor V F C'
-indexed-simple-editor-map-event {n = zero} F e
-  = empty
+indexed-simple-editor-map-event
+  {n = zero} F e
+  = nil
     (simple-editor-map-event F
       (indexed-simple-editor₀ e))
-indexed-simple-editor-map-event {n = suc _} F e
-  = sigma
+indexed-simple-editor-map-event
+  {n = suc _} F e
+  = cons
     (λ x → indexed-simple-editor-map-event F
       (indexed-simple-editor-tail e x))
 

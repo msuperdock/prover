@@ -30,7 +30,7 @@ module Internal where
     → Set
     where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → {D' : IndexedSet C}
@@ -39,7 +39,7 @@ module Internal where
         (indexed-set₀ D')
       → IndexedSimplePartialFunction C' D'
   
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' : IndexedSimpleCategory C}
@@ -60,7 +60,7 @@ module Internal where
     → Set
     where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → {C' D' : IndexedSet C}
       → PartialFunction
@@ -68,7 +68,7 @@ module Internal where
         (indexed-set₀ D')
       → IndexedSimplePartialFunction' C' D'
   
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' D' : IndexedSet C}
@@ -90,7 +90,7 @@ module Internal where
     → PartialFunction
       (indexed-simple-category₀ C')
       (indexed-set₀ D')
-  indexed-simple-partial-function₀ (empty f)
+  indexed-simple-partial-function₀ (nil f)
     = f
   
   indexed-simple-partial-function-tail
@@ -103,7 +103,7 @@ module Internal where
     → IndexedSimplePartialFunction
       (IndexedSimpleCategory.tail C' x)
       (IndexedSet.tail D' x)
-  indexed-simple-partial-function-tail (sigma F)
+  indexed-simple-partial-function-tail (cons F)
     = F
 
   -- #### IndexedSimplePartialFunction'
@@ -115,7 +115,7 @@ module Internal where
     → PartialFunction
       (indexed-set₀ C')
       (indexed-set₀ D')
-  indexed-simple-partial-function₀' (empty f)
+  indexed-simple-partial-function₀' (nil f)
     = f
   
   indexed-simple-partial-function-tail'
@@ -127,7 +127,7 @@ module Internal where
     → IndexedSimplePartialFunction'
       (IndexedSet.tail C' x)
       (IndexedSet.tail D' x)
-  indexed-simple-partial-function-tail' (sigma F)
+  indexed-simple-partial-function-tail' (cons F)
     = F
 
   -- ### Compose
@@ -140,13 +140,15 @@ module Internal where
     → IndexedSimplePartialFunction' D' E'
     → IndexedSimplePartialFunction C' D'
     → IndexedSimplePartialFunction C' E'
-  indexed-simple-partial-function-compose {n = zero} F G
-    = empty
+  indexed-simple-partial-function-compose
+    {n = zero} F G
+    = nil
       (partial-function-compose
         (indexed-simple-partial-function₀' F)
         (indexed-simple-partial-function₀ G))
-  indexed-simple-partial-function-compose {n = suc _} F G
-    = sigma
+  indexed-simple-partial-function-compose
+    {n = suc _} F G
+    = cons
       (λ x → indexed-simple-partial-function-compose
         (indexed-simple-partial-function-tail' F x)
         (indexed-simple-partial-function-tail G x))

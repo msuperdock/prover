@@ -11,8 +11,8 @@ open import Prover.Function.Indexed
 open import Prover.Function.Indexed.List
   using (indexed-set-list)
 open import Prover.Function.Indexed.Simple.Partial
-  using (IndexedSimplePartialFunction; empty; indexed-simple-partial-function₀;
-    sigma)
+  using (IndexedSimplePartialFunction; cons; indexed-simple-partial-function₀;
+    nil)
 open import Prover.Function.Partial.List
   using (partial-function-list)
 open import Prover.Prelude
@@ -28,12 +28,14 @@ indexed-simple-partial-function-list
   → IndexedSimplePartialFunction
     (indexed-simple-category-list C')
     (indexed-set-list D')
-indexed-simple-partial-function-list {n = zero} F
-  = empty
+indexed-simple-partial-function-list
+  {n = zero} F
+  = nil
     (partial-function-list
       (indexed-simple-partial-function₀ F))
-indexed-simple-partial-function-list {n = suc _} F
-  = sigma
+indexed-simple-partial-function-list
+  {n = suc _} F
+  = cons
     (λ x → indexed-simple-partial-function-list
       (IndexedSimplePartialFunction.tail F x))
 

@@ -1,10 +1,9 @@
 module Prover.Category.Indexed.Simple where
 
 open import Prover.Category
-  using (Category; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (FunctorCompose; FunctorIdentity; FunctorSquare)
 open import Prover.Category.Chain
-  using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
-    ChainFunctor)
+  using (ChainCategory; ChainFunctor)
 open import Prover.Function
   using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Prelude
@@ -80,79 +79,6 @@ module Internal where
     → IndexedSimpleFunctor C₂' D₂' H₂
     → Set
     
-  -- #### IndexedSimpleDependentCategory
-  
-  record IndexedSimpleDependentCategory
-    {n : ℕ}
-    {C : Category}
-    (C' : ChainDependentCategory C n)
-    : Set₁
-  
-  -- #### IndexedSimpleDependentFunctor
-  
-  record IndexedSimpleDependentFunctor
-    {n : ℕ}
-    {C D : Category}
-    {C' : ChainDependentCategory C n}
-    {D' : ChainDependentCategory D n}
-    (C'' : IndexedSimpleDependentCategory C')
-    (D'' : IndexedSimpleDependentCategory D')
-    (F : ChainDependentFunctor C' D')
-    : Set
-    
-  -- #### IndexedSimpleDependentFunctorIdentity
-  
-  record IndexedSimpleDependentFunctorIdentity
-    {n : ℕ}
-    {C : Category}
-    {C' : ChainDependentCategory C n}
-    {C'' : IndexedSimpleDependentCategory C'}
-    {F : ChainDependentFunctor C' C'}
-    (F' : IndexedSimpleDependentFunctor C'' C'' F)
-    : Set
-    
-  -- #### IndexedSimpleDependentFunctorCompose
-  
-  record IndexedSimpleDependentFunctorCompose
-    {n : ℕ}
-    {C D E : Category}
-    {C' : ChainDependentCategory C n}
-    {D' : ChainDependentCategory D n}
-    {E' : ChainDependentCategory E n}
-    {C'' : IndexedSimpleDependentCategory C'}
-    {D'' : IndexedSimpleDependentCategory D'}
-    {E'' : IndexedSimpleDependentCategory E'}
-    {F : ChainDependentFunctor D' E'}
-    {G : ChainDependentFunctor C' D'}
-    {H : ChainDependentFunctor C' E'}
-    (F' : IndexedSimpleDependentFunctor D'' E'' F)
-    (G' : IndexedSimpleDependentFunctor C'' D'' G)
-    (H' : IndexedSimpleDependentFunctor C'' E'' H)
-    : Set
-  
-  -- #### IndexedSimpleDependentFunctorSquare
-  
-  record IndexedSimpleDependentFunctorSquare
-    {n : ℕ}
-    {C₁ C₂ D₁ D₂ : Category}
-    {C₁' : ChainDependentCategory C₁ n}
-    {C₂' : ChainDependentCategory C₂ n}
-    {D₁' : ChainDependentCategory D₁ n}
-    {D₂' : ChainDependentCategory D₂ n}
-    {C₁'' : IndexedSimpleDependentCategory C₁'}
-    {C₂'' : IndexedSimpleDependentCategory C₂'}
-    {D₁'' : IndexedSimpleDependentCategory D₁'}
-    {D₂'' : IndexedSimpleDependentCategory D₂'}
-    {F : ChainDependentFunctor C₁' C₂'}
-    {G : ChainDependentFunctor D₁' D₂'}
-    {H₁ : ChainDependentFunctor C₁' D₁'}
-    {H₂ : ChainDependentFunctor C₂' D₂'}
-    (F' : IndexedSimpleDependentFunctor C₁'' C₂'' F)
-    (G' : IndexedSimpleDependentFunctor D₁'' D₂'' G)
-    (H₁' : IndexedSimpleDependentFunctor C₁'' D₁'' H₁)
-    (H₂' : IndexedSimpleDependentFunctor C₂'' D₂'' H₂)
-    : Set
-    
   -- ### Interface
 
   -- #### IndexedSimpleCategory
@@ -161,13 +87,47 @@ module Internal where
     : {C : ChainCategory zero}
     → IndexedSimpleCategory C
     → Set
-  
-  indexed-simple-category-unpack
+
+  indexed-simple-category-tail
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → IndexedSimpleCategory C
-    → IndexedSimpleDependentCategory
-      (ChainCategory.unpack C)
+    → (x : ChainCategory.Object C)
+    → IndexedSimpleCategory
+      (ChainCategory.tail C x)
+  
+  indexed-simple-category-indexed-simple-functor
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedSimpleCategory C)
+    → {x y : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C x y)
+    → IndexedSimpleFunctor
+      (indexed-simple-category-tail C' x)
+      (indexed-simple-category-tail C' y)
+      (ChainCategory.chain-functor C f)
+
+  indexed-simple-category-indexed-simple-functor-identity
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedSimpleCategory C)
+    → (x : ChainCategory.Object C)
+    → IndexedSimpleFunctorIdentity
+      (indexed-simple-category-indexed-simple-functor C'
+        (ChainCategory.identity C x))
+
+  indexed-simple-category-indexed-simple-functor-compose
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → (C' : IndexedSimpleCategory C)
+    → {x y z : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C y z)
+    → (g : ChainCategory.Arrow C x y)
+    → IndexedSimpleFunctorCompose
+      (indexed-simple-category-indexed-simple-functor C' f)
+      (indexed-simple-category-indexed-simple-functor C' g)
+      (indexed-simple-category-indexed-simple-functor C'
+        (ChainCategory.compose C f g))
 
   -- #### IndexedSimpleFunctor
 
@@ -181,17 +141,33 @@ module Internal where
       (indexed-simple-category₀ C')
       (indexed-simple-category₀ D')
 
-  indexed-simple-functor-unpack
+  indexed-simple-functor-tail
     : {n : ℕ}
     → {C D : ChainCategory (suc n)}
     → {C' : IndexedSimpleCategory C}
     → {D' : IndexedSimpleCategory D}
     → {F : ChainFunctor C D}
     → IndexedSimpleFunctor C' D' F
-    → IndexedSimpleDependentFunctor
-      (indexed-simple-category-unpack C')
-      (indexed-simple-category-unpack D')
-      (ChainFunctor.unpack F)
+    → (x : ChainCategory.Object C)
+    → IndexedSimpleFunctor
+      (indexed-simple-category-tail C' x)
+      (indexed-simple-category-tail D' (ChainFunctor.base F x))
+      (ChainFunctor.tail F x)
+
+  indexed-simple-functor-indexed-simple-functor-square
+    : {n : ℕ}
+    → {C D : ChainCategory (suc n)}
+    → {C' : IndexedSimpleCategory C}
+    → {D' : IndexedSimpleCategory D}
+    → {F : ChainFunctor C D}
+    → (F' : IndexedSimpleFunctor C' D' F)
+    → {x y : ChainCategory.Object C}
+    → (f : ChainCategory.Arrow C x y)
+    → IndexedSimpleFunctorSquare
+      (indexed-simple-category-indexed-simple-functor C' f)
+      (indexed-simple-category-indexed-simple-functor D' (ChainFunctor.map F f))
+      (indexed-simple-functor-tail F' x)
+      (indexed-simple-functor-tail F' y)
 
   -- #### IndexedSimpleFunctorIdentity
 
@@ -204,15 +180,36 @@ module Internal where
     → FunctionIdentity
       (indexed-simple-functor₀ F')
 
-  indexed-simple-functor-identity-unpack
+  indexed-simple-functor-identity-head
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' : IndexedSimpleCategory C}
     → {F : ChainFunctor C C}
     → {F' : IndexedSimpleFunctor C' C' F}
     → IndexedSimpleFunctorIdentity F'
-    → IndexedSimpleDependentFunctorIdentity
-      (indexed-simple-functor-unpack F')
+    → FunctorIdentity
+      (ChainFunctor.head F)
+
+  indexed-simple-functor-identity-base
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → {C' : IndexedSimpleCategory C}
+    → {F : ChainFunctor C C}
+    → {F' : IndexedSimpleFunctor C' C' F}
+    → IndexedSimpleFunctorIdentity F'
+    → (x : ChainCategory.Object C)
+    → ChainFunctor.base F x ≡ x
+
+  indexed-simple-functor-identity-tail
+    : {n : ℕ}
+    → {C : ChainCategory (suc n)}
+    → {C' : IndexedSimpleCategory C}
+    → {F : ChainFunctor C C}
+    → {F' : IndexedSimpleFunctor C' C' F}
+    → IndexedSimpleFunctorIdentity F'
+    → (x : ChainCategory.Object C)
+    → IndexedSimpleFunctorIdentity
+      (indexed-simple-functor-tail F' x)
 
   -- #### IndexedSimpleFunctorCompose
 
@@ -233,7 +230,7 @@ module Internal where
       (indexed-simple-functor₀ G')
       (indexed-simple-functor₀ H')
 
-  indexed-simple-functor-compose-unpack
+  indexed-simple-functor-compose-head
     : {n : ℕ}
     → {C D E : ChainCategory (suc n)}
     → {C' : IndexedSimpleCategory C}
@@ -246,10 +243,45 @@ module Internal where
     → {G' : IndexedSimpleFunctor C' D' G}
     → {H' : IndexedSimpleFunctor C' E' H}
     → IndexedSimpleFunctorCompose F' G' H'
-    → IndexedSimpleDependentFunctorCompose
-      (indexed-simple-functor-unpack F')
-      (indexed-simple-functor-unpack G')
-      (indexed-simple-functor-unpack H')
+    → FunctorCompose
+      (ChainFunctor.head F)
+      (ChainFunctor.head G)
+      (ChainFunctor.head H)
+
+  indexed-simple-functor-compose-base
+    : {n : ℕ}
+    → {C D E : ChainCategory (suc n)}
+    → {C' : IndexedSimpleCategory C}
+    → {D' : IndexedSimpleCategory D}
+    → {E' : IndexedSimpleCategory E}
+    → {F : ChainFunctor D E}
+    → {G : ChainFunctor C D}
+    → {H : ChainFunctor C E}
+    → {F' : IndexedSimpleFunctor D' E' F}
+    → {G' : IndexedSimpleFunctor C' D' G}
+    → {H' : IndexedSimpleFunctor C' E' H}
+    → IndexedSimpleFunctorCompose F' G' H'
+    → (x : ChainCategory.Object C)
+    → ChainFunctor.base H x ≡ ChainFunctor.base F (ChainFunctor.base G x)
+
+  indexed-simple-functor-compose-tail
+    : {n : ℕ}
+    → {C D E : ChainCategory (suc n)}
+    → {C' : IndexedSimpleCategory C}
+    → {D' : IndexedSimpleCategory D}
+    → {E' : IndexedSimpleCategory E}
+    → {F : ChainFunctor D E}
+    → {G : ChainFunctor C D}
+    → {H : ChainFunctor C E}
+    → {F' : IndexedSimpleFunctor D' E' F}
+    → {G' : IndexedSimpleFunctor C' D' G}
+    → {H' : IndexedSimpleFunctor C' E' H}
+    → IndexedSimpleFunctorCompose F' G' H'
+    → (x : ChainCategory.Object C)
+    → IndexedSimpleFunctorCompose
+      (indexed-simple-functor-tail F' (ChainFunctor.base G x))
+      (indexed-simple-functor-tail G' x)
+      (indexed-simple-functor-tail H' x)
 
   -- #### IndexedSimpleFunctorSquare
 
@@ -274,7 +306,7 @@ module Internal where
       (indexed-simple-functor₀ H₁')
       (indexed-simple-functor₀ H₂')
 
-  indexed-simple-functor-square-unpack
+  indexed-simple-functor-square-head
     : {n : ℕ}
     → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
     → {C₁' : IndexedSimpleCategory C₁}
@@ -290,11 +322,54 @@ module Internal where
     → {H₁' : IndexedSimpleFunctor C₁' D₁' H₁}
     → {H₂' : IndexedSimpleFunctor C₂' D₂' H₂}
     → IndexedSimpleFunctorSquare F' G' H₁' H₂'
-    → IndexedSimpleDependentFunctorSquare
-      (indexed-simple-functor-unpack F')
-      (indexed-simple-functor-unpack G')
-      (indexed-simple-functor-unpack H₁')
-      (indexed-simple-functor-unpack H₂')
+    → FunctorSquare
+      (ChainFunctor.head F)
+      (ChainFunctor.head G)
+      (ChainFunctor.head H₁)
+      (ChainFunctor.head H₂)
+
+  indexed-simple-functor-square-base
+    : {n : ℕ}
+    → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
+    → {C₁' : IndexedSimpleCategory C₁}
+    → {C₂' : IndexedSimpleCategory C₂}
+    → {D₁' : IndexedSimpleCategory D₁}
+    → {D₂' : IndexedSimpleCategory D₂}
+    → {F : ChainFunctor C₁ C₂}
+    → {G : ChainFunctor D₁ D₂}
+    → {H₁ : ChainFunctor C₁ D₁}
+    → {H₂ : ChainFunctor C₂ D₂}
+    → {F' : IndexedSimpleFunctor C₁' C₂' F}
+    → {G' : IndexedSimpleFunctor D₁' D₂' G}
+    → {H₁' : IndexedSimpleFunctor C₁' D₁' H₁}
+    → {H₂' : IndexedSimpleFunctor C₂' D₂' H₂}
+    → IndexedSimpleFunctorSquare F' G' H₁' H₂'
+    → (x₁ : ChainCategory.Object C₁)
+    → ChainFunctor.base H₂ (ChainFunctor.base F x₁)
+      ≡ ChainFunctor.base G (ChainFunctor.base H₁ x₁)
+
+  indexed-simple-functor-square-tail
+    : {n : ℕ}
+    → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
+    → {C₁' : IndexedSimpleCategory C₁}
+    → {C₂' : IndexedSimpleCategory C₂}
+    → {D₁' : IndexedSimpleCategory D₁}
+    → {D₂' : IndexedSimpleCategory D₂}
+    → {F : ChainFunctor C₁ C₂}
+    → {G : ChainFunctor D₁ D₂}
+    → {H₁ : ChainFunctor C₁ D₁}
+    → {H₂ : ChainFunctor C₂ D₂}
+    → {F' : IndexedSimpleFunctor C₁' C₂' F}
+    → {G' : IndexedSimpleFunctor D₁' D₂' G}
+    → {H₁' : IndexedSimpleFunctor C₁' D₁' H₁}
+    → {H₂' : IndexedSimpleFunctor C₂' D₂' H₂}
+    → IndexedSimpleFunctorSquare F' G' H₁' H₂'
+    → (x₁ : ChainCategory.Object C₁)
+    → IndexedSimpleFunctorSquare
+      (indexed-simple-functor-tail F' x₁)
+      (indexed-simple-functor-tail G' (ChainFunctor.base H₁ x₁))
+      (indexed-simple-functor-tail H₁' x₁)
+      (indexed-simple-functor-tail H₂' (ChainFunctor.base F x₁))
 
   -- ### Definitions
   
@@ -302,29 +377,51 @@ module Internal where
   
   data IndexedSimpleCategory where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → Set
       → IndexedSimpleCategory C
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
-      → IndexedSimpleDependentCategory
-        (ChainCategory.unpack C)
+      → (C' : (x : ChainCategory.Object C)
+        → IndexedSimpleCategory
+          (ChainCategory.tail C x))
+      → (F : {x y : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C x y)
+        → IndexedSimpleFunctor (C' x) (C' y)
+          (ChainCategory.chain-functor C f))
+      → ((x : ChainCategory.Object C)
+        → IndexedSimpleFunctorIdentity
+          (F (ChainCategory.identity C x)))
+      → ({x y z : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C y z)
+        → (g : ChainCategory.Arrow C x y)
+        → IndexedSimpleFunctorCompose (F f) (F g)
+          (F (ChainCategory.compose C f g)))
       → IndexedSimpleCategory C
-  
-  indexed-simple-category₀ (empty A)
+
+  indexed-simple-category₀ (nil A)
     = A
 
-  indexed-simple-category-unpack (sigma A)
-    = A
+  indexed-simple-category-tail (cons C' _ _ _)
+    = C'
+
+  indexed-simple-category-indexed-simple-functor (cons _ F _ _)
+    = F
+
+  indexed-simple-category-indexed-simple-functor-identity (cons _ _ p _)
+    = p
+
+  indexed-simple-category-indexed-simple-functor-compose (cons _ _ _ p)
+    = p
 
   -- #### IndexedSimpleFunctor
   
   data IndexedSimpleFunctor where
   
-    empty
+    nil
       : {C D : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → {D' : IndexedSimpleCategory D}
@@ -333,30 +430,42 @@ module Internal where
         (indexed-simple-category₀ C')
         (indexed-simple-category₀ D')
       → IndexedSimpleFunctor C' D' F
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C D : ChainCategory (suc n)}
       → {C' : IndexedSimpleCategory C}
       → {D' : IndexedSimpleCategory D}
       → {F : ChainFunctor C D}
-      → IndexedSimpleDependentFunctor
-        (indexed-simple-category-unpack C')
-        (indexed-simple-category-unpack D')
-        (ChainFunctor.unpack F)
+      → (F' : (x : ChainCategory.Object C)
+        → IndexedSimpleFunctor
+          (indexed-simple-category-tail C' x)
+          (indexed-simple-category-tail D' (ChainFunctor.base F x))
+          (ChainFunctor.tail F x))
+      → ({x y : ChainCategory.Object C}
+        → (f : ChainCategory.Arrow C x y)
+        → IndexedSimpleFunctorSquare
+          (indexed-simple-category-indexed-simple-functor C' f)
+          (indexed-simple-category-indexed-simple-functor D'
+            (ChainFunctor.map F f))
+          (F' x)
+          (F' y))
       → IndexedSimpleFunctor C' D' F
-  
-  indexed-simple-functor₀ (empty f)
+
+  indexed-simple-functor₀ (nil f)
     = f
 
-  indexed-simple-functor-unpack (sigma f)
-    = f
+  indexed-simple-functor-tail (cons F' _)
+    = F'
+
+  indexed-simple-functor-indexed-simple-functor-square (cons _ s)
+    = s
 
   -- #### IndexedSimpleFunctorIdentity
   
   data IndexedSimpleFunctorIdentity where
   
-    empty
+    nil
       : {C : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → {F : ChainFunctor C C}
@@ -364,28 +473,38 @@ module Internal where
       → FunctionIdentity
         (indexed-simple-functor₀ F')
       → IndexedSimpleFunctorIdentity F'
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
       → {C' : IndexedSimpleCategory C}
       → {F : ChainFunctor C C}
       → {F' : IndexedSimpleFunctor C' C' F}
-      → IndexedSimpleDependentFunctorIdentity
-        (indexed-simple-functor-unpack F')
+      → FunctorIdentity
+        (ChainFunctor.head F)
+      → ((x : ChainCategory.Object C)
+        → IndexedSimpleFunctorIdentity
+          (indexed-simple-functor-tail F' x))
       → IndexedSimpleFunctorIdentity F'
-  
-  indexed-simple-functor-identity₀ (empty p)
+
+  indexed-simple-functor-identity₀ (nil p)
     = p
 
-  indexed-simple-functor-identity-unpack (sigma p)
+  indexed-simple-functor-identity-head (cons p _)
+    = p
+
+  indexed-simple-functor-identity-base p
+    = FunctorIdentity.base
+      (indexed-simple-functor-identity-head p)
+
+  indexed-simple-functor-identity-tail (cons _ p)
     = p
 
   -- #### IndexedSimpleFunctorCompose
   
   data IndexedSimpleFunctorCompose where
   
-    empty
+    nil
       : {C D E : ChainCategory zero}
       → {C' : IndexedSimpleCategory C}
       → {D' : IndexedSimpleCategory D}
@@ -401,8 +520,8 @@ module Internal where
         (indexed-simple-functor₀ G')
         (indexed-simple-functor₀ H')
       → IndexedSimpleFunctorCompose F' G' H'
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C D E : ChainCategory (suc n)}
       → {C' : IndexedSimpleCategory C}
@@ -414,23 +533,35 @@ module Internal where
       → {F' : IndexedSimpleFunctor D' E' F}
       → {G' : IndexedSimpleFunctor C' D' G}
       → {H' : IndexedSimpleFunctor C' E' H}
-      → IndexedSimpleDependentFunctorCompose
-        (indexed-simple-functor-unpack F')
-        (indexed-simple-functor-unpack G')
-        (indexed-simple-functor-unpack H')
+      → FunctorCompose
+        (ChainFunctor.head F)
+        (ChainFunctor.head G)
+        (ChainFunctor.head H)
+      → ((x : ChainCategory.Object C)
+        → IndexedSimpleFunctorCompose
+          (indexed-simple-functor-tail F' (ChainFunctor.base G x))
+          (indexed-simple-functor-tail G' x)
+          (indexed-simple-functor-tail H' x))
       → IndexedSimpleFunctorCompose F' G' H'
-  
-  indexed-simple-functor-compose₀ (empty p)
+
+  indexed-simple-functor-compose₀ (nil p)
     = p
 
-  indexed-simple-functor-compose-unpack (sigma p)
+  indexed-simple-functor-compose-head (cons p _)
+    = p
+
+  indexed-simple-functor-compose-base p
+    = FunctorCompose.base
+      (indexed-simple-functor-compose-head p)
+
+  indexed-simple-functor-compose-tail (cons _ p)
     = p
 
   -- #### IndexedSimpleFunctorSquare
   
   data IndexedSimpleFunctorSquare where
   
-    empty
+    nil
       : {C₁ C₂ D₁ D₂ : ChainCategory zero}
       → {C₁' : IndexedSimpleCategory C₁}
       → {C₂' : IndexedSimpleCategory C₂}
@@ -450,8 +581,8 @@ module Internal where
         (indexed-simple-functor₀ H₁')
         (indexed-simple-functor₀ H₂')
       → IndexedSimpleFunctorSquare F' G' H₁' H₂'
-  
-    sigma
+
+    cons
       : {n : ℕ}
       → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
       → {C₁' : IndexedSimpleCategory C₁}
@@ -466,209 +597,33 @@ module Internal where
       → {G' : IndexedSimpleFunctor D₁' D₂' G}
       → {H₁' : IndexedSimpleFunctor C₁' D₁' H₁}
       → {H₂' : IndexedSimpleFunctor C₂' D₂' H₂}
-      → IndexedSimpleDependentFunctorSquare
-        (indexed-simple-functor-unpack F')
-        (indexed-simple-functor-unpack G')
-        (indexed-simple-functor-unpack H₁')
-        (indexed-simple-functor-unpack H₂')
+      → FunctorSquare
+        (ChainFunctor.head F)
+        (ChainFunctor.head G)
+        (ChainFunctor.head H₁)
+        (ChainFunctor.head H₂)
+      → ((x₁ : ChainCategory.Object C₁)
+        → IndexedSimpleFunctorSquare
+          (indexed-simple-functor-tail F' x₁)
+          (indexed-simple-functor-tail G' (ChainFunctor.base H₁ x₁))
+          (indexed-simple-functor-tail H₁' x₁)
+          (indexed-simple-functor-tail H₂' (ChainFunctor.base F x₁)))
       → IndexedSimpleFunctorSquare F' G' H₁' H₂'
-  
-  indexed-simple-functor-square₀ (empty s)
+
+  indexed-simple-functor-square₀ (nil s)
     = s
 
-  indexed-simple-functor-square-unpack (sigma s)
+  indexed-simple-functor-square-head (cons s _)
     = s
 
-  -- #### IndexedSimpleDependentCategory
-  
-  record IndexedSimpleDependentCategory {_ C} C' where
-  
-    inductive
-  
-    no-eta-equality
-  
-    constructor
+  indexed-simple-functor-square-base s
+    = FunctorSquare.base
+      (indexed-simple-functor-square-head s)
 
-      indexed-simple-dependent-category
-
-    field
-  
-      indexed-simple-category
-        : (x : Category.Object C)
-        → IndexedSimpleCategory
-          (ChainDependentCategory.chain-category C' x)
-  
-      indexed-simple-functor
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → IndexedSimpleFunctor
-          (indexed-simple-category x)
-          (indexed-simple-category y)
-          (ChainDependentCategory.chain-functor C' f)
-  
-      indexed-simple-functor-identity
-        : (x : Category.Object C)
-        → IndexedSimpleFunctorIdentity
-          (indexed-simple-functor (Category.identity C x))
-  
-      indexed-simple-functor-compose
-        : {x y z : Category.Object C}
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → IndexedSimpleFunctorCompose
-          (indexed-simple-functor f)
-          (indexed-simple-functor g)
-          (indexed-simple-functor (Category.compose C f g))
-  
-  -- #### IndexedSimpleDependentFunctor
-  
-  record IndexedSimpleDependentFunctor
-    {_ C} C'' D'' F
-    where
-
-    inductive
-
-    no-eta-equality
-
-    constructor
-    
-      indexed-simple-dependent-functor
-
-    field
-
-      indexed-simple-functor
-        : (x : Category.Object C)
-        → IndexedSimpleFunctor
-          (IndexedSimpleDependentCategory.indexed-simple-category C'' x)
-          (IndexedSimpleDependentCategory.indexed-simple-category D''
-            (ChainDependentFunctor.base F x))
-          (ChainDependentFunctor.chain-functor F x)
-
-      indexed-simple-functor-square
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → IndexedSimpleFunctorSquare
-          (IndexedSimpleDependentCategory.indexed-simple-functor C'' f)
-          (IndexedSimpleDependentCategory.indexed-simple-functor D''
-            (ChainDependentFunctor.map F f))
-          (indexed-simple-functor x)
-          (indexed-simple-functor y)
-
-  -- #### IndexedSimpleDependentFunctorIdentity
-  
-  record IndexedSimpleDependentFunctorIdentity
-    {_ C _ _ F} F'
-    where
-
-    inductive
-
-    constructor
-
-      indexed-simple-dependent-functor-identity
-
-    field
-
-      functor
-        : FunctorIdentity
-          (ChainDependentFunctor.functor F)
-  
-    open FunctorIdentity functor public
-
-    field
-
-      indexed-simple-functor
-        : (x : Category.Object C)
-        → IndexedSimpleFunctorIdentity
-          (IndexedSimpleDependentFunctor.indexed-simple-functor F' x)
-
-  -- #### IndexedSimpleDependentFunctorCompose
-  
-  record IndexedSimpleDependentFunctorCompose
-    {_ C _ _ _ _ _ _ _ _ F G H} F' G' H'
-    where
-    
-    inductive
-
-    constructor
-
-      indexed-simple-dependent-functor-compose
-
-    field
-
-      functor
-        : FunctorCompose
-          (ChainDependentFunctor.functor F)
-          (ChainDependentFunctor.functor G)
-          (ChainDependentFunctor.functor H)
-
-    open FunctorCompose functor public
-  
-    field
-  
-      indexed-simple-functor
-        : (x : Category.Object C)
-        → IndexedSimpleFunctorCompose
-          (IndexedSimpleDependentFunctor.indexed-simple-functor F'
-            (ChainDependentFunctor.base G x))
-          (IndexedSimpleDependentFunctor.indexed-simple-functor G' x)
-          (IndexedSimpleDependentFunctor.indexed-simple-functor H' x)
-  
-  -- #### IndexedSimpleDependentFunctorSquare
-  
-  record IndexedSimpleDependentFunctorSquare
-    {_ C₁ _ _ _ _ _ _ _ _ _ _ _ F G H₁ H₂} F' G' H₁' H₂'
-    where
-
-    inductive
-
-    constructor
-
-      indexed-simple-dependent-functor-square
-
-    field
-
-      functor
-        : FunctorSquare
-          (ChainDependentFunctor.functor F)
-          (ChainDependentFunctor.functor G)
-          (ChainDependentFunctor.functor H₁)
-          (ChainDependentFunctor.functor H₂)
-  
-    open FunctorSquare functor public
-  
-    field
-  
-      indexed-simple-functor
-        : (x₁ : Category.Object C₁)
-        → IndexedSimpleFunctorSquare
-          (IndexedSimpleDependentFunctor.indexed-simple-functor F' x₁)
-          (IndexedSimpleDependentFunctor.indexed-simple-functor G'
-            (ChainDependentFunctor.base H₁ x₁))
-          (IndexedSimpleDependentFunctor.indexed-simple-functor H₁' x₁)
-          (IndexedSimpleDependentFunctor.indexed-simple-functor H₂'
-            (ChainDependentFunctor.base F x₁))
-  
-  -- ### Tail
-
-  indexed-simple-category-tail
-    : {n : ℕ}
-    → {C : ChainCategory (suc n)}
-    → IndexedSimpleCategory C
-    → (x : Category.Object (ChainCategory.head C))
-    → IndexedSimpleCategory (ChainCategory.tail C x)
-  indexed-simple-category-tail C' x
-    = IndexedSimpleDependentCategory.indexed-simple-category
-      (indexed-simple-category-unpack C') x
+  indexed-simple-functor-square-tail (cons _ s)
+    = s
 
 -- ## Modules
-
-open Internal public
-  using (IndexedSimpleDependentCategory; IndexedSimpleDependentFunctor;
-    IndexedSimpleDependentFunctorCompose; IndexedSimpleDependentFunctorIdentity;
-    IndexedSimpleDependentFunctorSquare; indexed-simple-dependent-category;
-    indexed-simple-dependent-functor; indexed-simple-dependent-functor-compose;
-    indexed-simple-dependent-functor-identity;
-    indexed-simple-dependent-functor-square)
 
 -- ### IndexedSimpleCategory
 
@@ -687,10 +642,14 @@ open Internal public
 module IndexedSimpleCategory where
 
   open Internal public using () renaming
-    ( indexed-simple-category-tail
+    ( indexed-simple-category-indexed-simple-functor
+      to indexed-simple-functor
+    ; indexed-simple-category-indexed-simple-functor-compose
+      to indexed-simple-functor-compose
+    ; indexed-simple-category-indexed-simple-functor-identity
+      to indexed-simple-functor-identity
+    ; indexed-simple-category-tail
       to tail
-    ; indexed-simple-category-unpack
-      to unpack
     )
 
 -- ### IndexedSimpleFunctor
@@ -713,8 +672,10 @@ open Internal public
 module IndexedSimpleFunctor where
 
   open Internal public using () renaming
-    ( indexed-simple-functor-unpack
-      to unpack
+    ( indexed-simple-functor-indexed-simple-functor-square
+      to indexed-simple-functor-square
+    ; indexed-simple-functor-tail
+      to tail
     )
 
 -- ### IndexedSimpleFunctorIdentity
@@ -738,8 +699,12 @@ open Internal public
 module IndexedSimpleFunctorIdentity where
 
   open Internal public using () renaming
-    ( indexed-simple-functor-identity-unpack
-      to unpack
+    ( indexed-simple-functor-identity-base
+      to base
+    ; indexed-simple-functor-identity-head
+      to head
+    ; indexed-simple-functor-identity-tail
+      to tail
     )
 
 -- ### IndexedSimpleFunctorCompose
@@ -769,8 +734,12 @@ open Internal public
 module IndexedSimpleFunctorCompose where
 
   open Internal public using () renaming
-    ( indexed-simple-functor-compose-unpack
-      to unpack
+    ( indexed-simple-functor-compose-base
+      to base
+    ; indexed-simple-functor-compose-head
+      to head
+    ; indexed-simple-functor-compose-tail
+      to tail
     )
 
 -- ### IndexedSimpleFunctorSquare
@@ -803,7 +772,11 @@ open Internal public
 module IndexedSimpleFunctorSquare where
 
   open Internal public using () renaming
-    ( indexed-simple-functor-square-unpack
-      to unpack
+    ( indexed-simple-functor-square-base
+      to base
+    ; indexed-simple-functor-square-head
+      to head
+    ; indexed-simple-functor-square-tail
+      to tail
     )
 

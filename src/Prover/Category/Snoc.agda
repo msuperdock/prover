@@ -1,21 +1,11 @@
 module Prover.Category.Snoc where
 
-open import Prover.Category
-  using (Category)
 open import Prover.Category.Chain
-  using (ChainCategory; ChainDependentCategory; ChainDependentFunctor;
-    ChainDependentFunctorCompose; ChainDependentFunctorIdentity;
-    ChainDependentFunctorSquare; ChainFunctor; ChainFunctorCompose;
-    ChainFunctorIdentity; ChainFunctorSquare; chain-dependent-category;
-    chain-dependent-category₀; chain-dependent-functor;
-    chain-dependent-functor₀; chain-dependent-functor-identity;
-    chain-dependent-functor-identity₀; chain-dependent-functor-compose;
-    chain-dependent-functor-compose₀; chain-dependent-functor-square;
-    chain-dependent-functor-square₀; sigma)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
+    ChainFunctorSquare; chain-category₁; chain-functor₁; chain-functor-compose₁;
+    chain-functor-identity₁; chain-functor-square₁; cons)
 open import Prover.Category.Indexed
-  using (IndexedCategory; IndexedDependentCategory; IndexedDependentFunctor;
-    IndexedDependentFunctorCompose; IndexedDependentFunctorIdentity;
-    IndexedDependentFunctorSquare; IndexedFunctor; IndexedFunctorCompose;
+  using (IndexedCategory; IndexedFunctor; IndexedFunctorCompose;
     IndexedFunctorIdentity; IndexedFunctorSquare; indexed-category₀;
     indexed-functor₀; indexed-functor-compose₀; indexed-functor-identity₀;
     indexed-functor-square₀)
@@ -161,213 +151,96 @@ chain-functor-square-snoc-eq
     (chain-functor-snoc H₁')
     (chain-functor-snoc H₂')
 
--- ### ChainDependentCategory
-
-chain-dependent-category-snoc
-  : {n : ℕ}
-  → {C : Category}
-  → {C' : ChainDependentCategory C n}
-  → IndexedDependentCategory C'
-  → ChainDependentCategory C (suc n)
-
--- ### ChainDependentFunctor
-
-chain-dependent-functor-snoc
-  : {n : ℕ}
-  → {C D : Category}
-  → {C' : ChainDependentCategory C n}
-  → {D' : ChainDependentCategory D n}
-  → {C'' : IndexedDependentCategory C'}
-  → {D'' : IndexedDependentCategory D'}
-  → {F : ChainDependentFunctor C' D'}
-  → IndexedDependentFunctor C'' D'' F
-  → ChainDependentFunctor
-    (chain-dependent-category-snoc C'')
-    (chain-dependent-category-snoc D'')
-
--- ### ChainDependentFunctorIdentity
-
-chain-dependent-functor-identity-snoc
-  : {n : ℕ}
-  → {C : Category}
-  → {C' : ChainDependentCategory C n}
-  → {C'' : IndexedDependentCategory C'}
-  → {F : ChainDependentFunctor C' C'}
-  → {F' : IndexedDependentFunctor C'' C'' F}
-  → IndexedDependentFunctorIdentity F'
-  → ChainDependentFunctorIdentity
-    (chain-dependent-functor-snoc F')
-
--- ### ChainDependentFunctorCompose
-
-chain-dependent-functor-compose-snoc
-  : {n : ℕ}
-  → {C D E : Category}
-  → {C' : ChainDependentCategory C n}
-  → {D' : ChainDependentCategory D n}
-  → {E' : ChainDependentCategory E n}
-  → {C'' : IndexedDependentCategory C'}
-  → {D'' : IndexedDependentCategory D'}
-  → {E'' : IndexedDependentCategory E'}
-  → {F : ChainDependentFunctor D' E'}
-  → {G : ChainDependentFunctor C' D'}
-  → {H : ChainDependentFunctor C' E'}
-  → {F' : IndexedDependentFunctor D'' E'' F}
-  → {G' : IndexedDependentFunctor C'' D'' G}
-  → {H' : IndexedDependentFunctor C'' E'' H}
-  → IndexedDependentFunctorCompose F' G' H'
-  → ChainDependentFunctorCompose
-    (chain-dependent-functor-snoc F')
-    (chain-dependent-functor-snoc G')
-    (chain-dependent-functor-snoc H')
-
--- ### ChainDependentFunctorSquare
-
-chain-dependent-functor-square-snoc
-  : {n : ℕ}
-  → {C₁ C₂ D₁ D₂ : Category}
-  → {C₁' : ChainDependentCategory C₁ n}
-  → {C₂' : ChainDependentCategory C₂ n}
-  → {D₁' : ChainDependentCategory D₁ n}
-  → {D₂' : ChainDependentCategory D₂ n}
-  → {C₁'' : IndexedDependentCategory C₁'}
-  → {C₂'' : IndexedDependentCategory C₂'}
-  → {D₁'' : IndexedDependentCategory D₁'}
-  → {D₂'' : IndexedDependentCategory D₂'}
-  → {F : ChainDependentFunctor C₁' C₂'}
-  → {G : ChainDependentFunctor D₁' D₂'}
-  → {H₁ : ChainDependentFunctor C₁' D₁'}
-  → {H₂ : ChainDependentFunctor C₂' D₂'}
-  → {F' : IndexedDependentFunctor C₁'' C₂'' F}
-  → {G' : IndexedDependentFunctor D₁'' D₂'' G}
-  → {H₁' : IndexedDependentFunctor C₁'' D₁'' H₁}
-  → {H₂' : IndexedDependentFunctor C₂'' D₂'' H₂}
-  → IndexedDependentFunctorSquare F' G' H₁' H₂'
-  → ChainDependentFunctorSquare
-    (chain-dependent-functor-snoc F')
-    (chain-dependent-functor-snoc G')
-    (chain-dependent-functor-snoc H₁')
-    (chain-dependent-functor-snoc H₂')
-
 -- ## Definitions
 
 -- ### ChainCategory
 
-chain-category-snoc {n = zero} C
-  = sigma
-    (chain-dependent-category₀
-      (indexed-category₀ C))
-chain-category-snoc {n = suc _} C
-  = sigma
-    (chain-dependent-category-snoc
-      (IndexedCategory.unpack C))
+chain-category-snoc
+  {n = zero} C'
+  = chain-category₁
+    (indexed-category₀ C')
+chain-category-snoc
+  {n = suc _} {C = C} C'
+  = cons
+    (ChainCategory.head C)
+    (λ x → chain-category-snoc
+      (IndexedCategory.tail C' x))
+    (λ f → chain-functor-snoc
+      (IndexedCategory.indexed-functor C' f))
+    (λ x → chain-functor-identity-snoc
+      (IndexedCategory.indexed-functor-identity C' x))
+    (λ f g → chain-functor-compose-snoc
+      (IndexedCategory.indexed-functor-compose C' f g))
 
 -- ### ChainFunctor
 
-chain-functor-snoc {n = zero} F
-  = sigma
-    (chain-dependent-functor₀
-      (indexed-functor₀ F))
-chain-functor-snoc {n = suc _} F
-  = sigma
-    (chain-dependent-functor-snoc
-      (IndexedFunctor.unpack F))
+chain-functor-snoc
+  {n = zero} F'
+  = chain-functor₁
+    (indexed-functor₀ F')
+chain-functor-snoc
+  {n = suc _} {F = F} F'
+  = cons
+    (ChainFunctor.head F)
+    (λ x → chain-functor-snoc
+      (IndexedFunctor.tail F' x))
+    (λ f → chain-functor-square-snoc
+      (IndexedFunctor.indexed-functor-square F' f))
 
 -- ### ChainFunctorIdentity
 
-chain-functor-identity-snoc {n = zero} p
-  = sigma
-    (chain-dependent-functor-identity₀
-      (indexed-functor-identity₀ p))
-chain-functor-identity-snoc {n = suc _} p
-  = sigma
-    (chain-dependent-functor-identity-snoc
-      (IndexedFunctorIdentity.unpack p))
+chain-functor-identity-snoc
+  {n = zero} p
+  = chain-functor-identity₁
+    (indexed-functor-identity₀ p)
+chain-functor-identity-snoc
+  {n = suc _} {C = C} {C' = C'} p
+  = cons
+    (IndexedFunctorIdentity.head p)
+    (λ x → chain-functor-identity-snoc-eq
+      (ChainCategory.tail C)
+      (IndexedCategory.tail C')
+      (IndexedFunctorIdentity.base p x)
+      (IndexedFunctorIdentity.tail p x))
 
 chain-functor-identity-snoc-eq _ _ refl
   = chain-functor-identity-snoc
 
 -- ### ChainFunctorCompose
 
-chain-functor-compose-snoc {n = zero} p
-  = sigma
-    (chain-dependent-functor-compose₀
-      (indexed-functor-compose₀ p))
-chain-functor-compose-snoc {n = suc _} p
-  = sigma
-    (chain-dependent-functor-compose-snoc
-      (IndexedFunctorCompose.unpack p))
+chain-functor-compose-snoc
+  {n = zero} p
+  = chain-functor-compose₁
+    (indexed-functor-compose₀ p)
+chain-functor-compose-snoc
+  {n = suc _} {E = E} {E' = E'} p
+  = cons
+    (IndexedFunctorCompose.head p)
+    (λ x → chain-functor-compose-snoc-eq
+      (ChainCategory.tail E)
+      (IndexedCategory.tail E')
+      (IndexedFunctorCompose.base p x)
+      (IndexedFunctorCompose.tail p x))
 
 chain-functor-compose-snoc-eq _ _ refl
   = chain-functor-compose-snoc
 
 -- ### ChainFunctorSquare
 
-chain-functor-square-snoc {n = zero} s
-  = sigma
-    (chain-dependent-functor-square₀
-      (indexed-functor-square₀ s))
-chain-functor-square-snoc {n = suc _} s
-  = sigma
-    (chain-dependent-functor-square-snoc
-      (IndexedFunctorSquare.unpack s))
+chain-functor-square-snoc
+  {n = zero} s
+  = chain-functor-square₁
+    (indexed-functor-square₀ s)
+chain-functor-square-snoc
+  {n = suc _} {D₂ = D₂} {D₂' = D₂'} s
+  = cons
+    (IndexedFunctorSquare.head s)
+    (λ x₁ → chain-functor-square-snoc-eq
+      (ChainCategory.tail D₂)
+      (IndexedCategory.tail D₂')
+      (IndexedFunctorSquare.base s x₁)
+      (IndexedFunctorSquare.tail s x₁))
 
 chain-functor-square-snoc-eq _ _ refl
   = chain-functor-square-snoc
-
--- ### ChainDependentCategory
-
-chain-dependent-category-snoc C''
-  = chain-dependent-category
-    (λ x → chain-category-snoc
-      (IndexedDependentCategory.indexed-category C'' x))
-    (λ f → chain-functor-snoc
-      (IndexedDependentCategory.indexed-functor C'' f))
-    (λ x → chain-functor-identity-snoc
-      (IndexedDependentCategory.indexed-functor-identity C'' x))
-    (λ f g → chain-functor-compose-snoc
-      (IndexedDependentCategory.indexed-functor-compose C'' f g))
-
--- ### ChainDependentFunctor
-
-chain-dependent-functor-snoc {F = F} F'
-  = chain-dependent-functor
-    (ChainDependentFunctor.functor F)
-    (λ x → chain-functor-snoc
-      (IndexedDependentFunctor.indexed-functor F' x))
-    (λ f → chain-functor-square-snoc
-      (IndexedDependentFunctor.indexed-functor-square F' f))
-
--- ### ChainDependentFunctorIdentity
-
-chain-dependent-functor-identity-snoc {C' = C'} {C'' = C''} p
-  = chain-dependent-functor-identity
-    (IndexedDependentFunctorIdentity.functor p)
-    (λ x → chain-functor-identity-snoc-eq
-      (ChainDependentCategory.chain-category C')
-      (IndexedDependentCategory.indexed-category C'')
-      (IndexedDependentFunctorIdentity.base p x)
-      (IndexedDependentFunctorIdentity.indexed-functor p x))
-
--- ### ChainDependentFunctorCompose
-
-chain-dependent-functor-compose-snoc {E' = E'} {E'' = E''} p
-  = chain-dependent-functor-compose
-    (IndexedDependentFunctorCompose.functor p)
-    (λ x → chain-functor-compose-snoc-eq
-      (ChainDependentCategory.chain-category E')
-      (IndexedDependentCategory.indexed-category E'')
-      (IndexedDependentFunctorCompose.base p x)
-      (IndexedDependentFunctorCompose.indexed-functor p x))
-
--- ### ChainDependentFunctorSquare
-
-chain-dependent-functor-square-snoc {D₂' = D₂'} {D₂'' = D₂''} s
-  = chain-dependent-functor-square
-    (IndexedDependentFunctorSquare.functor s)
-    (λ x₁ → chain-functor-square-snoc-eq
-      (ChainDependentCategory.chain-category D₂')
-      (IndexedDependentCategory.indexed-category D₂'')
-      (IndexedDependentFunctorSquare.base s x₁)
-      (IndexedDependentFunctorSquare.indexed-functor s x₁))
 

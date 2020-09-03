@@ -1,68 +1,32 @@
 module Prover.Function.Indexed where
 
-open import Prover.Category
-  using (Category)
 open import Prover.Category.Chain
-  using (ChainCategory; ChainDependentCategory)
+  using (ChainCategory)
 open import Prover.Prelude
 
 -- ## Internal
 
 module Internal where
 
-  -- ### Types
-
-  -- #### IndexedSet
+  -- ### Definition
 
   data IndexedSet
     : {n : ℕ}
     → ChainCategory n
     → Set₁
+    where
 
-  -- #### IndexedDependentSet
-
-  record IndexedDependentSet
-    {n : ℕ}
-    {C : Category}
-    (C' : ChainDependentCategory C n)
-    : Set₁
-
-  -- ### Definitions
-
-  -- #### IndexedSet
-
-  data IndexedSet where
-
-    empty
+    nil
       : {C : ChainCategory zero}
       → Set
       → IndexedSet C
 
-    sigma
+    cons
       : {n : ℕ}
       → {C : ChainCategory (suc n)}
-      → IndexedDependentSet
-        (ChainCategory.unpack C)
+      → ((x : ChainCategory.Object C)
+        → IndexedSet (ChainCategory.tail C x))
       → IndexedSet C
-
-  -- #### IndexedDependentSet
-
-  record IndexedDependentSet {_ C} C' where
-
-    inductive
-
-    no-eta-equality
-
-    constructor
-
-      indexed-dependent-set
-
-    field
-      
-      indexed-set
-        : (x : Category.Object C)
-        → IndexedSet
-          (ChainDependentCategory.chain-category C' x)
 
   -- ### Interface
 
@@ -70,44 +34,19 @@ module Internal where
     : {C : ChainCategory zero}
     → IndexedSet C
     → Set
-  indexed-set₀ (empty A)
-    = A
-
-  indexed-set-unpack
-    : {n : ℕ}
-    → {C : ChainCategory (suc n)}
-    → IndexedSet C
-    → IndexedDependentSet
-      (ChainCategory.unpack C)
-  indexed-set-unpack (sigma A)
+  indexed-set₀ (nil A)
     = A
 
   indexed-set-tail
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → IndexedSet C
-    → (x : Category.Object (ChainCategory.head C))
+    → (x : ChainCategory.Object C)
     → IndexedSet (ChainCategory.tail C x)
-  indexed-set-tail C'
-    = IndexedDependentSet.indexed-set
-      (indexed-set-unpack C')
-
-  -- ### Destruction
-
-  indexed-dependent-set₀
-    : {C : Category}
-    → {C' : ChainDependentCategory C zero}
-    → IndexedDependentSet C'
-    → Category.Object C
-    → Set
-  indexed-dependent-set₀ C'' x
-    = indexed-set₀
-      (IndexedDependentSet.indexed-set C'' x)
+  indexed-set-tail (cons C')
+    = C'
 
 -- ## Module
-
-open Internal public
-  using (IndexedDependentSet; indexed-dependent-set; indexed-dependent-set₀)
 
 IndexedSet
   : {n : ℕ}
@@ -126,7 +65,5 @@ module IndexedSet where
   open Internal public using () renaming
     ( indexed-set-tail
       to tail
-    ; indexed-set-unpack
-      to unpack
     )
-
+  
