@@ -1,17 +1,19 @@
 module Prover.Editor.Sigma where
 
 open import Prover.Category
-  using (Category; DependentCategory)
+  using (Category)
+open import Prover.Category.Dependent1
+  using (Dependent₁Category)
+open import Prover.Category.Dependent1.Simple
+  using (Dependent₁SimpleCategory)
+open import Prover.Category.Dependent1.Unit
+  using (dependent₁-category-unit)
 open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum)
-open import Prover.Category.Simple
-  using (SimpleDependentCategory)
 open import Prover.Category.Sum
   using (module CategorySum)
-open import Prover.Category.Unit
-  using (dependent-category-unit)
 open import Prover.Editor
   using (Editor; EventStack; MainEditor; SimpleEditor; SplitEditor;
     SplitMainEditor; ViewStack; ViewStackMap; any; split-main-editor-unmain)
@@ -140,11 +142,11 @@ module _
   -- #### Module
 
   module EditorSigma
-    (C₂ : DependentCategory C₁)
+    (C₂ : Dependent₁Category C₁)
     (d : Direction)
     (e₁ : SplitEditor V₁ E₁ C₁)
     (e₂ : (x₁ : Category.Object C₁)
-      → Editor V₂ E₂ (DependentCategory.category C₂ x₁))
+      → Editor V₂ E₂ (Dependent₁Category.category C₂ x₁))
     where
 
     -- ##### Types
@@ -389,7 +391,7 @@ module _
           (CategorySigma.arrow s₂
             (Category.identity C₁ x₁)
             (just f₂)
-            (DependentCategory.base-identity C₂ x₁ s₂)))
+            (Dependent₁Category.base-identity C₂ x₁ s₂)))
     ... | ι₂ s₂'
       = ι₂ s₂'
 
@@ -435,7 +437,7 @@ module _
           (CategorySigma.arrow s₂
             (Category.identity C₁ x₁)
             (just f₂)
-            (DependentCategory.base-identity C₂ x₁ s₂))))
+            (Dependent₁Category.base-identity C₂ x₁ s₂))))
     ... | just (ι₂ s₂')
       = just (ι₂ s₂')
 
@@ -480,7 +482,7 @@ module _
           (CategorySigma.arrow s₂
             (Category.identity C₁ x₁)
             (just f₂)
-            (DependentCategory.base-identity C₂ x₁ s₂))))
+            (Dependent₁Category.base-identity C₂ x₁ s₂))))
     ... | just (ι₂ s₂')
       = just (ι₂ s₂')
 
@@ -608,10 +610,10 @@ module _
         , ι₂ (Editor.initial-path-with (e₂ x₁') s₂' (Direction.reverse d))
         , CategorySum.arrow₂
           (CategorySigma.arrow s₂' f₁'
-            (just (DependentCategory.identity C₂ x₁' s₂')) refl))
+            (just (Dependent₁Category.identity C₂ x₁' s₂')) refl))
       where
         f₁' = SplitEditor.map e₁ (SplitEditor.base-unbase e₁ x₁) p₁ f₁
-        s₂' = DependentCategory.base C₂ f₁' s₂
+        s₂' = Dependent₁Category.base C₂ f₁' s₂
     ... | just (ι₁ (s₁' , sp₁' , f₁')) | _ | _
       = ι₂ ((s₁' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁')
     ... | just (ι₂ (s₁' , sp₁')) | _ | _
@@ -631,7 +633,7 @@ module _
           (CategorySigma.arrow s₂
             (Category.identity C₁ x₁)
             (just f₂)
-            (DependentCategory.base-identity C₂ x₁ s₂)))
+            (Dependent₁Category.base-identity C₂ x₁ s₂)))
     ... | ι₂ s₂''
       = ι₂ s₂''
 
@@ -655,11 +657,11 @@ module _
 
   -- Takes direction from first to second component.
   editor-sigma
-    : (C₂ : DependentCategory C₁)
+    : (C₂ : Dependent₁Category C₁)
     → Direction
     → (e₁ : SplitEditor V₁ E₁ C₁)
     → ((x₁ : Category.Object C₁)
-      → Editor V₂ E₂ (DependentCategory.category C₂ x₁))
+      → Editor V₂ E₂ (Dependent₁Category.category C₂ x₁))
     → Editor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
@@ -677,20 +679,20 @@ module _
 
   -- Takes direction from first to second component.
   simple-editor-sigma
-    : (C₂ : SimpleDependentCategory C₁)
+    : (C₂ : Dependent₁SimpleCategory C₁)
     → Direction
     → (e₁ : SplitEditor V₁ E₁ C₁)
     → ((x₁ : Category.Object C₁)
-      → SimpleEditor V₂ E₂ (SimpleDependentCategory.set C₂ x₁))
+      → SimpleEditor V₂ E₂ (Dependent₁SimpleCategory.set C₂ x₁))
     → SimpleEditor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
       (SplitEditor.State e₁
-        ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂))
+        ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂))
   simple-editor-sigma C₂ d e₁ e₂
     = any
       (editor-sigma
-        (dependent-category-unit C₂) d e₁
+        (dependent₁-category-unit C₂) d e₁
         (λ x₁ → editor-unit (e₂ x₁)))
 
 -- ### MainEditor
@@ -703,18 +705,18 @@ module _
   where
 
   module MainEditorSigma
-    (C₂ : SimpleDependentCategory C₁)
+    (C₂ : Dependent₁SimpleCategory C₁)
     (d : Direction)
     (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
     (e₂ : (x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (SimpleDependentCategory.set C₂ x₁))
+      → MainEditor V₂ E₂ S₂ (Dependent₁SimpleCategory.set C₂ x₁))
     where
 
     State
       : Set
     State
       = SplitMainEditor.State e₁
-      ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂)
+      ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂)
 
     simple-editor
       : SimpleEditor
@@ -732,7 +734,7 @@ module _
         State
     split-function
       = split-function-sigma-sum
-        (SimpleDependentCategory.set C₂)
+        (Dependent₁SimpleCategory.set C₂)
         (SplitMainEditor.state-split-function e₁)
         (SplitMainEditor.pure-split-function e₁)
         (λ x₁ → MainEditor.split-function (e₂ x₁))
@@ -742,22 +744,22 @@ module _
         State
     bool-function
       = bool-function-sigma-sum
-        (SimpleDependentCategory.set C₂)
+        (Dependent₁SimpleCategory.set C₂)
         (λ x₁ → MainEditor.bool-function (e₂ x₁))
 
   -- Takes direction from first to second component.
   main-editor-sigma
-    : (C₂ : SimpleDependentCategory C₁)
+    : (C₂ : Dependent₁SimpleCategory C₁)
     → Direction
     → (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
     → ((x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (SimpleDependentCategory.set C₂ x₁))
+      → MainEditor V₂ E₂ S₂ (Dependent₁SimpleCategory.set C₂ x₁))
     → MainEditor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
       (S₁ ⊔ P₁ × S₂)
       (SplitMainEditor.State e₁
-        ⊔ Σ (Category.Object C₁) (SimpleDependentCategory.set C₂))
+        ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂))
   main-editor-sigma C₂ d e₁ e₂
     = record {MainEditorSigma C₂ d e₁ e₂}
 

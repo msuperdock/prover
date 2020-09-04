@@ -1,7 +1,11 @@
 module Prover.Category.Split.Sigma where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; Functor; FunctorSquare)
+  using (Category; Functor; FunctorSquare)
+open import Prover.Category.Dependent1
+  using (Dependent₁Category; Dependent₁Functor)
+open import Prover.Category.Dependent1.Split
+  using (Dependent₁SplitFunctor; Dependent₁SplitFunctorSquare)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Partial.Sigma
@@ -10,19 +14,18 @@ open import Prover.Category.Sigma
   using (module CategorySigma; category-sigma; functor-sigma;
     functor-square-sigma)
 open import Prover.Category.Split
-  using (SplitDependentFunctor; SplitDependentFunctorSquare; SplitFunctor;
-    SplitFunctorSquare)
+  using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Prelude
 
 -- ## SplitFunctor
 
 module _
   {C₁ : Category}
-  {C₂ D₂ : DependentCategory C₁}
+  {C₂ D₂ : Dependent₁Category C₁}
   where
 
   module SplitFunctorSigma
-    (F₂ : SplitDependentFunctor C₂ D₂)
+    (F₂ : Dependent₁SplitFunctor C₂ D₂)
     where
 
     partial-functor
@@ -31,7 +34,7 @@ module _
         (category-sigma D₂)
     partial-functor
       = partial-functor-sigma
-        (SplitDependentFunctor.partial-dependent-functor F₂)
+        (Dependent₁SplitFunctor.partial-dependent-functor F₂)
 
     open PartialFunctor partial-functor
 
@@ -41,7 +44,7 @@ module _
         (category-sigma C₂)
     functor
       = functor-sigma
-        (SplitDependentFunctor.dependent-functor F₂)
+        (Dependent₁SplitFunctor.dependent-functor F₂)
 
     open Functor functor using () renaming
       ( base
@@ -56,31 +59,31 @@ module _
         : (x' : Category.Object (category-sigma D₂))
         → base (unbase x') ≡ just x'
       base-unbase (x₁ , x₂)
-        with SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ x₂)
-        | SplitDependentFunctor.base-unbase F₂ x₁ x₂
+        with Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂)
+        | Dependent₁SplitFunctor.base-unbase F₂ x₁ x₂
       ... | _ | refl
         = refl
   
       map-unmap₂
         : (x₁ : Category.Object C₁)
-        → {x₂' x₂'' y₂' : DependentCategory.Object D₂ x₁}
-        → (p₂ : SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ x₂')
+        → {x₂' x₂'' y₂' : Dependent₁Category.Object D₂ x₁}
+        → (p₂ : Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂')
           ≡ just x₂'')
-        → (q₂ : SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ y₂')
+        → (q₂ : Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ y₂')
           ≡ just y₂')
-        → (f₂ : DependentCategory.Arrow D₂ x₁ x₂' y₂')
+        → (f₂ : Dependent₁Category.Arrow D₂ x₁ x₂' y₂')
         → x₂'' ≡ x₂'
-        → SplitDependentFunctor.map F₂ x₁ p₂ q₂
-          (SplitDependentFunctor.unmap F₂ x₁ f₂)
+        → Dependent₁SplitFunctor.map F₂ x₁ p₂ q₂
+          (Dependent₁SplitFunctor.unmap F₂ x₁ f₂)
           ≅ f₂
       map-unmap₂ x₁ {x₂' = x₂'} {y₂' = y₂'} p₂ q₂ f₂ refl
-        with irrelevant p₂ (SplitDependentFunctor.base-unbase F₂ x₁ x₂')
-        | irrelevant q₂ (SplitDependentFunctor.base-unbase F₂ x₁ y₂')
+        with irrelevant p₂ (Dependent₁SplitFunctor.base-unbase F₂ x₁ x₂')
+        | irrelevant q₂ (Dependent₁SplitFunctor.base-unbase F₂ x₁ y₂')
       ... | refl | refl
-        = SplitDependentFunctor.map-unmap F₂ x₁ f₂
+        = Dependent₁SplitFunctor.map-unmap F₂ x₁ f₂
   
       map-unmap
         : {x' y' : Category.Object (category-sigma D₂)}
@@ -88,24 +91,24 @@ module _
         → map (base-unbase x') (base-unbase y') (unmap f) ≡ f
       map-unmap {x' = (x₁ , x₂)} {y' = (y₁ , y₂)}
         (CategorySigma.arrow _ f₁ f₂ p₂)
-        with SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ x₂)
-        | inspect (SplitDependentFunctor.base F₂ x₁)
-          (SplitDependentFunctor.unbase F₂ x₁ x₂)
-        | SplitDependentFunctor.base-unbase F₂ x₁ x₂
-        | SplitDependentFunctor.base F₂ y₁
-          (SplitDependentFunctor.unbase F₂ y₁ y₂)
-        | inspect (SplitDependentFunctor.base F₂ y₁)
-          (SplitDependentFunctor.unbase F₂ y₁ y₂)
-        | SplitDependentFunctor.base-unbase F₂ y₁ y₂
+        with Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂)
+        | inspect (Dependent₁SplitFunctor.base F₂ x₁)
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂)
+        | Dependent₁SplitFunctor.base-unbase F₂ x₁ x₂
+        | Dependent₁SplitFunctor.base F₂ y₁
+          (Dependent₁SplitFunctor.unbase F₂ y₁ y₂)
+        | inspect (Dependent₁SplitFunctor.base F₂ y₁)
+          (Dependent₁SplitFunctor.unbase F₂ y₁ y₂)
+        | Dependent₁SplitFunctor.base-unbase F₂ y₁ y₂
       ... | _ | [ q₂ ] | refl | _ | [ r₂ ] | refl
         = CategorySigma.arrow-eq D₂ p₂ refl
           (map-unmap₂ y₁ (trans
-            (sub (SplitDependentFunctor.base F₂ y₁) (sym (trans
-              (sym (SplitDependentFunctor.unbase-commutative F₂ f₁ x₂))
-              (sub (SplitDependentFunctor.unbase F₂ y₁) p₂))))
-            (SplitDependentFunctor.base-commutative F₂ f₁
-              (SplitDependentFunctor.unbase F₂ x₁ x₂) q₂)) r₂ f₂ p₂)
+            (sub (Dependent₁SplitFunctor.base F₂ y₁) (sym (trans
+              (sym (Dependent₁SplitFunctor.unbase-commutative F₂ f₁ x₂))
+              (sub (Dependent₁SplitFunctor.unbase F₂ y₁) p₂))))
+            (Dependent₁SplitFunctor.base-commutative F₂ f₁
+              (Dependent₁SplitFunctor.unbase F₂ x₁ x₂) q₂)) r₂ f₂ p₂)
 
       normalize-arrow
         : {x' : Category.Object (category-sigma D₂)}
@@ -113,32 +116,32 @@ module _
         → base x ≡ just x'
         → Category.Arrow (category-sigma C₂) x (unbase x')
       normalize-arrow (x₁ , x₂) _
-        with SplitDependentFunctor.base F₂ x₁ x₂
-        | inspect (SplitDependentFunctor.base F₂ x₁) x₂
+        with Dependent₁SplitFunctor.base F₂ x₁ x₂
+        | inspect (Dependent₁SplitFunctor.base F₂ x₁) x₂
       normalize-arrow (x₁ , x₂) refl | just _ | [ p₂ ]
         = CategorySigma.arrow x₂
           (Category.identity C₁ x₁)
-          (SplitDependentFunctor.normalize-arrow F₂ x₁ x₂ p₂)
-          (DependentCategory.base-identity C₂ x₁ x₂)
+          (Dependent₁SplitFunctor.normalize-arrow F₂ x₁ x₂ p₂)
+          (Dependent₁Category.base-identity C₂ x₁ x₂)
 
       normalize-valid₂
         : {x₁ : Category.Object C₁}
-        → {x₂' x₂'' : DependentCategory.Object D₂ x₁}
-        → (x₂ : DependentCategory.Object C₂ x₁)
-        → (p₂ : SplitDependentFunctor.base F₂ x₁ x₂ ≡ just x₂')
-        → (p₂' : SplitDependentFunctor.base F₂ x₁ x₂ ≡ just x₂'')
-        → (q₂ : SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ x₂')
+        → {x₂' x₂'' : Dependent₁Category.Object D₂ x₁}
+        → (x₂ : Dependent₁Category.Object C₂ x₁)
+        → (p₂ : Dependent₁SplitFunctor.base F₂ x₁ x₂ ≡ just x₂')
+        → (p₂' : Dependent₁SplitFunctor.base F₂ x₁ x₂ ≡ just x₂'')
+        → (q₂ : Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂')
           ≡ just x₂')
         → x₂' ≡ x₂''
-        → SplitDependentFunctor.map F₂ x₁ p₂' q₂
-          (SplitDependentFunctor.normalize-arrow F₂ x₁ x₂ p₂)
-        ≅ DependentCategory.identity D₂ x₁ x₂'
+        → Dependent₁SplitFunctor.map F₂ x₁ p₂' q₂
+          (Dependent₁SplitFunctor.normalize-arrow F₂ x₁ x₂ p₂)
+        ≅ Dependent₁Category.identity D₂ x₁ x₂'
       normalize-valid₂ {x₁ = x₁} {x₂' = x₂'} x₂ p₂ p₂' q₂ refl
         with irrelevant p₂ p₂'
-        | irrelevant q₂ (SplitDependentFunctor.base-unbase F₂ x₁ x₂')
+        | irrelevant q₂ (Dependent₁SplitFunctor.base-unbase F₂ x₁ x₂')
       ... | refl | refl
-        = SplitDependentFunctor.normalize-valid F₂ x₁ x₂ p₂
+        = Dependent₁SplitFunctor.normalize-valid F₂ x₁ x₂ p₂
   
       normalize-valid
         : {x' : Category.Object (category-sigma D₂)}
@@ -147,27 +150,27 @@ module _
         → map p (base-unbase x') (normalize-arrow x p)
           ≡ Category.identity (category-sigma D₂) x'
       normalize-valid (x₁ , x₂) _
-        with SplitDependentFunctor.base F₂ x₁ x₂
-        | inspect (SplitDependentFunctor.base F₂ x₁) x₂
+        with Dependent₁SplitFunctor.base F₂ x₁ x₂
+        | inspect (Dependent₁SplitFunctor.base F₂ x₁) x₂
       normalize-valid (x₁ , x₂) refl | just x₂' | [ p₂ ]
-        with SplitDependentFunctor.base F₂ x₁
-          (SplitDependentFunctor.unbase F₂ x₁ x₂')
-        | inspect (SplitDependentFunctor.base F₂ x₁)
-          (SplitDependentFunctor.unbase F₂ x₁ x₂')
-        | SplitDependentFunctor.base-unbase F₂ x₁ x₂'
+        with Dependent₁SplitFunctor.base F₂ x₁
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂')
+        | inspect (Dependent₁SplitFunctor.base F₂ x₁)
+          (Dependent₁SplitFunctor.unbase F₂ x₁ x₂')
+        | Dependent₁SplitFunctor.base-unbase F₂ x₁ x₂'
       ... | just _ | [ p₂' ] | refl
         = CategorySigma.arrow-eq D₂
-          (DependentCategory.base-identity D₂ x₁ x₂') refl
+          (Dependent₁Category.base-identity D₂ x₁ x₂') refl
           (normalize-valid₂ x₂ p₂
             (trans
-              (sub (SplitDependentFunctor.base F₂ x₁)
-                (sym (DependentCategory.base-identity C₂ x₁ x₂)))
-              (SplitDependentFunctor.base-commutative F₂
+              (sub (Dependent₁SplitFunctor.base F₂ x₁)
+                (sym (Dependent₁Category.base-identity C₂ x₁ x₂)))
+              (Dependent₁SplitFunctor.base-commutative F₂
                 (Category.identity C₁ x₁) x₂ p₂)) p₂'
-            (sym (DependentCategory.base-identity D₂ x₁ x₂')))
+            (sym (Dependent₁Category.base-identity D₂ x₁ x₂')))
 
   split-functor-sigma
-    : SplitDependentFunctor C₂ D₂
+    : Dependent₁SplitFunctor C₂ D₂
     → SplitFunctor
       (category-sigma C₂)
       (category-sigma D₂)
@@ -178,16 +181,16 @@ module _
 
 module _
   {C₁₁ C₂₁ : Category}
-  {C₁₂ D₁₂ : DependentCategory C₁₁}
-  {C₂₂ D₂₂ : DependentCategory C₂₁}
-  {F₂ : DependentFunctor C₁₂ C₂₂}
-  {G₂ : DependentFunctor D₁₂ D₂₂}
-  {H₁₂ : SplitDependentFunctor C₁₂ D₁₂}
-  {H₂₂ : SplitDependentFunctor C₂₂ D₂₂}
+  {C₁₂ D₁₂ : Dependent₁Category C₁₁}
+  {C₂₂ D₂₂ : Dependent₁Category C₂₁}
+  {F₂ : Dependent₁Functor C₁₂ C₂₂}
+  {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
+  {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
   where
 
   module SplitFunctorSquareSigma
-    (s : SplitDependentFunctorSquare F₂ G₂ H₁₂ H₂₂)
+    (s : Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂)
     where
 
     partial-functor
@@ -198,7 +201,7 @@ module _
         (SplitFunctor.partial-functor (split-functor-sigma H₂₂))
     partial-functor
       = partial-functor-square-sigma
-        (SplitDependentFunctorSquare.partial-dependent-functor s)
+        (Dependent₁SplitFunctorSquare.partial-dependent-functor s)
 
     functor
       : FunctorSquare
@@ -208,10 +211,10 @@ module _
         (SplitFunctor.functor (split-functor-sigma H₂₂))
     functor
       = functor-square-sigma
-        (SplitDependentFunctorSquare.dependent-functor s)
+        (Dependent₁SplitFunctorSquare.dependent-functor s)
 
   split-functor-square-sigma
-    : SplitDependentFunctorSquare F₂ G₂ H₁₂ H₂₂
+    : Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
     → SplitFunctorSquare
       (functor-sigma F₂)
       (functor-sigma G₂)

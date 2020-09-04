@@ -1,9 +1,11 @@
 module Prover.Category.Sigma.Sum where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; Functor; FunctorCompose;
-    FunctorIdentity; FunctorSquare; functor-compose'; functor-square-compose)
+  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare;
+    functor-compose'; functor-square-compose)
+open import Prover.Category.Dependent1
+  using (Dependent₁Category; Dependent₁Functor; Dependent₁FunctorCompose;
+    Dependent₁FunctorIdentity; Dependent₁FunctorSquare)
 open import Prover.Category.Sigma.Maybe
   using (functor-compose-sigma-maybe; functor-identity-sigma-maybe;
     functor-sigma-maybe₁; functor-square-sigma-maybe;
@@ -18,7 +20,7 @@ open import Prover.Category.Sum
 
 category-sigma-sum
   : {C₁₁ C₂₁ : Category}
-  → DependentCategory C₂₁
+  → Dependent₁Category C₂₁
   → SplitFunctor C₁₁ C₂₁
   → Category
 category-sigma-sum C₂₂ F₁
@@ -31,13 +33,13 @@ category-sigma-sum C₂₂ F₁
 
 functor-sigma-sum
   : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
-  → {C₂₂ : DependentCategory C₂₁}
-  → {D₂₂ : DependentCategory D₂₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {D₂₂ : Dependent₁Category D₂₁}
   → {F₁ : SplitFunctor C₁₁ C₂₁}
   → {G₁ : SplitFunctor D₁₁ D₂₁}
   → {H₁₁ : Functor C₁₁ D₁₁}
-  → (H₂₂ : DependentFunctor C₂₂ D₂₂)
-  → SplitFunctorSquare H₁₁ (DependentFunctor.functor H₂₂) F₁ G₁
+  → (H₂₂ : Dependent₁Functor C₂₂ D₂₂)
+  → SplitFunctorSquare H₁₁ (Dependent₁Functor.functor H₂₂) F₁ G₁
   → Functor
     (category-sigma-sum C₂₂ F₁)
     (category-sigma-sum D₂₂ G₁)
@@ -51,13 +53,13 @@ functor-sigma-sum H₂₂ s₁
 
 functor-identity-sigma-sum
   : {C₁₁ C₂₁ : Category}
-  → {C₂₂ : DependentCategory C₂₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
   → {F₁ : SplitFunctor C₁₁ C₂₁}
   → {G₁₁ : Functor C₁₁ C₁₁}
-  → {G₂₂ : DependentFunctor C₂₂ C₂₂}
-  → (s₁ : SplitFunctorSquare G₁₁ (DependentFunctor.functor G₂₂) F₁ F₁)
+  → {G₂₂ : Dependent₁Functor C₂₂ C₂₂}
+  → (s₁ : SplitFunctorSquare G₁₁ (Dependent₁Functor.functor G₂₂) F₁ F₁)
   → FunctorIdentity G₁₁
-  → DependentFunctorIdentity G₂₂
+  → Dependent₁FunctorIdentity G₂₂
   → FunctorIdentity
     (functor-sigma-sum {C₂₂ = C₂₂} {D₂₂ = C₂₂} G₂₂ s₁)
 functor-identity-sigma-sum {G₂₂ = G₂₂} s₁ p₁₁ p₂₂
@@ -71,23 +73,23 @@ functor-identity-sigma-sum {G₂₂ = G₂₂} s₁ p₁₁ p₂₂
 
 functor-compose-sigma-sum
   : {C₁₁ C₂₁ D₁₁ D₂₁ E₁₁ E₂₁ : Category}
-  → {C₂₂ : DependentCategory C₂₁}
-  → {D₂₂ : DependentCategory D₂₁}
-  → {E₂₂ : DependentCategory E₂₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {D₂₂ : Dependent₁Category D₂₁}
+  → {E₂₂ : Dependent₁Category E₂₁}
   → {I₁ : SplitFunctor C₁₁ C₂₁}
   → {J₁ : SplitFunctor D₁₁ D₂₁}
   → {K₁ : SplitFunctor E₁₁ E₂₁}
   → {L₁₁ : Functor D₁₁ E₁₁}
   → {M₁₁ : Functor C₁₁ D₁₁}
   → {N₁₁ : Functor C₁₁ E₁₁}
-  → {L₂₂ : DependentFunctor D₂₂ E₂₂}
-  → {M₂₂ : DependentFunctor C₂₂ D₂₂}
-  → {N₂₂ : DependentFunctor C₂₂ E₂₂}
-  → (s₁ : SplitFunctorSquare L₁₁ (DependentFunctor.functor L₂₂) J₁ K₁)
-  → (t₁ : SplitFunctorSquare M₁₁ (DependentFunctor.functor M₂₂) I₁ J₁)
-  → (u₁ : SplitFunctorSquare N₁₁ (DependentFunctor.functor N₂₂) I₁ K₁)
+  → {L₂₂ : Dependent₁Functor D₂₂ E₂₂}
+  → {M₂₂ : Dependent₁Functor C₂₂ D₂₂}
+  → {N₂₂ : Dependent₁Functor C₂₂ E₂₂}
+  → (s₁ : SplitFunctorSquare L₁₁ (Dependent₁Functor.functor L₂₂) J₁ K₁)
+  → (t₁ : SplitFunctorSquare M₁₁ (Dependent₁Functor.functor M₂₂) I₁ J₁)
+  → (u₁ : SplitFunctorSquare N₁₁ (Dependent₁Functor.functor N₂₂) I₁ K₁)
   → FunctorCompose L₁₁ M₁₁ N₁₁
-  → DependentFunctorCompose L₂₂ M₂₂ N₂₂
+  → Dependent₁FunctorCompose L₂₂ M₂₂ N₂₂
   → FunctorCompose
     (functor-sigma-sum {C₂₂ = D₂₂} {D₂₂ = E₂₂} L₂₂ s₁)
     (functor-sigma-sum {C₂₂ = C₂₂} {D₂₂ = D₂₂} M₂₂ t₁)
@@ -109,10 +111,10 @@ functor-compose-sigma-sum {L₂₂ = L₂₂} {M₂₂ = M₂₂} {N₂₂ = N�
 
 functor-square-sigma-sum
   : {C₁₁₁ C₁₂₁ C₂₁₁ C₂₂₁ D₁₁₁ D₁₂₁ D₂₁₁ D₂₂₁ : Category}
-  → {C₁₂₂ : DependentCategory C₁₂₁}
-  → {C₂₂₂ : DependentCategory C₂₂₁}
-  → {D₁₂₂ : DependentCategory D₁₂₁}
-  → {D₂₂₂ : DependentCategory D₂₂₁}
+  → {C₁₂₂ : Dependent₁Category C₁₂₁}
+  → {C₂₂₂ : Dependent₁Category C₂₂₁}
+  → {D₁₂₂ : Dependent₁Category D₁₂₁}
+  → {D₂₂₂ : Dependent₁Category D₂₂₁}
   → {F₁₁ : SplitFunctor C₁₁₁ C₁₂₁}
   → {F₂₁ : SplitFunctor C₂₁₁ C₂₂₁}
   → {G₁₁ : SplitFunctor D₁₁₁ D₁₂₁}
@@ -121,16 +123,16 @@ functor-square-sigma-sum
   → {I₁₁ : Functor D₁₁₁ D₂₁₁}
   → {J₁₁₁ : Functor C₁₁₁ D₁₁₁}
   → {J₂₁₁ : Functor C₂₁₁ D₂₁₁}
-  → {H₂₂ : DependentFunctor C₁₂₂ C₂₂₂}
-  → {I₂₂ : DependentFunctor D₁₂₂ D₂₂₂}
-  → {J₁₂₂ : DependentFunctor C₁₂₂ D₁₂₂}
-  → {J₂₂₂ : DependentFunctor C₂₂₂ D₂₂₂}
-  → (s₁ : SplitFunctorSquare H₁₁ (DependentFunctor.functor H₂₂) F₁₁ F₂₁)
-  → (t₁ : SplitFunctorSquare I₁₁ (DependentFunctor.functor I₂₂) G₁₁ G₂₁)
-  → (u₁₁ : SplitFunctorSquare J₁₁₁ (DependentFunctor.functor J₁₂₂) F₁₁ G₁₁)
-  → (u₂₁ : SplitFunctorSquare J₂₁₁ (DependentFunctor.functor J₂₂₂) F₂₁ G₂₁)
+  → {H₂₂ : Dependent₁Functor C₁₂₂ C₂₂₂}
+  → {I₂₂ : Dependent₁Functor D₁₂₂ D₂₂₂}
+  → {J₁₂₂ : Dependent₁Functor C₁₂₂ D₁₂₂}
+  → {J₂₂₂ : Dependent₁Functor C₂₂₂ D₂₂₂}
+  → (s₁ : SplitFunctorSquare H₁₁ (Dependent₁Functor.functor H₂₂) F₁₁ F₂₁)
+  → (t₁ : SplitFunctorSquare I₁₁ (Dependent₁Functor.functor I₂₂) G₁₁ G₂₁)
+  → (u₁₁ : SplitFunctorSquare J₁₁₁ (Dependent₁Functor.functor J₁₂₂) F₁₁ G₁₁)
+  → (u₂₁ : SplitFunctorSquare J₂₁₁ (Dependent₁Functor.functor J₂₂₂) F₂₁ G₂₁)
   → FunctorSquare H₁₁ I₁₁ J₁₁₁ J₂₁₁
-  → DependentFunctorSquare H₂₂ I₂₂ J₁₂₂ J₂₂₂
+  → Dependent₁FunctorSquare H₂₂ I₂₂ J₁₂₂ J₂₂₂
   → FunctorSquare
     (functor-sigma-sum {C₂₂ = C₁₂₂} {D₂₂ = C₂₂₂} H₂₂ s₁)
     (functor-sigma-sum {C₂₂ = D₁₂₂} {D₂₂ = D₂₂₂} I₂₂ t₁)

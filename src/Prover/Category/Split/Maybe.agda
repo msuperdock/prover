@@ -1,18 +1,16 @@
 module Prover.Category.Split.Maybe where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; Functor; FunctorEqual;
-    FunctorSquare)
+  using (Category; Functor; FunctorSquare)
 open import Prover.Category.Maybe
-  using (category-maybe; dependent-category-maybe; dependent-functor-maybe;
-    functor-maybe; functor-square-maybe)
+  using (category-maybe; functor-maybe; functor-square-maybe)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Partial.Maybe
   using (partial-functor-maybe; partial-functor-square-maybe)
 open import Prover.Category.Split
-  using (SplitDependentFunctor; SplitDependentFunctorSquare; SplitFunctor;
-    SplitFunctorSquare; SplitFunctorSquare'; split-functor-square')
+  using (SplitFunctor; SplitFunctorSquare; SplitFunctorSquare';
+    split-functor-square')
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -153,96 +151,3 @@ split-functor-square-maybe'
 split-functor-square-maybe' (split-functor-square' s)
   = split-functor-square' (split-functor-square-maybe s)
 
--- ## SplitDependentFunctor
-
-module _
-  {C : Category}
-  {C' D' : DependentCategory C}
-  where
-
-  module SplitDependentFunctorMaybe
-    (F : SplitDependentFunctor C' D')
-    where
-
-    split-functor
-      : (x : Category.Object C)
-      → SplitFunctor
-        (DependentCategory.category (dependent-category-maybe C') x)
-        (DependentCategory.category (dependent-category-maybe D') x)
-    split-functor x
-      = split-functor-maybe
-        (SplitDependentFunctor.split-functor F x)
-
-    abstract
-
-      split-functor-square
-        : {x y : Category.Object C}
-        → (f : Category.Arrow C x y)
-        → SplitFunctorSquare
-          (DependentCategory.functor (dependent-category-maybe C') f)
-          (DependentCategory.functor (dependent-category-maybe D') f)
-          (split-functor x)
-          (split-functor y)
-      split-functor-square f
-        = split-functor-square-maybe
-          (SplitDependentFunctor.split-functor-square F f)
-
-  split-dependent-functor-maybe
-    : SplitDependentFunctor C' D'
-    → SplitDependentFunctor
-      (dependent-category-maybe C')
-      (dependent-category-maybe D')
-  split-dependent-functor-maybe F
-    = record {SplitDependentFunctorMaybe F}
-
--- ## SplitDependentFunctorSquare
-
-module _
-  {C₁ C₂ : Category}
-  {C₁' D₁' : DependentCategory C₁}
-  {C₂' D₂' : DependentCategory C₂}
-  {F : DependentFunctor C₁' C₂'}
-  {G : DependentFunctor D₁' D₂'}
-  {H₁ : SplitDependentFunctor C₁' D₁'}
-  {H₂ : SplitDependentFunctor C₂' D₂'}
-  where
-
-  module SplitDependentFunctorSquareMaybe
-    (s : SplitDependentFunctorSquare F G H₁ H₂)
-    where
-
-    functor
-      : FunctorEqual
-        (DependentFunctor.functor
-          (dependent-functor-maybe F))
-        (DependentFunctor.functor
-          (dependent-functor-maybe G))
-    functor
-      = SplitDependentFunctorSquare.functor s
-
-    split-functor
-      : (x₁ : Category.Object C₁)
-      → SplitFunctorSquare'
-        (DependentFunctor.functor'
-          (dependent-functor-maybe F) x₁)
-        (DependentFunctor.functor'
-          (dependent-functor-maybe G) x₁)
-        (SplitDependentFunctor.split-functor
-          (split-dependent-functor-maybe H₁) x₁)
-        (SplitDependentFunctor.split-functor
-          (split-dependent-functor-maybe H₂)
-          (DependentFunctor.base (dependent-functor-maybe F) x₁))
-    split-functor x₁
-      = split-functor-square-maybe'
-        (SplitDependentFunctorSquare.split-functor s x₁)
-
-  split-dependent-functor-square-maybe
-    : SplitDependentFunctorSquare F G H₁ H₂
-    → SplitDependentFunctorSquare
-      (dependent-functor-maybe F)
-      (dependent-functor-maybe G)
-      (split-dependent-functor-maybe H₁)
-      (split-dependent-functor-maybe H₂)
-  split-dependent-functor-square-maybe s
-    = record {SplitDependentFunctorSquareMaybe s}
-  

@@ -1,14 +1,16 @@
 module Prover.Category.Sigma where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare;
-    Functor; FunctorCompose; FunctorEqual; FunctorIdentity; FunctorSquare;
-    dependent-functor-compose; dependent-functor-compose-to-equal;
-    dependent-functor-identity; dependent-functor-identity-to-equal;
-    dependent-functor-square-to-equal; functor-compose';
-    functor-compose-from-equal; functor-identity'; functor-identity-from-equal;
-    functor-square-from-equal; functor-sym; functor-trans)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare; functor-compose'; functor-compose-from-equal;
+    functor-identity'; functor-identity-from-equal; functor-square-from-equal;
+    functor-sym; functor-trans)
+open import Prover.Category.Dependent1
+  using (Dependent₁Category; Dependent₁Functor; Dependent₁FunctorCompose;
+    Dependent₁FunctorEqual; Dependent₁FunctorIdentity; Dependent₁FunctorSquare;
+    dependent₁-functor-compose; dependent₁-functor-compose-to-equal;
+    dependent₁-functor-identity; dependent₁-functor-identity-to-equal;
+    dependent₁-functor-square-to-equal)
 open import Prover.Prelude
 
 -- ## Category
@@ -18,14 +20,14 @@ module _
   where
 
   module CategorySigma
-    (C₂ : DependentCategory C₁)
+    (C₂ : Dependent₁Category C₁)
     where
 
     Object
       : Set
     Object
       = x₁ ∈ Category.Object C₁
-      × DependentCategory.Object C₂ x₁
+      × Dependent₁Category.Object C₂ x₁
   
     record Arrow
       (x y : Object)
@@ -39,16 +41,16 @@ module _
       field
   
         domain
-          : DependentCategory.Object C₂ (π₁ y)
+          : Dependent₁Category.Object C₂ (π₁ y)
   
         arrow₁
           : Category.Arrow C₁ (π₁ x) (π₁ y)
   
         arrow₂
-          : DependentCategory.Arrow C₂ (π₁ y) domain (π₂ y)
+          : Dependent₁Category.Arrow C₂ (π₁ y) domain (π₂ y)
   
         valid
-          : DependentCategory.base C₂ arrow₁ (π₂ x) ≡ domain
+          : Dependent₁Category.base C₂ arrow₁ (π₂ x) ≡ domain
   
     arrow-eq
       : {x y : Object}
@@ -83,9 +85,9 @@ module _
       ; arrow₁
         = Category.identity C₁ x₁
       ; arrow₂
-        = DependentCategory.identity C₂ x₁ x₂
+        = Dependent₁Category.identity C₂ x₁ x₂
       ; valid
-        = DependentCategory.base-identity C₂ x₁ x₂
+        = Dependent₁Category.base-identity C₂ x₁ x₂
       }
   
     compose
@@ -98,29 +100,29 @@ module _
       (arrow y₂' g₁ g₂ q₂)
       = record
       { domain
-        = DependentCategory.base C₂ f₁ y₂'
+        = Dependent₁Category.base C₂ f₁ y₂'
       ; arrow₁
         = Category.compose C₁ f₁ g₁
       ; arrow₂
-        = DependentCategory.compose-eq C₂ z₁ p₂ f₂
-          (DependentCategory.map C₂ f₁ g₂)
+        = Dependent₁Category.compose-eq C₂ z₁ p₂ f₂
+          (Dependent₁Category.map C₂ f₁ g₂)
       ; valid
-        = trans (DependentCategory.base-compose C₂ f₁ g₁ x₂)
-          (sub (DependentCategory.base C₂ f₁) q₂)
+        = trans (Dependent₁Category.base-compose C₂ f₁ g₁ x₂)
+          (sub (Dependent₁Category.base C₂ f₁) q₂)
       }
   
     abstract
 
       precompose₂
         : {x₁ : Category.Object C₁}
-        → {x₂ y₂ z₂ : DependentCategory.Object C₂ x₁}
-        → {f₂ : DependentCategory.Arrow C₂ x₁ y₂ z₂}
-        → {g₂ : DependentCategory.Arrow C₂ x₁ x₂ x₂}
+        → {x₂ y₂ z₂ : Dependent₁Category.Object C₂ x₁}
+        → {f₂ : Dependent₁Category.Arrow C₂ x₁ y₂ z₂}
+        → {g₂ : Dependent₁Category.Arrow C₂ x₁ x₂ x₂}
         → (p₂ : x₂ ≡ y₂)
-        → (g₂ ≡ DependentCategory.identity C₂ x₁ x₂)
-        → DependentCategory.compose-eq C₂ x₁ p₂ f₂ g₂ ≅ f₂
+        → (g₂ ≡ Dependent₁Category.identity C₂ x₁ x₂)
+        → Dependent₁Category.compose-eq C₂ x₁ p₂ f₂ g₂ ≅ f₂
       precompose₂ {x₁ = x₁} {f₂ = f₂} refl refl
-        = DependentCategory.precompose C₂ x₁ f₂
+        = Dependent₁Category.precompose C₂ x₁ f₂
     
       precompose
         : {x y : Object}
@@ -129,21 +131,21 @@ module _
       precompose {x = (_ , x₂)} (arrow _ f₁ _ p₂)
         = arrow-eq p₂
           (Category.precompose C₁ f₁)
-          (precompose₂ p₂ (DependentCategory.map-identity' C₂ f₁ x₂))
+          (precompose₂ p₂ (Dependent₁Category.map-identity' C₂ f₁ x₂))
     
       postcompose₂
         : {x₁ : Category.Object C₁}
-        → {w₂ x₂ y₂ z₂ : DependentCategory.Object C₂ x₁}
-        → {g₂ : DependentCategory.Arrow C₂ x₁ w₂ y₂}
-        → {h₂ : DependentCategory.Arrow C₂ x₁ x₂ z₂}
+        → {w₂ x₂ y₂ z₂ : Dependent₁Category.Object C₂ x₁}
+        → {g₂ : Dependent₁Category.Arrow C₂ x₁ w₂ y₂}
+        → {h₂ : Dependent₁Category.Arrow C₂ x₁ x₂ z₂}
         → (p₂ : y₂ ≡ z₂)
         → (w₂ ≡ x₂)
         → g₂ ≅ h₂
-        → DependentCategory.compose-eq C₂ x₁ p₂
-          (DependentCategory.identity C₂ x₁ z₂) g₂
+        → Dependent₁Category.compose-eq C₂ x₁ p₂
+          (Dependent₁Category.identity C₂ x₁ z₂) g₂
         ≅ h₂
       postcompose₂ {x₁ = x₁} {g₂ = g₂} refl refl refl 
-        = DependentCategory.postcompose C₂ x₁ g₂
+        = Dependent₁Category.postcompose C₂ x₁ g₂
     
       postcompose
         : {x y : Object}
@@ -151,67 +153,67 @@ module _
         → compose (identity y) f ≡ f
       postcompose {y = (y₁ , y₂)} (arrow y₂' f₁ f₂ _)
         = arrow-eq
-          (DependentCategory.base-identity C₂ y₁ y₂')
+          (Dependent₁Category.base-identity C₂ y₁ y₂')
           (Category.postcompose C₁ f₁)
           (postcompose₂
-            (DependentCategory.base-identity C₂ y₁ y₂)
-            (DependentCategory.base-identity C₂ y₁ y₂')
-            (DependentCategory.map-identity C₂ y₁ f₂))
+            (Dependent₁Category.base-identity C₂ y₁ y₂)
+            (Dependent₁Category.base-identity C₂ y₁ y₂')
+            (Dependent₁Category.map-identity C₂ y₁ f₂))
     
       associative₂
         : {x₁ : Category.Object C₁}
-        → {u₂ u₂' v₂ v₂' w₂ x₂ y₂ z₂ : DependentCategory.Object C₂ x₁}
-        → {h₂ : DependentCategory.Arrow C₂ x₁ u₂ v₂}
-        → {h₂' : DependentCategory.Arrow C₂ x₁ u₂' v₂'}
-        → (f₂ : DependentCategory.Arrow C₂ x₁ y₂ z₂)
-        → (g₂ : DependentCategory.Arrow C₂ x₁ w₂ x₂)
+        → {u₂ u₂' v₂ v₂' w₂ x₂ y₂ z₂ : Dependent₁Category.Object C₂ x₁}
+        → {h₂ : Dependent₁Category.Arrow C₂ x₁ u₂ v₂}
+        → {h₂' : Dependent₁Category.Arrow C₂ x₁ u₂' v₂'}
+        → (f₂ : Dependent₁Category.Arrow C₂ x₁ y₂ z₂)
+        → (g₂ : Dependent₁Category.Arrow C₂ x₁ w₂ x₂)
         → (p₂ : v₂ ≡ w₂)
         → (q₂ : x₂ ≡ y₂)
         → (r₂ : v₂' ≡ w₂)
         → u₂ ≡ u₂'
         → h₂ ≅ h₂'
-        → DependentCategory.compose-eq C₂ x₁ p₂
-          (DependentCategory.compose-eq C₂ x₁ q₂ f₂ g₂) h₂
-        ≅ DependentCategory.compose-eq C₂ x₁ q₂ f₂
-          (DependentCategory.compose-eq C₂ x₁ r₂ g₂ h₂')
+        → Dependent₁Category.compose-eq C₂ x₁ p₂
+          (Dependent₁Category.compose-eq C₂ x₁ q₂ f₂ g₂) h₂
+        ≅ Dependent₁Category.compose-eq C₂ x₁ q₂ f₂
+          (Dependent₁Category.compose-eq C₂ x₁ r₂ g₂ h₂')
       associative₂ {x₁ = x₁} {h₂ = h₂} f₂ g₂ refl refl refl refl refl
-        = DependentCategory.associative C₂ x₁ f₂ g₂ h₂
+        = Dependent₁Category.associative C₂ x₁ f₂ g₂ h₂
     
       associative₂'
         : {x₁ y₁ z₁ : Category.Object C₁}
-        → {x₂ x₂' : DependentCategory.Object C₂ x₁}
-        → {y₂ y₂' : DependentCategory.Object C₂ y₁}
-        → {z₂ z₂' : DependentCategory.Object C₂ z₁}
+        → {x₂ x₂' : Dependent₁Category.Object C₂ x₁}
+        → {y₂ y₂' : Dependent₁Category.Object C₂ y₁}
+        → {z₂ z₂' : Dependent₁Category.Object C₂ z₁}
         → (f₁ : Category.Arrow C₁ y₁ z₁)
-        → (f₂ : DependentCategory.Arrow C₂ z₁ z₂' z₂)
+        → (f₂ : Dependent₁Category.Arrow C₂ z₁ z₂' z₂)
         → (g₁ : Category.Arrow C₁ x₁ y₁)
-        → (g₂ : DependentCategory.Arrow C₂ y₁ y₂' y₂)
-        → (h₂ : DependentCategory.Arrow C₂ x₁ x₂' x₂)
-        → (p₂ : DependentCategory.base C₂ (Category.compose C₁ f₁ g₁) x₂
-          ≡ DependentCategory.base C₂ f₁ y₂')
-        → (q₂ : DependentCategory.base C₂ f₁ y₂ ≡ z₂')
-        → (r₂ : DependentCategory.base C₂ g₁ x₂ ≡ y₂')
-        → DependentCategory.compose-eq C₂ z₁ p₂
-          (DependentCategory.compose-eq C₂ z₁ q₂ f₂
-            (DependentCategory.map C₂ f₁ g₂))
-          (DependentCategory.map C₂ (Category.compose C₁ f₁ g₁) h₂)
-        ≅ DependentCategory.compose-eq C₂ z₁ q₂ f₂
-          (DependentCategory.map C₂ f₁
-            (DependentCategory.compose-eq C₂ y₁ r₂ g₂
-              (DependentCategory.map C₂ g₁ h₂)))
+        → (g₂ : Dependent₁Category.Arrow C₂ y₁ y₂' y₂)
+        → (h₂ : Dependent₁Category.Arrow C₂ x₁ x₂' x₂)
+        → (p₂ : Dependent₁Category.base C₂ (Category.compose C₁ f₁ g₁) x₂
+          ≡ Dependent₁Category.base C₂ f₁ y₂')
+        → (q₂ : Dependent₁Category.base C₂ f₁ y₂ ≡ z₂')
+        → (r₂ : Dependent₁Category.base C₂ g₁ x₂ ≡ y₂')
+        → Dependent₁Category.compose-eq C₂ z₁ p₂
+          (Dependent₁Category.compose-eq C₂ z₁ q₂ f₂
+            (Dependent₁Category.map C₂ f₁ g₂))
+          (Dependent₁Category.map C₂ (Category.compose C₁ f₁ g₁) h₂)
+        ≅ Dependent₁Category.compose-eq C₂ z₁ q₂ f₂
+          (Dependent₁Category.map C₂ f₁
+            (Dependent₁Category.compose-eq C₂ y₁ r₂ g₂
+              (Dependent₁Category.map C₂ g₁ h₂)))
       associative₂' {y₁ = y₁} {x₂' = x₂'} f₁ f₂ g₁ g₂ h₂ p₂ q₂ r₂
-        with DependentCategory.map C₂ f₁
-          (DependentCategory.compose-eq C₂ y₁ r₂ g₂
-            (DependentCategory.map C₂ g₁ h₂))
-        | DependentCategory.map-compose-eq' C₂ f₁ r₂
-          (sub (DependentCategory.base C₂ f₁) r₂) g₂
-          (DependentCategory.map C₂ g₁ h₂)
+        with Dependent₁Category.map C₂ f₁
+          (Dependent₁Category.compose-eq C₂ y₁ r₂ g₂
+            (Dependent₁Category.map C₂ g₁ h₂))
+        | Dependent₁Category.map-compose-eq' C₂ f₁ r₂
+          (sub (Dependent₁Category.base C₂ f₁) r₂) g₂
+          (Dependent₁Category.map C₂ g₁ h₂)
       ... | _ | refl
         = associative₂ f₂ 
-          (DependentCategory.map C₂ f₁ g₂) p₂ q₂
-          (sub (DependentCategory.base C₂ f₁) r₂)
-          (DependentCategory.base-compose C₂ f₁ g₁ x₂')
-          (DependentCategory.map-compose C₂ f₁ g₁ h₂)
+          (Dependent₁Category.map C₂ f₁ g₂) p₂ q₂
+          (sub (Dependent₁Category.base C₂ f₁) r₂)
+          (Dependent₁Category.base-compose C₂ f₁ g₁ x₂')
+          (Dependent₁Category.map-compose C₂ f₁ g₁ h₂)
     
       associative
         : {w x y z : Object}
@@ -224,14 +226,14 @@ module _
         (arrow _ g₁ g₂ q₂)
         (arrow x₂' h₁ h₂ _)
         = arrow-eq
-          (DependentCategory.base-compose C₂ f₁ g₁ x₂')
+          (Dependent₁Category.base-compose C₂ f₁ g₁ x₂')
           (Category.associative C₁ f₁ g₁ h₁)
           (associative₂' f₁ f₂ g₁ g₂ h₂
-            (trans (DependentCategory.base-compose C₂ f₁ g₁ x₂)
-              (sub (DependentCategory.base C₂ f₁) q₂)) p₂ q₂)
+            (trans (Dependent₁Category.base-compose C₂ f₁ g₁ x₂)
+              (sub (Dependent₁Category.base C₂ f₁) q₂)) p₂ q₂)
 
   category-sigma
-    : DependentCategory C₁
+    : Dependent₁Category C₁
     → Category
   category-sigma C₂
     = record {CategorySigma C₂}
@@ -242,20 +244,20 @@ module _
 
 module _
   {C₁ D₁ : Category}
-  {C₂ : DependentCategory C₁}
-  {D₂ : DependentCategory D₁}
+  {C₂ : Dependent₁Category C₁}
+  {D₂ : Dependent₁Category D₁}
   where
 
   module FunctorSigma
-    (F₂ : DependentFunctor C₂ D₂)
+    (F₂ : Dependent₁Functor C₂ D₂)
     where
 
     base
       : Category.Object (category-sigma C₂)
       → Category.Object (category-sigma D₂)
     base (x₁ , x₂)
-      = DependentFunctor.base F₂ x₁
-      , DependentFunctor.base' F₂ x₁ x₂
+      = Dependent₁Functor.base F₂ x₁
+      , Dependent₁Functor.base' F₂ x₁ x₂
 
     map
       : {x y : Category.Object (category-sigma C₂)}
@@ -264,15 +266,15 @@ module _
     map {x = (_ , x₂)} {y = (y₁ , _)} (CategorySigma.arrow y₂' f₁ f₂ p₂)
       = record
       { domain
-        = DependentFunctor.base' F₂ y₁ y₂'
+        = Dependent₁Functor.base' F₂ y₁ y₂'
       ; arrow₁
-        = DependentFunctor.map F₂ f₁
+        = Dependent₁Functor.map F₂ f₁
       ; arrow₂
-        = DependentFunctor.map' F₂ y₁ f₂
+        = Dependent₁Functor.map' F₂ y₁ f₂
       ; valid
         = trans
-          (sym (DependentFunctor.base-commutative F₂ f₁ x₂))
-          (sub (DependentFunctor.base' F₂ y₁) p₂)
+          (sym (Dependent₁Functor.base-commutative F₂ f₁ x₂))
+          (sub (Dependent₁Functor.base' F₂ y₁) p₂)
       }
 
     abstract
@@ -283,22 +285,22 @@ module _
           ≡ Category.identity (category-sigma D₂) (base x)
       map-identity (x₁ , x₂)
         = CategorySigma.arrow-eq D₂ refl
-          (DependentFunctor.map-identity F₂ x₁)
-          (DependentFunctor.map-identity' F₂ x₁ x₂)
+          (Dependent₁Functor.map-identity F₂ x₁)
+          (Dependent₁Functor.map-identity' F₂ x₁ x₂)
   
       map-compose₂
         : (z₁' : Category.Object D₁)
-        → {w₂' w₂'' x₂' x₂'' y₂' z₂' : DependentCategory.Object D₂ z₁'}
-        → {g₂' : DependentCategory.Arrow D₂ z₁' w₂' x₂'}
-        → {g₂'' : DependentCategory.Arrow D₂ z₁' w₂'' x₂''}
+        → {w₂' w₂'' x₂' x₂'' y₂' z₂' : Dependent₁Category.Object D₂ z₁'}
+        → {g₂' : Dependent₁Category.Arrow D₂ z₁' w₂' x₂'}
+        → {g₂'' : Dependent₁Category.Arrow D₂ z₁' w₂'' x₂''}
         → (p₂' : x₂' ≡ y₂')
         → (p₂'' : x₂'' ≡ y₂')
-        → (f₂' : DependentCategory.Arrow D₂ z₁' y₂' z₂')
+        → (f₂' : Dependent₁Category.Arrow D₂ z₁' y₂' z₂')
         → w₂' ≡ w₂''
         → x₂' ≡ x₂''
         → g₂' ≅ g₂''
-        → DependentCategory.compose-eq D₂ z₁' p₂' f₂' g₂'
-          ≅ DependentCategory.compose-eq D₂ z₁' p₂'' f₂' g₂''
+        → Dependent₁Category.compose-eq D₂ z₁' p₂' f₂' g₂'
+          ≅ Dependent₁Category.compose-eq D₂ z₁' p₂'' f₂' g₂''
       map-compose₂ _ refl refl _ refl refl refl
         = refl
   
@@ -312,23 +314,23 @@ module _
         (CategorySigma.arrow _ f₁ f₂ p₂)
         (CategorySigma.arrow y₂' g₁ g₂ _)
         = CategorySigma.arrow-eq D₂
-          (DependentFunctor.base-commutative F₂ f₁ y₂')
-          (DependentFunctor.map-compose F₂ f₁ g₁)
-        $ trans (DependentFunctor.map-compose-eq' F₂ z₁ p₂
-          (sub (DependentFunctor.base' F₂ z₁) p₂) f₂
-            (DependentCategory.map C₂ f₁ g₂))
+          (Dependent₁Functor.base-commutative F₂ f₁ y₂')
+          (Dependent₁Functor.map-compose F₂ f₁ g₁)
+        $ trans (Dependent₁Functor.map-compose-eq' F₂ z₁ p₂
+          (sub (Dependent₁Functor.base' F₂ z₁) p₂) f₂
+            (Dependent₁Category.map C₂ f₁ g₂))
         $ map-compose₂
-          (DependentFunctor.base F₂ z₁)
-          (sub (DependentFunctor.base' F₂ z₁) p₂)
-          (trans (sym (DependentFunctor.base-commutative F₂ f₁ y₂))
-            (sub (DependentFunctor.base' F₂ z₁) p₂))
-          (DependentFunctor.map' F₂ z₁ f₂)
-          (DependentFunctor.base-commutative F₂ f₁ y₂')
-          (DependentFunctor.base-commutative F₂ f₁ y₂)
-          (DependentFunctor.map-commutative F₂ f₁ g₂)
+          (Dependent₁Functor.base F₂ z₁)
+          (sub (Dependent₁Functor.base' F₂ z₁) p₂)
+          (trans (sym (Dependent₁Functor.base-commutative F₂ f₁ y₂))
+            (sub (Dependent₁Functor.base' F₂ z₁) p₂))
+          (Dependent₁Functor.map' F₂ z₁ f₂)
+          (Dependent₁Functor.base-commutative F₂ f₁ y₂')
+          (Dependent₁Functor.base-commutative F₂ f₁ y₂)
+          (Dependent₁Functor.map-commutative F₂ f₁ g₂)
 
   functor-sigma
-    : DependentFunctor C₂ D₂
+    : Dependent₁Functor C₂ D₂
     → Functor
       (category-sigma C₂)
       (category-sigma D₂)
@@ -342,12 +344,12 @@ module _
   where
 
   module FunctorSigmaIdentity
-    (C₂ : DependentCategory C₁)
+    (C₂ : Dependent₁Category C₁)
     where
 
     base
       : (x : Category.Object (category-sigma C₂))
-      → Functor.base (functor-sigma (dependent-functor-identity C₂)) x
+      → Functor.base (functor-sigma (dependent₁-functor-identity C₂)) x
         ≅ Functor.base (functor-identity' (category-sigma C₂)) x
     base _
       = refl
@@ -355,15 +357,15 @@ module _
     map
       : {x y : Category.Object (category-sigma C₂)}
       → (f : Category.Arrow (category-sigma C₂) x y)
-      → Functor.map (functor-sigma (dependent-functor-identity C₂)) f
+      → Functor.map (functor-sigma (dependent₁-functor-identity C₂)) f
         ≅ Functor.map (functor-identity' (category-sigma C₂)) f
     map _
       = CategorySigma.arrow-eq C₂ refl refl refl
 
   functor-sigma-identity
-    : (C₂ : DependentCategory C₁)
+    : (C₂ : Dependent₁Category C₁)
     → FunctorEqual
-      (functor-sigma (dependent-functor-identity C₂))
+      (functor-sigma (dependent₁-functor-identity C₂))
       (functor-identity' (category-sigma C₂))
   functor-sigma-identity C₂
     = record {FunctorSigmaIdentity C₂}
@@ -372,20 +374,20 @@ module _
 
 module _
   {C₁ D₁ E₁ : Category}
-  {C₂ : DependentCategory C₁}
-  {D₂ : DependentCategory D₁}
-  {E₂ : DependentCategory E₁}
+  {C₂ : Dependent₁Category C₁}
+  {D₂ : Dependent₁Category D₁}
+  {E₂ : Dependent₁Category E₁}
   where
 
   module FunctorSigmaCompose
-    (F₂ : DependentFunctor D₂ E₂)
-    (G₂ : DependentFunctor C₂ D₂)
+    (F₂ : Dependent₁Functor D₂ E₂)
+    (G₂ : Dependent₁Functor C₂ D₂)
     where
 
     base
       : (x : Category.Object (category-sigma C₂))
       → Functor.base
-        (functor-sigma (dependent-functor-compose F₂ G₂)) x
+        (functor-sigma (dependent₁-functor-compose F₂ G₂)) x
       ≅ Functor.base
         (functor-compose' (functor-sigma F₂) (functor-sigma G₂)) x
     base _
@@ -395,17 +397,17 @@ module _
       : {x y : Category.Object (category-sigma C₂)}
       → (f : Category.Arrow (category-sigma C₂) x y)
       → Functor.map
-        (functor-sigma (dependent-functor-compose F₂ G₂)) f
+        (functor-sigma (dependent₁-functor-compose F₂ G₂)) f
       ≅ Functor.map
         (functor-compose' (functor-sigma F₂) (functor-sigma G₂)) f
     map _
       = CategorySigma.arrow-eq E₂ refl refl refl
 
   functor-sigma-compose
-    : (F₂ : DependentFunctor D₂ E₂)
-    → (G₂ : DependentFunctor C₂ D₂)
+    : (F₂ : Dependent₁Functor D₂ E₂)
+    → (G₂ : Dependent₁Functor C₂ D₂)
     → FunctorEqual
-      (functor-sigma (dependent-functor-compose F₂ G₂))
+      (functor-sigma (dependent₁-functor-compose F₂ G₂))
       (functor-compose' (functor-sigma F₂) (functor-sigma G₂))
   functor-sigma-compose F₂ G₂
     = record {FunctorSigmaCompose F₂ G₂}
@@ -417,7 +419,7 @@ module _
   where
 
   module FunctorSigma₁
-    (C₂ : DependentCategory C₁)
+    (C₂ : Dependent₁Category C₁)
     where
 
     base
@@ -452,7 +454,7 @@ module _
         = refl
   
   functor-sigma₁
-    : (C₂ : DependentCategory C₁)
+    : (C₂ : Dependent₁Category C₁)
     → Functor (category-sigma C₂) C₁
   functor-sigma₁ C₂
     = record {FunctorSigma₁ C₂}
@@ -461,13 +463,13 @@ module _
 
 module _
   {C₁ D₁ : Category}
-  {C₂ : DependentCategory C₁}
-  {D₂ : DependentCategory D₁}
-  {F₁₂ F₂₂ : DependentFunctor C₂ D₂}
+  {C₂ : Dependent₁Category C₁}
+  {D₂ : Dependent₁Category D₁}
+  {F₁₂ F₂₂ : Dependent₁Functor C₂ D₂}
   where
   
   module FunctorEqualSigma
-    (p : DependentFunctorEqual F₁₂ F₂₂)
+    (p : Dependent₁FunctorEqual F₁₂ F₂₂)
     where
 
     base
@@ -475,8 +477,8 @@ module _
       → Functor.base (functor-sigma F₁₂) x ≅ Functor.base (functor-sigma F₂₂) x
     base (x₁ , x₂)
       = Sigma.comma-eq
-        (DependentFunctorEqual.base p x₁)
-        (DependentFunctorEqual.base' p x₁ x₂)
+        (Dependent₁FunctorEqual.base p x₁)
+        (Dependent₁FunctorEqual.base' p x₁ x₂)
   
     map
       : {x y : Category.Object (category-sigma C₂)}
@@ -484,12 +486,12 @@ module _
       → Functor.map (functor-sigma F₁₂) f ≅ Functor.map (functor-sigma F₂₂) f
     map {x = x} {y = y@(y₁ , _)} (CategorySigma.arrow y₂' f₁ f₂ _)
       = CategorySigma.arrow-eq' D₂ (base x) (base y)
-        (DependentFunctorEqual.base' p y₁ y₂')
-        (DependentFunctorEqual.map p f₁)
-        (DependentFunctorEqual.map' p y₁ f₂)
+        (Dependent₁FunctorEqual.base' p y₁ y₂')
+        (Dependent₁FunctorEqual.map p f₁)
+        (Dependent₁FunctorEqual.map' p y₁ f₂)
 
   functor-equal-sigma
-    : DependentFunctorEqual F₁₂ F₂₂
+    : Dependent₁FunctorEqual F₁₂ F₂₂
     → FunctorEqual
       (functor-sigma F₁₂)
       (functor-sigma F₂₂)
@@ -500,28 +502,28 @@ module _
 
 functor-identity-sigma
   : {C₁ : Category}
-  → {C₂ : DependentCategory C₁}
-  → {F₂ : DependentFunctor C₂ C₂}
-  → DependentFunctorIdentity F₂
+  → {C₂ : Dependent₁Category C₁}
+  → {F₂ : Dependent₁Functor C₂ C₂}
+  → Dependent₁FunctorIdentity F₂
   → FunctorIdentity
     (functor-sigma F₂)
 functor-identity-sigma {C₂ = C₂} p
   = functor-identity-from-equal
   $ functor-trans (functor-equal-sigma
-    (dependent-functor-identity-to-equal p))
+    (dependent₁-functor-identity-to-equal p))
   $ functor-sigma-identity C₂
 
 -- ## FunctorCompose
 
 functor-compose-sigma
   : {C₁ D₁ E₁ : Category}
-  → {C₂ : DependentCategory C₁}
-  → {D₂ : DependentCategory D₁}
-  → {E₂ : DependentCategory E₁}
-  → {F₂ : DependentFunctor D₂ E₂}
-  → {G₂ : DependentFunctor C₂ D₂}
-  → {H₂ : DependentFunctor C₂ E₂}
-  → DependentFunctorCompose F₂ G₂ H₂
+  → {C₂ : Dependent₁Category C₁}
+  → {D₂ : Dependent₁Category D₁}
+  → {E₂ : Dependent₁Category E₁}
+  → {F₂ : Dependent₁Functor D₂ E₂}
+  → {G₂ : Dependent₁Functor C₂ D₂}
+  → {H₂ : Dependent₁Functor C₂ E₂}
+  → Dependent₁FunctorCompose F₂ G₂ H₂
   → FunctorCompose
     (functor-sigma F₂)
     (functor-sigma G₂)
@@ -531,22 +533,22 @@ functor-compose-sigma {F₂ = F₂} {G₂ = G₂} p
     (functor-sigma F₂)
     (functor-sigma G₂)
   $ functor-trans (functor-equal-sigma
-    (dependent-functor-compose-to-equal p))
+    (dependent₁-functor-compose-to-equal p))
   $ functor-sigma-compose F₂ G₂
 
 -- ## FunctorSquare
 
 functor-square-sigma
   : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
-  → {C₁₂ : DependentCategory C₁₁}
-  → {C₂₂ : DependentCategory C₂₁}
-  → {D₁₂ : DependentCategory D₁₁}
-  → {D₂₂ : DependentCategory D₂₁}
-  → {F₂ : DependentFunctor C₁₂ C₂₂}
-  → {G₂ : DependentFunctor D₁₂ D₂₂}
-  → {H₁₂ : DependentFunctor C₁₂ D₁₂}
-  → {H₂₂ : DependentFunctor C₂₂ D₂₂}
-  → DependentFunctorSquare F₂ G₂ H₁₂ H₂₂
+  → {C₁₂ : Dependent₁Category C₁₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {D₁₂ : Dependent₁Category D₁₁}
+  → {D₂₂ : Dependent₁Category D₂₁}
+  → {F₂ : Dependent₁Functor C₁₂ C₂₂}
+  → {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  → {H₁₂ : Dependent₁Functor C₁₂ D₁₂}
+  → {H₂₂ : Dependent₁Functor C₂₂ D₂₂}
+  → Dependent₁FunctorSquare F₂ G₂ H₁₂ H₂₂
   → FunctorSquare
     (functor-sigma F₂)
     (functor-sigma G₂)
@@ -561,26 +563,26 @@ functor-square-sigma {F₂ = F₂} {G₂ = G₂} {H₁₂ = H₁₂} {H₂₂ = 
   $ functor-trans (functor-sym
     (functor-sigma-compose H₂₂ F₂))
   $ functor-trans (functor-equal-sigma
-    (dependent-functor-square-to-equal s))
+    (dependent₁-functor-square-to-equal s))
   $ functor-sigma-compose G₂ H₁₂
 
 -- ## FunctorSquare₁
 
 module _
   {C₁₁ C₂₁ : Category}
-  {C₁₂ : DependentCategory C₁₁}
-  {C₂₂ : DependentCategory C₂₁}
+  {C₁₂ : Dependent₁Category C₁₁}
+  {C₂₂ : Dependent₁Category C₂₁}
   where
 
   module FunctorSquareSigma₁
-    (F : DependentFunctor C₁₂ C₂₂)
+    (F : Dependent₁Functor C₁₂ C₂₂)
     where
 
     base
       : (x₁ : Category.Object (category-sigma C₁₂))
       → Functor.base (functor-sigma₁ C₂₂)
         (Functor.base (functor-sigma F) x₁) 
-      ≅ Functor.base (DependentFunctor.functor F)
+      ≅ Functor.base (Dependent₁Functor.functor F)
         (Functor.base (functor-sigma₁ C₁₂) x₁)
     base _
       = refl
@@ -590,16 +592,16 @@ module _
       → (f₁ : Category.Arrow (category-sigma C₁₂) x₁ y₁)
       → Functor.map (functor-sigma₁ C₂₂)
         (Functor.map (functor-sigma F) f₁)
-      ≅ Functor.map (DependentFunctor.functor F)
+      ≅ Functor.map (Dependent₁Functor.functor F)
         (Functor.map (functor-sigma₁ C₁₂) f₁)
     map _
       = refl
 
   functor-square-sigma₁
-    : (F : DependentFunctor C₁₂ C₂₂)
+    : (F : Dependent₁Functor C₁₂ C₂₂)
     → FunctorSquare
       (functor-sigma F)
-      (DependentFunctor.functor F)
+      (Dependent₁Functor.functor F)
       (functor-sigma₁ C₁₂)
       (functor-sigma₁ C₂₂)
   functor-square-sigma₁ F

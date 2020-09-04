@@ -1,9 +1,11 @@
 module Prover.Category.Weak.Sigma.Maybe where
 
 open import Prover.Category
-  using (Category; DependentCategory; DependentFunctor; Functor; FunctorSquare)
-open import Prover.Category.Maybe
-  using (dependent-category-maybe)
+  using (Category; Functor; FunctorSquare)
+open import Prover.Category.Dependent1
+  using (Dependent₁Category; Dependent₁Functor)
+open import Prover.Category.Dependent1.Maybe
+  using (dependent₁-category-maybe)
 open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Maybe
@@ -20,7 +22,7 @@ module _
   where
 
   module WeakFunctorSigmaMay₁
-    (C₂ : DependentCategory C₁)
+    (C₂ : Dependent₁Category C₁)
     where
 
     open Functor (functor-sigma-maybe₁ C₂) using () renaming
@@ -37,7 +39,7 @@ module _
     map (_ , x₂) _ f₁
       = record
       { domain
-        = DependentCategory.base C₂ f₁ x₂
+        = Dependent₁Category.base C₂ f₁ x₂
       ; arrow₁
         = f₁
       ; arrow₂
@@ -55,18 +57,18 @@ module _
         → map x z (Category.compose C₁ f₁ g₁)
           ≡ Category.compose (category-sigma-maybe C₂) (map y z f₁) (map x y g₁)
       map-compose (_ , x₂) _ (z₁ , _) f₁ g₁
-        = CategorySigma.arrow-eq (dependent-category-maybe C₂) p₂ refl
-          (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) p₂ refl)
-        where p₂ = DependentCategory.base-compose C₂ f₁ g₁ x₂
+        = CategorySigma.arrow-eq (dependent₁-category-maybe C₂) p₂ refl
+          (Maybe.nothing-eq₂ (Dependent₁Category.Arrow C₂ z₁) p₂ refl)
+        where p₂ = Dependent₁Category.base-compose C₂ f₁ g₁ x₂
   
       map-unmap₁₂
         : (x₁ : Category.Object C₁)
-        → {x₂ y₁₂ y₂₂ z₂ : DependentCategory.Object C₂ x₁}
+        → {x₂ y₁₂ y₂₂ z₂ : Dependent₁Category.Object C₂ x₁}
         → (p₂ : y₁₂ ≡ y₂₂)
-        → (f₂ : DependentCategory.Arrow
-          (dependent-category-maybe C₂) x₁ y₂₂ z₂)
-        → DependentCategory.compose-eq
-          (dependent-category-maybe C₂) x₁ {x' = x₂} p₂ f₂ nothing
+        → (f₂ : Dependent₁Category.Arrow
+          (dependent₁-category-maybe C₂) x₁ y₂₂ z₂)
+        → Dependent₁Category.compose-eq
+          (dependent₁-category-maybe C₂) x₁ {x' = x₂} p₂ f₂ nothing
         ≡ nothing
       map-unmap₁₂ _ refl nothing
         = refl
@@ -87,7 +89,7 @@ module _
           (map x y g₁)
       map-unmap₁ {z = (z₁ , _)} _ (CategorySigma.arrow _ _ f₂ p₂) _
         = CategorySigma.arrow-eq
-          (dependent-category-maybe C₂) refl refl
+          (dependent₁-category-maybe C₂) refl refl
           (sym (map-unmap₁₂ z₁ p₂ f₂))
   
       map-unmap₂
@@ -103,12 +105,12 @@ module _
           (category-sigma-maybe C₂)
           (map y z f₁) g
       map-unmap₂ (z₁ , _) f₁ (CategorySigma.arrow _ _ _ p₂)
-        = CategorySigma.arrow-eq (dependent-category-maybe C₂) q₂ refl
-          (Maybe.nothing-eq₂ (DependentCategory.Arrow C₂ z₁) q₂ refl)
-        where q₂ = sub (DependentCategory.base C₂ f₁) p₂
+        = CategorySigma.arrow-eq (dependent₁-category-maybe C₂) q₂ refl
+          (Maybe.nothing-eq₂ (Dependent₁Category.Arrow C₂ z₁) q₂ refl)
+        where q₂ = sub (Dependent₁Category.base C₂ f₁) p₂
 
   weak-functor-sigma-maybe₁
-    : (C₂ : DependentCategory C₁)
+    : (C₂ : Dependent₁Category C₁)
     → WeakFunctor (functor-sigma-maybe₁ C₂)
   weak-functor-sigma-maybe₁ C₂
     = record {WeakFunctorSigmaMay₁ C₂}
@@ -117,12 +119,12 @@ module _
 
 module _
   {C₁₁ C₂₁ : Category}
-  {C₁₂ : DependentCategory C₁₁}
-  {C₂₂ : DependentCategory C₂₁}
+  {C₁₂ : Dependent₁Category C₁₁}
+  {C₂₂ : Dependent₁Category C₂₁}
   where
 
   module WeakFunctorSquareSigmaMay₁
-    (F : DependentFunctor C₁₂ C₂₂)
+    (F : Dependent₁Functor C₁₂ C₂₂)
     where
 
     map
@@ -136,20 +138,20 @@ module _
         (Functor.base (functor-sigma-maybe F) y₁)
         (FunctorSquare.base (functor-square-sigma-maybe₁ F) x₁)
         (FunctorSquare.base (functor-square-sigma-maybe₁ F) y₁)
-        (Functor.map (DependentFunctor.functor F) f₁₁)
+        (Functor.map (Dependent₁Functor.functor F) f₁₁)
       ≡ Functor.map (functor-sigma-maybe F)
         (WeakFunctor.map (weak-functor-sigma-maybe₁ C₁₂) x₁ y₁ f₁₁)
     map (_ , x₁₂) y₁ f₁₁
       = CategorySigma.arrow-eq
-        (dependent-category-maybe C₂₂) p₂₂ refl
+        (dependent₁-category-maybe C₂₂) p₂₂ refl
         (Maybe.nothing-eq₂
-          (DependentCategory.Arrow C₂₂
-            (DependentFunctor.base F
+          (Dependent₁Category.Arrow C₂₂
+            (Dependent₁Functor.base F
               (Functor.base (functor-sigma-maybe₁ C₁₂) y₁))) p₂₂ refl)
-      where p₂₂ = sym (DependentFunctor.base-commutative F f₁₁ x₁₂)
+      where p₂₂ = sym (Dependent₁Functor.base-commutative F f₁₁ x₁₂)
 
   weak-functor-square-sigma-maybe₁
-    : (F : DependentFunctor C₁₂ C₂₂)
+    : (F : Dependent₁Functor C₁₂ C₂₂)
     → WeakFunctorSquare
       (weak-functor-sigma-maybe₁ C₁₂)
       (weak-functor-sigma-maybe₁ C₂₂)

@@ -1,10 +1,7 @@
 module Prover.Category.Unit where
 
 open import Prover.Category
-  using (Category; DependentCategory; Functor; FunctorCompose; FunctorIdentity;
-    FunctorSquare)
-open import Prover.Category.Simple
-  using (SimpleDependentCategory)
+  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
 open import Prover.Function
   using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
 open import Prover.Prelude
@@ -238,63 +235,4 @@ module _
       (functor-unit h₂)
   functor-square-unit f g h₁ h₂ s
     = record {FunctorSquareUnit f g h₁ h₂ s}
-
--- ## DependentCategory
-
-module _
-  {C : Category}
-  where
-
-  module DependentCategoryUnit
-    (A : SimpleDependentCategory C)
-    where
-
-    category
-      : Category.Object C
-      → Category
-    category x
-      = category-unit
-        (SimpleDependentCategory.set A x)
-
-    functor
-      : {x y : Category.Object C}
-      → Category.Arrow C x y
-      → Functor
-        (category x)
-        (category y)
-    functor f
-      = functor-unit
-        (SimpleDependentCategory.function A f)
-
-    abstract
-
-      functor-identity
-        : (x : Category.Object C)
-        → FunctorIdentity
-          (functor (Category.identity C x))
-      functor-identity x
-        = functor-identity-unit
-          (SimpleDependentCategory.function A (Category.identity C x))
-          (SimpleDependentCategory.function-identity A x)
-  
-      functor-compose
-        : {x y z : Category.Object C}
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → FunctorCompose
-          (functor f)
-          (functor g)
-          (functor (Category.compose C f g))
-      functor-compose f g
-        = functor-compose-unit
-          (SimpleDependentCategory.function A f)
-          (SimpleDependentCategory.function A g)
-          (SimpleDependentCategory.function A (Category.compose C f g))
-          (SimpleDependentCategory.function-compose A f g)
-
-  dependent-category-unit
-    : SimpleDependentCategory C
-    → DependentCategory C
-  dependent-category-unit A
-    = record {DependentCategoryUnit A}
 
