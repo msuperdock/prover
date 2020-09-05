@@ -9,7 +9,6 @@ open import Prover.Category.Dependent1.Simple
 open import Prover.Category.Unit
   using (category-unit; functor-compose-unit; functor-identity-unit;
     functor-unit)
-open import Prover.Prelude
 
 -- ## Dependent₁Category
 

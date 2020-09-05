@@ -9,7 +9,7 @@ open import Prover.Prelude.Char public
 open import Prover.Prelude.CharWith public
   using (CharWith; char-with)
 open import Prover.Prelude.Collection public
-  using (Collection; collection)
+  using (Collection; collection; collection-eq)
 open import Prover.Prelude.Direction public
   using (Direction; _≟_dir)
 open import Prover.Prelude.Empty public
@@ -42,7 +42,8 @@ open import Prover.Prelude.Nat public
 open import Prover.Prelude.Pair public
   using (Pair; pair)
 open import Prover.Prelude.Relation public
-  using (Dec; Decidable; Relation; Symmetric; Transitive; τ₁; τ₂; τ₃; no; yes)
+  using (Dec; Decidable; Injective; Relation; Symmetric; Transitive; τ₁; τ₂; τ₃;
+    no; yes)
 open import Prover.Prelude.Retraction public
   using (Retraction)
 open import Prover.Prelude.Sigma public

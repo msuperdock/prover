@@ -6,46 +6,52 @@ Prover.Editor
 
 - split-main-editor-partial
 
-Prover.Editor.Indexed.List
+Prover.Editor.Dependent.Collection
 
-- indexed-partial-editor-list
-- indexed-split-editor-list
-- indexed-main-editor-list
-- indexed-split-main-editor-list
+- dependent-partial-editor-collection
+- dependent-split-editor-collection
+- dependent-split-main-editor-collection
 
-Prover.Editor.Indexed.Map
+Prover.Editor.Dependent.List
 
-- indexed-partial-editor-map-view
-- indexed-split-editor-map-view
-- indexed-main-editor-map-view
-- indexed-split-main-editor-map-view
+- dependent-partial-editor-list
+- dependent-split-editor-list
+- dependent-main-editor-list
+- dependent-split-main-editor-list
 
-- indexed-partial-editor-map-event
-- indexed-split-editor-map-event
-- indexed-main-editor-map-event
-- indexed-split-main-editor-map-event
+Prover.Editor.Dependent.Map
 
-- indexed-main-editor-map-state
-- indexed-split-main-editor-map-state
-- indexed-split-main-editor-map-pure
+- dependent-partial-editor-map-view
+- dependent-split-editor-map-view
+- dependent-main-editor-map-view
+- dependent-split-main-editor-map-view
 
-- indexed-partial-editor-map
-- indexed-split-editor-map
-- indexed-split-main-editor-map
+- dependent-partial-editor-map-event
+- dependent-split-editor-map-event
+- dependent-main-editor-map-event
+- dependent-split-main-editor-map-event
 
-Prover.Editor.Indexed.Product
+- dependent-main-editor-map-state
+- dependent-split-main-editor-map-state
+- dependent-split-main-editor-map-pure
 
-- indexed-partial-editor-product
-- indexed-split-editor-product
-- indexed-main-editor-product
-- indexed-split-main-editor-product
+- dependent-partial-editor-map
+- dependent-split-editor-map
+- dependent-split-main-editor-map
 
-Prover.Editor.Indexed.Sigma
+Prover.Editor.Dependent.Product
 
-- indexed-partial-editor-sigma
-- indexed-split-editor-sigma
-- indexed-main-editor-sigma
-- indexed-split-main-editor-sigma
+- dependent-partial-editor-product
+- dependent-split-editor-product
+- dependent-main-editor-product
+- dependent-split-main-editor-product
+
+Prover.Editor.Dependent.Sigma
+
+- dependent-partial-editor-sigma
+- dependent-split-editor-sigma
+- dependent-main-editor-sigma
+- dependent-split-main-editor-sigma
 
 Prover.Editor.List
 

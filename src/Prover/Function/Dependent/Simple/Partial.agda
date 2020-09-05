@@ -159,6 +159,8 @@ open Internal public
   using (DependentSimplePartialFunction';
     dependent-simple-partial-function-compose)
 
+open DependentSimplePartialFunction' public
+
 -- ### DependentSimplePartialFunction
 
 DependentSimplePartialFunction

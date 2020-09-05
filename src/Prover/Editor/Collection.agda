@@ -13,6 +13,8 @@ open import Prover.Editor.List
     split-main-editor-list; view-stack-list)
 open import Prover.Editor.Map
   using (partial-editor-map; split-editor-map; split-main-editor-map)
+open import Prover.Function.Partial.Collection
+  using (partial-function-collection)
 open import Prover.Prelude
 
 -- ## Editors
@@ -27,17 +29,17 @@ module _
 
   -- Takes direction from earlier to later elements.
   partial-editor-collection
-    : Direction
-    → (R : Relation A)
+    : (R : Relation A)
     → Decidable R
+    → Direction
     → PartialEditor V E A
     → PartialEditor
       (view-stack-list V)
       (event-stack-list E)
       (Collection R)
   partial-editor-collection d R d'
-    = partial-editor-map (Collection.from-list R d')
-    ∘ partial-editor-list d
+    = partial-editor-map (partial-function-collection R d)
+    ∘ partial-editor-list d'
 
 -- ### SplitEditor
 
@@ -49,17 +51,17 @@ module _
 
   -- Takes direction from earlier to later elements.
   split-editor-collection
-    : Direction
-    → (R : Relation (Category.Object C))
+    : (R : Relation (Category.Object C))
     → Decidable R
+    → Direction
     → SplitEditor V E C
     → SplitEditor
       (view-stack-list V)
       (event-stack-list E)
       (category-collection C R)
   split-editor-collection d R d'
-    = split-editor-map (split-functor-collection C R d')
-    ∘ split-editor-list d
+    = split-editor-map (split-functor-collection C R d)
+    ∘ split-editor-list d'
 
 -- ### SplitMainEditor
 
@@ -72,9 +74,9 @@ module _
 
   -- Takes direction from earlier to later elements.
   split-main-editor-collection
-    : Direction
-    → (R : Relation (Category.Object C))
+    : (R : Relation (Category.Object C))
     → Decidable R
+    → Direction
     → SplitMainEditor V E S P C
     → SplitMainEditor
       (view-stack-list V)
@@ -83,6 +85,6 @@ module _
       (List P)
       (category-collection C R)
   split-main-editor-collection d R d'
-    = split-main-editor-map (split-functor-collection C R d')
-    ∘ split-main-editor-list d
+    = split-main-editor-map (split-functor-collection C R d)
+    ∘ split-main-editor-list d'
 

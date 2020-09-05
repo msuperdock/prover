@@ -138,7 +138,7 @@ module Collection where
     → {R : Relation A}
     → (S : Relation B)
     → (f : A → B)
-    → ((x₁ x₂ : A) → S (f x₁) (f x₂) → R x₁ x₂)
+    → Injective R S f
     → Collection R
     → Collection S
   map S f r xs
@@ -205,32 +205,6 @@ module Collection where
   ... | yes f
     = just (collection xs f)
 
-  from-list-eq
-    : {A : Set}
-    → {R : Relation A}
-    → {xs' : Collection R}
-    → (d : Decidable R)
-    → (xs : List A)
-    → from-list R d xs ≡ just xs'
-    → elements xs' ≡ xs
-  from-list-eq {R = R} d xs _
-    with from-list' R d xs
-  from-list-eq _ _ refl | yes _
-    = refl
-
-  from-list-elements
-    : {A : Set}
-    → {R : Relation A}
-    → (d : Decidable R)
-    → (xs : Collection R)
-    → from-list R d (elements xs) ≡ just xs
-  from-list-elements {R = R} d (collection xs p)
-    with from-list' R d xs
-  ... | no ¬p
-    = ⊥-elim (¬p p)
-  ... | yes _
-    = refl
-
   -- ### Equality
 
   module _
@@ -247,6 +221,13 @@ module Collection where
       = no λ {refl → ¬p refl}
     ... | yes refl
       = yes refl
+
+    collection-eq
+      : {xs₁ xs₂ : Collection R}
+      → elements xs₁ ≡ elements xs₂
+      → xs₁ ≡ xs₂
+    collection-eq refl
+      = refl
 
   -- ### Membership
 
@@ -537,4 +518,9 @@ module Collection where
       = member-find-unique xs₂ f u
         (find-true xs₁ f q₁)
         (p y (find-is-member xs₁ f q₁))
+
+-- ## Exports
+
+open Collection public
+  using (collection-eq)
 

@@ -55,9 +55,9 @@ module ViewStackList
     : (v : View)
     → ViewPath v
     → Set
-  ViewInner [] _
+  ViewInner (any {zero} _) _
     = ⊥
-  ViewInner vs@(_ ∷ _) (k , vp)
+  ViewInner vs@(any {suc _} _) (k , vp)
     = ViewStack.ViewInner V (vs ! k) vp
 
   ViewInnerPath
@@ -65,7 +65,7 @@ module ViewStackList
     → (vp : ViewPath v)
     → ViewInner v vp
     → Set
-  ViewInnerPath vs@(_ ∷ _) (k , vp)
+  ViewInnerPath vs@(any {suc _} _) (k , vp)
     = ViewStack.ViewInnerPath V (vs ! k) vp
 
 view-stack-list

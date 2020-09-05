@@ -1,17 +1,18 @@
 module Prover.Category.Split.Collection where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category; Functor; FunctorSquare)
 open import Prover.Category.Collection
-  using (category-collection; functor-collection)
+  using (category-collection; functor-collection; functor-collection';
+    functor-square-collection')
 open import Prover.Category.List
-  using (category-list)
+  using (category-list; functor-list)
 open import Prover.Category.Partial
-  using (PartialFunctor)
+  using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Partial.Collection
-  using (partial-functor-collection)
+  using (partial-functor-collection; partial-functor-square-collection)
 open import Prover.Category.Split
-  using (SplitFunctor)
+  using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -36,7 +37,7 @@ module SplitFunctorCollection
       (category-collection C R)
       (category-list C)
   functor
-    = functor-collection C R
+    = functor-collection' C R
 
   open Functor functor using () renaming
     ( base
@@ -48,17 +49,25 @@ module SplitFunctorCollection
   base-unbase
     : (xs' : Category.Object (category-collection C R))
     → base (unbase xs') ≡ just xs'
-  base-unbase
-    = Collection.from-list-elements d
+  base-unbase (collection xs' p)
+    with Collection.from-list' R d xs'
+  ... | no ¬p
+    = ⊥-elim (¬p p)
+  ... | yes _
+    = refl
 
   map-unmap
     : {xs' ys' : Category.Object (category-collection C R)}
     → (fs' : Category.Arrow (category-collection C R) xs' ys')
     → map (base-unbase xs') (base-unbase ys') (unmap fs') ≡ fs'
-  map-unmap {xs' = xs'} {ys' = ys'} _
-    with Collection.from-list-eq d (Collection.elements xs') (base-unbase xs')
-    | Collection.from-list-eq d (Collection.elements ys') (base-unbase ys')
-  ... | refl | refl
+  map-unmap {xs' = collection xs' p} {ys' = collection ys' q} _
+    with Collection.from-list' R d xs'
+    | Collection.from-list' R d ys'
+  ... | no ¬p | _
+    = ⊥-elim (¬p p)
+  ... | _ | no ¬q
+    = ⊥-elim (¬q q)
+  ... | yes _ | yes _
     = refl
 
   normalize-arrow
@@ -66,9 +75,9 @@ module SplitFunctorCollection
     → (xs : Category.Object (category-list C))
     → base xs ≡ just xs'
     → Category.Arrow (category-list C) xs (unbase xs')
-  normalize-arrow xs p
-    with Collection.from-list-eq d xs p
-  ... | refl
+  normalize-arrow xs _
+    with Collection.from-list' R d xs
+  normalize-arrow xs refl | yes _
     = Category.identity (category-list C) xs
 
   normalize-valid
@@ -77,10 +86,12 @@ module SplitFunctorCollection
     → (p : base xs ≡ just xs')
     → map p (base-unbase xs') (normalize-arrow xs p)
       ≡ Category.identity (category-collection C R) xs'
-  normalize-valid {xs' = xs'} xs p
-    with Collection.from-list-eq d xs p
-    | Collection.from-list-eq d (Collection.elements xs') (base-unbase xs')
-  ... | refl | refl
+  normalize-valid {xs' = collection xs' p} xs _
+    with Collection.from-list' R d xs
+    | Collection.from-list' R d xs'
+  ... | _ | no ¬p
+    = ⊥-elim (¬p p)
+  normalize-valid _ refl | yes _ | yes _
     = refl
 
 split-functor-collection
@@ -92,4 +103,50 @@ split-functor-collection
     (category-collection C R)
 split-functor-collection C R d
   = record {SplitFunctorCollection C R d}
+
+-- ## SplitFunctorSquare
+
+module SplitFunctorSquareCollection
+  {C₁ C₂ : Category}
+  (R₁ : Relation (Category.Object C₁))
+  (R₂ : Relation (Category.Object C₂))
+  (d₁ : Decidable R₁)
+  (d₂ : Decidable R₂)
+  (F : Functor C₁ C₂)
+  (i : Injective R₁ R₂ (Functor.base F))
+  where
+
+  partial-functor
+    : PartialFunctorSquare
+      (functor-list F)
+      (functor-collection R₁ R₂ F i)
+      (SplitFunctor.partial-functor (split-functor-collection C₁ R₁ d₁))
+      (SplitFunctor.partial-functor (split-functor-collection C₂ R₂ d₂))
+  partial-functor
+    = partial-functor-square-collection R₁ R₂ d₁ d₂ F i
+
+  functor
+    : FunctorSquare
+      (functor-collection R₁ R₂ F i)
+      (functor-list F)
+      (SplitFunctor.functor (split-functor-collection C₁ R₁ d₁))
+      (SplitFunctor.functor (split-functor-collection C₂ R₂ d₂))
+  functor
+    = functor-square-collection' R₁ R₂ F i
+
+split-functor-square-collection
+  : {C₁ C₂ : Category}
+  → (R₁ : Relation (Category.Object C₁))
+  → (R₂ : Relation (Category.Object C₂))
+  → (d₁ : Decidable R₁)
+  → (d₂ : Decidable R₂)
+  → (F : Functor C₁ C₂)
+  → (i : Injective R₁ R₂ (Functor.base F))
+  → SplitFunctorSquare
+    (functor-list F)
+    (functor-collection R₁ R₂ F i)
+    (split-functor-collection C₁ R₁ d₁)
+    (split-functor-collection C₂ R₂ d₂)
+split-functor-square-collection R₁ R₂ d₁ d₂ F i
+  = record {SplitFunctorSquareCollection R₁ R₂ d₁ d₂ F i}
 

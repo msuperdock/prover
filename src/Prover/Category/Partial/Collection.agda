@@ -1,13 +1,13 @@
 module Prover.Category.Partial.Collection where
 
 open import Prover.Category
-  using (Category)
+  using (Category; Functor)
 open import Prover.Category.Collection
-  using (module CategoryCollection; category-collection)
+  using (module CategoryCollection; category-collection; functor-collection)
 open import Prover.Category.List
-  using (category-list)
+  using (category-list; functor-list)
 open import Prover.Category.Partial
-  using (PartialFunctor)
+  using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -31,10 +31,10 @@ module PartialFunctorCollection
     → base ys ≡ just ys'
     → Category.Arrow (category-list C) xs ys
     → Category.Arrow (category-collection C R) xs' ys'
-  map {xs = xs} {ys = ys} p q
-    with Collection.from-list-eq d xs p
-    | Collection.from-list-eq d ys q
-  ... | refl | refl
+  map {xs = xs} {ys = ys} _ _
+    with Collection.from-list' R d xs
+    | Collection.from-list' R d ys
+  map refl refl | yes _ | yes _
     = CategoryCollection.arrow
 
   abstract
@@ -45,9 +45,9 @@ module PartialFunctorCollection
       → (p : base xs ≡ just xs')
       → map p p (Category.identity (category-list C) xs)
         ≡ Category.identity (category-collection C R) xs'
-    map-identity xs p
-      with Collection.from-list-eq d xs p
-    ... | refl
+    map-identity xs _
+      with Collection.from-list' R d xs
+    map-identity _ refl | yes _
       = refl
 
     map-compose
@@ -60,11 +60,11 @@ module PartialFunctorCollection
       → (gs : Category.Arrow (category-list C) xs ys)
       → map p r (Category.compose (category-list C) fs gs)
         ≡ Category.compose (category-collection C R) (map q r fs) (map p q gs)
-    map-compose {xs = xs} {ys = ys} {zs = zs} p q r _ _
-      with Collection.from-list-eq d xs p
-      | Collection.from-list-eq d ys q
-      | Collection.from-list-eq d zs r
-    ... | refl | refl | refl
+    map-compose {xs = xs} {ys = ys} {zs = zs} _ _ _ _ _
+      with Collection.from-list' R d xs
+      | Collection.from-list' R d ys
+      | Collection.from-list' R d zs
+    map-compose refl refl refl _ _ | yes _ | yes _ | yes _
       = refl
 
 partial-functor-collection
@@ -76,4 +76,77 @@ partial-functor-collection
     (category-collection C R)
 partial-functor-collection C R d
   = record {PartialFunctorCollection C R d}
+
+-- ## PartialFunctorSquare
+
+module PartialFunctorSquareCollection
+  {C₁ C₂ : Category}
+  (R₁ : Relation (Category.Object C₁))
+  (R₂ : Relation (Category.Object C₂))
+  (d₁ : Decidable R₁)
+  (d₂ : Decidable R₂)
+  (F : Functor C₁ C₂)
+  (i : Injective R₁ R₂ (Functor.base F))
+  where
+
+  base
+    : {xs₁' : Category.Object (category-collection C₁ R₁)}
+    → (xs₁ : Category.Object (category-list C₁))
+    → PartialFunctor.base (partial-functor-collection C₁ R₁ d₁) xs₁
+      ≡ just xs₁'
+    → PartialFunctor.base (partial-functor-collection C₂ R₂ d₂)
+      (Functor.base (functor-list F) xs₁)
+    ≡ just (Functor.base (functor-collection R₁ R₂ F i) xs₁')
+  base xs₁ _
+    with Collection.from-list' R₁ d₁ xs₁
+    | Collection.from-list' R₂ d₂ (List.map (Functor.base F) xs₁)
+  base {xs₁' = xs₁'} _ refl | yes _ | no ¬p₂
+    = ⊥-elim (¬p₂ (Collection.valid'
+      (Collection.map R₂ (Functor.base F) i xs₁')))
+  base _ refl | yes _ | yes _
+    = refl
+
+  map
+    : {xs₁ ys₁ : Category.Object (category-list C₁)}
+    → {xs₁' ys₁' : Category.Object (category-collection C₁ R₁)}
+    → (p₁ : PartialFunctor.base (partial-functor-collection C₁ R₁ d₁) xs₁
+      ≡ just xs₁')
+    → (q₁ : PartialFunctor.base (partial-functor-collection C₁ R₁ d₁) ys₁
+      ≡ just ys₁')
+    → (fs₁ : Category.Arrow (category-list C₁) xs₁ ys₁)
+    → PartialFunctor.map (partial-functor-collection C₂ R₂ d₂)
+      (base xs₁ p₁)
+      (base ys₁ q₁)
+      (Functor.map (functor-list F) fs₁)
+    ≡ Functor.map (functor-collection R₁ R₂ F i)
+      (PartialFunctor.map (partial-functor-collection C₁ R₁ d₁) p₁ q₁ fs₁)
+  map {xs₁ = xs₁} {ys₁ = ys₁} _ _ _
+    with Collection.from-list' R₁ d₁ xs₁
+    | Collection.from-list' R₂ d₂ (List.map (Functor.base F) xs₁)
+    | Collection.from-list' R₁ d₁ ys₁
+    | Collection.from-list' R₂ d₂ (List.map (Functor.base F) ys₁)
+  map {xs₁' = xs₁'} refl _ _ | yes _ | no ¬p₂ | _ | _
+    = ⊥-elim (¬p₂ (Collection.valid'
+      (Collection.map R₂ (Functor.base F) i xs₁')))
+  map {ys₁' = ys₁'} _ refl _ | _ | _ | yes _ | no ¬q₂
+    = ⊥-elim (¬q₂ (Collection.valid'
+      (Collection.map R₂ (Functor.base F) i ys₁')))
+  map refl refl _ | yes _ | yes _ | yes _ | yes _
+    = refl
+
+partial-functor-square-collection
+  : {C₁ C₂ : Category}
+  → (R₁ : Relation (Category.Object C₁))
+  → (R₂ : Relation (Category.Object C₂))
+  → (d₁ : Decidable R₁)
+  → (d₂ : Decidable R₂)
+  → (F : Functor C₁ C₂)
+  → (i : Injective R₁ R₂ (Functor.base F))
+  → PartialFunctorSquare
+    (functor-list F)
+    (functor-collection R₁ R₂ F i)
+    (partial-functor-collection C₁ R₁ d₁)
+    (partial-functor-collection C₂ R₂ d₂)
+partial-functor-square-collection R₁ R₂ d₁ d₂ F i
+  = record {PartialFunctorSquareCollection R₁ R₂ d₁ d₂ F i}
 
