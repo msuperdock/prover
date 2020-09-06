@@ -728,14 +728,6 @@ module _
       = editor-list d
         (SplitMainEditor.editor e)
 
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-list C)
-    split-functor
-      = split-functor-list
-        (SplitMainEditor.split-functor e)
-
     state-split-function
       : SplitFunction
         (List S)
@@ -751,6 +743,14 @@ module _
     pure-split-function
       = split-function-list
         (SplitMainEditor.pure-split-function e)
+
+    split-functor
+      : SplitFunctor
+        StateCategory
+        (category-list C)
+    split-functor
+      = split-functor-list
+        (SplitMainEditor.split-functor e)
 
   -- Takes direction from earlier to later elements.
   split-main-editor-list

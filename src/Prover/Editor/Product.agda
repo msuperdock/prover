@@ -682,15 +682,6 @@ module _
         (SplitMainEditor.editor e₁)
         (SplitMainEditor.editor e₂)
 
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-product C₁ C₂)
-    split-functor
-      = split-functor-product
-        (SplitMainEditor.split-functor e₁)
-        (SplitMainEditor.split-functor e₂)
-
     state-split-function
       : SplitFunction
         (S₁ × S₂)
@@ -708,6 +699,15 @@ module _
       = split-function-product
         (SplitMainEditor.pure-split-function e₁)
         (SplitMainEditor.pure-split-function e₂)
+
+    split-functor
+      : SplitFunctor
+        StateCategory
+        (category-product C₁ C₂)
+    split-functor
+      = split-functor-product
+        (SplitMainEditor.split-functor e₁)
+        (SplitMainEditor.split-functor e₂)
 
   -- Takes direction from first to second component.
   split-main-editor-product

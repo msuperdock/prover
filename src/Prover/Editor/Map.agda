@@ -687,18 +687,18 @@ module _
     open SplitMainEditor e public
       hiding (split-functor; pure-split-function)
 
-    split-functor
-      : SplitFunctor StateCategory D
-    split-functor
-      = split-functor-compose F
-        (SplitMainEditor.split-functor e)
-
     pure-split-function
       : SplitFunction P (Category.Object D)
     pure-split-function
       = split-function-compose
         (split-functor-base F)
         (SplitMainEditor.pure-split-function e)
+
+    split-functor
+      : SplitFunctor StateCategory D
+    split-functor
+      = split-functor-compose F
+        (SplitMainEditor.split-functor e)
 
   split-main-editor-map
     : SplitFunctor C D

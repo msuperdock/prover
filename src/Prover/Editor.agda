@@ -603,19 +603,6 @@ record SplitMainEditor
 
   field
 
-    split-functor
-      : SplitFunctor StateCategory C
-
-  open SplitFunctor split-functor public
-
-  draw-pure
-    : Category.Object C
-    → ViewStack.View V
-  draw-pure x
-    = draw (unbase x)
-  
-  field
-
     state-split-function
       : SplitFunction S State
 
@@ -642,6 +629,19 @@ record SplitMainEditor
       to pure-decode-encode
     )
 
+  field
+
+    split-functor
+      : SplitFunctor StateCategory C
+
+  open SplitFunctor split-functor public
+
+  draw-pure
+    : Category.Object C
+    → ViewStack.View V
+  draw-pure x
+    = draw (unbase x)
+  
 -- #### Conversion
 
 -- ##### SplitEditor
