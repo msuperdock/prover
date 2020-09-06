@@ -104,12 +104,6 @@ module Maybe where
 
   -- ### Properties
 
-  nothing≢just
-    : {A : Set}
-    → {x : A}
-    → nothing ≢ just x
-  nothing≢just ()
-
   just≢nothing
     : {A : Set}
     → {x : A}

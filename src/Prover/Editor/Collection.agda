@@ -37,7 +37,7 @@ module _
       (view-stack-list V)
       (event-stack-list E)
       (Collection R)
-  partial-editor-collection d R d'
+  partial-editor-collection R d d'
     = partial-editor-map (partial-function-collection R d)
     ∘ partial-editor-list d'
 
@@ -59,7 +59,7 @@ module _
       (view-stack-list V)
       (event-stack-list E)
       (category-collection C R)
-  split-editor-collection d R d'
+  split-editor-collection R d d'
     = split-editor-map (split-functor-collection C R d)
     ∘ split-editor-list d'
 
@@ -84,7 +84,7 @@ module _
       (List S)
       (List P)
       (category-collection C R)
-  split-main-editor-collection d R d'
+  split-main-editor-collection R d d'
     = split-main-editor-map (split-functor-collection C R d)
     ∘ split-main-editor-list d'
 
