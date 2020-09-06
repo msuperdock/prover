@@ -3,39 +3,35 @@ module Prover.Data.Symbols where
 open import Prover.Data.Identifier
   using (Identifier; _≟_idn)
 open import Prover.Data.Symbol
-  using (Symbol; _≟_sym?)
+  using (Symbol; _≟_sym; symbol)
 open import Prover.Prelude
 
 -- ## Utilities
 
 relation
-  : Relation (Any Symbol)
+  : Relation Symbol
 relation
-  = Relation.map
-    (Symbol.name ∘ Any.value)
+  = Relation.map Symbol.name
     (Equal Identifier)
 
 symmetric
   : Symmetric relation
 symmetric
-  = Symmetric.map
-    (Symbol.name ∘ Any.value)
+  = Symmetric.map Symbol.name
     (Equal Identifier)
     (Symmetric.equal Identifier)
 
 transitive
   : Transitive relation
 transitive
-  = Transitive.map
-    (Symbol.name ∘ Any.value)
+  = Transitive.map Symbol.name
     (Equal Identifier)
     (Transitive.equal Identifier)
 
 decidable
   : Decidable relation
 decidable
-  = Decidable.map
-    (Symbol.name ∘ Any.value)
+  = Decidable.map Symbol.name
     (Equal Identifier)
     _≟_idn
 
@@ -44,150 +40,84 @@ decidable
 Symbols
   : Set
 Symbols
-  = Collection {A = Any Symbol} relation
+  = Collection
+    {A = Symbol}
+    relation
 
 -- ## Module
 
 module Symbols where
+
+  open Collection public
+    using (Member; empty; member)
 
   -- ### Interface
 
   lookup
     : Symbols
     → Identifier
-    → Maybe (Any Symbol)
+    → Maybe Symbol
   lookup ss n
     = Collection.find ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
+      (Bool.from-decidable _≟_idn n ∘ Symbol.name)
 
   insert
-    : {a : ℕ}
-    → (ss : Symbols)
-    → (s : Symbol a)
+    : (ss : Symbols)
+    → (s : Symbol)
     → lookup ss (Symbol.name s) ≡ nothing
     → Symbols
   insert ss s
-    = Collection.insert ss symmetric decidable (any s)
-
-  -- ### Construction
-
-  open Collection public
-    using (empty)
+    = Collection.insert ss
+      symmetric
+      decidable s
 
   -- ### Membership
 
   sym_∈_
-    : {a : ℕ}
-    → Symbol a
+    : Symbol
     → Symbols
     → Set
   sym s ∈ ss
-    = Collection.IsMember ss (any s)
+    = Collection.IsMember ss s
 
   sym_∈?_
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → (ss : Symbols)
     → Dec (sym s ∈ ss)
   sym s ∈? ss
-    = Collection.is-member? ss _≟_sym? (any s)
-
-  record Member
-    (ss : Symbols)
-    : Set
-    where
-
-    constructor
-
-      member
-
-    field
-
-      {arity}
-        : ℕ
-
-      value
-        : Symbol arity
-
-      is-member
-        : sym value ∈ ss
+    = Collection.is-member? ss _≟_sym s
 
   lookup-member
     : (ss : Symbols)
     → Identifier
     → Maybe (Member ss)
   lookup-member ss n
-    with Collection.find-member ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-  ... | nothing
-    = nothing
-  ... | just (Collection.member (any s) p)
-    = just (member s p)
+    = Collection.find-member ss
+      (Bool.from-decidable _≟_idn n ∘ Symbol.name)
 
   lookup-member-nothing
-    : {a : ℕ}
-    → (ss : Symbols)
-    → (s : Symbol a)
+    : (ss : Symbols)
+    → (s : Symbol)
     → lookup-member ss (Symbol.name s) ≡ nothing
     → ¬ sym s ∈ ss
-  lookup-member-nothing ss s@(Symbol.symbol _ n _ _ _) _
-    with Collection.find-member ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-    | inspect (Collection.find-member ss)
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-  ... | nothing | [ q ]
-    = Collection.find-¬is-member ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value) (any s)
+  lookup-member-nothing ss s@(symbol _ n _ _ _)
+    = Collection.find-member-nothing ss
+      (Bool.from-decidable _≟_idn n ∘ Symbol.name) s
       (Bool.from-decidable-true _≟_idn n n refl)
-    $ Collection.find-member-nothing ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value) q
 
-  lookup-member-any
-    : {ss : Symbols}
+  lookup-member-just
+    : (ss : Symbols)
+    → (s : Symbol)
     → {m : Member ss}
-    → {a : ℕ}
-    → (s : Symbol a)
     → .(sym s ∈ ss)
     → lookup-member ss (Symbol.name s) ≡ just m
-    → Equal (Any Symbol) (any s) (any (Member.value m))
-  lookup-member-any {ss = ss} (Symbol.symbol _ n _ _ _) _ _
-    with Collection.find-member ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-    | inspect (Collection.find-member ss)
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-  lookup-member-any {ss = ss} s@(Symbol.symbol _ n _ _ _) p refl
-    | just _ | [ q ]
-    = Collection.member-find-unique' ss
-      (Bool.from-decidable _≟_idn n ∘ Symbol.name ∘ Any.value)
-      (Unique.decidable symmetric transitive decidable (any s))
-      (Bool.from-decidable-true decidable (any s) (any s) refl)
+    → s ≡ Member.value m
+  lookup-member-just ss s@(symbol _ n _ _ _) p q
+    = Collection.find-member-just-eq ss
+      (Bool.from-decidable _≟_idn n ∘ Symbol.name)
+      (Unique.decidable symmetric transitive decidable s)
+      (Bool.from-decidable-true _≟_idn n n refl)
       (Dec.recompute (sym s ∈? ss) p) q
-
-  lookup-member-arity
-    : {ss : Symbols}
-    → {m : Member ss}
-    → {a : ℕ}
-    → (s : Symbol a)
-    → .(sym s ∈ ss)
-    → lookup-member ss (Symbol.name s) ≡ just m
-    → a ≡ Member.arity m
-  lookup-member-arity s p q
-    with lookup-member-any s p q
-  ... | refl
-    = refl
-
-  lookup-member-eq
-    : {ss : Symbols}
-    → {m : Member ss}
-    → {a : ℕ}
-    → (s : Symbol a)
-    → .(sym s ∈ ss)
-    → lookup-member ss (Symbol.name s) ≡ just m
-    → s ≅ Member.value m
-  lookup-member-eq s p q
-    with lookup-member-any s p q
-  ... | refl
-    = refl
 
 -- ## Exports
 

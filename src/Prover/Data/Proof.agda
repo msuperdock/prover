@@ -47,10 +47,9 @@ module Internal where
       → Branch rs vs
 
     rule
-      : {a : ℕ}
-      → (r : Rule ss a)
+      : (r : Rule ss)
       → .(rul r ∈ rs)
-      → (bs : Vec (Branch rs vs) a)
+      → (bs : Vec (Branch rs vs) (Rule.arity r))
       → (c : Formula ss vs true)
       → .(Rule.Match r (Vec.map branch-conclusion bs) c)
       → Branch rs vs
@@ -68,8 +67,8 @@ module Internal where
     → ℕ
   branch-arity (assumption _)
     = zero
-  branch-arity (rule {a = a} _ _ _ _ _)
-    = a
+  branch-arity (rule r _ _ _ _)
+    = Rule.arity r
   
   branch-branches
     : {ss : Symbols}
@@ -108,9 +107,8 @@ module Internal where
 
   record Proof
     {ss : Symbols}
-    {a : ℕ}
     (rs : Rules ss)
-    (r : Rule ss a)
+    (r : Rule ss)
     : Set
     where
 
@@ -161,8 +159,7 @@ module Internal where
   ProofPath
     : {ss : Symbols}
     → {rs : Rules ss}
-    → {a : ℕ}
-    → {r : Rule ss a}
+    → {r : Rule ss}
     → Proof rs r
     → Set
   ProofPath (proof b _)
@@ -236,8 +233,7 @@ module Internal where
   module _
     {ss : Symbols}
     {rs : Rules ss}
-    {a : ℕ}
-    {r : Rule ss a}
+    {r : Rule ss}
     where
 
     proof-metas
@@ -289,7 +285,7 @@ module Internal where
       = nothing
     branch-path-up {b = rule _ _ [] _ _} stop
       = nothing
-    branch-path-up {b = rule {a = suc a} _ _ (_ ∷ _) _ _} stop
+    branch-path-up {b = rule (rule {suc a} _ _ _ _) _ (_ ∷ _) _ _} stop
       = just (go (Fin.maximum a) stop)
     branch-path-up (go k bp)
       with branch-path-up bp
@@ -335,8 +331,7 @@ module Internal where
   module _
     {ss : Symbols}
     {rs : Rules ss}
-    {a : ℕ}
-    {r : Rule ss a}
+    {r : Rule ss}
     where
 
     proof-path-top
@@ -370,8 +365,7 @@ module Internal where
   module _
     {ss : Symbols}
     {rs : Rules ss}
-    {a : ℕ}
-    {r : Rule ss a}
+    {r : Rule ss}
     where
 
     proof-assumption
@@ -431,8 +425,7 @@ module Internal where
   
     proof-is-complete
       : {rs : Rules ss}
-      → {a : ℕ}
-      → {r : Rule ss a}
+      → {r : Rule ss}
       → Proof rs r
       → Bool
     proof-is-complete {r = rule _ _ hs _} (proof b _)
@@ -551,8 +544,7 @@ module Internal where
       = branch-substitutes-meta-path bs k bp m f
 
     proof-substitute-meta 
-      : {a : ℕ}
-      → {r : Rule ss a}
+      : {r : Rule ss}
       → (p : Proof rs r)
       → ProofPath p
       → Meta
@@ -575,10 +567,9 @@ module Internal where
 
     branch-with-infer-formula
       : {vs : Variables}
-      → {a : ℕ}
       → Metas
       → (f : Formula ss vs true)
-      → (r : Rule ss a)
+      → (r : Rule ss)
       → rul r ∈ rs
       → Formula.Match (Rule.conclusion r) f
       → BranchWith rs f
@@ -598,11 +589,10 @@ module Internal where
       }
   
     proof-infer
-      : {a a' : ℕ}
-      → {r : Rule ss a}
+      : {r : Rule ss}
       → (p : Proof rs r)
       → (pp : ProofPath p)
-      → (r' : Rule ss a')
+      → (r' : Rule ss)
       → rul r' ∈ rs
       → Formula.Match (Rule.conclusion r') (proof-lookup p pp)
       → Σ (Proof rs r) ProofPath
@@ -637,9 +627,8 @@ module Branch where
 
 Proof
   : {ss : Symbols}
-  → {a : ℕ}
   → Rules ss
-  → Rule ss a
+  → Rule ss
   → Set
 Proof
   = Internal.Proof
@@ -680,8 +669,7 @@ open Internal.BranchPath public
 ProofPath
   : {ss : Symbols}
   → {rs : Rules ss}
-  → {a : ℕ}
-  → {r : Rule ss a}
+  → {r : Rule ss}
   → Proof rs r
   → Set
 ProofPath

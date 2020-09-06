@@ -21,7 +21,6 @@ module _Rule where
 
   record Rule
     (ss : Symbols)
-    (a : ℕ)
     : Set
     where
 
@@ -31,6 +30,9 @@ module _Rule where
 
     field
 
+      {arity}
+        : ℕ
+
       name
         : Identifier
 
@@ -38,14 +40,13 @@ module _Rule where
         : Variables
 
       hypotheses
-        : Vec (Formula ss variables false) a
+        : Vec (Formula ss variables false) arity
 
       conclusion
         : Formula ss variables false
 
 Rule
   : Symbols
-  → ℕ
   → Set
 Rule
   = _Rule.Rule
@@ -69,17 +70,19 @@ module Rule where
     where
 
     _≟_rul
-      : {a : ℕ}
-      → Decidable (Equal (Rule ss a))
-    rule n₁ vs₁ hs₁ c₁ ≟ rule n₂ vs₂ hs₂ c₂ rul
-      with n₁ ≟ n₂ idn
+      : Decidable (Equal (Rule ss))
+    rule {a₁} n₁ vs₁ hs₁ c₁ ≟ rule {a₂} n₂ vs₂ hs₂ c₂ rul
+      with a₁ ≟ a₂ nat
+      | n₁ ≟ n₂ idn
       | vs₁ ≟ vs₂ vars
   
-    ... | no ¬p | _
+    ... | no ¬p | _ | _
       = no (λ {refl → ¬p refl})
-    ... | _ | no ¬p
+    ... | _ | no ¬p | _
       = no (λ {refl → ¬p refl})
-    ... | yes refl | yes refl
+    ... | _ | _ | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl | yes refl | yes refl
       with hs₁ ≟ hs₂ frms
       | c₁ ≟ c₂ frm
     
@@ -89,23 +92,17 @@ module Rule where
       = no (λ {refl → ¬p refl})
     ... | yes refl | yes refl
       = yes refl
-    
-    _≟_rul?
-      : Decidable (Equal (Any (Rule ss)))
-    _≟_rul?
-      = Any.decidable (Rule ss) _≟_nat _≟_rul
 
   -- ### Matching
 
   module _
     {ss : Symbols}
     {vs : Variables}
-    {a : ℕ}
     where
 
     record Match
-      (r : Rule ss a)
-      (fs : Vec (Formula ss vs true) a)
+      (r : Rule ss)
+      (fs : Vec (Formula ss vs true) (arity r))
       (f : Formula ss vs true)
       : Set
       where
@@ -126,8 +123,8 @@ module Rule where
           : Formula.substitute (conclusion r) substitutions ≡ just f
   
     match?
-      : (r : Rule ss a)
-      → (fs : Vec (Formula ss vs true) a)
+      : (r : Rule ss)
+      → (fs : Vec (Formula ss vs true) (arity r))
       → (f : Formula ss vs true)
       → Dec (Match r fs f)
     match? (rule _ _ hs c) fs f
@@ -139,19 +136,19 @@ module Rule where
       { substitutions
         = subs
       ; hypotheses-valid
-        = Formula.substitutes-to-substitutes c hs subs p
+        = Formula.substitutes-tail c hs subs p
       ; conclusion-valid
-        = Formula.substitutes-to-substitute c hs subs p
+        = Formula.substitutes-head c hs subs p
       }
 
     ... | Formula.no p
       = no (λ {(match subs q r)
         → p (Formula.matches-with subs (Map.⊆-empty subs)
-          (Formula.substitutes-recursive c hs subs r q))})
+          (Formula.substitutes-cons c hs subs r q))})
   
     substitute-meta-match
-      : {r : Rule ss a}
-      → {fs : Vec (Formula ss vs true) a}
+      : {r : Rule ss}
+      → {fs : Vec (Formula ss vs true) (arity r)}
       → {m : Meta}
       → {f' : Formula ss vs false}
       → {f : Formula ss vs true}
@@ -174,5 +171,5 @@ module Rule where
 -- ## Exports
 
 open Rule public
-  using (_≟_rul?)
+  using (_≟_rul)
 

@@ -124,9 +124,8 @@ proof-view-stack-map b
 
 proof-window-main-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → MainEditor
     ProofWindowViewStack
     ProofEventStack
@@ -148,7 +147,9 @@ module ProofClient where
     → ViewPath v
     → Widget
   draw w _
-    = draw-interface-with (interface nothing (w ∷ [])) nothing
+    = draw-interface-with
+      (interface nothing (w ∷ []))
+      nothing
 
   draw-inner
     : (v : View)

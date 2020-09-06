@@ -137,14 +137,12 @@ module _
     → RichText
   
   draw-formula-left
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → Left ss vs m s
     → RichText
 
   draw-formula-right
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → Right ss vs m s
     → RichText
 
@@ -366,12 +364,12 @@ decode-formula ss vs m
   = nothing
 ... | _ | nothing
   = nothing
-... | just n' | just (any {index = a} fs')
+... | just n' | just (any {a} fs')
   with Symbols.lookup-member ss n'
 ... | nothing
   = nothing
-... | just (Symbols.member {a'} s p)
-  with a ≟ a' nat
+... | just (Symbols.member s p)
+  with Symbol.arity s ≟ a nat
 ... | no _
   = nothing
 ... | yes refl
@@ -429,7 +427,7 @@ decode-encode-formula {vs = vs}
   = refl
 
 decode-encode-formula {ss = ss} {vs = vs} {m = m}
-  (Formula.symbol {a = a} s@(symbol _ n _ _ _) p fs)
+  (Formula.symbol s@(symbol _ n _ _ _) p fs)
   with decode-identifier (encode-identifier n)
   | decode-encode-identifier n
   | decode-formulas ss vs m (encode-formulas fs)
@@ -439,16 +437,13 @@ decode-encode-formula {ss = ss} {vs = vs} {m = m}
   | inspect (Symbols.lookup-member ss) n
 ... | nothing | [ q ]
   = ⊥-elim (Symbols.lookup-member-nothing ss s q p)
-... | just (Symbols.member {a'} _ _) | [ q ]
-  with a ≟ a' nat
-... | no ¬q
-  = ⊥-elim (¬q (Symbols.lookup-member-arity s p q))
+... | just _ | [ q ]
+  with Symbols.lookup-member-just ss s p q
+... | refl
+  with Symbol.arity s ≟ Symbol.arity s nat
+... | no ¬p
+  = ⊥-elim (¬p refl)
 ... | yes refl
-  with a ≟ a' nat
-  | Symbols.lookup-member-eq s p q
-... | no ¬q | _
-  = ⊥-elim (¬q (Symbols.lookup-member-arity s p q))
-... | yes refl | refl
   = refl
 
 decode-encode-formulas []

@@ -486,45 +486,6 @@ module List where
   find (any xs)
     = Vec.find xs
 
-  find-member
-    : {A : Set}
-    → (xs : List A)
-    → (A → Bool)
-    → Maybe (Member xs)
-  find-member (any xs)
-    = Vec.find-member xs
-
-  find-true
-    : {A : Set}
-    → {y : A}
-    → (xs : List A)
-    → (f : A → Bool)
-    → find xs f ≡ just y
-    → T (f y)
-  find-true (any xs)
-    = Vec.find-true xs
-
-  find-is-member
-    : {A : Set}
-    → {y : A}
-    → (xs : List A)
-    → (f : A → Bool)
-    → find xs f ≡ just y
-    → IsMember xs y
-  find-is-member (any xs)
-    = Vec.find-is-member xs
-
-  find-¬is-member
-    : {A : Set}
-    → (xs : List A)
-    → (f : A → Bool)
-    → (x : A)
-    → T (f x)
-    → find xs f ≡ nothing
-    → ¬ IsMember xs x
-  find-¬is-member (any xs)
-    = Vec.find-¬is-member xs
-
   find-nothing
     : {A : Set}
     → (xs : List A)
@@ -535,24 +496,25 @@ module List where
   find-nothing (any xs)
     = Vec.find-nothing xs
 
-  find-member-nothing
+  find-just
     : {A : Set}
+    → {y : A}
     → (xs : List A)
     → (f : A → Bool)
-    → find-member xs f ≡ nothing
-    → find xs f ≡ nothing
-  find-member-nothing (any xs)
-    = Vec.find-member-nothing xs
+    → find xs f ≡ just y
+    → IsMember xs y
+  find-just (any xs)
+    = Vec.find-just xs
 
-  find-member-just
+  find-true
     : {A : Set}
+    → {y : A}
     → (xs : List A)
-    → {m : Member xs}
     → (f : A → Bool)
-    → find-member xs f ≡ just m
-    → find xs f ≡ just (Member.value m)
-  find-member-just (any xs)
-    = Vec.find-member-just xs
+    → find xs f ≡ just y
+    → T (f y)
+  find-true (any xs)
+    = Vec.find-true xs
 
   find-cons
     : {A : Set}
@@ -585,6 +547,35 @@ module List where
     → z ∈ A × find xs f ≡ just z
   member-find (any xs)
     = Vec.member-find xs
+
+  find-member
+    : {A : Set}
+    → (xs : List A)
+    → (A → Bool)
+    → Maybe (Member xs)
+  find-member (any xs)
+    = Vec.find-member xs
+
+  find-member-nothing
+    : {A : Set}
+    → (xs : List A)
+    → (f : A → Bool)
+    → (x : A)
+    → T (f x)
+    → find-member xs f ≡ nothing
+    → ¬ IsMember xs x
+  find-member-nothing (any xs)
+    = Vec.find-member-nothing xs
+
+  find-member-just
+    : {A : Set}
+    → (xs : List A)
+    → {m : Member xs}
+    → (f : A → Bool)
+    → find-member xs f ≡ just m
+    → find xs f ≡ just (Member.value m)
+  find-member-just (any xs)
+    = Vec.find-member-just xs
 
 -- ## Exports
 

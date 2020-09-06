@@ -242,8 +242,7 @@ module _
 module _
   {ss : Symbols}
   {rs : Rules ss}
-  {a : ℕ}
-  {r : Rule ss a}
+  {r : Rule ss}
   where
 
   draw-proof
@@ -309,9 +308,8 @@ encode-branches (b ∷ bs)
 
 encode-proof
   : {ss : Symbols}
-  → {a : ℕ}
   → {rs : Rules ss}
-  → {r : Rule ss a}
+  → {r : Rule ss}
   → Proof rs r
   → Value
 encode-proof (proof b _)
@@ -348,12 +346,12 @@ decode-branch {ss = ss} rs vs
   = nothing
 ... | _ | _ | nothing
   = nothing
-... | just n' | just (any {index = a} bs') | just c'
+... | just n' | just (any {a} bs') | just c'
   with Rules.lookup-member rs n'
 ... | nothing
   = nothing
-... | just (Rules.member {a'} r p)
-  with a ≟ a' nat
+... | just (Rules.member r p)
+  with Rule.arity r ≟ a nat
 ... | no _
   = nothing
 ... | yes refl
@@ -380,9 +378,8 @@ decode-branches rs vs (p ∷' ps)
 
 decode-proof
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → Value
   → Maybe (Proof rs r)
 decode-proof rs (rule _ vs _ c) v
@@ -421,7 +418,7 @@ decode-encode-branch {ss = ss} {vs = vs}
   = refl
 
 decode-encode-branch {ss = ss} {rs = rs} {vs = vs}
-  (Branch.rule {a = a} r@(rule n _ _ _) p bs c m)
+  (Branch.rule r@(rule n _ _ _) p bs c m)
   with decode-identifier (encode-identifier n)
   | decode-encode-identifier n
   | decode-branches rs vs (encode-branches bs)
@@ -433,13 +430,14 @@ decode-encode-branch {ss = ss} {rs = rs} {vs = vs}
   | inspect (Rules.lookup-member rs) n
 ... | nothing | [ q ] 
   = ⊥-elim (Rules.lookup-member-nothing rs r q p)
-... | just (Rules.member {a'} r' _) | [ q ]
-  with a ≟ a' nat
-  | Rules.lookup-member-eq r p q
-... | no ¬q | _
-  = ⊥-elim (¬q (Rules.lookup-member-arity r p q))
-... | yes refl | refl
-  with Rule.match? r' (Vec.map Branch.conclusion bs) c
+... | just _ | [ q ]
+  with Rules.lookup-member-just rs r p q
+... | refl
+  with Rule.arity r ≟ Rule.arity r nat
+... | no ¬p
+  = ⊥-elim (¬p refl)
+... | yes refl
+  with Rule.match? r (Vec.map Branch.conclusion bs) c
 ... | no ¬m
   = ⊥-elim (¬m m)
 ... | yes _
@@ -457,9 +455,8 @@ decode-encode-branches {rs = rs} {vs = vs} (b ∷ bs)
 
 decode-encode-proof
   : {ss : Symbols}
-  → {a : ℕ}
   → {rs : Rules ss}
-  → {r : Rule ss a}
+  → {r : Rule ss}
   → (p : Proof rs r)
   → decode-proof rs r (encode-proof p) ≡ just p
 decode-encode-proof {rs = rs} {r = r} (proof b q)
@@ -476,9 +473,8 @@ decode-encode-proof {rs = rs} {r = r} (proof b q)
 
 proof-split-function
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → SplitFunction Value (Proof rs r)
 proof-split-function rs r
   = record
@@ -522,9 +518,8 @@ ProofBaseEventStack
 
 module ProofSimpleBaseEditor
   {ss : Symbols}
-  {a : ℕ}
   (rs : Rules ss)
-  (r : Rule ss a)
+  (r : Rule ss)
   where
 
   -- ##### Types
@@ -640,9 +635,8 @@ module ProofSimpleBaseEditor
 
 proof-simple-base-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → SimpleBaseEditor
     ProofBaseViewStack
     ProofBaseEventStack
@@ -688,12 +682,11 @@ ProofChildEventStack meta
 
 module _
   {ss : Symbols}
-  {a : ℕ}
   where
 
   module ProofSimpleChildEditorInfer
     (rs : Rules ss)
-    (r : Rule ss a)
+    (r : Rule ss)
     where
   
     BaseState
@@ -718,11 +711,8 @@ module _
   
       field
   
-        {arity}
-          : ℕ
-  
         value
-          : Rule ss arity
+          : Rule ss
   
         member
           : rul value ∈ rs
@@ -767,7 +757,7 @@ module _
 
   proof-simple-child-editor-infer
     : (rs : Rules ss)
-    → (r : Rule ss a)
+    → (r : Rule ss)
     → SimpleChildEditor
       (ProofChildViewStack infer)
       (ProofChildEventStack infer)
@@ -779,12 +769,11 @@ module _
 
 module _
   {ss : Symbols}
-  {a : ℕ}
   where
 
   module ProofSimpleChildEditorMeta
     (rs : Rules ss)
-    (r : Rule ss a)
+    (r : Rule ss)
     where
 
     BaseState
@@ -824,7 +813,7 @@ module _
 
   proof-simple-child-editor-meta
     : (rs : Rules ss)
-    → (r : Rule ss a)
+    → (r : Rule ss)
     → SimpleChildEditor
       (ProofChildViewStack meta)
       (ProofChildEventStack meta)
@@ -836,9 +825,8 @@ module _
 
 proof-simple-child-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → (k : ProofKey)
   → SimpleChildEditor
     (ProofChildViewStack k)
@@ -873,9 +861,8 @@ ProofParentEventStack
 
 proof-parent-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → SimpleEditor
     ProofParentViewStack
     ProofParentEventStack
@@ -1007,9 +994,8 @@ proof-event-stack-map
 
 proof-simple-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → SimpleEditor
     ProofViewStack
     ProofEventStack
@@ -1023,9 +1009,8 @@ proof-simple-editor rs r
 
 proof-main-editor
   : {ss : Symbols}
-  → {a : ℕ}
   → (rs : Rules ss)
-  → (r : Rule ss a)
+  → (r : Rule ss)
   → MainEditor
     ProofViewStack
     ProofEventStack

@@ -7,7 +7,7 @@ open import Prover.Prelude.Bool
 open import Prover.Prelude.Empty
   using (¬_; ⊥-elim)
 open import Prover.Prelude.Equal
-  using (Equal; _≡_; _≢_; refl; sub; sym; trans)
+  using (Equal; _≡_; _≢_; refl; sub)
 open import Prover.Prelude.Fin
   using (Fin; _<_fin; s<s; z<s; zero; suc)
 open import Prover.Prelude.Function
@@ -23,7 +23,7 @@ open import Prover.Prelude.Relation
 open import Prover.Prelude.Retraction
   using (Retraction)
 open import Prover.Prelude.Sigma
-  using (Σ; _,_; π₂)
+  using (Σ; _,_)
 
 open import Agda.Builtin.List using () renaming
   ( List
@@ -723,85 +723,6 @@ module Vec where
   ... | true
     = just x
 
-  find-member
-    : {A : Set}
-    → {n : ℕ}
-    → (xs : Vec A n)
-    → (A → Bool)
-    → Maybe (Member xs)
-  find-member [] _
-    = nothing
-  find-member (x ∷ xs) f
-    with f x | find-member xs f
-  ... | false | nothing
-    = nothing
-  ... | false | just (member y (k , p))
-    = just (member y (suc k , p))
-  ... | true | _
-    = just (member x (zero , refl))
-
-  find-true
-    : {A : Set}
-    → {n : ℕ}
-    → {y : A}
-    → (xs : Vec A n)
-    → (f : A → Bool)
-    → find xs f ≡ just y
-    → T (f y)
-  find-true (x ∷ xs) f p
-    with f x | inspect f x
-  ... | false | _
-    = find-true xs f p
-  find-true _ _ refl | true | [ q ]
-    = q
-
-  member-find
-    : {A : Set}
-    → {n : ℕ}
-    → {y : A}
-    → (xs : Vec A n)
-    → (f : A → Bool)
-    → T (f y)
-    → IsMember xs y
-    → z ∈ A × find xs f ≡ just z
-  member-find (x ∷ _) f _ _
-    with f x | inspect f x
-  member-find _ _ p (zero , refl) | false | [ r ]
-    = ⊥-elim (Bool.¬both r p)
-  member-find (x ∷ xs) f p (suc k , q) | false | _
-    = member-find xs f p (k , q)
-  ... | true | _
-    = (x , refl)
-
-  find-is-member
-    : {A : Set}
-    → {n : ℕ}
-    → {y : A}
-    → (xs : Vec A n)
-    → (f : A → Bool)
-    → find xs f ≡ just y
-    → IsMember xs y
-  find-is-member (x ∷ xs) f p
-    with f x
-  ... | false
-    with find-is-member xs f p
-  ... | (k , q)
-    = (suc k , q)
-  find-is-member _ _ refl | true
-    = (zero , refl)
-
-  find-¬is-member
-    : {A : Set}
-    → {n : ℕ}
-    → (xs : Vec A n)
-    → (f : A → Bool)
-    → (x : A)
-    → T (f x)
-    → find xs f ≡ nothing
-    → ¬ IsMember xs x
-  find-¬is-member xs f _ p q m
-    = Maybe.nothing≢just (trans (sym q) (π₂ (member-find xs f p m)))
-
   find-nothing
     : {A : Set}
     → {n : ℕ}
@@ -817,38 +738,37 @@ module Vec where
   find-nothing (x ∷ xs) f p (suc k) | false | _
     = find-nothing xs f p k
 
-  find-member-nothing
+  find-just
     : {A : Set}
     → {n : ℕ}
+    → {y : A}
     → (xs : Vec A n)
     → (f : A → Bool)
-    → find-member xs f ≡ nothing
-    → find xs f ≡ nothing
-  find-member-nothing [] _ _
-    = refl
-  find-member-nothing (x ∷ xs) f _
+    → find xs f ≡ just y
+    → IsMember xs y
+  find-just (x ∷ xs) f p
     with f x
-    | find-member xs f
-    | inspect (find-member xs) f
-  ... | false | nothing | [ q ]
-    = find-member-nothing xs f q
+  ... | false
+    with find-just xs f p
+  ... | (k , q)
+    = (suc k , q)
+  find-just _ _ refl | true
+    = (zero , refl)
 
-  find-member-just
+  find-true
     : {A : Set}
     → {n : ℕ}
+    → {y : A}
     → (xs : Vec A n)
-    → {m : Member xs}
     → (f : A → Bool)
-    → find-member xs f ≡ just m
-    → find xs f ≡ just (Member.value m)
-  find-member-just (x ∷ xs) f _
-    with f x
-    | find-member xs f
-    | inspect (find-member xs) f
-  find-member-just (_ ∷ xs) f refl | false | just _ | [ p ]
-    = find-member-just xs f p
-  find-member-just _ _ refl | true | _  | _
-    = refl
+    → find xs f ≡ just y
+    → T (f y)
+  find-true (x ∷ xs) f p
+    with f x | inspect f x
+  ... | false | _
+    = find-true xs f p
+  find-true _ _ refl | true | [ q ]
+    = q
 
   find-cons
     : {A : Set}
@@ -877,6 +797,77 @@ module Vec where
   ... | false
     = find-map f xs g p
   find-map _ _ _ refl | true
+    = refl
+
+  member-find
+    : {A : Set}
+    → {n : ℕ}
+    → {y : A}
+    → (xs : Vec A n)
+    → (f : A → Bool)
+    → T (f y)
+    → IsMember xs y
+    → z ∈ A × find xs f ≡ just z
+  member-find (x ∷ _) f _ _
+    with f x | inspect f x
+  member-find _ _ p (zero , refl) | false | [ r ]
+    = ⊥-elim (Bool.¬both r p)
+  member-find (x ∷ xs) f p (suc k , q) | false | _
+    = member-find xs f p (k , q)
+  ... | true | _
+    = (x , refl)
+
+  find-member
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → (A → Bool)
+    → Maybe (Member xs)
+  find-member [] _
+    = nothing
+  find-member (x ∷ xs) f
+    with f x | find-member xs f
+  ... | false | nothing
+    = nothing
+  ... | false | just (member y (k , p))
+    = just (member y (suc k , p))
+  ... | true | _
+    = just (member x (zero , refl))
+
+  find-member-nothing
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → (f : A → Bool)
+    → (x : A)
+    → T (f x)
+    → find-member xs f ≡ nothing
+    → ¬ IsMember xs x
+  find-member-nothing (x ∷ xs) f _ _ _ _
+    with f x
+    | inspect f x
+    | find-member xs f
+    | inspect (find-member xs) f
+  find-member-nothing _ _ _ p _ (zero , refl) | false | [ q ] | _ | _
+    = Bool.¬both q p
+  find-member-nothing (_ ∷ xs) f x p _ (suc k , q) | _ | _ | nothing | [ r ]
+    = find-member-nothing xs f x p r (k , q)
+
+  find-member-just
+    : {A : Set}
+    → {n : ℕ}
+    → (xs : Vec A n)
+    → {m : Member xs}
+    → (f : A → Bool)
+    → find-member xs f ≡ just m
+    → find xs f ≡ just (Member.value m)
+  find-member-just (x ∷ xs) f _
+    with f x
+    | find-member xs f
+    | inspect (find-member xs) f
+  find-member-just (_ ∷ xs) f refl | false | just _ | [ p ]
+    = find-member-just xs f p
+  find-member-just _ _ refl | true | _  | _
     = refl
 
 -- ## Exports

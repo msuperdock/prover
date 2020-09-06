@@ -86,9 +86,8 @@ module Collection where
     → Collection R
     → (A → Bool)
     → Maybe A
-  find xs
-    = List.find
-      (elements xs)
+  find (collection xs _)
+    = List.find xs
 
   find-nothing
     : {A : Set}
@@ -98,9 +97,8 @@ module Collection where
     → find xs f ≡ nothing
     → (k : Fin (size xs))
     → F (f (elements xs ! k))
-  find-nothing xs
-    = List.find-nothing
-      (elements xs)
+  find-nothing (collection xs _)
+    = List.find-nothing xs
 
   insert
     : {A : Set}
@@ -111,10 +109,10 @@ module Collection where
     → (x : A)
     → find xs (Bool.from-decidable d x) ≡ nothing
     → Collection R
-  insert xs s d x p
+  insert xs@(collection xs' _) s d x p
     = record
     { elements
-      = x ∷ elements xs
+      = x ∷ xs'
     ; valid
       = λ
       { zero zero _
@@ -122,12 +120,11 @@ module Collection where
       ; zero (suc k₂) r
         → ⊥-elim (Bool.¬both
           (find-nothing xs (Bool.from-decidable d x) p k₂)
-          (Bool.from-decidable-true d x (elements xs ! k₂) r))
+          (Bool.from-decidable-true d x (xs' ! k₂) r))
       ; (suc k₁) zero r
         → ⊥-elim (Bool.¬both
           (find-nothing xs (Bool.from-decidable d x) p k₁)
-          (Bool.from-decidable-true d x (elements xs ! k₁)
-            (s (elements xs ! k₁) x r)))
+          (Bool.from-decidable-true d x (xs' ! k₁) (s (xs' ! k₁) x r)))
       ; (suc k₁) (suc k₂) r
         → sub suc (valid' xs k₁ k₂ r)
       }
@@ -141,18 +138,17 @@ module Collection where
     → Injective R S f
     → Collection R
     → Collection S
-  map S f r xs
+  map S f r xs@(collection xs' _)
     = record
     { elements
-      = List.map f
-        (elements xs)
+      = List.map f xs'
     ; valid
       = λ k₁ k₂
       → valid' xs k₁ k₂
-      ∘ r (elements xs ! k₁) (elements xs ! k₂)
+      ∘ r (xs' ! k₁) (xs' ! k₂)
       ∘ rewrite₂ S
-        (sym (List.lookup-map f (elements xs) k₁))
-        (sym (List.lookup-map f (elements xs) k₂))
+        (sym (List.lookup-map f xs' k₁))
+        (sym (List.lookup-map f xs' k₂))
     }
 
   -- ### Construction
@@ -215,8 +211,8 @@ module Collection where
     decidable
       : Decidable (Equal A)
       → Decidable (Equal (Collection R))
-    decidable d xs₁ xs₂
-      with List.decidable d (elements xs₁) (elements xs₂)
+    decidable d (collection xs₁ _) (collection xs₂ _)
+      with List.decidable d xs₁ xs₂
     ... | no ¬p
       = no λ {refl → ¬p refl}
     ... | yes refl
@@ -243,17 +239,16 @@ module Collection where
       : Collection R
       → A
       → Set
-    IsMember xs
-      = List.IsMember
-        (elements xs)
+    IsMember (collection xs _)
+      = List.IsMember xs
 
     is-member?
       : (xs : Collection R)
       → Decidable (Equal A)
       → (x : A)
       → Dec (IsMember xs x)
-    is-member? xs
-      = List.is-member? (elements xs)
+    is-member? (collection xs _)
+      = List.is-member? xs
 
     is-member-eq
       : {x₁ x₂ : A}
@@ -262,21 +257,16 @@ module Collection where
       → IsMember xs x₂
       → R x₁ x₂
       → x₁ ≡ x₂
-    is-member-eq xs (k₁ , p₁) (k₂ , p₂) r
-      = trans
-        (sym p₁)
-      $ trans
-        (sub (List.lookup (elements xs))
-          (valid' xs k₁ k₂
-            (rewrite₂ R p₁ p₂ r)))
+    is-member-eq xs@(collection xs' _) (k₁ , p₁) (k₂ , p₂) r
+      = trans (sym p₁)
+      $ trans (sub (List.lookup xs') (valid' xs k₁ k₂ (rewrite₂ R p₁ p₂ r)))
       $ p₂
 
     Member
       : Collection R
       → Set
-    Member xs
-      = List.Member
-        (elements xs)
+    Member (collection xs _)
+      = List.Member xs
 
     module Member where
 
@@ -286,11 +276,21 @@ module Collection where
       : (xs : Collection R)
       → (A → Bool)
       → Maybe (Member xs)
-    find-member xs
-      = List.find-member
-        (elements xs)
+    find-member (collection xs _)
+      = List.find-member xs
 
   -- ### Properties
+
+  find-just
+    : {A : Set}
+    → {R : Relation A}
+    → {y : A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → find xs f ≡ just y
+    → IsMember xs y
+  find-just (collection xs _)
+    = List.find-just xs
 
   find-true
     : {A : Set}
@@ -300,57 +300,8 @@ module Collection where
     → (f : A → Bool)
     → find xs f ≡ just y
     → T (f y)
-  find-true xs
-    = List.find-true
-      (elements xs)
-
-  find-is-member
-    : {A : Set}
-    → {R : Relation A}
-    → {y : A}
-    → (xs : Collection R)
-    → (f : A → Bool)
-    → find xs f ≡ just y
-    → IsMember xs y
-  find-is-member xs
-    = List.find-is-member
-      (elements xs)
-
-  find-¬is-member
-    : {A : Set}
-    → {R : Relation A}
-    → (xs : Collection R)
-    → (f : A → Bool)
-    → (x : A)
-    → T (f x)
-    → find xs f ≡ nothing
-    → ¬ IsMember xs x
-  find-¬is-member xs
-    = List.find-¬is-member
-      (elements xs)
-
-  find-member-nothing
-    : {A : Set}
-    → {R : Relation A}
-    → (xs : Collection R)
-    → (f : A → Bool)
-    → find-member xs f ≡ nothing
-    → find xs f ≡ nothing
-  find-member-nothing xs
-    = List.find-member-nothing
-      (elements xs)
-
-  find-member-just
-    : {A : Set}
-    → {R : Relation A}
-    → (xs : Collection R)
-    → {m : Member xs}
-    → (f : A → Bool)
-    → find-member xs f ≡ just m
-    → find xs f ≡ just (Member.value m)
-  find-member-just xs
-    = List.find-member-just
-      (elements xs)
+  find-true (collection xs _)
+    = List.find-true xs
 
   find-insert
     : {A : Set}
@@ -363,9 +314,8 @@ module Collection where
     → (f : A → Bool)
     → f x ≡ true
     → find (insert xs s d x p) f ≡ just x
-  find-insert xs _ _ x _
-    = List.find-cons
-      (elements xs) x
+  find-insert (collection xs _) _ _ x _
+    = List.find-cons xs x
 
   find-map
     : {A B : Set}
@@ -378,9 +328,8 @@ module Collection where
     → (g : B → Bool)
     → find xs (g ∘ f) ≡ just y
     → find (map S f i xs) g ≡ just (f y)
-  find-map _ f _ xs
-    = List.find-map f
-      (elements xs)
+  find-map _ f _ (collection xs _)
+    = List.find-map f xs
 
   member-find
     : {A : Set}
@@ -391,9 +340,8 @@ module Collection where
     → T (f y)
     → IsMember xs y
     → z ∈ A × find xs f ≡ just z
-  member-find xs
-    = List.member-find
-      (elements xs)
+  member-find (collection xs _)
+    = List.member-find xs
 
   member-find-unique
     : {A : Set}
@@ -411,10 +359,33 @@ module Collection where
     = trans q
     $ sub just
     $ is-member-eq xs
-      (find-is-member xs f q) m
+      (find-just xs f q) m
       (u z y (find-true xs f q) p)
 
-  member-find-unique'
+  find-member-nothing
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → (f : A → Bool)
+    → (x : A)
+    → T (f x)
+    → find-member xs f ≡ nothing
+    → ¬ IsMember xs x
+  find-member-nothing (collection xs _)
+    = List.find-member-nothing xs
+
+  find-member-just
+    : {A : Set}
+    → {R : Relation A}
+    → (xs : Collection R)
+    → {m : Member xs}
+    → (f : A → Bool)
+    → find-member xs f ≡ just m
+    → find xs f ≡ just (Member.value m)
+  find-member-just (collection xs _)
+    = List.find-member-just xs
+
+  find-member-just-eq
     : {A : Set}
     → {R : Relation A}
     → {y : A}
@@ -426,7 +397,7 @@ module Collection where
     → IsMember xs y
     → find-member xs f ≡ just m
     → y ≡ Member.value m
-  member-find-unique' xs f u p m q
+  find-member-just-eq xs f u p m q
     = Maybe.just-injective
     $ trans (sym (member-find-unique xs f u p m))
     $ find-member-just xs f q
@@ -442,10 +413,8 @@ module Collection where
       : Collection R
       → Collection R
       → Set
-    Subcollection xs₁ xs₂
-      = Sublist
-        (elements xs₁)
-        (elements xs₂)
+    Subcollection (collection xs₁ _) (collection xs₂ _)
+      = Sublist xs₁ xs₂
     
     infix 4 _⊆_
     
@@ -459,27 +428,22 @@ module Collection where
     ⊆-refl
       : (xs : Collection R)
       → xs ⊆ xs
-    ⊆-refl xs
-      = List.⊆-refl
-        (elements xs)
+    ⊆-refl (collection xs _)
+      = List.⊆-refl xs
   
     ⊆-trans
       : (xs₁ xs₂ xs₃ : Collection R)
       → xs₁ ⊆ xs₂
       → xs₂ ⊆ xs₃
       → xs₁ ⊆ xs₃
-    ⊆-trans xs₁ xs₂ xs₃
-      = List.⊆-trans
-        (elements xs₁)
-        (elements xs₂)
-        (elements xs₃)
+    ⊆-trans (collection xs₁ _) (collection xs₂ _) (collection xs₃ _)
+      = List.⊆-trans xs₁ xs₂ xs₃
   
     ⊆-empty
       : (xs : Collection R)
       → empty ⊆ xs
-    ⊆-empty xs
-      = List.⊆-nil
-        (elements xs)
+    ⊆-empty (collection xs _)
+      = List.⊆-nil xs
 
     ⊆-insert
       : (xs : Collection R)
@@ -488,9 +452,8 @@ module Collection where
       → (x : A)
       → (p : find xs (Bool.from-decidable d x) ≡ nothing)
       → xs ⊆ insert xs s d x p
-    ⊆-insert xs _ _ x _
-      = List.⊆-cons x
-        (elements xs)
+    ⊆-insert (collection xs _) _ _ x _
+      = List.⊆-cons x xs
 
     ⊆-insert-left
       : (xs₁ xs₂ : Collection R)
@@ -501,10 +464,8 @@ module Collection where
       → IsMember xs₂ x
       → xs₁ ⊆ xs₂
       → insert xs₁ s d x p ⊆ xs₂
-    ⊆-insert-left xs₁ xs₂ _ _ x _
-      = List.⊆-cons-left
-        (elements xs₁)
-        (elements xs₂) x
+    ⊆-insert-left (collection xs₁ _) (collection xs₂ _) _ _ x _
+      = List.⊆-cons-left xs₁ xs₂ x
 
     ⊆-find
       : {y : A}
@@ -517,7 +478,7 @@ module Collection where
     ⊆-find {y = y} xs₁ xs₂ f u p q₁
       = member-find-unique xs₂ f u
         (find-true xs₁ f q₁)
-        (p y (find-is-member xs₁ f q₁))
+        (p y (find-just xs₁ f q₁))
 
 -- ## Exports
 

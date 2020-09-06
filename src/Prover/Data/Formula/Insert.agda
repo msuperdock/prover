@@ -303,8 +303,7 @@ module _
   where
 
   formula-state-path-map-left
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → .{p : sym s ∈ ss}
     → {f f' : FormulaState ss vs m}
     → {lv : Construct.LeftValid s (FormulaState.construct f)}
@@ -324,8 +323,7 @@ module _
     = center k sp
 
   formula-state-path-map-right
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → .{p : sym s ∈ ss}
     → {l : Left ss vs m s}
     → {f f' : FormulaState ss vs m}
@@ -345,8 +343,7 @@ module _
     = center k sp
 
   formula-state-path-map-not-left
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → .{p : sym s ∈ ss}
     → {l l' : Left ss vs m s}
     → {r : Right ss vs m s}
@@ -362,8 +359,7 @@ module _
     = center k sp
 
   formula-state-path-map-not-right
-    : {a : ℕ}
-    → {s : Symbol a}
+    : {s : Symbol}
     → .{p : sym s ∈ ss}
     → {l : Left ss vs m s}
     → {r r' : Right ss vs m s}
@@ -413,9 +409,7 @@ module _
     = h fp refl
 
   left-valid-sum
-    : {a a' : ℕ}
-    → (s : Symbol a)
-    → (s' : Symbol a')
+    : (s s' : Symbol)
     → (f'' f''' : FormulaState ss vs m)
     → FormulaState.construct f''' ≡ FormulaState.construct f''
       ⊔ FormulaState.construct f''' ≡ Construct.symbol s
@@ -430,9 +424,7 @@ module _
     = lv
 
   right-valid-sum
-    : {a a' : ℕ}
-    → (s : Symbol a)
-    → (s' : Symbol a')
+    : (s s' : Symbol)
     → (f'' f''' : FormulaState ss vs m)
     → FormulaState.construct f''' ≡ FormulaState.construct f''
       ⊔ FormulaState.construct f''' ≡ Construct.symbol s
@@ -1236,10 +1228,9 @@ module _
       (go zero stop)
 
   sandbox-state-insert-symbol
-    : {a : ℕ}
-    → (s₁ : Any (SandboxState ss vs m))
+    : (s₁ : Any (SandboxState ss vs m))
     → SandboxStatePath s₁
-    → (s : Symbol a)
+    → (s : Symbol)
     → .(sym s ∈ ss)
     → Σ (Any (SandboxState ss vs m)) SandboxStatePath
   sandbox-state-insert-symbol s₁ sp₁ s p

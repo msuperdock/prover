@@ -44,10 +44,9 @@ module _Formula where
   
     symbol
       : {m : Bool}
-      → {a : ℕ}
-      → (s : Symbol a)
+      → (s : Symbol)
       → .(sym s ∈ ss)
-      → Vec (Formula ss vs m) a
+      → Vec (Formula ss vs m) (Symbol.arity s)
       → Formula ss vs m
 
 Formula
@@ -224,17 +223,15 @@ module Formula where
       = no (λ {refl → ¬p refl})
     ... | yes refl
       = yes refl
-    symbol {a = n₁} s₁ _ fs₁ ≟ symbol {a = n₂} s₂ _ fs₂ frm
-      with n₁ ≟ n₂ nat
+    symbol s₁ _ fs₁ ≟ symbol s₂ _ fs₂ frm
+      with s₁ ≟ s₂ sym
     ... | no ¬p
       = no (λ {refl → ¬p refl})
     ... | yes refl
-      with s₁ ≟ s₂ sym | fs₁ ≟ fs₂ frms
-    ... | no ¬p | _
+      with fs₁ ≟ fs₂ frms
+    ... | no ¬p
       = no (λ {refl → ¬p refl})
-    ... | _ | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl | yes refl
+    ... | yes refl
       = yes refl
 
     meta _ ≟ variable' _ _ frm
@@ -260,7 +257,7 @@ module Formula where
       = no (λ {refl → ¬p refl})
     ... | yes refl | yes refl
       = yes refl
-  
+
   -- ### Membership
   
   module _
@@ -289,22 +286,21 @@ module Formula where
   module _
     {ss : Symbols}
     {vs : Variables}
-    {a : ℕ}
     where
 
     symbol≢meta
-      : (s : Symbol a)
+      : (s : Symbol)
       → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs true) a)
+      → (fs : Vec (Formula ss vs true) (Symbol.arity s))
       → (m' : Meta)
       → symbol s p fs ≢ meta m'
     symbol≢meta _ _ _ _ ()
     
     symbol≢variable
       : {m : Bool}
-      → (s : Symbol a)
+      → (s : Symbol)
       → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs m) a)
+      → (fs : Vec (Formula ss vs m) (Symbol.arity s))
       → (v : Variable)
       → .(q : var v ∈ vs)
       → _≢_ {Formula ss vs m} (symbol s p fs) (variable' v q)
@@ -347,11 +343,23 @@ module Formula where
     ... | _ | _
       = nothing
 
-    ¬substitute-symbol-meta
-      : {a : ℕ}
-      → (s : Symbol a)
+    substitute-symbol
+      : (s : Symbol)
       → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs false) a)
+      → (fs : Vec (Formula ss vs false) (Symbol.arity s))
+      → {fs' : Vec (Formula ss vs' true) (Symbol.arity s)}
+      → (subs : Substitutions ss vs')
+      → substitutes fs subs ≡ just fs'
+      → substitute (symbol s p fs) subs ≡ just (symbol s p fs')
+    substitute-symbol _ _ fs subs _
+      with substitutes fs subs
+    substitute-symbol _ _ _ _ refl | _
+      = refl
+    
+    ¬substitute-symbol-meta
+      : (s : Symbol)
+      → .(p : sym s ∈ ss)
+      → (fs : Vec (Formula ss vs false) (Symbol.arity s))
       → (subs : Substitutions ss vs')
       → (m : Meta)
       → substitute (symbol s p fs) subs ≢ just (meta m)
@@ -364,10 +372,9 @@ module Formula where
       ∘ Maybe.just-injective
     
     ¬substitute-symbol-variable
-      : {a : ℕ}
-      → (s : Symbol a)
+      : (s : Symbol)
       → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs false) a)
+      → (fs : Vec (Formula ss vs false) (Symbol.arity s))
       → (subs : Substitutions ss vs')
       → (v : Variable)
       → .(q : var v ∈ vs')
@@ -378,30 +385,13 @@ module Formula where
       = symbol≢variable s p fs' v q
       ∘ Maybe.just-injective
     
-    substitute-symbol-arity
-      : {a a' : ℕ}
-      → {s' : Symbol a'}
-      → .{p' : sym s' ∈ ss}
-      → {fs' : Vec (Formula ss vs' true) a'}
-      → (s : Symbol a)
-      → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs false) a)
-      → (subs : Substitutions ss vs')
-      → substitute (symbol s p fs) subs ≡ just (symbol s' p' fs')
-      → a ≡ a'
-    substitute-symbol-arity _ _ fs subs _
-      with substitutes fs subs
-    substitute-symbol-arity _ _ _ _ refl | just _
-      = refl
-    
     substitute-symbol-symbol 
-      : {a : ℕ}
-      → {s' : Symbol a}
+      : {s' : Symbol}
       → .{p' : sym s' ∈ ss}
-      → {fs' : Vec (Formula ss vs' true) a}
-      → (s : Symbol a)
+      → {fs' : Vec (Formula ss vs' true) (Symbol.arity s')}
+      → (s : Symbol)
       → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs false) a)
+      → (fs : Vec (Formula ss vs false) (Symbol.arity s))
       → (subs : Substitutions ss vs')
       → substitute (symbol s p fs) subs ≡ just (symbol s' p' fs')
       → s ≡ s'
@@ -410,51 +400,36 @@ module Formula where
     substitute-symbol-symbol _ _ _ _ refl | just _
       = refl
     
-    substitute-recursive
-      : {a : ℕ}
-      → {fs' : Vec (Formula ss vs' true) a}
-      → (s : Symbol a)
-      → .(p : sym s ∈ ss)
-      → (fs : Vec (Formula ss vs false) a)
-      → (subs : Substitutions ss vs')
-      → substitutes fs subs ≡ just fs'
-      → substitute (symbol s p fs) subs ≡ just (symbol s p fs')
-    substitute-recursive _ _ fs subs _
-      with substitutes fs subs
-    substitute-recursive _ _ _ _ refl | _
-      = refl
-    
-    substitutes-recursive
-      : {n : ℕ}
-      → {f' : Formula ss vs' true}
-      → {fs' : Vec (Formula ss vs' true) n}
-      → (f : Formula ss vs false)
-      → (fs : Vec (Formula ss vs false) n)
-      → (subs : Substitutions ss vs')
-      → substitute f subs ≡ just f'
-      → substitutes fs subs ≡ just fs'
-      → substitutes (f ∷ fs) subs ≡ just (f' ∷ fs')
-    substitutes-recursive f fs subs _ _
-      with substitute f subs
-      | substitutes fs subs
-    substitutes-recursive _ _ _ refl refl | _ | _
-      = refl
-    
-    substitute-to-substitutes
-      : {a : ℕ}
-      → {s : Symbol a}
+    substitute-symbol-formulas
+      : {s : Symbol}
       → .{p : sym s ∈ ss}
-      → {fs' : Vec (Formula ss vs' true) a}
-      → (fs : Vec (Formula ss vs false) a)
+      → {fs' : Vec (Formula ss vs' true) (Symbol.arity s)}
+      → (fs : Vec (Formula ss vs false) (Symbol.arity s))
       → (subs : Substitutions ss vs')
       → substitute (symbol s p fs) subs ≡ just (symbol s p fs')
       → substitutes fs subs ≡ just fs'
-    substitute-to-substitutes fs subs _
+    substitute-symbol-formulas fs subs _
       with substitutes fs subs
-    substitute-to-substitutes _ _ refl | just _
+    substitute-symbol-formulas _ _ refl | just _
       = refl
     
-    substitutes-to-substitute
+    substitutes-cons
+      : {n : ℕ}
+      → {f' : Formula ss vs' true}
+      → {fs' : Vec (Formula ss vs' true) n}
+      → (f : Formula ss vs false)
+      → (fs : Vec (Formula ss vs false) n)
+      → (subs : Substitutions ss vs')
+      → substitute f subs ≡ just f'
+      → substitutes fs subs ≡ just fs'
+      → substitutes (f ∷ fs) subs ≡ just (f' ∷ fs')
+    substitutes-cons f fs subs _ _
+      with substitute f subs
+      | substitutes fs subs
+    substitutes-cons _ _ _ refl refl | _ | _
+      = refl
+    
+    substitutes-head
       : {n : ℕ}
       → {f' : Formula ss vs' true}
       → {fs' : Vec (Formula ss vs' true) n}
@@ -463,13 +438,13 @@ module Formula where
       → (subs : Substitutions ss vs')
       → substitutes (f ∷ fs) subs ≡ just (f' ∷ fs')
       → substitute f subs ≡ just f'
-    substitutes-to-substitute f fs subs _
+    substitutes-head f fs subs _
       with substitute f subs
       | substitutes fs subs
-    substitutes-to-substitute _ _ _ refl | just _ | just _
+    substitutes-head _ _ _ refl | just _ | just _
       = refl
     
-    substitutes-to-substitutes
+    substitutes-tail
       : {n : ℕ}
       → {f' : Formula ss vs' true}
       → {fs' : Vec (Formula ss vs' true) n}
@@ -478,10 +453,10 @@ module Formula where
       → (subs : Substitutions ss vs')
       → substitutes (f ∷ fs) subs ≡ just (f' ∷ fs')
       → substitutes fs subs ≡ just fs'
-    substitutes-to-substitutes f fs subs _
+    substitutes-tail f fs subs _
       with substitute f subs
       | substitutes fs subs
-    substitutes-to-substitutes _ _ _ refl | just _ | just _
+    substitutes-tail _ _ _ refl | just _ | just _
       = refl
     
     ⊆-substitute
@@ -598,7 +573,7 @@ module Formula where
     
     ... | substitutes-def-result subs' ms' q r
       = substitute-def-result subs' ms' q
-        (substitute-recursive s p fs subs' r)
+        (substitute-symbol s p fs subs' r)
     
     substitutes-def [] subs ms
       = substitutes-def-result subs ms (Map.⊆-refl subs) refl
@@ -610,7 +585,7 @@ module Formula where
     ... | substitutes-def-result subs'' ms'' ps qs
       = substitutes-def-result subs'' ms''
         (Map.⊆-trans subs subs' subs'' p ps)
-        (substitutes-recursive f fs subs''
+        (substitutes-cons f fs subs''
           (⊆-substitute f subs' subs'' ps q) qs)
 
   -- ### Meta-substitution
@@ -893,19 +868,18 @@ module Formula where
         : ¬ MatchesWith subs fs fs'
         → MatchesWith? subs fs fs'
     
-    match-to-matches
-      : {a : ℕ}
-      → {subs : Substitutions ss vs'}
-      → {s : Symbol a}
+    match-symbol-formulas
+      : {subs : Substitutions ss vs'}
+      → {s : Symbol}
       → .{p : sym s ∈ ss}
-      → {fs : Vec (Formula ss vs false) a}
-      → {fs' : Vec (Formula ss vs' true) a}
+      → {fs : Vec (Formula ss vs false) (Symbol.arity s)}
+      → {fs' : Vec (Formula ss vs' true) (Symbol.arity s)}
       → MatchWith subs (symbol s p fs) (symbol s p fs')
       → MatchesWith subs fs fs'
-    match-to-matches {fs = fs} (match-with subs' q r)
-      = matches-with subs' q (substitute-to-substitutes fs subs' r)
+    match-symbol-formulas {fs = fs} (match-with subs' q r)
+      = matches-with subs' q (substitute-symbol-formulas fs subs' r)
     
-    matches-to-match
+    matches-head
       : {n : ℕ}
       → {subs : Substitutions ss vs'}
       → {f : Formula ss vs false}
@@ -914,10 +888,10 @@ module Formula where
       → {fs' : Vec (Formula ss vs' true) n}
       → MatchesWith subs (f ∷ fs) (f' ∷ fs')
       → MatchWith subs f f'
-    matches-to-match {f = f} {fs = fs} (matches-with subs' p q)
-      = match-with subs' p (substitutes-to-substitute f fs subs' q)
+    matches-head {f = f} {fs = fs} (matches-with subs' p q)
+      = match-with subs' p (substitutes-head f fs subs' q)
     
-    matches-to-matches
+    matches-tail
       : {n : ℕ}
       → {subs : Substitutions ss vs'}
       → {f : Formula ss vs false}
@@ -927,11 +901,11 @@ module Formula where
       → (m : MatchWithMinimal subs f f')
       → MatchesWith subs (f ∷ fs) (f' ∷ fs')
       → MatchesWith (MatchWithMinimal.substitutions m) fs fs'
-    matches-to-matches {f = f} {fs = fs}
+    matches-tail {f = f} {fs = fs}
       (match-with-minimal _ _ _ r)
       m@(matches-with subs'' _ ps)
-      = matches-with subs'' (r (matches-to-match m))
-        (substitutes-to-substitutes f fs subs'' ps)
+      = matches-with subs'' (r (matches-head m))
+        (substitutes-tail f fs subs'' ps)
     
     insert-minimal
       : {subs : Substitutions ss vs'}
@@ -986,13 +960,7 @@ module Formula where
       = no (λ {(match-with subs _ r)
         → (¬substitute-symbol-variable s p fs subs v q r)})
     
-    match-with? subs (symbol {a = a} s p fs) (symbol {a = a'} s' _ fs')
-      with a ≟ a' nat
-    
-    ... | no ¬p
-      = no (λ {(match-with subs' _ r)
-        → ¬p (substitute-symbol-arity s p fs subs' r)})
-    ... | yes refl
+    match-with? subs (symbol s p fs) (symbol s' _ fs')
       with s ≟ s' sym
     
     ... | no ¬p
@@ -1000,16 +968,16 @@ module Formula where
         → ¬p (substitute-symbol-symbol s p fs subs' r)})
     ... | yes refl
       with matches-with? subs fs fs'
-    
+
     ... | no ¬p
-      = no (¬p ∘ match-to-matches)
+      = no (¬p ∘ match-symbol-formulas)
     ... | yes (matches-with-minimal subs' p'' q'' r'')
       = yes (match-with-minimal subs' p''
-        (substitute-recursive s p fs subs' q'')
+        (substitute-symbol s p fs subs' q'')
         (λ {(match-with subs'' q''' r''')
           → r'' (matches-with subs'' q'''
-            (substitute-to-substitutes fs subs'' r'''))}))
-    
+            (substitute-symbol-formulas fs subs'' r'''))}))
+
     matches-with? subs [] []
       = yes (matches-with-minimal subs
         (Map.⊆-refl subs) refl MatchesWith.subset)
@@ -1018,22 +986,22 @@ module Formula where
       with match-with? subs f f'
     
     ... | no ¬p
-      = no (¬p ∘ matches-to-match)
+      = no (¬p ∘ matches-head)
     ... | yes m@(match-with-minimal subs' p q r)
       with matches-with? subs' fs fs'
     
     ... | no ¬p
-      = no (¬p ∘ matches-to-matches m)
+      = no (¬p ∘ matches-tail m)
     ... | yes (matches-with-minimal subs'' p' q' r')
       = yes (matches-with-minimal subs''
         (Map.⊆-trans subs subs' subs'' p p')
-        (substitutes-recursive f fs subs''
+        (substitutes-cons f fs subs''
           (⊆-substitute f subs' subs'' p' q) q')
         (λ {(matches-with subs''' p'' q'')
           → r' (matches-with subs'''
             (r (match-with subs''' p''
-              (substitutes-to-substitute f fs subs''' q'')))
-            (substitutes-to-substitutes f fs subs''' q''))}))
+              (substitutes-head f fs subs''' q'')))
+            (substitutes-tail f fs subs''' q''))}))
     
     match?
       : (f : Formula ss vs false)

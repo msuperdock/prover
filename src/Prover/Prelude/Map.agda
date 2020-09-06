@@ -184,7 +184,7 @@ module Map where
       → lookup xs d k ≡ just x
       → Collection.IsMember xs (k , x)
     lookup-is-member xs d k p
-      = Collection.find-is-member xs
+      = Collection.find-just xs
         (Bool.from-decidable d k ∘ π₁)
         (lookup-just xs d k p)
 

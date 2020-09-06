@@ -39,7 +39,6 @@ data SymbolValid
 module _Symbol where
 
   record Symbol
-    (a : ℕ)
     : Set
     where
 
@@ -48,6 +47,9 @@ module _Symbol where
       symbol
 
     field
+
+      {arity}
+        : ℕ
 
       {has-left}
         : Bool
@@ -59,7 +61,7 @@ module _Symbol where
         : ℕ
 
       valid
-        : SymbolValid has-left has-right center-arity a
+        : SymbolValid has-left has-right center-arity arity
 
       name
         : Identifier
@@ -74,8 +76,7 @@ module _Symbol where
         : If Associativity (has-left ∧ has-right)
 
 Symbol
-  : ℕ
-  → Set
+  : Set
 Symbol
   = _Symbol.Symbol
 
@@ -92,14 +93,13 @@ module Symbol where
     using (symbol)
 
   data HasLeft
-    {a : ℕ}
-    : Symbol a
+    : Symbol
     → Set
     where
 
     tt
-      : {hr : Bool}
-      → {ca : ℕ}
+      : {a ca : ℕ}
+      → {hr : Bool}
       → {v : SymbolValid true hr ca a}
       → {n : Identifier}
       → {ts : Vec Token (suc ca)}
@@ -108,14 +108,13 @@ module Symbol where
       → HasLeft (symbol v n ts ip ia)
 
   data HasRight
-    {a : ℕ}
-    : Symbol a
+    : Symbol
     → Set
     where
 
     tt
-      : {hl : Bool}
-      → {ca : ℕ}
+      : {a ca : ℕ}
+      → {hl : Bool}
       → {v : SymbolValid hl true ca a}
       → {n : Identifier}
       → {ts : Vec Token (suc ca)}
@@ -124,8 +123,7 @@ module Symbol where
       → HasRight (symbol v n ts ip ia)
 
   has-left?
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → Dec (HasLeft s)
   has-left? (symbol {has-left = false} _ _ _ _ _)
     = no (λ ())
@@ -133,8 +131,7 @@ module Symbol where
     = yes tt
 
   has-right?
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → Dec (HasRight s)
   has-right? (symbol {has-right = false} _ _ _ _ _)
     = no (λ ())
@@ -142,14 +139,13 @@ module Symbol where
     = yes tt
 
   data ¬HasLeft
-    {a : ℕ}
-    : Symbol a
+    : Symbol
     → Set
     where
 
     tt
-      : {hr : Bool}
-      → {ca : ℕ}
+      : {a ca : ℕ}
+      → {hr : Bool}
       → {v : SymbolValid false hr ca a}
       → {n : Identifier}
       → {ts : Vec Token (suc ca)}
@@ -158,14 +154,13 @@ module Symbol where
       → ¬HasLeft (symbol v n ts ip ia)
 
   data ¬HasRight
-    {a : ℕ}
-    : Symbol a
+    : Symbol
     → Set
     where
 
     tt
-      : {hl : Bool}
-      → {ca : ℕ}
+      : {a ca : ℕ}
+      → {hl : Bool}
       → {v : SymbolValid hl false ca a}
       → {n : Identifier}
       → {ts : Vec Token (suc ca)}
@@ -206,22 +201,24 @@ module Symbol where
     = If.decidable _≟_ass
 
   _≟_sym
-    : {a : ℕ}
-    → Decidable (Equal (Symbol a))
+    : Decidable (Equal Symbol)
   _≟_sym
-    (symbol {hl₁} {hr₁} {ca₁} v₁ n₁ ts₁ ip₁ ia₁)
-    (symbol {hl₂} {hr₂} {ca₂} v₂ n₂ ts₂ ip₂ ia₂)
-    with hl₁ ≟ hl₂ bool
+    (symbol {a₁} {hl₁} {hr₁} {ca₁} v₁ n₁ ts₁ ip₁ ia₁)
+    (symbol {a₂} {hl₂} {hr₂} {ca₂} v₂ n₂ ts₂ ip₂ ia₂)
+    with a₁ ≟ a₂ nat
+    | hl₁ ≟ hl₂ bool
     | hr₁ ≟ hr₂ bool
     | ca₁ ≟ ca₂ nat
 
-  ... | no ¬p | _ | _
+  ... | no ¬p | _ | _ | _
     = no (λ {refl → ¬p refl})
-  ... | _ | no ¬p | _
+  ... | _ | no ¬p | _ | _
     = no (λ {refl → ¬p refl})
-  ... | _ | _ | no ¬p
+  ... | _ | _ | no ¬p | _
     = no (λ {refl → ¬p refl})
-  ... | yes refl | yes refl | yes refl
+  ... | _ | _ | _ | no ¬p
+    = no (λ {refl → ¬p refl})
+  ... | yes refl | yes refl | yes refl | yes refl
     with valid-eq v₁ v₂
     | n₁ ≟ n₂ idn
     | ts₁ ≟ ts₂ tkns
@@ -239,13 +236,8 @@ module Symbol where
   ... | refl | yes refl | yes refl | yes refl | yes refl
     = yes refl
 
-  _≟_sym?
-    : Decidable (Equal (Any Symbol))
-  _≟_sym?
-    = Any.decidable Symbol _≟_nat _≟_sym
-
 -- ## Exports
 
 open Symbol public
-  using (_≟_sym; _≟_sym?; tt)
+  using (_≟_sym; tt)
 

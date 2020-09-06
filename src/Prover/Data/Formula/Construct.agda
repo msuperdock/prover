@@ -22,8 +22,7 @@ module Internal where
       : Construct
   
     symbol
-      : {a : ℕ}
-      → Symbol a
+      : Symbol
       → Construct
 
   construct-to-pair
@@ -41,8 +40,7 @@ module Internal where
     = just (If.value ip , If.value ia)
   
   construct-is-left-valid
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → Symbol.HasLeft s
     → Construct
     → Bool
@@ -65,8 +63,7 @@ module Internal where
     = false
   
   record ConstructLeftValid
-    {a : ℕ}
-    (s : Symbol a)
+    (s : Symbol)
     (c : Construct)
     : Set
     where
@@ -84,8 +81,7 @@ module Internal where
         : T (construct-is-left-valid s has-left c)
 
   construct-left-valid?
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → (c : Construct)
     → Dec (ConstructLeftValid s c)
   construct-left-valid? s c
@@ -100,8 +96,7 @@ module Internal where
     = yes (construct-left-valid hl lv)
 
   construct-is-right-valid
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → Symbol.HasRight s
     → Construct
     → Bool
@@ -124,8 +119,7 @@ module Internal where
     = false
   
   record ConstructRightValid
-    {a : ℕ}
-    (s : Symbol a)
+    (s : Symbol)
     (c : Construct)
     : Set
     where
@@ -143,8 +137,7 @@ module Internal where
         : T (construct-is-right-valid s has-right c)
 
   construct-right-valid?
-    : {a : ℕ}
-    → (s : Symbol a)
+    : (s : Symbol)
     → (c : Construct)
     → Dec (ConstructRightValid s c)
   construct-right-valid? s c
@@ -159,9 +152,7 @@ module Internal where
     = yes (construct-right-valid hr rv)
 
   construct-left-valid-right-valid'
-    : {a₁ a₂ : ℕ}
-    → (s₁ : Symbol a₁)
-    → (s₂ : Symbol a₂)
+    : (s₁ s₂ : Symbol)
     → (c : Construct)
     → (rv : ConstructRightValid s₁ (symbol s₂))
     → ConstructLeftValid s₂ c
@@ -199,9 +190,7 @@ module Internal where
     = rv
   
   construct-left-valid-right-valid
-    : {a₁ a₂ : ℕ}
-    → (s₁ : Symbol a₁)
-    → (s₂ : Symbol a₂)
+    : (s₁ s₂ : Symbol)
     → (c : Construct)
     → ConstructRightValid s₁ (symbol s₂)
     → ConstructLeftValid s₂ c
@@ -210,9 +199,7 @@ module Internal where
     = construct-right-valid hr (construct-left-valid-right-valid' s₁ s₂ c rv lv)
 
   construct-right-valid-left-valid'
-    : {a₁ a₂ : ℕ}
-    → (s₁ : Symbol a₁)
-    → (s₂ : Symbol a₂)
+    : (s₁ s₂ : Symbol)
     → (c : Construct)
     → (lv : ConstructLeftValid s₁ (symbol s₂))
     → ConstructRightValid s₂ c
@@ -250,9 +237,7 @@ module Internal where
     = lv
 
   construct-right-valid-left-valid
-    : {a₁ a₂ : ℕ}
-    → (s₁ : Symbol a₁)
-    → (s₂ : Symbol a₂)
+    : (s₁ s₂ : Symbol)
     → (c : Construct)
     → ConstructLeftValid s₁ (symbol s₂)
     → ConstructRightValid s₂ c
@@ -271,8 +256,7 @@ module Internal where
       → LeftSubconstruct c c
 
     recursive
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → {c₁ c₂ : Construct}
       → ConstructLeftValid s c₁
       → LeftSubconstruct c₁ c₂
@@ -289,18 +273,16 @@ module Internal where
       → RightSubconstruct c c
 
     recursive
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → {c₁ c₂ : Construct}
       → ConstructRightValid s c₁
       → RightSubconstruct c₁ c₂
       → RightSubconstruct (symbol s) c₂
 
   left-subconstruct-right-valid
-    : {a : ℕ}
-    → {c₁ c₂ : Construct}
+    : {c₁ c₂ : Construct}
     → LeftSubconstruct c₁ c₂
-    → (s : Symbol a)
+    → (s : Symbol)
     → ConstructRightValid s c₁
     → ConstructRightValid s c₂
   left-subconstruct-right-valid reflexive _ rv
@@ -310,10 +292,9 @@ module Internal where
       (construct-left-valid-right-valid s₁ s₂ c rv lv)
 
   right-subconstruct-left-valid
-    : {a : ℕ}
-    → {c₁ c₂ : Construct}
+    : {c₁ c₂ : Construct}
     → RightSubconstruct c₁ c₂
-    → (s : Symbol a)
+    → (s : Symbol)
     → ConstructLeftValid s c₁
     → ConstructLeftValid s c₂
   right-subconstruct-left-valid reflexive _ lv

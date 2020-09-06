@@ -43,19 +43,17 @@ module Internal where
     → Set
   
   data Left
-    {a : ℕ}
     (ss : Symbols)
     (vs : Variables)
     (m : Bool)
-    (s : Symbol a)
+    (s : Symbol)
     : Set
   
   data Right
-    {a : ℕ}
     (ss : Symbols)
     (vs : Variables)
     (m : Bool)
-    (s : Symbol a)
+    (s : Symbol)
     : Set
   
   formula-state-construct
@@ -130,8 +128,7 @@ module Internal where
   
     symbol
       : {m : Bool}
-      → {a : ℕ}
-      → (s : Symbol a)
+      → (s : Symbol)
       → .(sym s ∈ ss)
       → Left ss vs m s
       → Right ss vs m s
@@ -313,8 +310,7 @@ module Internal where
         → FormulaStatePath f
   
       left
-        : {a : ℕ}
-        → {s : Symbol a}
+        : {s : Symbol}
         → .{p : sym s ∈ ss}
         → {f : FormulaState ss vs m}
         → {lv : Construct.LeftValid s (formula-state-construct f)}
@@ -324,8 +320,7 @@ module Internal where
         → FormulaStatePath (symbol s p (left f lv) r cs)
 
       right
-        : {a : ℕ}
-        → {s : Symbol a}
+        : {s : Symbol}
         → .{p : sym s ∈ ss}
         → {l : Left ss vs m s}
         → {f : FormulaState ss vs m}
@@ -366,8 +361,7 @@ module Internal where
       where
 
       tt
-        : {a : ℕ}
-        → {s : Symbol a}
+        : {s : Symbol}
         → .{p : sym s ∈ ss}
         → {f : FormulaState ss vs m}
         → {lv : Construct.LeftValid s (formula-state-construct f)}
@@ -381,8 +375,7 @@ module Internal where
       where
 
       tt
-        : {a : ℕ}
-        → {s : Symbol a}
+        : {s : Symbol}
         → .{p : sym s ∈ ss}
         → {l : Left ss vs m s}
         → {f : FormulaState ss vs m}
@@ -683,8 +676,7 @@ module Internal where
       = sandbox-state-hole ∷ sandbox-state-holes
 
     left-hole
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → Left ss vs m s
     left-hole {s = symbol {has-left = false} _ _ _ _ _}
       = nothing tt
@@ -692,8 +684,7 @@ module Internal where
       = left hole (Construct.left-valid tt refl)
 
     right-hole
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → Right ss vs m s
     right-hole {s = symbol {has-right = false} _ _ _ _ _}
       = nothing tt
@@ -701,8 +692,7 @@ module Internal where
       = right hole (Construct.right-valid tt refl)
 
     left-force
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → Symbol.HasLeft s
       → FormulaState ss vs m
       → Left ss vs m s
@@ -714,8 +704,7 @@ module Internal where
       = left f lv
   
     right-force
-      : {a : ℕ}
-      → {s : Symbol a}
+      : {s : Symbol}
       → Symbol.HasRight s
       → FormulaState ss vs m
       → Right ss vs m s
@@ -739,8 +728,7 @@ module Internal where
       = any (singleton (variable' v p))
 
     symbol-template
-      : {a : ℕ}
-      → (s : Symbol a)
+      : (s : Symbol)
       → .(sym s ∈ ss)
       → Any (SandboxState ss vs m)
     symbol-template s p
@@ -1121,8 +1109,7 @@ module Internal where
     where
   
     formula-state-left-closed-equal
-      : {a : ℕ}
-      → (s : Symbol a)
+      : (s : Symbol)
       → .(p : sym s ∈ ss)
       → (l : Left ss vs m s)
       → (r r' : Right ss vs m s)
@@ -1135,8 +1122,7 @@ module Internal where
       = id
   
     formula-state-right-closed-equal
-      : {a : ℕ}
-      → (s : Symbol a)
+      : (s : Symbol)
       → .(p : sym s ∈ ss)
       → (l l' : Left ss vs m s)
       → (r : Right ss vs m s)
@@ -1153,11 +1139,10 @@ module Internal where
 -- ### Left
 
 Left
-  : {a : ℕ}
-  → Symbols
+  : Symbols
   → Variables
   → Bool
-  → Symbol a
+  → Symbol
   → Set
 Left
   = Internal.Left
@@ -1174,11 +1159,10 @@ module Left where
 -- ### Right
 
 Right
-  : {a : ℕ}
-  → Symbols
+  : Symbols
   → Variables
   → Bool
-  → Symbol a
+  → Symbol
   → Set
 Right
   = Internal.Right

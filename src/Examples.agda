@@ -99,7 +99,7 @@ token' s
   = token (String.to-list s) (is-valid s)
 
 ⟨formula⟩
-  : Symbol 1
+  : Symbol
 ⟨formula⟩
   = record
   { valid
@@ -115,7 +115,7 @@ token' s
   }
 
 ⟨context⟩
-  : Symbol 1
+  : Symbol
 ⟨context⟩
   = record
   { valid
@@ -131,7 +131,7 @@ token' s
   }
 
 ⟨⊢⟩
-  : Symbol 2
+  : Symbol
 ⟨⊢⟩
   = record
   { valid
@@ -147,7 +147,7 @@ token' s
   }
 
 ⟨∅⟩
-  : Symbol 0
+  : Symbol
 ⟨∅⟩
   = record
   { valid
@@ -163,7 +163,7 @@ token' s
   }
 
 ⟨,⟩
-  : Symbol 2
+  : Symbol
 ⟨,⟩
   = record
   { valid
@@ -179,7 +179,7 @@ token' s
   }
 
 ⟨∧⟩
-  : Symbol 2
+  : Symbol
 ⟨∧⟩
   = record
   { valid
@@ -197,8 +197,7 @@ token' s
 -- ## Symbols
 
 symbols-insert
-  : {a : ℕ}
-  → (s : Symbol a)
+  : (s : Symbol)
   → (ss : Symbols)
   → {_ : True (is-nothing? (Symbols.lookup ss (Symbol.name s)))}
   → Symbols
@@ -282,40 +281,12 @@ formula-variable v {p}
 
 formula-symbol
   : {vs : Variables}
-  → {a : ℕ}
-  → (s : Symbol a)
+  → (s : Symbol)
   → {_ : True (sym s ∈? symbols)}
-  → Vec (Formula symbols vs false) a
+  → Vec (Formula symbols vs false) (Symbol.arity s)
   → Formula symbols vs false
 formula-symbol s {p}
   = Formula.symbol s (to-witness p)
-
-formula₀
-  : {vs : Variables}
-  → (s : Symbol 0)
-  → {_ : True (sym s ∈? symbols)}
-  → Formula symbols vs false
-formula₀ s {p}
-  = formula-symbol s {p} []
-
-formula₁
-  : {vs : Variables}
-  → (s : Symbol 1)
-  → {_ : True (sym s ∈? symbols)}
-  → Formula symbols vs false
-  → Formula symbols vs false
-formula₁ s {p} f₁
-  = formula-symbol s {p} (f₁ ∷ [])
-
-formula₂
-  : {vs : Variables}
-  → (s : Symbol 2)
-  → {_ : True (sym s ∈? symbols)}
-  → Formula symbols vs false
-  → Formula symbols vs false
-  → Formula symbols vs false
-formula₂ s {p} f₁ f₂
-  = formula-symbol s {p} (f₁ ∷ f₂ ∷ [])
 
 φ
   : {vs : Variables}
@@ -348,50 +319,50 @@ _formula
   : {vs : Variables}
   → Formula symbols vs false
   → Formula symbols vs false
-_formula
-  = formula₁ ⟨formula⟩
+_formula f₀
+  = formula-symbol ⟨formula⟩ (f₀ ∷ [])
 
 _context
   : {vs : Variables}
   → Formula symbols vs false
   → Formula symbols vs false
-_context
-  = formula₁ ⟨context⟩
+_context f₀
+  = formula-symbol ⟨context⟩ (f₀ ∷ [])
 
 _⊢_
   : {vs : Variables}
   → Formula symbols vs false
   → Formula symbols vs false
   → Formula symbols vs false
-_⊢_
-  = formula₂ ⟨⊢⟩
+_⊢_ f₀ f₁
+  = formula-symbol ⟨⊢⟩ (f₀ ∷ f₁ ∷ [])
 
 ∅
   : {vs : Variables}
   → Formula symbols vs false
 ∅
-  = formula₀ ⟨∅⟩
+  = formula-symbol ⟨∅⟩ []
 
 _,_
   : {vs : Variables}
   → Formula symbols vs false
   → Formula symbols vs false
   → Formula symbols vs false
-_,_
-  = formula₂ ⟨,⟩
+_,_ f₀ f₁
+  = formula-symbol ⟨,⟩ (f₀ ∷ f₁ ∷ [])
 
 _∧_
   : {vs : Variables}
   → Formula symbols vs false
   → Formula symbols vs false
   → Formula symbols vs false
-_∧_
-  = formula₂ ⟨∧⟩
+_∧_ f₀ f₁
+  = formula-symbol ⟨∧⟩ (f₀ ∷ f₁ ∷ [])
 
 -- ## Rule
 
 ∧-formation
-  : Rule symbols 2
+  : Rule symbols
 ∧-formation
   = record
   { name
@@ -407,7 +378,7 @@ _∧_
   }
 
 ∅-formation
-  : Rule symbols 0
+  : Rule symbols
 ∅-formation
   = record
   { name
@@ -421,7 +392,7 @@ _∧_
   }
 
 ,-formation
-  : Rule symbols 2
+  : Rule symbols
 ,-formation
   = record
   { name
@@ -437,7 +408,7 @@ _∧_
   }
 
 axiom
-  : Rule symbols 2
+  : Rule symbols
 axiom
   = record
   { name
@@ -453,7 +424,7 @@ axiom
   }
 
 weakening
-  : Rule symbols 2
+  : Rule symbols
 weakening
   = record
   { name
@@ -469,7 +440,7 @@ weakening
   }
 
 ∧-introduction
-  : Rule symbols 2
+  : Rule symbols
 ∧-introduction
   = record
   { name
@@ -485,7 +456,7 @@ weakening
   }
 
 ∧-elimination-left
-  : Rule symbols 1
+  : Rule symbols
 ∧-elimination-left
   = record
   { name
@@ -500,7 +471,7 @@ weakening
   }
 
 ∧-elimination-right
-  : Rule symbols 1
+  : Rule symbols
 ∧-elimination-right
   = record
   { name
@@ -515,7 +486,7 @@ weakening
   }
 
 ∧-commutative
-  : Rule symbols 2
+  : Rule symbols
 ∧-commutative
   = record
   { name
@@ -533,8 +504,7 @@ weakening
 -- ## Rules
 
 rules-insert
-  : {a : ℕ}
-  → (r : Rule symbols a)
+  : (r : Rule symbols)
   → (rs : Rules symbols)
   → {_ : True (is-nothing? (Rules.lookup rs (Rule.name r)))}
   → Rules symbols

@@ -3,7 +3,7 @@ module Prover.Data.Rules where
 open import Prover.Data.Identifier
   using (Identifier; _≟_idn)
 open import Prover.Data.Rule
-  using (Rule; _≟_rul?)
+  using (Rule; _≟_rul; rule)
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Prelude
@@ -12,18 +12,16 @@ open import Prover.Prelude
 
 relation
   : (ss : Symbols)
-  → Relation (Any (Rule ss))
+  → Relation (Rule ss)
 relation _
-  = Relation.map
-    (Rule.name ∘ Any.value)
+  = Relation.map Rule.name
     (Equal Identifier)
 
 symmetric
   : (ss : Symbols)
   → Symmetric (relation ss)
 symmetric _
-  = Symmetric.map
-    (Rule.name ∘ Any.value)
+  = Symmetric.map Rule.name
     (Equal Identifier)
     (Symmetric.equal Identifier)
 
@@ -31,8 +29,7 @@ transitive
   : (ss : Symbols)
   → Transitive (relation ss)
 transitive _
-  = Transitive.map
-    (Rule.name ∘ Any.value)
+  = Transitive.map Rule.name
     (Equal Identifier)
     (Transitive.equal Identifier)
 
@@ -40,8 +37,7 @@ decidable
   : (ss : Symbols)
   → Decidable (relation ss)
 decidable _
-  = Decidable.map
-    (Rule.name ∘ Any.value)
+  = Decidable.map Rule.name
     (Equal Identifier)
     _≟_idn
 
@@ -51,11 +47,16 @@ Rules
   : Symbols
   → Set
 Rules ss
-  = Collection {A = Any (Rule ss)} (relation ss)
+  = Collection
+    {A = Rule ss}
+    (relation ss)
 
 -- ## Module
 
 module Rules where
+
+  open Collection public
+    using (Member; empty; member)
 
   -- ### Interface
 
@@ -66,24 +67,20 @@ module Rules where
     lookup
       : Rules ss
       → Identifier
-      → Maybe (Any (Rule ss))
+      → Maybe (Rule ss)
     lookup rs n
       = Collection.find rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
+        (Bool.from-decidable _≟_idn n ∘ Rule.name)
 
     insert
-      : {a : ℕ}
-      → (rs : Rules ss)
-      → (r : Rule ss a)
+      : (rs : Rules ss)
+      → (r : Rule ss)
       → lookup rs (Rule.name r) ≡ nothing
       → Rules ss
     insert rs r
-      = Collection.insert rs (symmetric ss) (decidable ss) (any r)
-
-  -- ### Construction
-
-  open Collection public
-    using (empty)
+      = Collection.insert rs
+        (symmetric ss)
+        (decidable ss) r
 
   -- ### Membership
 
@@ -92,117 +89,50 @@ module Rules where
     where
 
     rul_∈_
-      : {a : ℕ}
-      → Rule ss a
+      : Rule ss
       → Rules ss
       → Set
     rul r ∈ rs
-      = Collection.IsMember rs (any r)
+      = Collection.IsMember rs r
 
     rul_∈?_
-      : {a : ℕ}
-      → (r : Rule ss a)
+      : (r : Rule ss)
       → (rs : Rules ss)
       → Dec (rul r ∈ rs)
     rul r ∈? rs
-      = Collection.is-member? rs _≟_rul? (any r)
-
-    record Member
-      (rs : Rules ss)
-      : Set
-      where
-
-      constructor
-
-        member
-
-      field
-
-        {arity}
-          : ℕ
-
-        value
-          : Rule ss arity
-
-        is-member
-          : rul value ∈ rs
+      = Collection.is-member? rs _≟_rul r
 
     lookup-member
       : (rs : Rules ss)
       → Identifier
       → Maybe (Member rs)
     lookup-member rs n
-      with Collection.find-member rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-    ... | nothing
-      = nothing
-    ... | just (Collection.member (any r) p)
-      = just (member r p)
+      = Collection.find-member rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name)
 
     lookup-member-nothing
-      : {a : ℕ}
-      → (rs : Rules ss)
-      → (r : Rule ss a)
+      : (rs : Rules ss)
+      → (r : Rule ss)
       → lookup-member rs (Rule.name r) ≡ nothing
       → ¬ rul r ∈ rs
-    lookup-member-nothing rs r@(Rule.rule n _ _ _) _
-      with Collection.find-member rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-      | inspect (Collection.find-member rs)
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-    ... | nothing | [ q ]
-      = Collection.find-¬is-member rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value) (any r)
+    lookup-member-nothing rs r@(rule n _ _ _)
+      = Collection.find-member-nothing rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name) r
         (Bool.from-decidable-true _≟_idn n n refl)
-      $ Collection.find-member-nothing rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value) q
 
-    lookup-member-any
-      : {rs : Rules ss}
+    lookup-member-just
+      : (rs : Rules ss)
+      → (r : Rule ss)
       → {m : Member rs}
-      → {a : ℕ}
-      → (r : Rule ss a)
       → .(rul r ∈ rs)
       → lookup-member rs (Rule.name r) ≡ just m
-      → Equal (Any (Rule ss)) (any r) (any (Member.value m))
-    lookup-member-any {rs = rs} (Rule.rule n _ _ _) _ _
-      with Collection.find-member rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-      | inspect (Collection.find-member rs)
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-    lookup-member-any {rs = rs} r@(Rule.rule n _ _ _) p refl
-      | just _ | [ q ]
-      = Collection.member-find-unique' rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name ∘ Any.value)
-        (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) (any r))
-        (Bool.from-decidable-true (decidable ss) (any r) (any r) refl)
+      → r ≡ Member.value m
+    lookup-member-just rs r@(rule n _ _ _) p q
+      = Collection.find-member-just-eq rs
+        (Bool.from-decidable _≟_idn n ∘ Rule.name)
+        (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) r)
+        (Bool.from-decidable-true _≟_idn n n refl)
         (Dec.recompute (rul r ∈? rs) p) q
-  
-    lookup-member-arity
-      : {rs : Rules ss}
-      → {m : Member rs}
-      → {a : ℕ}
-      → (r : Rule ss a)
-      → .(rul r ∈ rs)
-      → lookup-member rs (Rule.name r) ≡ just m
-      → a ≡ Member.arity m
-    lookup-member-arity r p q
-      with lookup-member-any r p q
-    ... | refl
-      = refl
-  
-    lookup-member-eq
-      : {rs : Rules ss}
-      → {m : Member rs}
-      → {a : ℕ}
-      → (r : Rule ss a)
-      → .(rul r ∈ rs)
-      → lookup-member rs (Rule.name r) ≡ just m
-      → r ≅ Member.value m
-    lookup-member-eq r p q
-      with lookup-member-any r p q
-    ... | refl
-      = refl
 
 -- ## Exports
 
