@@ -650,19 +650,25 @@ module _
 module _
   {V : ViewStack}
   {E : EventStack}
-  {S A : Set}
+  {S : Set}
   where
 
   module MainEditorList
     (d : Direction)
-    (e : MainEditor V E S A)
+    (e : MainEditor V E S)
     where
+
+    State
+      : Set
+    State
+      = List
+        (MainEditor.State e)
 
     simple-editor
       : SimpleEditor
         (view-stack-list V)
         (event-stack-list E)
-        (List A)
+        State
     simple-editor
       = simple-editor-list d
         (MainEditor.simple-editor e)
@@ -670,14 +676,14 @@ module _
     split-function
       : SplitFunction
         (List S)
-        (List A)
+        State
     split-function
       = split-function-list
         (MainEditor.split-function e)
 
     bool-function
       : BoolFunction
-        (List A)
+        State
     bool-function
       = bool-function-list
         (MainEditor.bool-function e)
@@ -685,12 +691,11 @@ module _
   -- Takes direction from earlier to later elements.
   main-editor-list
     : Direction
-    → MainEditor V E S A
+    → MainEditor V E S
     → MainEditor
       (view-stack-list V)
       (event-stack-list E)
       (List S)
-      (List A)
   main-editor-list d e
     = record {MainEditorList d e}
 

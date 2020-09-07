@@ -63,7 +63,6 @@ executable prover
     -- MAlonzo.Code.Prover.Category.Dependent1.Simple,
     -- MAlonzo.Code.Prover.Category.Dependent1.Split,
     -- MAlonzo.Code.Prover.Category.Dependent1.Split.Maybe,
-    -- MAlonzo.Code.Prover.Category.Dependent1.Unit,
     -- MAlonzo.Code.Prover.Category.List,
     -- MAlonzo.Code.Prover.Category.Maybe,
     MAlonzo.Code.Prover.Category.Partial,

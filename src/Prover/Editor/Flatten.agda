@@ -377,16 +377,16 @@ split-editor-flatten
 module _
   {V : ViewStack}
   {E : EventStack}
-  {S A : Set}
+  {S : Set}
   where
 
   module MainEditorFlatten
-    (e : MainEditor V E S A)
+    (e : MainEditor V E S)
     where
 
     editor
       : Editor V E
-        (category-unit A)
+        (category-unit (MainEditor.State e))
     editor
       = editor-unit
         (MainEditor.simple-editor e)
@@ -394,7 +394,8 @@ module _
     flat-editor
       : FlatEditor
         (view-stack-flatten V)
-        (event-stack-flatten E) A
+        (event-stack-flatten E)
+        (MainEditor.State e)
     flat-editor
       = editor-flatten editor
 
@@ -450,7 +451,7 @@ module _
       = MainEditor.encode e s
 
   main-editor-flatten
-    : MainEditor V E S A
+    : MainEditor V E S
     → FlatMainEditor
       (view-stack-flatten V)
       (event-stack-flatten E) S

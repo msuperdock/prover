@@ -596,20 +596,26 @@ module _
 module _
   {V₁ V₂ : ViewStack}
   {E₁ E₂ : EventStack}
-  {S₁ S₂ A₁ A₂ : Set}
+  {S₁ S₂ : Set}
   where
 
   module MainEditorProduct
     (d : Direction)
-    (e₁ : MainEditor V₁ E₁ S₁ A₁)
-    (e₂ : MainEditor V₂ E₂ S₂ A₂)
+    (e₁ : MainEditor V₁ E₁ S₁)
+    (e₂ : MainEditor V₂ E₂ S₂)
     where
+
+    State
+      : Set
+    State
+      = MainEditor.State e₁
+      × MainEditor.State e₂
 
     simple-editor
       : SimpleEditor
         (view-stack-product V₁ V₂)
         (event-stack-product E₁ E₂)
-        (A₁ × A₂)
+        State
     simple-editor
       = simple-editor-product d
         (MainEditor.simple-editor e₁)
@@ -618,7 +624,7 @@ module _
     split-function
       : SplitFunction
         (S₁ × S₂)
-        (A₁ × A₂)
+        State
     split-function
       = split-function-product
         (MainEditor.split-function e₁)
@@ -626,7 +632,7 @@ module _
 
     bool-function
       : BoolFunction
-        (A₁ × A₂)
+        State
     bool-function
       = bool-function-product
         (MainEditor.bool-function e₁)
@@ -635,13 +641,12 @@ module _
   -- Takes direction from first to second component.
   main-editor-product
     : Direction
-    → MainEditor V₁ E₁ S₁ A₁
-    → MainEditor V₂ E₂ S₂ A₂
+    → MainEditor V₁ E₁ S₁
+    → MainEditor V₂ E₂ S₂
     → MainEditor
       (view-stack-product V₁ V₂)
       (event-stack-product E₁ E₂)
       (S₁ × S₂)
-      (A₁ × A₂)
   main-editor-product d e₁ e₂
     = record {MainEditorProduct d e₁ e₂}
 

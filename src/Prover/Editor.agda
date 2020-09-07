@@ -525,7 +525,6 @@ record MainEditor
   (V : ViewStack)
   (E : EventStack)
   (S : Set)
-  (A : Set)
   : Set₁
   where
 
@@ -535,11 +534,14 @@ record MainEditor
 
   field
 
+    State
+      : Set
+
     simple-editor
-      : SimpleEditor V E A
+      : SimpleEditor V E State
 
     split-function
-      : SplitFunction S A
+      : SplitFunction S State
 
   open SplitFunction split-function public using () renaming
     ( partial-function
@@ -553,11 +555,9 @@ record MainEditor
   field
 
     bool-function
-      : BoolFunction A
+      : BoolFunction State
 
 -- ### SplitMainEditor
-
--- #### Definition
 
 record SplitMainEditor
   (V : ViewStack)
@@ -642,48 +642,3 @@ record SplitMainEditor
   draw-pure x
     = draw (unbase x)
   
--- #### Conversion
-
--- ##### SplitEditor
-
-split-main-editor-unmain
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {S P : Set}
-  → {C : Category}
-  → SplitMainEditor V E S P C
-  → SplitEditor V E C
-split-main-editor-unmain e
-  = record {SplitMainEditor e}
-
--- ##### PartialEditor
-
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {S P : Set}
-  {C : Category}
-  where
-
-  module SplitMainEditorPartial
-    (e : SplitMainEditor V E S P C)
-    where
-
-    open SplitMainEditor e public using () renaming
-      ( State
-        to State
-      ; base
-        to partial-function
-      )
-
-    simple-editor
-      : SimpleEditor V E State
-    simple-editor
-      = any (SplitMainEditor.editor e)
-
-  split-main-editor-partial
-    : SplitMainEditor V E S P C
-    → PartialEditor V E (Category.Object C)
-  split-main-editor-partial e
-    = record {SplitMainEditorPartial e}
-

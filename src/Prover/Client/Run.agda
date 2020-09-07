@@ -162,9 +162,8 @@ module _
 main-editor-run
   : {V : ViewStack}
   → {E : EventStack}
-  → {A : Set}
   → String
-  → MainEditor V E Value A
+  → MainEditor V E Value
   → Client V E
   → IO ⊤
 main-editor-run p e c

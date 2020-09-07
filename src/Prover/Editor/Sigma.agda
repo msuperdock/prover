@@ -4,10 +4,6 @@ open import Prover.Category
   using (Category)
 open import Prover.Category.Dependent1
   using (Dependent₁Category)
-open import Prover.Category.Dependent1.Simple
-  using (Dependent₁SimpleCategory)
-open import Prover.Category.Dependent1.Unit
-  using (dependent₁-category-unit)
 open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Sum
@@ -15,18 +11,7 @@ open import Prover.Category.Sigma.Sum
 open import Prover.Category.Sum
   using (module CategorySum)
 open import Prover.Editor
-  using (Editor; EventStack; MainEditor; SimpleEditor; SplitEditor;
-    SplitMainEditor; ViewStack; ViewStackMap; any; split-main-editor-unmain)
-open import Prover.Editor.Unit
-  using (editor-unit)
-open import Prover.Function.Bool
-  using (BoolFunction)
-open import Prover.Function.Bool.Sigma.Sum
-  using (bool-function-sigma-sum)
-open import Prover.Function.Split
-  using (SplitFunction)
-open import Prover.Function.Split.Sigma.Sum
-  using (split-function-sigma-sum)
+  using (Editor; EventStack; SplitEditor; ViewStack; ViewStackMap)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -129,9 +114,7 @@ event-stack-sigma
 event-stack-sigma E₁ E₂
   = record {EventStackSigma E₁ E₂}
 
--- ## Editors
-
--- ### Editor
+-- ## Editor
 
 module _
   {V₁ V₂ : ViewStack}
@@ -139,7 +122,7 @@ module _
   {C₁ : Category}
   where
 
-  -- #### Module
+  -- ### Module
 
   module EditorSigma
     (C₂ : Dependent₁Category C₁)
@@ -149,7 +132,7 @@ module _
       → Editor V₂ E₂ (Dependent₁Category.category C₂ x₁))
     where
 
-    -- ##### Types
+    -- #### Types
 
     open ViewStack (view-stack-sigma V₁ V₂)
     open EventStack (event-stack-sigma E₁ E₂)
@@ -167,7 +150,7 @@ module _
         to StateArrow
       )
 
-    -- ##### State
+    -- #### State
 
     StatePath
       : State
@@ -245,7 +228,7 @@ module _
     ... | yes _
       = ι₂ (Editor.initial-path-with (e₂ x₁) s₂ d')
 
-    -- ##### Draw
+    -- #### Draw
 
     draw
       : State
@@ -331,7 +314,7 @@ module _
         = draw-inner-path
       }
 
-    -- ##### Mode
+    -- #### Mode
 
     mode
       : (s : State)
@@ -359,7 +342,7 @@ module _
     mode-inner (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
       = ι₂ (ι₂ (Editor.mode-inner (e₂ x₁) s₂ sp₂ s₂' sp₂'))
 
-    -- ##### Handle
+    -- #### Handle
 
     handle
       : (s : State)
@@ -653,7 +636,7 @@ module _
     handle-inner-direction (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂' d'
       = Editor.handle-inner-direction (e₂ x₁) s₂ sp₂ s₂' sp₂' d'
 
-  -- #### Function
+  -- ### Function
 
   -- Takes direction from first to second component.
   editor-sigma
@@ -668,98 +651,4 @@ module _
       (category-sigma-sum C₂ (SplitEditor.split-functor e₁))
   editor-sigma C₂ d e₁ e₂
     = record {EditorSigma C₂ d e₁ e₂}
-
--- ### SimpleEditor
-
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {C₁ : Category}
-  where
-
-  -- Takes direction from first to second component.
-  simple-editor-sigma
-    : (C₂ : Dependent₁SimpleCategory C₁)
-    → Direction
-    → (e₁ : SplitEditor V₁ E₁ C₁)
-    → ((x₁ : Category.Object C₁)
-      → SimpleEditor V₂ E₂ (Dependent₁SimpleCategory.set C₂ x₁))
-    → SimpleEditor
-      (view-stack-sigma V₁ V₂)
-      (event-stack-sigma E₁ E₂)
-      (SplitEditor.State e₁
-        ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂))
-  simple-editor-sigma C₂ d e₁ e₂
-    = any
-      (editor-sigma
-        (dependent₁-category-unit C₂) d e₁
-        (λ x₁ → editor-unit (e₂ x₁)))
-
--- ### MainEditor
-
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {S₁ S₂ P₁ : Set}
-  {C₁ : Category}
-  where
-
-  module MainEditorSigma
-    (C₂ : Dependent₁SimpleCategory C₁)
-    (d : Direction)
-    (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
-    (e₂ : (x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (Dependent₁SimpleCategory.set C₂ x₁))
-    where
-
-    State
-      : Set
-    State
-      = SplitMainEditor.State e₁
-      ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂)
-
-    simple-editor
-      : SimpleEditor
-        (view-stack-sigma V₁ V₂)
-        (event-stack-sigma E₁ E₂)
-        State
-    simple-editor
-      = simple-editor-sigma C₂ d
-        (split-main-editor-unmain e₁)
-        (λ x₁ → MainEditor.simple-editor (e₂ x₁))
-
-    split-function
-      : SplitFunction
-        (S₁ ⊔ P₁ × S₂)
-        State
-    split-function
-      = split-function-sigma-sum
-        (Dependent₁SimpleCategory.set C₂)
-        (SplitMainEditor.state-split-function e₁)
-        (SplitMainEditor.pure-split-function e₁)
-        (λ x₁ → MainEditor.split-function (e₂ x₁))
-
-    bool-function
-      : BoolFunction
-        State
-    bool-function
-      = bool-function-sigma-sum
-        (Dependent₁SimpleCategory.set C₂)
-        (λ x₁ → MainEditor.bool-function (e₂ x₁))
-
-  -- Takes direction from first to second component.
-  main-editor-sigma
-    : (C₂ : Dependent₁SimpleCategory C₁)
-    → Direction
-    → (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
-    → ((x₁ : Category.Object C₁)
-      → MainEditor V₂ E₂ S₂ (Dependent₁SimpleCategory.set C₂ x₁))
-    → MainEditor
-      (view-stack-sigma V₁ V₂)
-      (event-stack-sigma E₁ E₂)
-      (S₁ ⊔ P₁ × S₂)
-      (SplitMainEditor.State e₁
-        ⊔ Σ (Category.Object C₁) (Dependent₁SimpleCategory.set C₂))
-  main-editor-sigma C₂ d e₁ e₂
-    = record {MainEditorSigma C₂ d e₁ e₂}
 

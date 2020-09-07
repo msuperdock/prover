@@ -164,19 +164,19 @@ module _
 module _
   {V W : ViewStack}
   {E : EventStack}
-  {S A : Set}
+  {S : Set}
   where
 
   module MainEditorMapViewWith
     (F : Bool → ViewStackMap V W)
-    (e : MainEditor V E S A)
+    (e : MainEditor V E S)
     where
 
     open MainEditor e public
       hiding (simple-editor)
 
     simple-editor
-      : SimpleEditor W E A
+      : SimpleEditor W E State
     simple-editor
       = simple-editor-map-view-with
         (λ s → F (MainEditor.bool-function e s))
@@ -184,15 +184,15 @@ module _
 
   main-editor-map-view-with
     : (Bool → ViewStackMap V W)
-    → MainEditor V E S A
-    → MainEditor W E S A
+    → MainEditor V E S
+    → MainEditor W E S
   main-editor-map-view-with F e
     = record {MainEditorMapViewWith F e}
 
   main-editor-map-view
     : ViewStackMap V W
-    → MainEditor V E S A
-    → MainEditor W E S A
+    → MainEditor V E S
+    → MainEditor W E S
   main-editor-map-view F
     = main-editor-map-view-with (const F)
 
@@ -411,27 +411,27 @@ module _
 module _
   {V : ViewStack}
   {E F : EventStack}
-  {S A : Set}
+  {S : Set}
   where
 
   module MainEditorMapEvent
     (G : EventStackMap E F)
-    (e : MainEditor V E S A)
+    (e : MainEditor V E S)
     where
 
     open MainEditor e public
       hiding (simple-editor)
 
     simple-editor
-      : SimpleEditor V F A
+      : SimpleEditor V F State
     simple-editor
       = simple-editor-map-event G
         (MainEditor.simple-editor e)
 
   main-editor-map-event
     : EventStackMap E F
-    → MainEditor V E S A
-    → MainEditor V F S A
+    → MainEditor V E S
+    → MainEditor V F S
   main-editor-map-event G e
     = record {MainEditorMapEvent G e}
 
@@ -514,27 +514,27 @@ module _
 module _
   {V : ViewStack}
   {E : EventStack}
-  {S T A : Set}
+  {S T : Set}
   where
 
   module MainEditorMapState
     (F : SplitFunction T S)
-    (e : MainEditor V E S A)
+    (e : MainEditor V E S)
     where
 
     open MainEditor e public
       hiding (split-function)
 
     split-function
-      : SplitFunction T A
+      : SplitFunction T State
     split-function
       = split-function-compose
         (MainEditor.split-function e) F
 
   main-editor-map-state
     : SplitFunction T S
-    → MainEditor V E S A
-    → MainEditor V E T A
+    → MainEditor V E S
+    → MainEditor V E T
   main-editor-map-state F e
     = record {MainEditorMapState F e}
 

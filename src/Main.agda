@@ -14,8 +14,6 @@ open import Prover.Client.Run
   using (main-editor-run)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent)
-open import Prover.Data.Proof
-  using (Proof)
 open import Prover.Data.Proof.Editor
   using (ProofEvent; ProofEventStack; ProofModeInner; ProofViewInner;
     ProofViewInnerPath; ProofViewStack; both; command; proof-main-editor;
@@ -124,13 +122,12 @@ proof-view-stack-map b
 
 proof-window-main-editor
   : {ss : Symbols}
-  → (rs : Rules ss)
-  → (r : Rule ss)
+  → Rules ss
+  → Rule ss
   → MainEditor
     ProofWindowViewStack
     ProofEventStack
     Value
-    (Proof rs r)
 proof-window-main-editor rs r
   = main-editor-map-view-with proof-view-stack-map
   $ proof-main-editor rs r

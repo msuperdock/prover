@@ -1009,13 +1009,12 @@ proof-simple-editor rs r
 
 proof-main-editor
   : {ss : Symbols}
-  → (rs : Rules ss)
-  → (r : Rule ss)
+  → Rules ss
+  → Rule ss
   → MainEditor
     ProofViewStack
     ProofEventStack
     Value
-    (Proof rs r)
 proof-main-editor rs r
   = record
   { simple-editor

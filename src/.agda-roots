@@ -2,9 +2,45 @@ Main
 
 - main
 
-Prover.Editor
+Prover.Editor.Collection
 
-- split-main-editor-partial
+- partial-editor-collection
+- split-editor-collection
+- split-main-editor-collection
+
+Prover.Editor.List
+
+- partial-editor-list
+- split-editor-list
+- main-editor-list
+- split-main-editor-list
+
+Prover.Editor.Map
+
+- partial-editor-map-view
+- split-editor-map-view
+- main-editor-map-view
+- split-main-editor-map-view
+
+- partial-editor-map-event
+- split-editor-map-event
+- main-editor-map-event
+- split-main-editor-map-event
+
+- main-editor-map-state
+- split-main-editor-map-state
+- split-main-editor-map-pure
+
+- partial-editor-map
+- split-editor-map-simple
+- split-main-editor-map-simple
+
+Prover.Editor.Product
+
+- partial-editor-product
+- split-editor-product
+- main-editor-product
+- split-main-editor-product
 
 Prover.Editor.Dependent.Collection
 
@@ -52,42 +88,4 @@ Prover.Editor.Dependent.Sigma
 - dependent-split-editor-sigma
 - dependent-main-editor-sigma
 - dependent-split-main-editor-sigma
-
-Prover.Editor.List
-
-- partial-editor-list
-- split-editor-list
-- main-editor-list
-- split-main-editor-list
-
-Prover.Editor.Map
-
-- partial-editor-map-view
-- split-editor-map-view
-- main-editor-map-view
-- split-main-editor-map-view
-
-- partial-editor-map-event
-- split-editor-map-event
-- main-editor-map-event
-- split-main-editor-map-event
-
-- main-editor-map-state
-- split-main-editor-map-state
-- split-main-editor-map-pure
-
-- partial-editor-map
-- split-editor-map-simple
-- split-main-editor-map-simple
-
-Prover.Editor.Product
-
-- partial-editor-product
-- split-editor-product
-- main-editor-product
-- split-main-editor-product
-
-Prover.Editor.Sigma
-
-- main-editor-sigma
 
