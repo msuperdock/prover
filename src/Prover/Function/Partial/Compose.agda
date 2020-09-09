@@ -8,6 +8,8 @@ open import Prover.Function.Partial
   using (PartialFunction)
 open import Prover.Prelude
 
+-- ## PartialFunction
+
 partial-function-compose
   : {A B C : Set}
   → PartialFunction B C
