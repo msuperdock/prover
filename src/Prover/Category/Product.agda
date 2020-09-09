@@ -282,7 +282,8 @@ functor-identity-product
   → FunctorIdentity F₂
   → FunctorIdentity
     (functor-product F₁ F₂)
-functor-identity-product {C₁ = C₁} {C₂ = C₂} p₁ p₂
+functor-identity-product
+  {C₁ = C₁} {C₂ = C₂} p₁ p₂
   = functor-identity-from-equal
   $ functor-trans (functor-equal-product
     (functor-identity-to-equal p₁)
@@ -305,7 +306,8 @@ functor-compose-product
     (functor-product F₁ F₂)
     (functor-product G₁ G₂)
     (functor-product H₁ H₂)
-functor-compose-product {F₁ = F₁} {F₂ = F₂} {G₁ = G₁} {G₂ = G₂} p₁ p₂
+functor-compose-product
+  {F₁ = F₁} {F₂ = F₂} {G₁ = G₁} {G₂ = G₂} p₁ p₂
   = functor-compose-from-equal
     (functor-product F₁ F₂)
     (functor-product G₁ G₂)
