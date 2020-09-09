@@ -20,11 +20,8 @@ module CategoryList
   (C : Category)
   where
 
-  Object
-    : Set
-  Object
-    = List
-      (Category.Object C)
+  open SetoidCategory (setoid-category-list C)
+    using (Object)
 
   data Arrow'
     : Object
@@ -167,7 +164,7 @@ module CategoryList
 
   abstract
 
-    from-setoid-injective
+    from-injective
       : {xs ys : Object}
       → (fs : SetoidCategory.Arrow (setoid-category-list C) xs ys)
       → (k₁ k₂ : Fin (List.length xs))
@@ -179,7 +176,7 @@ module CategoryList
       → to-lookup (from-lookup xs ys (SetoidCategoryList.Arrow.lookup fs)) k₂
         ≡ just (l , f₂)
       → k₁ ≡ k₂
-    from-setoid-injective {xs = xs} {ys = ys} fs k₁ k₂ p₁ p₂
+    from-injective {xs = xs} {ys = ys} fs k₁ k₂ p₁ p₂
       = SetoidCategoryList.Arrow.injective fs k₁ k₂
         (trans (sym (to-from-lookup xs ys
           (SetoidCategoryList.Arrow.lookup fs) k₁)) p₁)
@@ -196,7 +193,7 @@ module CategoryList
       = from-lookup xs ys
         (SetoidCategoryList.Arrow.lookup fs)
     ; injective
-      = from-setoid-injective fs
+      = from-injective fs
     }
 
   abstract
