@@ -285,8 +285,8 @@ module Internal where
       = nothing
     branch-path-up {b = rule _ _ [] _ _} stop
       = nothing
-    branch-path-up {b = rule (rule {suc a} _ _ _ _) _ (_ ∷ _) _ _} stop
-      = just (go (Fin.maximum a) stop)
+    branch-path-up {b = rule _ _ (_ ∷ bs) _ _} stop
+      = just (go (Fin.maximum (Vec.length bs)) stop)
     branch-path-up (go k bp)
       with branch-path-up bp
       | Fin.decrement k
@@ -386,8 +386,7 @@ module Internal where
 
     branch-is-complete-assumption
       : {vs : Variables}
-      → {m : ℕ}
-      → Vec (Formula ss vs false) m
+      → List (Formula ss vs false)
       → Formula ss vs true
       → Bool
     branch-is-complete-assumption hs f
@@ -400,16 +399,15 @@ module Internal where
     branch-is-complete
       : {rs : Rules ss}
       → {vs : Variables}
-      → {m : ℕ}
-      → Vec (Formula ss vs false) m
+      → List (Formula ss vs false)
       → Branch rs vs
       → Bool
     
     branch-are-complete
       : {rs : Rules ss}
       → {vs : Variables}
-      → {m n : ℕ}
-      → Vec (Formula ss vs false) m
+      → {n : ℕ}
+      → List (Formula ss vs false)
       → Vec (Branch rs vs) n
       → Bool
 
@@ -428,8 +426,8 @@ module Internal where
       → {r : Rule ss}
       → Proof rs r
       → Bool
-    proof-is-complete {r = rule _ _ hs _} (proof b _)
-      = branch-is-complete hs b
+    proof-is-complete {r = r} (proof b _)
+      = branch-is-complete (Rule.hypotheses r) b
 
   -- ### Properties
 
@@ -573,7 +571,8 @@ module Internal where
       → rul r ∈ rs
       → Formula.Match (Rule.conclusion r) f
       → BranchWith rs f
-    branch-with-infer-formula ms f r@(rule _ _ hs c) p (Formula.match subs q)
+    branch-with-infer-formula ms f r@(rule _ _ (any hs) c) p
+      (Formula.match subs q)
       with Formula.substitutes-def hs subs ms
     ... | Formula.substitutes-def-result {fs' = hs'} subs' _ p' q'
       = record

@@ -370,7 +370,8 @@ _∧_ f₀ f₁
   ; variables
     = ⟪φ,ψ⟫
   ; hypotheses
-    = φ formula
+    = any
+    $ φ formula
     ∷ ψ formula
     ∷ []
   ; conclusion
@@ -386,7 +387,8 @@ _∧_ f₀ f₁
   ; variables
     = ⟪⟫
   ; hypotheses
-    = []
+    = any
+    $ []
   ; conclusion
     = ∅ context
   }
@@ -400,7 +402,8 @@ _∧_ f₀ f₁
   ; variables
     = ⟪Γ,φ⟫
   ; hypotheses
-    = Γ context
+    = any
+    $ Γ context
     ∷ φ formula
     ∷ []
   ; conclusion
@@ -416,7 +419,8 @@ axiom
   ; variables
     = ⟪Γ,φ⟫
   ; hypotheses
-    = Γ context
+    = any
+    $ Γ context
     ∷ φ formula
     ∷ []
   ; conclusion
@@ -432,7 +436,8 @@ weakening
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
-    = φ formula
+    = any
+    $ φ formula
     ∷ Γ ⊢ ψ
     ∷ []
   ; conclusion
@@ -448,7 +453,8 @@ weakening
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
-    = Γ ⊢ φ
+    = any
+    $ Γ ⊢ φ
     ∷ Γ ⊢ ψ
     ∷ []
   ; conclusion
@@ -464,7 +470,8 @@ weakening
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
-    = Γ ⊢ φ ∧ ψ
+    = any
+    $ Γ ⊢ φ ∧ ψ
     ∷ []
   ; conclusion
     = Γ ⊢ φ
@@ -479,7 +486,8 @@ weakening
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
-    = Γ ⊢ φ ∧ ψ
+    = any
+    $ Γ ⊢ φ ∧ ψ
     ∷ []
   ; conclusion
     = Γ ⊢ ψ
@@ -494,7 +502,8 @@ weakening
   ; variables
     = ⟪φ,ψ⟫
   ; hypotheses
-    = φ formula
+    = any
+    $ φ formula
     ∷ ψ formula
     ∷ []
   ; conclusion

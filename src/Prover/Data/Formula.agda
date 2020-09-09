@@ -258,28 +258,32 @@ module Formula where
     ... | yes refl | yes refl
       = yes refl
 
+    _≟_frms'
+      : Decidable (Equal (List (Formula ss vs m)))
+    _≟_frms'
+      = List.decidable _≟_frm
+
   -- ### Membership
   
   module _
     {ss : Symbols}
     {vs : Variables}
     {m : Bool}
-    {n : ℕ}
     where
 
     frm_∈_
       : Formula ss vs m
-      → Vec (Formula ss vs m) n
+      → List (Formula ss vs m)
       → Set
     frm f ∈ fs
-      = Vec.IsMember fs f
+      = List.IsMember fs f
     
     frm_∈?_
       : (f : Formula ss vs m)
-      → (fs : Vec (Formula ss vs m) n)
+      → (fs : List (Formula ss vs m))
       → Dec (frm f ∈ fs)
     frm f ∈? fs
-      = Vec.is-member? fs _≟_frm f
+      = List.is-member? fs _≟_frm f
 
   -- ### Properties
 
@@ -1017,5 +1021,5 @@ module Formula where
 -- ## Exports
 
 open Formula public
-  using (_≟_frm; _≟_frms; frm_∈?_)
+  using (_≟_frm; _≟_frms'; frm_∈?_)
 

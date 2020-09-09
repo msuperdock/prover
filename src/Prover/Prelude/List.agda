@@ -186,6 +186,12 @@ module List where
     {A : Set}
     where
 
+    to-vec
+      : (xs : List A)
+      → Vec A (length xs)
+    to-vec (any xs)
+      = xs
+
     from-builtin
       : List' A
       → List A

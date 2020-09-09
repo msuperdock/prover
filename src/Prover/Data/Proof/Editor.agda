@@ -174,11 +174,10 @@ module _
   {ss : Symbols}
   {rs : Rules ss}
   {vs : Variables}
-  {a : ℕ}
   where
 
   draw-status
-    : Vec (Formula ss vs false) a
+    : List (Formula ss vs false)
     → Formula ss vs true
     → Bool
   draw-status hs f
@@ -191,13 +190,13 @@ module _
     = SplitEditor.draw-pure (formula-split-editor ss vs true)
 
   draw-branch
-    : Vec (Formula ss vs false) a
+    : List (Formula ss vs false)
     → Branch rs vs
     → Tree
 
   draw-branches
     : {n : ℕ}
-    → Vec (Formula ss vs false) a
+    → List (Formula ss vs false)
     → Vec (Branch rs vs) n
     → Vec Tree n
 
@@ -214,14 +213,14 @@ module _
     = draw-branch hs b ∷ draw-branches hs bs
   
   draw-path-branch
-    : (hs : Vec (Formula ss vs false) a)
+    : (hs : List (Formula ss vs false))
     → (b : Branch rs vs)
     → BranchPath b
     → TreePath (draw-branch hs b)
 
   draw-path-branches
     : {n : ℕ}
-    → (hs : Vec (Formula ss vs false) a)
+    → (hs : List (Formula ss vs false))
     → (bs : Vec (Branch rs vs) n)
     → (k : Fin n)
     → BranchPath (bs ! k)
