@@ -267,7 +267,8 @@ module Fin where
   drop-just {n = suc _} zero refl
     = refl
   drop-just {n = suc _} (suc k) _
-    with drop k | inspect drop k
+    with drop k
+    | inspect drop k
   drop-just (suc k) refl | just _ | [ p ]
     = sub suc (drop-just k p)
 

@@ -250,7 +250,8 @@ module Formula where
     [] ≟ [] frms
       = yes refl
     (x₁ ∷ xs₁) ≟ (x₂ ∷ xs₂) frms
-      with x₁ ≟ x₂ frm | xs₁ ≟ xs₂ frms
+      with x₁ ≟ x₂ frm
+      | xs₁ ≟ xs₂ frms
     ... | no ¬p | _
       = no (λ {refl → ¬p refl})
     ... | _ | no ¬p

@@ -52,7 +52,9 @@ module Internal where
   ... | nothing | _
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
-    with Precedence.compare p₁ p₂ | a₁ | a₂
+    with Precedence.compare p₁ p₂
+    | a₁
+    | a₂
   ... | τ₁ _ _ _ | _ | _
     = true
   ... | τ₂ _ _ _ | Associativity.left | Associativity.left
@@ -108,7 +110,9 @@ module Internal where
   ... | nothing | _
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
-    with Precedence.compare p₁ p₂ | a₁ | a₂
+    with Precedence.compare p₁ p₂
+    | a₁
+    | a₂
   ... | τ₁ _ _ _ | _ | _
     = true
   ... | τ₂ _ _ _ | Associativity.right | Associativity.right
@@ -185,7 +189,8 @@ module Internal where
   ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
   ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
-    with a₁ | a₂
+    with a₁
+    | a₂
   ... | Associativity.left | Associativity.left
     = rv
   
@@ -232,7 +237,8 @@ module Internal where
   ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
   ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
-    with a₁ | a₂
+    with a₁
+    | a₂
   ... | Associativity.right | Associativity.right
     = lv
 

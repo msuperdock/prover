@@ -243,7 +243,8 @@ module Vec where
     decidable _ [] []
       = yes refl
     decidable d (x₁ ∷ xs₁) (x₂ ∷ xs₂)
-      with d x₁ x₂ | decidable d xs₁ xs₂
+      with d x₁ x₂
+      | decidable d xs₁ xs₂
     ... | no ¬p | _
       = no (λ {refl → ¬p refl})
     ... | _ | no ¬p
@@ -327,7 +328,8 @@ module Vec where
     is-member? [] _ _
       = no (λ ())
     is-member? (x ∷ xs) d y
-      with d x y | is-member? xs d y
+      with d x y
+      | is-member? xs d y
     ... | no ¬p | no ¬m
       = no (λ
         { (zero , p)
@@ -443,7 +445,8 @@ module Vec where
   lookup-delete-less (_ ∷ _ ∷ _) refl z<s
     = refl
   lookup-delete-less {l = suc l} (_ ∷ _ ∷ _) _ _
-    with Fin.drop l | inspect Fin.drop l
+    with Fin.drop l
+    | inspect Fin.drop l
   lookup-delete-less (_ ∷ xs@(_ ∷ _)) refl (s<s p) | just _ | [ q ]
     = lookup-delete-less xs q p
 
@@ -732,7 +735,8 @@ module Vec where
     → (k : Fin n)
     → F (f (xs ! k))
   find-nothing (x ∷ _) f _ _
-    with f x | inspect f x
+    with f x
+    | inspect f x
   find-nothing _ _ _ zero | false | [ p ]
     = p
   find-nothing (x ∷ xs) f p (suc k) | false | _
@@ -764,7 +768,8 @@ module Vec where
     → find xs f ≡ just y
     → T (f y)
   find-true (x ∷ xs) f p
-    with f x | inspect f x
+    with f x
+    | inspect f x
   ... | false | _
     = find-true xs f p
   find-true _ _ refl | true | [ q ]
@@ -809,7 +814,8 @@ module Vec where
     → IsMember xs y
     → z ∈ A × find xs f ≡ just z
   member-find (x ∷ _) f _ _
-    with f x | inspect f x
+    with f x
+    | inspect f x
   member-find _ _ p (zero , refl) | false | [ r ]
     = ⊥-elim (Bool.¬both r p)
   member-find (x ∷ xs) f p (suc k , q) | false | _
@@ -826,7 +832,8 @@ module Vec where
   find-member [] _
     = nothing
   find-member (x ∷ xs) f
-    with f x | find-member xs f
+    with f x
+    | find-member xs f
   ... | false | nothing
     = nothing
   ... | false | just (member y (k , p))
