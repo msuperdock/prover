@@ -727,7 +727,7 @@ module _
   where
 
   module FlatEditorMap
-    (F : PartialFunction A B)
+    (f : A → Maybe B)
     (e : FlatEditor V E A)
     where
 
@@ -743,16 +743,16 @@ module _
     ... | ι₂ s'
       = ι₂ s'
     ... | ι₁ x
-      with PartialFunction.base F x
+      with f x
     ... | nothing
       = ι₂ (s , sp)
     ... | just y
       = ι₁ y
 
   flat-editor-map
-    : PartialFunction A B
+    : (A → Maybe B)
     → FlatEditor V E A
     → FlatEditor V E B
-  flat-editor-map F e
-    = record {FlatEditorMap F e}
+  flat-editor-map f e
+    = record {FlatEditorMap f e}
 

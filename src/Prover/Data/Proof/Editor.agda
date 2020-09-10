@@ -747,7 +747,7 @@ module _
         (ProofChildEventStack infer)
         (Result s sp)
     flat-editor s sp
-      = flat-editor-map (partial-function (result-map s sp))
+      = flat-editor-map (result-map s sp)
       $ command-flat-editor "i"
 
     update

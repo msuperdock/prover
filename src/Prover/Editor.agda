@@ -427,10 +427,7 @@ record PartialEditor
     partial-function
       : PartialFunction State A
 
-  bool-function
-    : BoolFunction State
-  bool-function
-    = PartialFunction.bool-function partial-function
+  open PartialFunction partial-function public
 
 -- ### SplitEditor
 
