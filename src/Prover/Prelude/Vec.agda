@@ -310,14 +310,24 @@ module Vec where
     {A : Set}
     where
 
-    IsMember
-      : {n : ℕ}
-      → Vec A n
-      → A
-      → Set
-    IsMember {n = n} xs x
-      = k ∈ Fin n
-      × xs ! k ≡ x
+    record IsMember
+      {n : ℕ}
+      (xs : Vec A n)
+      (x : A)
+      : Set
+      where
+
+      constructor
+
+        is-member
+
+      field
+
+        index
+          : Fin n
+
+        valid
+          : xs ! index ≡ x
   
     is-member?
       : {n : ℕ}
@@ -332,15 +342,15 @@ module Vec where
       | is-member? xs d y
     ... | no ¬p | no ¬m
       = no (λ
-        { (zero , p)
+        { (is-member zero p)
           → ¬p p
-        ; (suc k , m)
-          → ¬m (k , m)
+        ; (is-member (suc k) m)
+          → ¬m (is-member k m)
         })
     ... | yes p | _
-      = yes (zero , p)
-    ... | _ | yes (k , m)
-      = yes (suc k , m)
+      = yes (is-member zero p)
+    ... | _ | yes (is-member k m)
+      = yes (is-member (suc k) m)
 
     record Member
       {n : ℕ}
@@ -650,7 +660,7 @@ module Vec where
       → Vec A n₂
       → Set
     Subvec xs₁ xs₂
-      = (x : A)
+      = {x : A}
       → IsMember xs₁ x
       → IsMember xs₂ x
 
@@ -668,7 +678,7 @@ module Vec where
       : {n : ℕ}
       → (xs : Vec A n)
       → xs ⊆ xs
-    ⊆-refl _ _
+    ⊆-refl _
       = id
 
     ⊆-trans
@@ -679,35 +689,35 @@ module Vec where
       → xs₁ ⊆ xs₂
       → xs₂ ⊆ xs₃
       → xs₁ ⊆ xs₃
-    ⊆-trans _ _ _ p₁ p₂ x
-      = p₂ x ∘ p₁ x
+    ⊆-trans _ _ _ p₁ p₂
+      = p₂ ∘ p₁
 
     ⊆-nil
       : {n : ℕ}
       → (xs : Vec A n)
       → [] ⊆ xs
-    ⊆-nil _ _ ()
+    ⊆-nil _ ()
 
     ⊆-cons
       : {n : ℕ}
       → (x : A)
       → (xs : Vec A n)
       → xs ⊆ x ∷ xs
-    ⊆-cons _ _ _ (k , p)
-      = (suc k , p)
+    ⊆-cons _ _ (is-member k p)
+      = is-member (suc k) p
 
     ⊆-cons-left
       : {n₁ n₂ : ℕ}
+      → {xs₂ : Vec A n₂}
+      → {x : A}
       → (xs₁ : Vec A n₁)
-      → (xs₂ : Vec A n₂)
-      → (x : A)
       → IsMember xs₂ x
       → xs₁ ⊆ xs₂
       → x ∷ xs₁ ⊆ xs₂
-    ⊆-cons-left _ _ _ m _ _ (zero , refl)
+    ⊆-cons-left _ m _ (is-member zero refl)
       = m
-    ⊆-cons-left _ _ _ _ p x (suc k , q)
-      = p x (k , q)
+    ⊆-cons-left _ _ p (is-member (suc k) q)
+      = p (is-member k q)
 
   -- ### Find
 
@@ -754,10 +764,10 @@ module Vec where
     with f x
   ... | false
     with find-just xs f p
-  ... | (k , q)
-    = (suc k , q)
+  ... | is-member k q
+    = is-member (suc k) q
   find-just _ _ refl | true
-    = (zero , refl)
+    = is-member zero refl
 
   find-true
     : {A : Set}
@@ -816,10 +826,10 @@ module Vec where
   member-find (x ∷ _) f _ _
     with f x
     | inspect f x
-  member-find _ _ p (zero , refl) | false | [ r ]
+  member-find _ _ p (is-member zero refl) | false | [ r ]
     = ⊥-elim (Bool.¬both r p)
-  member-find (x ∷ xs) f p (suc k , q) | false | _
-    = member-find xs f p (k , q)
+  member-find (x ∷ xs) f p (is-member (suc k) q) | false | _
+    = member-find xs f p (is-member k q)
   ... | true | _
     = (x , refl)
 
@@ -836,10 +846,10 @@ module Vec where
     | find-member xs f
   ... | false | nothing
     = nothing
-  ... | false | just (member y (k , p))
-    = just (member y (suc k , p))
+  ... | false | just (member y (is-member k p))
+    = just (member y (is-member (suc k) p))
   ... | true | _
-    = just (member x (zero , refl))
+    = just (member x (is-member zero refl))
 
   find-member-nothing
     : {A : Set}
@@ -855,10 +865,12 @@ module Vec where
     | inspect f x
     | find-member xs f
     | inspect (find-member xs) f
-  find-member-nothing _ _ _ p _ (zero , refl) | false | [ q ] | _ | _
+  find-member-nothing _ _ _ p _ (is-member zero refl)
+    | false | [ q ] | _ | _
     = Bool.¬both q p
-  find-member-nothing (_ ∷ xs) f x p _ (suc k , q) | _ | _ | nothing | [ r ]
-    = find-member-nothing xs f x p r (k , q)
+  find-member-nothing (_ ∷ xs) f x p _ (is-member (suc k) q)
+    | _ | _ | nothing | [ r ]
+    = find-member-nothing xs f x p r (is-member k q)
 
   find-member-just
     : {A : Set}

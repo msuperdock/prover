@@ -236,7 +236,7 @@ module List where
     where
 
     open Vec public
-      using (member)
+      using (is-member; member)
 
     IsMember
       : List A
@@ -474,13 +474,14 @@ module List where
       = Vec.⊆-cons x xs
 
     ⊆-cons-left
-      : (xs₁ xs₂ : List A)
-      → (x : A)
+      : {xs₂ : List A}
+      → {x : A}
+      → (xs₁ : List A)
       → IsMember xs₂ x
       → xs₁ ⊆ xs₂
       → x ∷ xs₁ ⊆ xs₂
-    ⊆-cons-left (any xs₁) (any xs₂)
-      = Vec.⊆-cons-left xs₁ xs₂
+    ⊆-cons-left (any xs₁)
+      = Vec.⊆-cons-left xs₁
 
   -- ### Find
 

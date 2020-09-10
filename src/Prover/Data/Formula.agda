@@ -920,8 +920,8 @@ module Formula where
       → (q : Map.lookup subs _≟_var v ≡ nothing)
       → (m : MatchWith subs (variable' v p) f)
       → Map.insert subs _≟_var v f q ⊆ MatchWith.substitutions m
-    insert-minimal {subs = subs} {v = v} {f = f} q (match-with subs' r s)
-      = Map.⊆-insert-left subs subs' _≟_var v f q s r
+    insert-minimal {subs = subs} {v = v} q (match-with subs' r s)
+      = Map.⊆-insert-left subs subs' _≟_var v q s r
 
     match-with?
       : (subs : Substitutions ss vs')

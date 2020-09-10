@@ -233,7 +233,7 @@ module Collection where
     where
 
     open List public
-      using (member)
+      using (is-member; member)
 
     IsMember
       : Collection R
@@ -257,7 +257,7 @@ module Collection where
       → IsMember xs x₂
       → R x₁ x₂
       → x₁ ≡ x₂
-    is-member-eq xs@(collection xs' _) (k₁ , p₁) (k₂ , p₂) r
+    is-member-eq xs@(collection xs' _) (is-member k₁ p₁) (is-member k₂ p₂) r
       = trans (sym p₁)
       $ trans (sub (List.lookup xs') (valid' xs k₁ k₂ (rewrite₂ R p₁ p₂ r)))
       $ p₂
@@ -456,16 +456,16 @@ module Collection where
       = List.⊆-cons x xs
 
     ⊆-insert-left
-      : (xs₁ xs₂ : Collection R)
+      : {x : A}
+      → (xs₁ xs₂ : Collection R)
       → (s : Symmetric R)
       → (d : Decidable R)
-      → (x : A)
       → (p : find xs₁ (Bool.from-decidable d x) ≡ nothing)
       → IsMember xs₂ x
       → xs₁ ⊆ xs₂
       → insert xs₁ s d x p ⊆ xs₂
-    ⊆-insert-left (collection xs₁ _) (collection xs₂ _) _ _ x _
-      = List.⊆-cons-left xs₁ xs₂ x
+    ⊆-insert-left (collection xs₁ _) _ _ _ _
+      = List.⊆-cons-left xs₁
 
     ⊆-find
       : {y : A}
@@ -475,10 +475,10 @@ module Collection where
       → xs₁ ⊆ xs₂
       → find xs₁ f ≡ just y
       → find xs₂ f ≡ just y
-    ⊆-find {y = y} xs₁ xs₂ f u p q₁
+    ⊆-find xs₁ xs₂ f u p q₁
       = member-find-unique xs₂ f u
         (find-true xs₁ f q₁)
-        (p y (find-just xs₁ f q₁))
+        (p (find-just xs₁ f q₁))
 
 -- ## Exports
 

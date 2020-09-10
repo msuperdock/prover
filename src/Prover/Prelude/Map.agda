@@ -246,19 +246,18 @@ module Map where
         (lookup-nothing xs d k p)
 
     ⊆-insert-left
-      : (xs₁ xs₂ : Map K A)
+      : {x : A}
+      → (xs₁ xs₂ : Map K A)
       → (d : Decidable (Equal K))
       → (k : K)
-      → (x : A)
       → (p : lookup xs₁ d k ≡ nothing)
       → lookup xs₂ d k ≡ just x
       → xs₁ ⊆ xs₂
       → insert xs₁ d k x p ⊆ xs₂
-    ⊆-insert-left xs₁ xs₂ d k x p q r
+    ⊆-insert-left xs₁ xs₂ d k p q r
       = Collection.⊆-insert-left xs₁ xs₂
         (symmetric K A)
         (decidable K A d)
-        (k , x)
         (lookup-nothing xs₁ d k p)
         (lookup-is-member xs₂ d k q) r
 
