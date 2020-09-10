@@ -276,15 +276,15 @@ module Vec where
         : {n : ℕ}
         → Vec A n
         → Vec B n
-      to xs
-        = map (Retraction.to F) xs
+      to
+        = map (Retraction.to F)
   
       from
         : {n : ℕ}
         → Vec B n
         → Vec A n
-      from ys
-        = map (Retraction.from F) ys
+      from
+        = map (Retraction.from F)
     
       to-from
         : {n : ℕ}
