@@ -7,17 +7,17 @@ open import Prover.Category.Dependent
     dependent-functor₀)
 open import Prover.Category.Dependent.Collection
   using (dependent-category-collection; dependent-functor-collection)
+open import Prover.Category.Dependent.Decidable
+  using (DependentDecidable; dependent-decidable₀)
 open import Prover.Category.Dependent.List
   using (dependent-category-list; dependent-functor-list)
+open import Prover.Category.Dependent.Relation
+  using (DependentFunctorInjective; DependentRelation;
+    dependent-functor-injective₀; dependent-relation₀)
 open import Prover.Category.Dependent.Split
   using (DependentSplitFunctor; DependentSplitFunctorSquare; cons; nil)
 open import Prover.Category.Split.Collection
   using (split-functor-collection; split-functor-square-collection)
-open import Prover.Function.Dependent.Decidable
-  using (DependentDecidable; dependent-decidable₀)
-open import Prover.Function.Dependent.Relation
-  using (DependentInjective; DependentRelation; dependent-injective₀;
-    dependent-relation₀)
 open import Prover.Prelude
 
 -- ## Types
@@ -47,7 +47,7 @@ dependent-split-functor-square-collection
   → (d₂ : DependentDecidable R₂)
   → {F : ChainFunctor C₁ C₂}
   → {F' : DependentFunctor C₁' C₂' F}
-  → (i : DependentInjective R₁ R₂ F')
+  → (i : DependentFunctorInjective R₁ R₂ F')
   → DependentSplitFunctorSquare
     (dependent-functor-list F')
     (dependent-functor-collection i)
@@ -73,25 +73,23 @@ dependent-split-functor-collection
     (λ {x = x} {y = y} f → dependent-split-functor-square-collection
       (DependentDecidable.tail d x)
       (DependentDecidable.tail d y)
-      (DependentRelation.dependent-injective R f))
+      (DependentRelation.dependent-functor-injective R f))
 
 -- ### DependentSplitFunctorSquare
 
 dependent-split-functor-square-collection
-  {n = zero} {R₁ = R₁} {R₂ = R₂} d₁ d₂ {F' = F'} i
+  {n = zero} d₁ d₂ {F' = F'} i
   = nil
     (split-functor-square-collection
-      (dependent-relation₀ R₁)
-      (dependent-relation₀ R₂)
       (dependent-decidable₀ d₁)
       (dependent-decidable₀ d₂)
       (dependent-functor₀ F')
-      (dependent-injective₀ i))
+      (dependent-functor-injective₀ i))
 dependent-split-functor-square-collection
   {n = suc _} d₁ d₂ {F = F} i
   = cons
     (λ x₁ → dependent-split-functor-square-collection
       (DependentDecidable.tail d₁ x₁)
       (DependentDecidable.tail d₂ (ChainFunctor.base F x₁))
-      (DependentInjective.tail i x₁))
+      (DependentFunctorInjective.tail i x₁))
 

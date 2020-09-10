@@ -82,3 +82,19 @@ record FunctionSquare
       → Function.base H₂ (Function.base F x₁)
         ≅ Function.base G (Function.base H₁ x₁)
 
+-- ## FunctionInjective
+
+record FunctionInjective
+  {A B : Set}
+  (R : Relation A)
+  (S : Relation B)
+  (F : Function A B)
+  : Set
+  where
+
+  field
+
+    base
+      : Injective R S
+        (Function.base F)
+

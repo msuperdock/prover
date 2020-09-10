@@ -1,4 +1,4 @@
-module Prover.Function.Dependent.Relation where
+module Prover.Category.Dependent.Relation where
 
 open import Prover.Category
   using (Category; Functor)
@@ -7,6 +7,8 @@ open import Prover.Category.Chain
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; dependent-category₀;
     dependent-functor₀)
+open import Prover.Function
+  using (FunctionInjective)
 open import Prover.Prelude
 
 -- ## Internal
@@ -23,9 +25,9 @@ module Internal where
     → DependentCategory C
     → Set₁
 
-  -- #### DependentInjective
+  -- #### DependentFunctorInjective
 
-  data DependentInjective
+  data DependentFunctorInjective
     : {n : ℕ}
     → {C D : ChainCategory n}
     → {C' : DependentCategory C}
@@ -54,21 +56,21 @@ module Internal where
     → (x : ChainCategory.Object C)
     → DependentRelation (DependentCategory.tail C' x)
 
-  dependent-relation-dependent-injective
+  dependent-relation-dependent-functor-injective
     : {n : ℕ}
     → {C : ChainCategory (suc n)}
     → {C' : DependentCategory C}
     → (R : DependentRelation C')
     → {x y : ChainCategory.Object C}
     → (f : ChainCategory.Arrow C x y)
-    → DependentInjective
+    → DependentFunctorInjective
       (dependent-relation-tail R x)
       (dependent-relation-tail R y)
       (DependentCategory.dependent-functor C' f)
 
-  -- #### DependentInjective
+  -- #### DependentFunctorInjective
 
-  dependent-injective₀
+  dependent-functor-injective₀
     : {C D : ChainCategory zero}
     → {C' : DependentCategory C}
     → {D' : DependentCategory D}
@@ -76,13 +78,13 @@ module Internal where
     → {S : DependentRelation D'}
     → {F : ChainFunctor C D}
     → {F' : DependentFunctor C' D' F}
-    → DependentInjective R S F'
-    → Injective
+    → DependentFunctorInjective R S F'
+    → FunctionInjective
       (dependent-relation₀ R)
       (dependent-relation₀ S)
-      (Functor.base (dependent-functor₀ F'))
+      (Functor.function (dependent-functor₀ F'))
 
-  dependent-injective-tail
+  dependent-functor-injective-tail
     : {n : ℕ}
     → {C D : ChainCategory (suc n)}
     → {C' : DependentCategory C}
@@ -91,9 +93,9 @@ module Internal where
     → {S : DependentRelation D'}
     → {F : ChainFunctor C D}
     → {F' : DependentFunctor C' D' F}
-    → DependentInjective R S F'
+    → DependentFunctorInjective R S F'
     → (x : ChainCategory.Object C)
-    → DependentInjective
+    → DependentFunctorInjective
       (dependent-relation-tail R x)
       (dependent-relation-tail S (ChainFunctor.base F x))
       (DependentFunctor.tail F' x)
@@ -119,7 +121,7 @@ module Internal where
           (DependentCategory.tail C' x))
       → ({x y : ChainCategory.Object C}
         → (f : ChainCategory.Arrow C x y)
-        → DependentInjective (R x) (R y)
+        → DependentFunctorInjective (R x) (R y)
           (DependentCategory.dependent-functor C' f))
       → DependentRelation C'
 
@@ -129,12 +131,12 @@ module Internal where
   dependent-relation-tail (cons R _)
     = R
 
-  dependent-relation-dependent-injective (cons _ i)
+  dependent-relation-dependent-functor-injective (cons _ i)
     = i
 
-  -- #### DependentInjective
+  -- #### DependentFunctorInjective
 
-  data DependentInjective where
+  data DependentFunctorInjective where
 
     nil
       : {C D : ChainCategory zero}
@@ -144,11 +146,11 @@ module Internal where
       → {S : DependentRelation D'}
       → {F : ChainFunctor C D}
       → {F' : DependentFunctor C' D' F}
-      → Injective
+      → FunctionInjective
         (dependent-relation₀ R)
         (dependent-relation₀ S)
-        (Functor.base (dependent-functor₀ F'))
-      → DependentInjective R S F'
+        (Functor.function (dependent-functor₀ F'))
+      → DependentFunctorInjective R S F'
 
     cons
       : {n : ℕ}
@@ -160,16 +162,16 @@ module Internal where
       → {F : ChainFunctor C D}
       → {F' : DependentFunctor C' D' F}
       → ((x : ChainCategory.Object C)
-        → DependentInjective
+        → DependentFunctorInjective
           (dependent-relation-tail R x)
           (dependent-relation-tail S (ChainFunctor.base F x))
           (DependentFunctor.tail F' x))
-      → DependentInjective R S F'
+      → DependentFunctorInjective R S F'
 
-  dependent-injective₀ (nil i)
+  dependent-functor-injective₀ (nil i)
     = i
 
-  dependent-injective-tail (cons i)
+  dependent-functor-injective-tail (cons i)
     = i
 
 -- ## Modules
@@ -190,15 +192,15 @@ open Internal public
 module DependentRelation where
 
   open Internal public using () renaming
-    ( dependent-relation-dependent-injective
-      to dependent-injective
+    ( dependent-relation-dependent-functor-injective
+      to dependent-functor-injective
     ; dependent-relation-tail
       to tail
     )
 
--- ### DependentInjective
+-- ### DependentFunctorInjective
 
-DependentInjective
+DependentFunctorInjective
   : {n : ℕ}
   → {C D : ChainCategory n}
   → {C' : DependentCategory C}
@@ -208,16 +210,16 @@ DependentInjective
   → {F : ChainFunctor C D}
   → DependentFunctor C' D' F
   → Set
-DependentInjective
-  = Internal.DependentInjective
+DependentFunctorInjective
+  = Internal.DependentFunctorInjective
 
 open Internal public
-  using (dependent-injective₀)
+  using (dependent-functor-injective₀)
 
-module DependentInjective where
+module DependentFunctorInjective where
 
   open Internal public using () renaming
-    ( dependent-injective-tail
+    ( dependent-functor-injective-tail
       to tail
     )
 

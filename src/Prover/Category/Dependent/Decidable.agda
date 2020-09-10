@@ -1,10 +1,10 @@
-module Prover.Function.Dependent.Decidable where
+module Prover.Category.Dependent.Decidable where
 
 open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Category.Dependent
   using (DependentCategory)
-open import Prover.Function.Dependent.Relation
+open import Prover.Category.Dependent.Relation
   using (DependentRelation; dependent-relation₀)
 open import Prover.Prelude
 

@@ -6,6 +6,10 @@ open import Prover.Category.Dependent
   using (DependentCategory)
 open import Prover.Category.Dependent.Collection
   using (dependent-category-collection)
+open import Prover.Category.Dependent.Decidable
+  using (DependentDecidable)
+open import Prover.Category.Dependent.Relation
+  using (DependentRelation)
 open import Prover.Category.Dependent.Split.Collection
   using (dependent-split-functor-collection)
 open import Prover.Editor
@@ -24,10 +28,6 @@ open import Prover.Function.Dependent
   using (DependentSet)
 open import Prover.Function.Dependent.Collection
   using (dependent-set-collection)
-open import Prover.Function.Dependent.Decidable
-  using (DependentDecidable)
-open import Prover.Function.Dependent.Relation
-  using (DependentRelation)
 open import Prover.Function.Dependent.Simple.Decidable
   using (DependentSimpleDecidable)
 open import Prover.Function.Dependent.Simple.Partial.Collection

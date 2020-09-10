@@ -13,6 +13,8 @@ open import Prover.Category.Partial.Collection
   using (partial-functor-collection; partial-functor-square-collection)
 open import Prover.Category.Split
   using (SplitFunctor; SplitFunctorSquare)
+open import Prover.Function
+  using (FunctionInjective)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -106,47 +108,47 @@ split-functor-collection C R d
 
 -- ## SplitFunctorSquare
 
-module SplitFunctorSquareCollection
+module _
   {C₁ C₂ : Category}
-  (R₁ : Relation (Category.Object C₁))
-  (R₂ : Relation (Category.Object C₂))
-  (d₁ : Decidable R₁)
-  (d₂ : Decidable R₂)
-  (F : Functor C₁ C₂)
-  (i : Injective R₁ R₂ (Functor.base F))
+  {R₁ : Relation (Category.Object C₁)}
+  {R₂ : Relation (Category.Object C₂)}
   where
 
-  partial-functor
-    : PartialFunctorSquare
-      (functor-list F)
-      (functor-collection R₁ R₂ F i)
-      (SplitFunctor.partial-functor (split-functor-collection C₁ R₁ d₁))
-      (SplitFunctor.partial-functor (split-functor-collection C₂ R₂ d₂))
-  partial-functor
-    = partial-functor-square-collection R₁ R₂ d₁ d₂ F i
+  module SplitFunctorSquareCollection
+    (d₁ : Decidable R₁)
+    (d₂ : Decidable R₂)
+    (F : Functor C₁ C₂)
+    (i : FunctionInjective R₁ R₂ (Functor.function F))
+    where
 
-  functor
-    : FunctorSquare
-      (functor-collection R₁ R₂ F i)
-      (functor-list F)
-      (SplitFunctor.functor (split-functor-collection C₁ R₁ d₁))
-      (SplitFunctor.functor (split-functor-collection C₂ R₂ d₂))
-  functor
-    = functor-square-collection' R₁ R₂ F i
+    partial-functor
+      : PartialFunctorSquare
+        (functor-list F)
+        (functor-collection F i)
+        (SplitFunctor.partial-functor (split-functor-collection C₁ R₁ d₁))
+        (SplitFunctor.partial-functor (split-functor-collection C₂ R₂ d₂))
+    partial-functor
+      = partial-functor-square-collection d₁ d₂ F i
 
-split-functor-square-collection
-  : {C₁ C₂ : Category}
-  → (R₁ : Relation (Category.Object C₁))
-  → (R₂ : Relation (Category.Object C₂))
-  → (d₁ : Decidable R₁)
-  → (d₂ : Decidable R₂)
-  → (F : Functor C₁ C₂)
-  → (i : Injective R₁ R₂ (Functor.base F))
-  → SplitFunctorSquare
-    (functor-list F)
-    (functor-collection R₁ R₂ F i)
-    (split-functor-collection C₁ R₁ d₁)
-    (split-functor-collection C₂ R₂ d₂)
-split-functor-square-collection R₁ R₂ d₁ d₂ F i
-  = record {SplitFunctorSquareCollection R₁ R₂ d₁ d₂ F i}
+    functor
+      : FunctorSquare
+        (functor-collection F i)
+        (functor-list F)
+        (SplitFunctor.functor (split-functor-collection C₁ R₁ d₁))
+        (SplitFunctor.functor (split-functor-collection C₂ R₂ d₂))
+    functor
+      = functor-square-collection' F i
+
+  split-functor-square-collection
+    : (d₁ : Decidable R₁)
+    → (d₂ : Decidable R₂)
+    → (F : Functor C₁ C₂)
+    → (i : FunctionInjective R₁ R₂ (Functor.function F))
+    → SplitFunctorSquare
+      (functor-list F)
+      (functor-collection F i)
+      (split-functor-collection C₁ R₁ d₁)
+      (split-functor-collection C₂ R₂ d₂)
+  split-functor-square-collection d₁ d₂ F i
+    = record {SplitFunctorSquareCollection d₁ d₂ F i}
 
