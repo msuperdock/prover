@@ -40,8 +40,6 @@ record SplitFunction
 
 -- ### Conversion
 
--- #### Retraction
-
 module _
   {A B : Set}
   where
