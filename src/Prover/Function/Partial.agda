@@ -6,20 +6,23 @@ open import Prover.Prelude
 
 -- ## PartialFunction
 
-PartialFunction
+record PartialFunction
+  (A B : Set)
   : Set
-  → Set
-  → Set
-PartialFunction A B
-  = A
-  → Maybe B
+  where
 
-module PartialFunction where
+  constructor
+
+    partial-function
+
+  field
+
+    base
+      : A
+      → Maybe B
 
   bool-function
-    : {A B : Set}
-    → PartialFunction A B
-    → BoolFunction A
-  bool-function f x
-    = Maybe.is-just (f x)
+    : BoolFunction A
+  bool-function x
+    = Maybe.is-just (base x)
 

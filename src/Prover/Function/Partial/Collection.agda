@@ -18,7 +18,7 @@ partial-function-collection
   → Decidable R
   → PartialFunction (List A) (Collection R)
 partial-function-collection {A = A} R d
-  = PartialFunctor.base
+  = PartialFunctor.partial-function
   $ partial-functor-collection
     (category-unit A) R d
 

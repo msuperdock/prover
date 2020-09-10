@@ -1,9 +1,9 @@
 module Prover.Function.Split where
 
-open import Prover.Category
-  using (Category)
-open import Prover.Category.Split
-  using (SplitFunctor)
+open import Prover.Function
+  using (Function)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Prelude
 
 -- ## SplitFunction
@@ -18,16 +18,25 @@ record SplitFunction
   field
 
     partial-function
-      : A
-      → Maybe B
+      : PartialFunction A B
+
+  open PartialFunction partial-function public
+
+  field
 
     function
-      : B
-      → A
+      : Function B A
 
-    valid
-      : (y : B)
-      → partial-function (function y) ≡ just y
+  open Function function public using () renaming
+    ( base
+      to unbase
+    )
+
+  field
+
+    base-unbase
+      : (x' : B)
+      → base (unbase x') ≡ just x'
 
 -- ### Conversion
 
@@ -43,60 +52,40 @@ module _
 
     open Retraction F public using () renaming
       ( from
-        to function
+        to unbase
       )
 
-    partial-function
+    base
       : A
       → Maybe B
-    partial-function x
+    base x
       = just (Retraction.to F x)
 
-    valid
-      : (y : B)
-      → partial-function (function y) ≡ just y
-    valid y
-      = sub just (Retraction.to-from F y)
+    partial-function
+      : PartialFunction A B
+    partial-function
+      = record
+      { base
+        = base
+      }
+
+    function
+      : Function B A
+    function
+      = record
+      { base
+        = unbase
+      }
+
+    base-unbase
+      : (x' : B)
+      → base (unbase x') ≡ just x'
+    base-unbase x'
+      = sub just (Retraction.to-from F x')
 
   split-function-from-retraction
     : Retraction A B
     → SplitFunction A B
   split-function-from-retraction F
     = record {SplitFunctionFromRetraction F}
-
--- #### SplitFunctor
-
-module _
-  {C D : Category}
-  where
-
-  module SplitFunctorBase
-    (F : SplitFunctor C D)
-    where
-
-    partial-function
-      : Category.Object C
-      → Maybe (Category.Object D)
-    partial-function
-      = SplitFunctor.base F
-
-    function
-      : Category.Object D
-      → Category.Object C
-    function
-      = SplitFunctor.unbase F
-
-    valid
-      : (y : Category.Object D)
-      → partial-function (function y) ≡ just y
-    valid
-      = SplitFunctor.base-unbase F
-
-  split-functor-base
-    : SplitFunctor C D
-    → SplitFunction
-      (Category.Object C)
-      (Category.Object D)
-  split-functor-base F
-    = record {SplitFunctorBase F}
 

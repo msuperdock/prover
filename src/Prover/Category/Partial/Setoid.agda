@@ -7,6 +7,8 @@ open import Prover.Category.Partial
 open import Prover.Category.Setoid
   using (module CategorySetoid; SetoidCategory; SetoidFunctor; category-setoid;
     functor-setoid)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Prelude
 
 -- ## PartialSetoidFunctor
@@ -25,6 +27,18 @@ record PartialSetoidFunctor
     base
       : SetoidCategory.Object C
       → Maybe (SetoidCategory.Object D)
+
+  partial-function
+    : PartialFunction
+      (SetoidCategory.Object C)
+      (SetoidCategory.Object D)
+  partial-function
+    = record
+    { base
+      = base
+    }
+
+  field
 
     map
       : {x y : SetoidCategory.Object C}

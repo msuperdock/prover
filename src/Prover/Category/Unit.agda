@@ -79,14 +79,11 @@ module _
   where
 
   module FunctorUnit
-    (f : Function A B)
+    (F : Function A B)
     where
 
-    base
-      : Category.Object (category-unit A)
-      → Category.Object (category-unit B)
-    base
-      = f
+    open Function F public
+      using (base)
 
     map
       : {x y : Category.Object (category-unit A)}
@@ -118,121 +115,114 @@ module _
     → Functor
       (category-unit A)
       (category-unit B)
-  functor-unit f
-    = record {FunctorUnit f}
+  functor-unit F
+    = record {FunctorUnit F}
   
 -- ## FunctorIdentity
 
 module _
   {A : Set}
+  {F : Function A A}
   where
 
   module FunctorIdentityUnit
-    (f : Function A A)
-    (p : FunctionIdentity f)
+    (p : FunctionIdentity F)
     where
 
-    base
-      : (x : Category.Object (category-unit A))
-      → Functor.base (functor-unit f) x ≅ x
-    base
-      = p
+    open FunctionIdentity p public
+      using (base)
 
     map
       : {x y : Category.Object (category-unit A)}
-      → (f' : Category.Arrow (category-unit A) x y)
-      → Functor.map (functor-unit f) f' ≅ f'
+      → (f : Category.Arrow (category-unit A) x y)
+      → Functor.map (functor-unit F) f ≅ f
     map {x = x} {y = y} CategoryUnit.arrow
-      = Category.arrow-eq (category-unit A) (p x) (p y) CategoryUnit.arrow
+      = Category.arrow-eq
+        (category-unit A)
+        (base x)
+        (base y)
+        CategoryUnit.arrow
 
   functor-identity-unit
-    : (f : Function A A)
-    → FunctionIdentity f
+    : FunctionIdentity F
     → FunctorIdentity
-      (functor-unit f)
-  functor-identity-unit f p
-    = record {FunctorIdentityUnit f p}
+      (functor-unit F)
+  functor-identity-unit p
+    = record {FunctorIdentityUnit p}
 
 -- ## FunctorCompose
 
 module _
   {A B C : Set}
+  {F : Function B C}
+  {G : Function A B}
+  {H : Function A C}
   where
 
   module FunctorComposeUnit
-    (f : Function B C)
-    (g : Function A B)
-    (h : Function A C)
-    (p : FunctionCompose f g h)
+    (p : FunctionCompose F G H)
     where
 
-    base
-      : (x : Category.Object (category-unit A))
-      → Functor.base (functor-unit h) x
-        ≅ Functor.base (functor-unit f) (Functor.base (functor-unit g) x)
-    base
-      = p
+    open FunctionCompose p public
+      using (base)
 
     map
       : {x y : Category.Object (category-unit A)}
-      → (f' : Category.Arrow (category-unit A) x y)
-      → Functor.map (functor-unit h) f'
-        ≅ Functor.map (functor-unit f) (Functor.map (functor-unit g) f')
+      → (f : Category.Arrow (category-unit A) x y)
+      → Functor.map (functor-unit H) f
+        ≅ Functor.map (functor-unit F) (Functor.map (functor-unit G) f)
     map {x = x} {y = y} _
-      = Category.arrow-eq (category-unit C) (p x) (p y) CategoryUnit.arrow
+      = Category.arrow-eq
+        (category-unit C)
+        (base x)
+        (base y)
+        CategoryUnit.arrow
 
   functor-compose-unit
-    : (f : Function B C)
-    → (g : Function A B)
-    → (h : Function A C)
-    → FunctionCompose f g h
+    : FunctionCompose F G H
     → FunctorCompose
-      (functor-unit f)
-      (functor-unit g)
-      (functor-unit h)
-  functor-compose-unit f g h p
-    = record {FunctorComposeUnit f g h p}
+      (functor-unit F)
+      (functor-unit G)
+      (functor-unit H)
+  functor-compose-unit p
+    = record {FunctorComposeUnit p}
 
 -- ## FunctorSquare
 
 module _
   {A₁ A₂ B₁ B₂ : Set}
+  {F : Function A₁ A₂}
+  {G : Function B₁ B₂}
+  {H₁ : Function A₁ B₁}
+  {H₂ : Function A₂ B₂}
   where
 
   module FunctorSquareUnit
-    (f : Function A₁ A₂)
-    (g : Function B₁ B₂)
-    (h₁ : Function A₁ B₁)
-    (h₂ : Function A₂ B₂)
-    (s : FunctionSquare f g h₁ h₂)
+    (s : FunctionSquare F G H₁ H₂)
     where
 
-    base
-      : (x₁ : Category.Object (category-unit A₁))
-      → Functor.base (functor-unit h₂) (Functor.base (functor-unit f) x₁) 
-        ≅ Functor.base (functor-unit g) (Functor.base (functor-unit h₁) x₁)
-    base
-      = s
+    open FunctionSquare s public
+      using (base)
   
     map
       : {x₁ y₁ : Category.Object (category-unit A₁)}
-      → (f₁' : Category.Arrow (category-unit A₁) x₁ y₁)
-      → Functor.map (functor-unit h₂) (Functor.map (functor-unit f) f₁')
-        ≅ Functor.map (functor-unit g) (Functor.map (functor-unit h₁) f₁')
+      → (f₁ : Category.Arrow (category-unit A₁) x₁ y₁)
+      → Functor.map (functor-unit H₂) (Functor.map (functor-unit F) f₁)
+        ≅ Functor.map (functor-unit G) (Functor.map (functor-unit H₁) f₁)
     map {x₁ = x₁} {y₁ = y₁} _
-      = Category.arrow-eq (category-unit B₂) (s x₁) (s y₁) CategoryUnit.arrow
+      = Category.arrow-eq
+        (category-unit B₂)
+        (base x₁)
+        (base y₁)
+        CategoryUnit.arrow
 
   functor-square-unit
-    : (f : Function A₁ A₂)
-    → (g : Function B₁ B₂)
-    → (h₁ : Function A₁ B₁)
-    → (h₂ : Function A₂ B₂)
-    → FunctionSquare f g h₁ h₂
+    : FunctionSquare F G H₁ H₂
     → FunctorSquare
-      (functor-unit f)
-      (functor-unit g)
-      (functor-unit h₁)
-      (functor-unit h₂)
-  functor-square-unit f g h₁ h₂ s
-    = record {FunctorSquareUnit f g h₁ h₂ s}
+      (functor-unit F)
+      (functor-unit G)
+      (functor-unit H₁)
+      (functor-unit H₂)
+  functor-square-unit s
+    = record {FunctorSquareUnit s}
 

@@ -9,6 +9,8 @@ open import Prover.Category.Partial
     partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
+open import Prover.Function.Split
+  using (SplitFunction)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -37,6 +39,8 @@ record SplitFunctor
   open Functor functor public using () renaming
     ( base
       to unbase
+    ; function
+      to function
     ; map
       to unmap
     ; map-identity
@@ -69,6 +73,20 @@ record SplitFunctor
       → (x : Category.Object C)
       → (p : base x ≡ just x')
       → map p (base-unbase x') (normalize-arrow x p) ≡ Category.identity D x'
+
+  split-function
+    : SplitFunction
+      (Category.Object C)
+      (Category.Object D)
+  split-function
+    = record
+    { partial-function
+      = partial-function
+    ; function
+      = function
+    ; base-unbase
+      = base-unbase
+    }
 
 -- ### Compose
 

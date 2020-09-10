@@ -16,8 +16,8 @@ partial-function-list
   : {A B : Set}
   → PartialFunction A B
   → PartialFunction (List A) (List B)
-partial-function-list f
-  = PartialSetoidFunctor.base
+partial-function-list F
+  = PartialSetoidFunctor.partial-function
   $ partial-setoid-functor-list
-    (partial-functor-unit f)
+    (partial-functor-unit F)
 

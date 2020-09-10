@@ -14,6 +14,10 @@ open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
   using (Variables; var_∈_)
+open import Prover.Function
+  using (function)
+open import Prover.Function.Partial
+  using (partial-function)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.Prelude
@@ -1093,10 +1097,10 @@ module Internal where
   sandbox-state-split-function _ _ _
     = record
     { partial-function
-      = sandbox-state-to-formula
+      = partial-function sandbox-state-to-formula
     ; function
-      = sandbox-state-from-formula
-    ; valid
+      = function sandbox-state-from-formula
+    ; base-unbase
       = sandbox-state-to-from-formula
     }
   

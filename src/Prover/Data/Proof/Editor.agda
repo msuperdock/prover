@@ -42,6 +42,10 @@ open import Prover.Editor.Map
   using (flat-editor-map; simple-editor-map-event; simple-editor-map-view)
 open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
+open import Prover.Function
+  using (function)
+open import Prover.Function.Partial
+  using (partial-function)
 open import Prover.Function.Split
   using (SplitFunction)
 open import Prover.View.Command
@@ -478,10 +482,10 @@ proof-split-function
 proof-split-function rs r
   = record
   { partial-function
-    = decode-proof rs r
+    = partial-function (decode-proof rs r)
   ; function
-    = encode-proof
-  ; valid
+    = function encode-proof
+  ; base-unbase
     = decode-encode-proof
   }
 
@@ -743,7 +747,7 @@ module _
         (ProofChildEventStack infer)
         (Result s sp)
     flat-editor s sp
-      = flat-editor-map (result-map s sp)
+      = flat-editor-map (partial-function (result-map s sp))
       $ command-flat-editor "i"
 
     update

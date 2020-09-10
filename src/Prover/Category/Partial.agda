@@ -2,8 +2,8 @@ module Prover.Category.Partial where
 
 open import Prover.Category
   using (Category; Functor)
-open import Prover.Function.Bool
-  using (BoolFunction)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -22,6 +22,21 @@ record PartialFunctor
     base
       : Category.Object C
       → Maybe (Category.Object D)
+
+  partial-function
+    : PartialFunction
+      (Category.Object C)
+      (Category.Object D)
+  partial-function
+    = record
+    { base
+      = base
+    }
+
+  open PartialFunction partial-function public
+    using (bool-function)
+
+  field
 
     map
       : {x y : Category.Object C}
@@ -67,11 +82,6 @@ record PartialFunctor
     | irrelevant q₁ q₂
   ... | refl | refl
     = refl
-
-  bool-function
-    : BoolFunction (Category.Object C)
-  bool-function x
-    = Maybe.is-just (base x)
 
 -- ### Compose
 

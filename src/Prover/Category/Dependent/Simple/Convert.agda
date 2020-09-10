@@ -181,7 +181,7 @@ dependent-category-simple
 dependent-functor-simple
   {n = zero} F'
   = nil
-    (Functor.base
+    (Functor.function
       (dependent-functor₀ F'))
 dependent-functor-simple
   {n = suc _} F'
@@ -196,7 +196,7 @@ dependent-functor-simple
 dependent-functor-identity-simple
   {n = zero} p
   = nil
-    (FunctorIdentity.base
+    (FunctorIdentity.function
       (dependent-functor-identity₀ p))
 dependent-functor-identity-simple
   {n = suc _} {C = C} {C' = C'} p
@@ -216,7 +216,7 @@ dependent-functor-identity-simple-eq _ _ refl
 dependent-functor-compose-simple
   {n = zero} p
   = nil
-    (FunctorCompose.base
+    (FunctorCompose.function
       (dependent-functor-compose₀ p))
 dependent-functor-compose-simple
   {n = suc _} {E = E} {E' = E'} p
@@ -236,7 +236,7 @@ dependent-functor-compose-simple-eq _ _ refl
 dependent-functor-square-simple
   {n = zero} s
   = nil
-    (FunctorSquare.base
+    (FunctorSquare.function
       (dependent-functor-square₀ s))
 dependent-functor-square-simple
   {n = suc _} {D₂ = D₂} {D₂' = D₂'} s

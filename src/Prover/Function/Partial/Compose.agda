@@ -15,9 +15,9 @@ partial-function-compose
   → PartialFunction B C
   → PartialFunction A B
   → PartialFunction A C
-partial-function-compose f g
-  = PartialFunctor.base
+partial-function-compose F G
+  = PartialFunctor.partial-function
   $ partial-functor-compose
-    (partial-functor-unit f)
-    (partial-functor-unit g)
+    (partial-functor-unit F)
+    (partial-functor-unit G)
 

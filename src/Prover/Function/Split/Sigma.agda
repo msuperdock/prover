@@ -21,7 +21,7 @@ module _
   module SplitFunctionSigma
     (B₂ : B₁ → Set)
     (F₁ : SplitFunction A₁ B₁)
-    (F₂ : (y₁ : B₁) → SplitFunction A₂ (B₂ y₁))
+    (F₂ : (x₁' : B₁) → SplitFunction A₂ (B₂ x₁'))
     where
 
     partial-function
@@ -31,6 +31,8 @@ module _
         (SplitFunction.partial-function F₁)
         (λ y₁ → SplitFunction.partial-function (F₂ y₁))
 
+    open PartialFunction partial-function
+
     function
       : Function (Σ B₁ B₂) (A₁ × A₂)
     function
@@ -38,24 +40,27 @@ module _
         (SplitFunction.function F₁)
         (λ y₁ → SplitFunction.function (F₂ y₁))
 
-    valid
-      : (y : Σ B₁ B₂)
-      → partial-function (function y) ≡ just y
-    valid (y₁ , y₂)
-      with SplitFunction.partial-function F₁
-        (SplitFunction.function F₁ y₁)
-      | SplitFunction.valid F₁ y₁
+    open Function function using () renaming
+      ( base
+        to unbase
+      )
+
+    base-unbase
+      : (x' : Σ B₁ B₂)
+      → base (unbase x') ≡ just x'
+    base-unbase (x₁' , x₂')
+      with SplitFunction.base F₁ (SplitFunction.unbase F₁ x₁')
+      | SplitFunction.base-unbase F₁ x₁'
     ... | _ | refl
-      with SplitFunction.partial-function (F₂ y₁)
-        (SplitFunction.function (F₂ y₁) y₂)
-      | SplitFunction.valid (F₂ y₁) y₂
+      with SplitFunction.base (F₂ x₁') (SplitFunction.unbase (F₂ x₁') x₂')
+      | SplitFunction.base-unbase (F₂ x₁') x₂'
     ... | _ | refl
       = refl
 
   split-function-sigma
     : (B₂ : B₁ → Set)
     → SplitFunction A₁ B₁
-    → ((y₁ : B₁) → SplitFunction A₂ (B₂ y₁))
+    → ((x₁' : B₁) → SplitFunction A₂ (B₂ x₁'))
     → SplitFunction (A₁ × A₂) (Σ B₁ B₂)
   split-function-sigma B₂ F₁ F₂
     = record {SplitFunctionSigma B₂ F₁ F₂}

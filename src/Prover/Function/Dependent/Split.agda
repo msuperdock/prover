@@ -8,8 +8,10 @@ open import Prover.Category.Dependent
   using (DependentCategory; dependent-category₀)
 open import Prover.Category.Dependent.Split
   using (DependentSplitFunctor; dependent-split-functor₀)
+open import Prover.Category.Split
+  using (SplitFunctor)
 open import Prover.Function.Split
-  using (SplitFunction; split-functor-base)
+  using (SplitFunction)
 open import Prover.Function.Split.Compose
   using (split-function-compose)
 open import Prover.Prelude
@@ -99,7 +101,7 @@ module Internal where
     {n = zero} F G
     = nil
       (split-function-compose
-        (split-functor-base
+        (SplitFunctor.split-function
           (dependent-split-functor₀ F))
         (dependent-split-function₀ G))
   dependent-split-function-compose'

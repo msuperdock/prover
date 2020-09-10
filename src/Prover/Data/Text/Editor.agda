@@ -24,6 +24,10 @@ open import Prover.Editor.Map
     split-editor-map-simple)
 open import Prover.Editor.Unit
   using (split-editor-unit)
+open import Prover.Function
+  using (Function)
+open import Prover.Function.Partial
+  using (PartialFunction)
 open import Prover.Function.Split
   using (SplitFunction; split-function-from-retraction)
 open import Prover.View.Command
@@ -320,24 +324,44 @@ module TextWithSplitFunction
   (p : Char → Bool)
   where
 
-  partial-function
+  base
     : TextWithState p
     → Maybe (TextWith p)
-  partial-function []
+  base []
     = nothing
-  partial-function (c ∷ cs)
+  base (c ∷ cs)
     = just (c ∷ cs)
 
-  function
+  partial-function
+    : PartialFunction
+      (TextWithState p)
+      (TextWith p)
+  partial-function
+    = record
+    { base
+      = base
+    }
+
+  unbase
     : TextWith p
     → TextWithState p
-  function (c ∷ cs)
+  unbase (c ∷ cs)
     = c ∷ cs
 
-  valid
+  function
+    : Function
+      (TextWith p)
+      (TextWithState p)
+  function
+    = record
+    { base
+      = unbase
+    }
+
+  base-unbase
     : (t : TextWith p)
-    → partial-function (function t) ≡ just t
-  valid (_ ∷ _)
+    → base (unbase t) ≡ just t
+  base-unbase (_ ∷ _)
     = refl
 
 text-with-split-function

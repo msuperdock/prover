@@ -30,6 +30,8 @@ module _
         (SplitFunction.partial-function F₁)
         (SplitFunction.partial-function F₂)
 
+    open PartialFunction partial-function
+
     function
       : Function (B₁ ⊔ B₂) (A₁ ⊔ A₂)
     function
@@ -37,17 +39,22 @@ module _
         (SplitFunction.function F₁)
         (SplitFunction.function F₂)
 
-    valid
-      : (y : B₁ ⊔ B₂)
-      → partial-function (function y) ≡ just y
-    valid (ι₁ y₁)
-      with SplitFunction.partial-function F₁ (SplitFunction.function F₁ y₁)
-      | SplitFunction.valid F₁ y₁
+    open Function function using () renaming
+      ( base
+        to unbase
+      )
+
+    base-unbase
+      : (x' : B₁ ⊔ B₂)
+      → base (unbase x') ≡ just x'
+    base-unbase (ι₁ x₁')
+      with SplitFunction.base F₁ (SplitFunction.unbase F₁ x₁')
+      | SplitFunction.base-unbase F₁ x₁'
     ... | _ | refl
       = refl
-    valid (ι₂ y₂)
-      with SplitFunction.partial-function F₂ (SplitFunction.function F₂ y₂)
-      | SplitFunction.valid F₂ y₂
+    base-unbase (ι₂ x₂')
+      with SplitFunction.base F₂ (SplitFunction.unbase F₂ x₂')
+      | SplitFunction.base-unbase F₂ x₂'
     ... | _ | refl
       = refl
 

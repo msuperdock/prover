@@ -17,14 +17,11 @@ module _
   where
 
   module PartialFunctorUnit
-    (f : PartialFunction A B)
+    (F : PartialFunction A B)
     where
 
-    base
-      : Category.Object (category-unit A)
-      → Maybe (Category.Object (category-unit B))
-    base
-      = f
+    open PartialFunction F public
+      using (base)
 
     map
       : {x y : Category.Object (category-unit A)}
@@ -65,6 +62,6 @@ module _
     → PartialFunctor
       (category-unit A)
       (category-unit B)
-  partial-functor-unit f
-    = record {PartialFunctorUnit f}
+  partial-functor-unit F
+    = record {PartialFunctorUnit F}
 

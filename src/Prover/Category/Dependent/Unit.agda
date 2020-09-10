@@ -195,10 +195,9 @@ dependent-functor-unit
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-unit
-  {n = zero} {F' = F'} p
+  {n = zero} p
   = nil
     (functor-identity-unit
-      (dependent-simple-functor₀ F')
       (dependent-simple-functor-identity₀ p))
 dependent-functor-identity-unit
   {n = suc _} {C = C} {C' = C'} p
@@ -216,12 +215,9 @@ dependent-functor-identity-unit-eq _ _ refl
 -- ### DependentFunctorCompose
 
 dependent-functor-compose-unit
-  {n = zero} {F' = F'} {G' = G'} {H' = H'} p
+  {n = zero} p
   = nil
     (functor-compose-unit
-      (dependent-simple-functor₀ F')
-      (dependent-simple-functor₀ G')
-      (dependent-simple-functor₀ H')
       (dependent-simple-functor-compose₀ p))
 dependent-functor-compose-unit
   {n = suc _} {E = E} {E' = E'} p
@@ -239,13 +235,9 @@ dependent-functor-compose-unit-eq _ _ refl
 -- ### DependentFunctorSquare
 
 dependent-functor-square-unit
-  {n = zero} {F' = F'} {G' = G'} {H₁' = H₁'} {H₂' = H₂'} s
+  {n = zero} s
   = nil
     (functor-square-unit
-      (dependent-simple-functor₀ F')
-      (dependent-simple-functor₀ G')
-      (dependent-simple-functor₀ H₁')
-      (dependent-simple-functor₀ H₂')
       (dependent-simple-functor-square₀ s))
 dependent-functor-square-unit
   {n = suc _} {D₂ = D₂} {D₂' = D₂'} s

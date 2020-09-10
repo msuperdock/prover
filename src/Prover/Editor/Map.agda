@@ -20,7 +20,7 @@ open import Prover.Function.Partial
 open import Prover.Function.Partial.Compose
   using (partial-function-compose)
 open import Prover.Function.Split
-  using (SplitFunction; split-functor-base)
+  using (SplitFunction)
 open import Prover.Function.Split.Compose
   using (split-function-compose)
 open import Prover.Prelude
@@ -691,7 +691,7 @@ module _
       : SplitFunction P (Category.Object D)
     pure-split-function
       = split-function-compose
-        (split-functor-base F)
+        (SplitFunctor.split-function F)
         (SplitMainEditor.pure-split-function e)
 
     split-functor
@@ -727,7 +727,7 @@ module _
   where
 
   module FlatEditorMap
-    (f : A → Maybe B)
+    (F : PartialFunction A B)
     (e : FlatEditor V E A)
     where
 
@@ -743,16 +743,16 @@ module _
     ... | ι₂ s'
       = ι₂ s'
     ... | ι₁ x
-      with f x
+      with PartialFunction.base F x
     ... | nothing
       = ι₂ (s , sp)
     ... | just y
       = ι₁ y
 
   flat-editor-map
-    : (A → Maybe B)
+    : PartialFunction A B
     → FlatEditor V E A
     → FlatEditor V E B
-  flat-editor-map f e
-    = record {FlatEditorMap f e}
+  flat-editor-map F e
+    = record {FlatEditorMap F e}
 

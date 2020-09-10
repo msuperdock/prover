@@ -501,12 +501,8 @@ module _
     (e : SplitEditor V E C)
     where
 
-    open SplitEditor e public using () renaming
-      ( State
-        to State
-      ; base
-        to partial-function
-      )
+    open SplitEditor e public
+      using (State; partial-function)
 
     simple-editor 
       : SimpleEditor V E State
@@ -544,11 +540,11 @@ record MainEditor
       : SplitFunction S State
 
   open SplitFunction split-function public using () renaming
-    ( partial-function
+    ( base
       to decode
-    ; function
+    ; unbase
       to encode
-    ; valid
+    ; base-unbase
       to decode-encode
     )
 
@@ -607,11 +603,11 @@ record SplitMainEditor
       : SplitFunction S State
 
   open SplitFunction state-split-function public using () renaming
-    ( partial-function
+    ( base
       to state-decode
-    ; function
+    ; unbase
       to state-encode
-    ; valid
+    ; base-unbase
       to state-decode-encode
     )
 
@@ -621,11 +617,11 @@ record SplitMainEditor
       : SplitFunction P (Category.Object C)
 
   open SplitFunction pure-split-function public using () renaming
-    ( partial-function
+    ( base
       to pure-decode
-    ; function
+    ; unbase
       to pure-encode
-    ; valid
+    ; base-unbase
       to pure-decode-encode
     )
 

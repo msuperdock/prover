@@ -17,9 +17,9 @@ partial-function-product
   → PartialFunction A₁ B₁
   → PartialFunction A₂ B₂
   → PartialFunction (A₁ × A₂) (B₁ × B₂)
-partial-function-product f₁ f₂
-  = PartialFunctor.base
+partial-function-product F₁ F₂
+  = PartialFunctor.partial-function
   $ partial-functor-product
-    (partial-functor-unit f₁)
-    (partial-functor-unit f₂)
+    (partial-functor-unit F₁)
+    (partial-functor-unit F₂)
 

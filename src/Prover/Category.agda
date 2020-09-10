@@ -1,5 +1,8 @@
 module Prover.Category where
 
+open import Prover.Function
+  using (Function; FunctionCompose; FunctionEqual; FunctionIdentity;
+    FunctionSquare)
 open import Prover.Prelude
 
 -- ## Category
@@ -112,6 +115,18 @@ record Functor
     base
       : Category.Object C
       → Category.Object D
+
+  function
+    : Function
+      (Category.Object C)
+      (Category.Object D)
+  function
+    = record
+    { base
+      = base
+    }
+
+  field
 
     map
       : {x y : Category.Object C}
@@ -266,6 +281,18 @@ record FunctorEqual
       : (x : Category.Object C)
       → Functor.base F₁ x ≅ Functor.base F₂ x
   
+  function
+    : FunctionEqual
+      (Functor.function F₁)
+      (Functor.function F₂)
+  function
+    = record
+    { base
+      = base
+    }
+
+  field
+
     map
       : {x y : Category.Object C}
       → (f : Category.Arrow C x y)
@@ -385,6 +412,17 @@ record FunctorIdentity
       : (x₁ : Category.Object C₁)
       → Functor.base F x₁ ≅ x₁
 
+  function
+    : FunctionIdentity
+      (Functor.function F)
+  function
+    = record
+    { base
+      = base
+    }
+
+  field
+
     map
       : {x₁ y₁ : Category.Object C₁}
       → (f₁ : Category.Arrow C₁ x₁ y₁)
@@ -427,6 +465,19 @@ record FunctorCompose
     base
       : (x : Category.Object C)
       → Functor.base H x ≅ Functor.base F (Functor.base G x)
+
+  function
+    : FunctionCompose
+      (Functor.function F)
+      (Functor.function G)
+      (Functor.function H)
+  function
+    = record
+    { base
+      = base
+    }
+
+  field
 
     map
       : {x y : Category.Object C}
@@ -476,6 +527,20 @@ record FunctorSquare
       : (x₁ : Category.Object C₁)
       → Functor.base H₂ (Functor.base F x₁) 
         ≅ Functor.base G (Functor.base H₁ x₁)
+
+  function
+    : FunctionSquare
+      (Functor.function F)
+      (Functor.function G)
+      (Functor.function H₁)
+      (Functor.function H₂)
+  function
+    = record
+    { base
+      = base
+    }
+
+  field
   
     map
       : {x₁ y₁ : Category.Object C₁}

@@ -43,6 +43,8 @@ open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
 open import Prover.Editor.Unit
   using (split-editor-unit)
+open import Prover.Function.Partial
+  using (partial-function)
 open import Prover.View.Command
   using (Command; CommandFlatViewStack; CommandPath)
 open import Prover.View.Text
@@ -685,7 +687,7 @@ module FormulaSimpleChildEditorVariable
       (FormulaChildEventStack variable')
       (Result s sp)
   flat-editor _ _
-    = flat-editor-map (Variables.find-member vs)
+    = flat-editor-map (partial-function (Variables.find-member vs))
     $ command-flat-editor "v"
 
   update
@@ -740,7 +742,7 @@ module FormulaSimpleChildEditorSymbol
       (FormulaChildEventStack symbol)
       (Result s sp)
   flat-editor _ _
-    = flat-editor-map (Symbols.lookup-member ss)
+    = flat-editor-map (partial-function (Symbols.lookup-member ss))
     $ command-flat-editor "s"
 
   update

@@ -55,7 +55,7 @@ module _
         : (x' : Category.Object (category-unit B))
         → base (unbase x') ≡ just x'
       base-unbase
-        = SplitFunction.valid F
+        = SplitFunction.base-unbase F
   
       map-unmap
         : {x' y' : Category.Object (category-unit B)}
