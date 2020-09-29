@@ -1,12 +1,11 @@
 module Prover.Category.Dependent.List where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
+    ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; cons; dependent-category₀;
-    dependent-functor₀; dependent-functor-compose₀; dependent-functor-identity₀;
-    dependent-functor-square₀; nil)
+    DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.List
   using (category-list; functor-compose-list; functor-identity-list;
     functor-list; functor-square-list)
@@ -43,6 +42,7 @@ dependent-functor-identity-list
   → {C' : DependentCategory C}
   → {F : ChainFunctor C C}
   → {F' : DependentFunctor C' C' F}
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-list F')
@@ -56,6 +56,7 @@ dependent-functor-identity-list-eq
   → {F : ChainFunctor (C x₁) (C x₂)}
   → {F' : DependentFunctor (C' x₁) (C' x₂) F}
   → x₂ ≡ x₁
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-list F')
@@ -74,6 +75,7 @@ dependent-functor-compose-list
   → {F' : DependentFunctor D' E' F}
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' E' H}
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-list F')
@@ -96,6 +98,7 @@ dependent-functor-compose-list-eq
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' (E' x₂) H}
   → x₂ ≡ x₁
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-list F')
@@ -119,6 +122,7 @@ dependent-functor-square-list
   → {G' : DependentFunctor D₁' D₂' G}
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' D₂' H₂}
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-list F')
@@ -145,6 +149,7 @@ dependent-functor-square-list-eq
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' (D₂' x₂) H₂}
   → x₂ ≡ x₁
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-list F')
@@ -156,94 +161,96 @@ dependent-functor-square-list-eq
 
 -- ### DependentCategory
 
-dependent-category-list
-  {n = zero} C'
-  = nil
-    (category-list
-      (dependent-category₀ C'))
-dependent-category-list
-  {n = suc _} C'
-  = cons
-    (λ x → dependent-category-list
-      (DependentCategory.tail C' x))
-    (λ f → dependent-functor-list
-      (DependentCategory.dependent-functor C' f))
-    (λ x → dependent-functor-identity-list
-      (DependentCategory.dependent-functor-identity C' x))
-    (λ f g → dependent-functor-compose-list
-      (DependentCategory.dependent-functor-compose C' f g))
+dependent-category-list {n = zero} C'
+  = category-list C'
+
+dependent-category-list {n = suc _} {C = C} C'
+  = record
+  { category
+    = λ x → dependent-category-list
+      (DependentCategory.category C' x)
+  ; functor
+    = λ f → dependent-functor-list
+      (DependentCategory.functor C' f)
+  ; functor-identity
+    = λ x → dependent-functor-identity-list
+      (ChainCategory.functor-identity C x)
+      (DependentCategory.functor-identity C' x)
+  ; functor-compose
+    = λ f g → dependent-functor-compose-list
+      (ChainCategory.functor-compose C f g)
+      (DependentCategory.functor-compose C' f g)
+  }
 
 -- ### DependentFunctor
 
-dependent-functor-list
-  {n = zero} F'
-  = nil
-    (functor-list
-      (dependent-functor₀ F'))
-dependent-functor-list
-  {n = suc _} F'
-  = cons
-    (λ x → dependent-functor-list
-      (DependentFunctor.tail F' x))
-    (λ f → dependent-functor-square-list
-      (DependentFunctor.dependent-functor-square F' f))
+dependent-functor-list {n = zero} F'
+  = functor-list F'
+
+dependent-functor-list {n = suc _} {F = F} F'
+  = record
+  { functor
+    = λ x → dependent-functor-list
+      (DependentFunctor.functor F' x)
+  ; functor-square
+    = λ f → dependent-functor-square-list
+      (ChainFunctor.functor-square F f)
+      (DependentFunctor.functor-square F' f)
+  }
 
 -- ### DependentFunctorIdentity
 
-dependent-functor-identity-list
-  {n = zero} p
-  = nil
-    (functor-identity-list
-      (dependent-functor-identity₀ p))
-dependent-functor-identity-list
-  {n = suc _} {C = C} {C' = C'} p
-  = cons
-    (DependentFunctorIdentity.head p)
-    (λ x → dependent-functor-identity-list-eq
-      (ChainCategory.tail C)
-      (DependentCategory.tail C')
-      (DependentFunctorIdentity.base p x)
-      (DependentFunctorIdentity.tail p x))
+dependent-functor-identity-list {n = zero} _ p'
+  = functor-identity-list p'
+
+dependent-functor-identity-list {n = suc _} {C = C} {C' = C'} p p'
+  = record
+  { functor
+    = λ x → dependent-functor-identity-list-eq
+      (ChainCategory.category' C)
+      (DependentCategory.category C')
+      (ChainFunctorIdentity.base p x)
+      (ChainFunctorIdentity.functor' p x)
+      (DependentFunctorIdentity.functor p' x)
+  }
 
 dependent-functor-identity-list-eq _ _ refl
   = dependent-functor-identity-list
 
 -- ### DependentFunctorCompose
 
-dependent-functor-compose-list
-  {n = zero} p
-  = nil
-    (functor-compose-list
-      (dependent-functor-compose₀ p))
-dependent-functor-compose-list
-  {n = suc _} {E = E} {E' = E'} p
-  = cons
-    (DependentFunctorCompose.head p)
-    (λ x → dependent-functor-compose-list-eq
-      (ChainCategory.tail E)
-      (DependentCategory.tail E')
-      (DependentFunctorCompose.base p x)
-      (DependentFunctorCompose.tail p x))
+dependent-functor-compose-list {n = zero} _ p'
+  = functor-compose-list p'
+
+dependent-functor-compose-list {n = suc _} {E = E} {E' = E'} p p'
+  = record
+  { functor
+    = λ x → dependent-functor-compose-list-eq
+      (ChainCategory.category' E)
+      (DependentCategory.category E')
+      (ChainFunctorCompose.base p x)
+      (ChainFunctorCompose.functor' p x)
+      (DependentFunctorCompose.functor p' x)
+  }
 
 dependent-functor-compose-list-eq _ _ refl
   = dependent-functor-compose-list
 
 -- ### DependentFunctorSquare
 
-dependent-functor-square-list
-  {n = zero} s
-  = nil
-    (functor-square-list
-      (dependent-functor-square₀ s))
-dependent-functor-square-list
-  {n = suc _} {D₂ = D₂} {D₂' = D₂'} s
-  = cons
-    (DependentFunctorSquare.head s)
-    (λ x₁ → dependent-functor-square-list-eq
-      (ChainCategory.tail D₂)
-      (DependentCategory.tail D₂')
-      (DependentFunctorSquare.base s x₁)
-      (DependentFunctorSquare.tail s x₁))
+dependent-functor-square-list {n = zero} _ s'
+  = functor-square-list s'
+
+dependent-functor-square-list {n = suc _} {D₂ = D₂} {D₂' = D₂'} s s'
+  = record
+  { functor
+    = λ x₁ → dependent-functor-square-list-eq
+      (ChainCategory.category' D₂)
+      (DependentCategory.category D₂')
+      (ChainFunctorSquare.base s x₁)
+      (ChainFunctorSquare.functor' s x₁)
+      (DependentFunctorSquare.functor s' x₁)
+  }
 
 dependent-functor-square-list-eq _ _ refl
   = dependent-functor-square-list

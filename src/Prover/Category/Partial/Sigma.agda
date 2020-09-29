@@ -56,7 +56,7 @@ module _
       ; arrow₂
         = Dependent₁PartialFunctor.map F₂ y₁
           (trans (sub (Dependent₁PartialFunctor.base F₂ y₁) (sym p₂))
-            (Dependent₁PartialFunctor.base-commutative F₂ f₁ x₂ q₂)) r₂ f₂
+            (Dependent₁PartialFunctor.base-square F₂ f₁ x₂ q₂)) r₂ f₂
       ; valid
         = refl
       }
@@ -95,7 +95,7 @@ module _
             (trans
               (sub (Dependent₁PartialFunctor.base F₂ x₁)
                 (sym (Dependent₁Category.base-identity C₂ x₁ x₂)))
-              (Dependent₁PartialFunctor.base-commutative F₂
+              (Dependent₁PartialFunctor.base-square F₂
                 (Category.identity C₁ x₁) x₂ p₂)) p₂
             (Dependent₁Category.base-identity D₂ x₁ x₂'))
   
@@ -114,7 +114,7 @@ module _
         → w₂'' ≡ w₂'
         → Dependent₁PartialFunctor.map F₂ x₁ p₂ q₂ g₂ ≅ g₂'
         → Dependent₁PartialFunctor.map F₂ x₁ p₂ s₂
-          (Dependent₁Category.compose-eq C₂ x₁ t₂ f₂ g₂)
+          (Dependent₁Category.compose-eq' C₂ x₁ t₂ f₂ g₂)
         ≅ Dependent₁Category.compose D₂ x₁
           (Dependent₁PartialFunctor.map F₂ x₁ r₂ s₂ f₂) g₂'
       map-compose₂ x₁ p₂ q₂ r₂ s₂ refl f₂ g₂ refl refl
@@ -136,15 +136,14 @@ module _
         → (f₂ : Dependent₁Category.Arrow C₂ x₁ x₂ y₂)
         → Dependent₁Category.base D₂ f₁ x₂' ≡ y₂''
         → Dependent₁PartialFunctor.map F₂ y₁ r₂
-          (Dependent₁PartialFunctor.base-commutative F₂ f₁ y₂ q₂)
+          (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂)
           (Dependent₁Category.map C₂ f₁ f₂)
         ≅ Dependent₁Category.map D₂ f₁
           (Dependent₁PartialFunctor.map F₂ x₁ p₂ q₂ f₂)
       map-compose₂' {x₂ = x₂} f₁ p₂ q₂ r₂ f₂ refl
-        with irrelevant r₂
-          (Dependent₁PartialFunctor.base-commutative F₂ f₁ x₂ p₂)
+        with irrelevant r₂ (Dependent₁PartialFunctor.base-square F₂ f₁ x₂ p₂)
       ... | refl
-        = Dependent₁PartialFunctor.map-commutative F₂ f₁ p₂ q₂ f₂
+        = Dependent₁PartialFunctor.map-square F₂ f₁ p₂ q₂ f₂
   
       map-compose
         : {x y z : Category.Object (category-sigma C₂)}
@@ -170,21 +169,21 @@ module _
         = CategorySigma.arrow-eq D₂
           (Dependent₁Category.base-compose D₂ f₁ g₁ x₂') refl
         $ map-compose₂ z₁ s₂
-          (Dependent₁PartialFunctor.base-commutative F₂ f₁ y₂ q₂')
+          (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂')
           (trans (sub (Dependent₁PartialFunctor.base F₂ z₁) (sym p₂))
-            (Dependent₁PartialFunctor.base-commutative F₂ f₁ y₂ q₂')) r₂' p₂ f₂
+            (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂')) r₂' p₂ f₂
           (Dependent₁Category.map C₂ f₁ g₂)
           (Dependent₁Category.base-compose D₂ f₁ g₁ x₂')
         $ map-compose₂' f₁
           (trans (sub (Dependent₁PartialFunctor.base F₂ y₁) (sym q₂))
-            (Dependent₁PartialFunctor.base-commutative F₂ g₁ x₂ p₂')) q₂' s₂ g₂
+            (Dependent₁PartialFunctor.base-square F₂ g₁ x₂ p₂')) q₂' s₂ g₂
           (sym (Dependent₁Category.base-compose D₂ f₁ g₁ x₂'))
         where
           s₂ = trans
             (sub (Dependent₁PartialFunctor.base F₂ z₁)
               (sym (trans (Dependent₁Category.base-compose C₂ f₁ g₁ x₂)
                 (sub (Dependent₁Category.base C₂ f₁) q₂))))
-            (Dependent₁PartialFunctor.base-commutative F₂
+            (Dependent₁PartialFunctor.base-square F₂
               (Category.compose C₁ f₁ g₁) x₂ p₂')
 
   partial-functor-sigma
@@ -201,8 +200,9 @@ module _
   {C₁₁ C₂₁ : Category}
   {C₁₂ D₁₂ : Dependent₁Category C₁₁}
   {C₂₂ D₂₂ : Dependent₁Category C₂₁}
-  {F₂ : Dependent₁Functor C₁₂ C₂₂}
-  {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  {F₁ : Functor C₁₁ C₂₁}
+  {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
+  {G₂ : Dependent₁Functor D₁₂ D₂₂ F₁}
   {H₁₂ : Dependent₁PartialFunctor C₁₂ D₁₂}
   {H₂₂ : Dependent₁PartialFunctor C₂₂ D₂₂}
   where
@@ -222,14 +222,10 @@ module _
       with Dependent₁PartialFunctor.base H₁₂ x₁₁ x₁₂
       | inspect (Dependent₁PartialFunctor.base H₁₂ x₁₁) x₁₂
     base (x₁₁ , x₁₂) refl | just _ | [ p ]
-      with Dependent₁Functor.base F₂ x₁₁
-      | Dependent₁PartialFunctorSquare.base s x₁₁
-      | Dependent₁Functor.base' F₂ x₁₁ x₁₂
-      | Dependent₁PartialFunctor.base H₂₂
-        (Dependent₁Functor.base F₂ x₁₁)
-        (Dependent₁Functor.base' F₂ x₁₁ x₁₂)
-      | Dependent₁PartialFunctorSquare.base' s x₁₁ x₁₂ p
-    ... | _ | refl | _ | _ | refl
+      with Dependent₁PartialFunctor.base H₂₂ (Functor.base F₁ x₁₁)
+        (Dependent₁Functor.base F₂ x₁₁ x₁₂)
+      | Dependent₁PartialFunctorSquare.base s x₁₁ x₁₂ p
+    ... | _ | refl
       = refl
 
     map-eq
@@ -266,33 +262,28 @@ module _
       | just x₁₂' | [ p₁ ] | just _ | [ q₁ ]
       | just _ | [ p₂ ] | just _ | [ q₂ ]
       = CategorySigma.arrow-eq' D₂₂
-        (Sigma.comma-eq p₁' p₂')
-        (Sigma.comma-eq q₁' q₂') p₂'' r₁'
-        (Dependent₁PartialFunctorSquare.map-eq' s y₁₁
+        (Sigma.comma-eq refl p₂')
+        (Sigma.comma-eq refl q₂') p₂'' refl
+        (Dependent₁PartialFunctorSquare.map-eq s y₁₁
           (trans
             (sub (Dependent₁PartialFunctor.base H₁₂ y₁₁) (sym r₂))
-            (Dependent₁PartialFunctor.base-commutative H₁₂ f₁₁ x₁₂ p₁)) q₁
+            (Dependent₁PartialFunctor.base-square H₁₂ f₁₁ x₁₂ p₁)) q₁
           (trans
-            (sub
-              (Dependent₁PartialFunctor.base H₂₂
-                (Dependent₁Functor.base F₂ y₁₁))
-              (sym (trans (sym (Dependent₁Functor.base-commutative F₂ f₁₁ x₁₂))
-                (sub (Dependent₁Functor.base' F₂ y₁₁) r₂))))
-            (Dependent₁PartialFunctor.base-commutative H₂₂
-              (Dependent₁Functor.map F₂ f₁₁)
-              (Dependent₁Functor.base' F₂ x₁₁ x₁₂) p₂)) q₂ f₁₂
+            (sub (Dependent₁PartialFunctor.base H₂₂ (Functor.base F₁ y₁₁))
+              (sym (trans (sym (Dependent₁Functor.base-square F₂ f₁₁ x₁₂))
+                (sub (Dependent₁Functor.base F₂ y₁₁) r₂))))
+            (Dependent₁PartialFunctor.base-square H₂₂ (Functor.map F₁ f₁₁)
+              (Dependent₁Functor.base F₂ x₁₁ x₁₂) p₂)) q₂ f₁₂
           (sym p₂'')
           (sym q₂'))
-      where
-        p₁' = Dependent₁PartialFunctorSquare.base s x₁₁
-        q₁' = Dependent₁PartialFunctorSquare.base s y₁₁
-        r₁' = Dependent₁PartialFunctorSquare.map s f₁₁
-        p₂' = Maybe.just-injective' (Dependent₁Category.Object D₂₂) p₁'
-          (trans (sym p₂) (Dependent₁PartialFunctorSquare.base' s x₁₁ x₁₂ p₁))
-        q₂' = Maybe.just-injective' (Dependent₁Category.Object D₂₂) q₁'
-          (trans (sym q₂) (Dependent₁PartialFunctorSquare.base' s y₁₁ y₁₂ q₁))
-        p₂'' = trans (Dependent₁Category.base-eq D₂₂ p₁' q₁' p₂' r₁')
-          (sym (Dependent₁Functor.base-commutative G₂ f₁₁ x₁₂'))
+        where
+          p₂' = Maybe.just-injective
+            (trans (sym p₂) (Dependent₁PartialFunctorSquare.base s x₁₁ x₁₂ p₁))
+          q₂' = Maybe.just-injective
+            (trans (sym q₂) (Dependent₁PartialFunctorSquare.base s y₁₁ y₁₂ q₁))
+          p₂'' = trans
+            (sub (Dependent₁Category.base D₂₂ (Functor.map F₁ f₁₁)) p₂')
+            (sym (Dependent₁Functor.base-square G₂ f₁₁ x₁₂'))
 
     map
       : {x₁ y₁ : Category.Object (category-sigma C₁₂)}

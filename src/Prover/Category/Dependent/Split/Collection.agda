@@ -3,19 +3,17 @@ module Prover.Category.Dependent.Split.Collection where
 open import Prover.Category.Chain
   using (ChainCategory; ChainFunctor)
 open import Prover.Category.Dependent
-  using (DependentCategory; DependentFunctor; dependent-category₀;
-    dependent-functor₀)
+  using (DependentCategory; DependentFunctor)
 open import Prover.Category.Dependent.Collection
   using (dependent-category-collection; dependent-functor-collection)
 open import Prover.Category.Dependent.Decidable
-  using (DependentDecidable; dependent-decidable₀)
+  using (DependentDecidable)
 open import Prover.Category.Dependent.List
   using (dependent-category-list; dependent-functor-list)
 open import Prover.Category.Dependent.Relation
-  using (DependentFunctorInjective; DependentRelation;
-    dependent-functor-injective₀; dependent-relation₀)
+  using (DependentInjective; DependentRelation)
 open import Prover.Category.Dependent.Split
-  using (DependentSplitFunctor; DependentSplitFunctorSquare; cons; nil)
+  using (DependentSplitFunctor; DependentSplitFunctorSquare)
 open import Prover.Category.Split.Collection
   using (split-functor-collection; split-functor-square-collection)
 open import Prover.Prelude
@@ -47,7 +45,7 @@ dependent-split-functor-square-collection
   → (d₂ : DependentDecidable R₂)
   → {F : ChainFunctor C₁ C₂}
   → {F' : DependentFunctor C₁' C₂' F}
-  → (i : DependentFunctorInjective R₁ R₂ F')
+  → (i : DependentInjective R₁ R₂ F')
   → DependentSplitFunctorSquare
     (dependent-functor-list F')
     (dependent-functor-collection i)
@@ -58,38 +56,32 @@ dependent-split-functor-square-collection
 
 -- ### DependentSplitFunctor
 
-dependent-split-functor-collection
-  {n = zero} {C' = C'} {R = R} d
-  = nil
-    (split-functor-collection
-      (dependent-category₀ C')
-      (dependent-relation₀ R)
-      (dependent-decidable₀ d))
-dependent-split-functor-collection
-  {n = suc _} {R = R} d
-  = cons
-    (λ x → dependent-split-functor-collection
-      (DependentDecidable.tail d x))
-    (λ {x = x} {y = y} f → dependent-split-functor-square-collection
-      (DependentDecidable.tail d x)
-      (DependentDecidable.tail d y)
-      (DependentRelation.dependent-functor-injective R f))
+dependent-split-functor-collection {n = zero} {C' = C'} {R = R} d
+  = split-functor-collection C' R d
+
+dependent-split-functor-collection {n = suc _} {R = R} d
+  = record
+  { split-functor
+    = λ x → dependent-split-functor-collection
+      (DependentDecidable.decidable d x)
+  ; split-functor-square
+    = λ {x = x} {y = y} f → dependent-split-functor-square-collection
+      (DependentDecidable.decidable d x)
+      (DependentDecidable.decidable d y)
+      (DependentRelation.injective R f)
+  }
 
 -- ### DependentSplitFunctorSquare
 
-dependent-split-functor-square-collection
-  {n = zero} d₁ d₂ {F' = F'} i
-  = nil
-    (split-functor-square-collection
-      (dependent-decidable₀ d₁)
-      (dependent-decidable₀ d₂)
-      (dependent-functor₀ F')
-      (dependent-functor-injective₀ i))
-dependent-split-functor-square-collection
-  {n = suc _} d₁ d₂ {F = F} i
-  = cons
-    (λ x₁ → dependent-split-functor-square-collection
-      (DependentDecidable.tail d₁ x₁)
-      (DependentDecidable.tail d₂ (ChainFunctor.base F x₁))
-      (DependentFunctorInjective.tail i x₁))
+dependent-split-functor-square-collection {n = zero} d₁ d₂ {F' = F'} i
+  = split-functor-square-collection d₁ d₂ F' i
+
+dependent-split-functor-square-collection {n = suc _} d₁ d₂ {F = F} i
+  = record
+  { split-functor
+    = λ x₁ → dependent-split-functor-square-collection
+      (DependentDecidable.decidable d₁ x₁)
+      (DependentDecidable.decidable d₂ (ChainFunctor.base F x₁))
+      (DependentInjective.injective i x₁)
+  }
 

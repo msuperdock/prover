@@ -15,6 +15,9 @@ Variables
 
 module Variables where
 
+  open FinSet public
+    using (Member; empty; member)
+
   -- ### Interface
 
   is-member
@@ -32,17 +35,7 @@ module Variables where
   insert vs
     = FinSet.insert vs _≟_var
 
-  -- ### Construction
-
-  empty
-    : Variables
-  empty
-    = FinSet.empty
-
   -- ### Membership
-
-  open FinSet public
-    using (Member; member)
 
   var_∈_
     : Variable

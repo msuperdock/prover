@@ -118,22 +118,6 @@ module Maybe where
   just-injective refl
     = refl
 
-  just-injective'
-    : {A : Set}
-    → (B : A → Set)
-    → {x₁ x₂ : A}
-    → {y₁ : B x₁}
-    → {y₂ : B x₂}
-    → x₁ ≡ x₂
-    → Equal'
-      (Maybe (B x₁))
-      (Maybe (B x₂))
-      (just y₁)
-      (just y₂)
-    → y₁ ≅ y₂
-  just-injective' _ refl refl
-    = refl
-
   map-nothing
     : {A B : Set}
     → (f : A → B)

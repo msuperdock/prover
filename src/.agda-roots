@@ -1,91 +1,16 @@
 Main
-
 - main
 
+Prover.Editor
 Prover.Editor.Collection
-
-- partial-editor-collection
-- split-editor-collection
-- split-main-editor-collection
-
+Prover.Editor.Flatten
 Prover.Editor.List
-
-- partial-editor-list
-- split-editor-list
-- main-editor-list
-- split-main-editor-list
-
 Prover.Editor.Map
-
-- partial-editor-map-view
-- split-editor-map-view
-- main-editor-map-view
-- split-main-editor-map-view
-
-- partial-editor-map-event
-- split-editor-map-event
-- main-editor-map-event
-- split-main-editor-map-event
-
-- main-editor-map-state
-- split-main-editor-map-state
-- split-main-editor-map-pure
-
-- partial-editor-map
-- split-editor-map-simple
-- split-main-editor-map-simple
-
+Prover.Editor.Map.Event
+Prover.Editor.Map.Pure
+Prover.Editor.Map.State
+Prover.Editor.Map.View
 Prover.Editor.Product
-
-- partial-editor-product
-- split-editor-product
-- main-editor-product
-- split-main-editor-product
-
-Prover.Editor.Dependent.Collection
-
-- dependent-partial-editor-collection
-- dependent-split-editor-collection
-- dependent-split-main-editor-collection
-
-Prover.Editor.Dependent.List
-
-- dependent-partial-editor-list
-- dependent-split-editor-list
-- dependent-main-editor-list
-- dependent-split-main-editor-list
-
-Prover.Editor.Dependent.Map
-
-- dependent-partial-editor-map-view
-- dependent-split-editor-map-view
-- dependent-main-editor-map-view
-- dependent-split-main-editor-map-view
-
-- dependent-partial-editor-map-event
-- dependent-split-editor-map-event
-- dependent-main-editor-map-event
-- dependent-split-main-editor-map-event
-
-- dependent-main-editor-map-state
-- dependent-split-main-editor-map-state
-- dependent-split-main-editor-map-pure
-
-- dependent-partial-editor-map
-- dependent-split-editor-map
-- dependent-split-main-editor-map
-
-Prover.Editor.Dependent.Product
-
-- dependent-partial-editor-product
-- dependent-split-editor-product
-- dependent-main-editor-product
-- dependent-split-main-editor-product
-
-Prover.Editor.Dependent.Sigma
-
-- dependent-partial-editor-sigma
-- dependent-split-editor-sigma
-- dependent-main-editor-sigma
-- dependent-split-main-editor-sigma
+Prover.Editor.Sigma
+Prover.Editor.Unit
 

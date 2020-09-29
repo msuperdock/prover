@@ -9,8 +9,7 @@ open import Prover.Category.Partial
 open import Prover.Category.Partial.Maybe
   using (partial-functor-maybe; partial-functor-square-maybe)
 open import Prover.Category.Split
-  using (SplitFunctor; SplitFunctorSquare; SplitFunctorSquare';
-    split-functor-square')
+  using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -133,21 +132,4 @@ module _
       (split-functor-maybe H₂)
   split-functor-square-maybe s
     = record {SplitFunctorSquareMaybe s}
-
--- ## SplitFunctorSquare'
-
-split-functor-square-maybe'
-  : {C₁ C₂ D₁ D₂ D₃ : Category}
-  → {F : Functor C₁ C₂}
-  → {G : Functor D₁ D₃}
-  → {H₁ : SplitFunctor C₁ D₁}
-  → {H₂ : SplitFunctor C₂ D₂}
-  → SplitFunctorSquare' F G H₁ H₂
-  → SplitFunctorSquare'
-    (functor-maybe F)
-    (functor-maybe G)
-    (split-functor-maybe H₁)
-    (split-functor-maybe H₂)
-split-functor-square-maybe' (split-functor-square' s)
-  = split-functor-square' (split-functor-square-maybe s)
 

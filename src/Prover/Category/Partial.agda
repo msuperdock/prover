@@ -3,7 +3,7 @@ module Prover.Category.Partial where
 open import Prover.Category
   using (Category; Functor)
 open import Prover.Function.Partial
-  using (PartialFunction)
+  using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -190,6 +190,20 @@ record PartialFunctorSquare
       → PartialFunctor.base H₂ (Functor.base F x₁)
         ≡ just (Functor.base G x₁')
 
+  partial-function
+    : PartialFunctionSquare
+      (Functor.function F)
+      (Functor.function G)
+      (PartialFunctor.partial-function H₁)
+      (PartialFunctor.partial-function H₂)
+  partial-function
+    = record
+    { base
+      = base
+    }
+
+  field
+
     map
       : {x₁ y₁ : Category.Object C₁}
       → {x₁' y₁' : Category.Object D₁}
@@ -216,6 +230,22 @@ record PartialFunctorSquare
     | irrelevant q₂ (base y₁ q₁)
   ... | refl | refl
     = map p₁ q₁
+
+  map-eq
+    : {x₁ y₁ : Category.Object C₁}
+    → {x₁' y₁' : Category.Object D₁}
+    → {x₂' y₂' : Category.Object D₂}
+    → (p₁ : PartialFunctor.base H₁ x₁ ≡ just x₁')
+    → (q₁ : PartialFunctor.base H₁ y₁ ≡ just y₁')
+    → (p₂ : PartialFunctor.base H₂ (Functor.base F x₁) ≡ just x₂')
+    → (q₂ : PartialFunctor.base H₂ (Functor.base F y₁) ≡ just y₂')
+    → (f₁ : Category.Arrow C₁ x₁ y₁)
+    → Functor.base G x₁' ≡ x₂'
+    → Functor.base G y₁' ≡ y₂'
+    → PartialFunctor.map H₂ p₂ q₂ (Functor.map F f₁)
+      ≅ Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁)
+  map-eq p₁ q₁ p₂ q₂ f₁ refl refl
+    = map' p₁ q₁ p₂ q₂ f₁
 
   map-arrow
     : {x₁ y₁ : Category.Object C₁}
@@ -314,80 +344,4 @@ module _
       (partial-functor-compose I₂ J₂)
   partial-functor-square-compose s t
     = record {PartialFunctorSquareCompose s t}
-
--- ## PartialFunctorSquare'
-
-module _PartialFunctorSquare' where
-
-  data PartialFunctorSquare'
-    : {C₁ C₂ D₁ D₂ D₃ : Category}
-    → Functor C₁ C₂
-    → Functor D₁ D₃
-    → PartialFunctor C₁ D₁
-    → PartialFunctor C₂ D₂
-    → Set
-    where
-  
-    partial-functor-square'
-      : {C₁ C₂ D₁ D₂ : Category}
-      → {F : Functor C₁ C₂}
-      → {G : Functor D₁ D₂}
-      → {H₁ : PartialFunctor C₁ D₁}
-      → {H₂ : PartialFunctor C₂ D₂}
-      → PartialFunctorSquare F G H₁ H₂
-      → PartialFunctorSquare' F G H₁ H₂
-
-PartialFunctorSquare'
-  : {C₁ C₂ D₁ D₂ D₃ : Category}
-  → Functor C₁ C₂
-  → Functor D₁ D₃
-  → PartialFunctor C₁ D₁
-  → PartialFunctor C₂ D₂
-  → Set
-PartialFunctorSquare'
-  = _PartialFunctorSquare'.PartialFunctorSquare'
- 
-open _PartialFunctorSquare'.PartialFunctorSquare' public
-
-module PartialFunctorSquare' where
-
-  base
-    : {C₁ C₂ D₁ D₂ D₃ : Category}
-    → {F : Functor C₁ C₂}
-    → {G : Functor D₁ D₃}
-    → {H₁ : PartialFunctor C₁ D₁}
-    → {H₂ : PartialFunctor C₂ D₂}
-    → PartialFunctorSquare' F G H₁ H₂
-    → {x₁' : Category.Object D₁}
-    → (x₁ : Category.Object C₁)
-    → PartialFunctor.base H₁ x₁ ≡ just x₁'
-    → Equal'
-      (Maybe (Category.Object D₂))
-      (Maybe (Category.Object D₃))
-      (PartialFunctor.base H₂ (Functor.base F x₁))
-      (just (Functor.base G x₁'))
-  base (partial-functor-square' s)
-    = PartialFunctorSquare.base s
-  
-  map-eq
-    : {C₁ C₂ D₁ D₂ D₃ : Category}
-    → {F : Functor C₁ C₂}
-    → {G : Functor D₁ D₃}
-    → {H₁ : PartialFunctor C₁ D₁}
-    → {H₂ : PartialFunctor C₂ D₂}
-    → PartialFunctorSquare' F G H₁ H₂
-    → {x₁ y₁ : Category.Object C₁}
-    → {x₁' y₁' : Category.Object D₁}
-    → {x₂' y₂' : Category.Object D₂}
-    → (p₁ : PartialFunctor.base H₁ x₁ ≡ just x₁')
-    → (q₁ : PartialFunctor.base H₁ y₁ ≡ just y₁')
-    → (p₂ : PartialFunctor.base H₂ (Functor.base F x₁) ≡ just x₂')
-    → (q₂ : PartialFunctor.base H₂ (Functor.base F y₁) ≡ just y₂')
-    → (f₁ : Category.Arrow C₁ x₁ y₁)
-    → Functor.base G x₁' ≅ x₂'
-    → Functor.base G y₁' ≅ y₂'
-    → PartialFunctor.map H₂ p₂ q₂ (Functor.map F f₁)
-      ≅ Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁)
-  map-eq (partial-functor-square' s) p₁ q₁ p₂ q₂ f₁ refl refl
-    = PartialFunctorSquare.map' s p₁ q₁ p₂ q₂ f₁
 

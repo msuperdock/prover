@@ -38,8 +38,9 @@ functor-sigma-sum
   → {F₁ : SplitFunctor C₁₁ C₂₁}
   → {G₁ : SplitFunctor D₁₁ D₂₁}
   → {H₁₁ : Functor C₁₁ D₁₁}
-  → (H₂₂ : Dependent₁Functor C₂₂ D₂₂)
-  → SplitFunctorSquare H₁₁ (Dependent₁Functor.functor H₂₂) F₁ G₁
+  → {H₂₁ : Functor C₂₁ D₂₁}
+  → Dependent₁Functor C₂₂ D₂₂ H₂₁
+  → SplitFunctorSquare H₁₁ H₂₁ F₁ G₁
   → Functor
     (category-sigma-sum C₂₂ F₁)
     (category-sigma-sum D₂₂ G₁)
@@ -56,18 +57,20 @@ functor-identity-sigma-sum
   → {C₂₂ : Dependent₁Category C₂₁}
   → {F₁ : SplitFunctor C₁₁ C₂₁}
   → {G₁₁ : Functor C₁₁ C₁₁}
-  → {G₂₂ : Dependent₁Functor C₂₂ C₂₂}
-  → (s₁ : SplitFunctorSquare G₁₁ (Dependent₁Functor.functor G₂₂) F₁ F₁)
+  → {G₂₁ : Functor C₂₁ C₂₁}
+  → {G₂₂ : Dependent₁Functor C₂₂ C₂₂ G₂₁}
+  → (s₁ : SplitFunctorSquare G₁₁ G₂₁ F₁ F₁)
   → FunctorIdentity G₁₁
+  → FunctorIdentity G₂₁
   → Dependent₁FunctorIdentity G₂₂
   → FunctorIdentity
-    (functor-sigma-sum {C₂₂ = C₂₂} {D₂₂ = C₂₂} G₂₂ s₁)
-functor-identity-sigma-sum {G₂₂ = G₂₂} s₁ p₁₁ p₂₂
+    (functor-sigma-sum G₂₂ s₁)
+functor-identity-sigma-sum {G₂₂ = G₂₂} s₁ p₁₁ p₂₁ p₂₂
   = functor-identity-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
       (functor-square-sigma-maybe₁ G₂₂)) p₁₁
-    (functor-identity-sigma-maybe {F₂ = G₂₂} p₂₂)
+    (functor-identity-sigma-maybe p₂₁ p₂₂)
 
 -- ## FunctorCompose
 
@@ -80,21 +83,26 @@ functor-compose-sigma-sum
   → {J₁ : SplitFunctor D₁₁ D₂₁}
   → {K₁ : SplitFunctor E₁₁ E₂₁}
   → {L₁₁ : Functor D₁₁ E₁₁}
+  → {L₂₁ : Functor D₂₁ E₂₁}
   → {M₁₁ : Functor C₁₁ D₁₁}
+  → {M₂₁ : Functor C₂₁ D₂₁}
   → {N₁₁ : Functor C₁₁ E₁₁}
-  → {L₂₂ : Dependent₁Functor D₂₂ E₂₂}
-  → {M₂₂ : Dependent₁Functor C₂₂ D₂₂}
-  → {N₂₂ : Dependent₁Functor C₂₂ E₂₂}
-  → (s₁ : SplitFunctorSquare L₁₁ (Dependent₁Functor.functor L₂₂) J₁ K₁)
-  → (t₁ : SplitFunctorSquare M₁₁ (Dependent₁Functor.functor M₂₂) I₁ J₁)
-  → (u₁ : SplitFunctorSquare N₁₁ (Dependent₁Functor.functor N₂₂) I₁ K₁)
+  → {N₂₁ : Functor C₂₁ E₂₁}
+  → {L₂₂ : Dependent₁Functor D₂₂ E₂₂ L₂₁}
+  → {M₂₂ : Dependent₁Functor C₂₂ D₂₂ M₂₁}
+  → {N₂₂ : Dependent₁Functor C₂₂ E₂₂ N₂₁}
+  → (s₁ : SplitFunctorSquare L₁₁ L₂₁ J₁ K₁)
+  → (t₁ : SplitFunctorSquare M₁₁ M₂₁ I₁ J₁)
+  → (u₁ : SplitFunctorSquare N₁₁ N₂₁ I₁ K₁)
   → FunctorCompose L₁₁ M₁₁ N₁₁
+  → FunctorCompose L₂₁ M₂₁ N₂₁
   → Dependent₁FunctorCompose L₂₂ M₂₂ N₂₂
   → FunctorCompose
-    (functor-sigma-sum {C₂₂ = D₂₂} {D₂₂ = E₂₂} L₂₂ s₁)
-    (functor-sigma-sum {C₂₂ = C₂₂} {D₂₂ = D₂₂} M₂₂ t₁)
-    (functor-sigma-sum {C₂₂ = C₂₂} {D₂₂ = E₂₂} N₂₂ u₁)
-functor-compose-sigma-sum {L₂₂ = L₂₂} {M₂₂ = M₂₂} {N₂₂ = N₂₂} s₁ t₁ u₁ p₁₁ p₂₂
+    (functor-sigma-sum L₂₂ s₁)
+    (functor-sigma-sum M₂₂ t₁)
+    (functor-sigma-sum N₂₂ u₁)
+functor-compose-sigma-sum
+  {L₂₂ = L₂₂} {M₂₂ = M₂₂} {N₂₂ = N₂₂} s₁ t₁ u₁ p₁₁ p₂₁ p₂₂
   = functor-compose-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
@@ -105,7 +113,7 @@ functor-compose-sigma-sum {L₂₂ = L₂₂} {M₂₂ = M₂₂} {N₂₂ = N�
     (functor-square-compose
       (SplitFunctorSquare.functor u₁)
       (functor-square-sigma-maybe₁ N₂₂)) p₁₁
-    (functor-compose-sigma-maybe {F₂ = L₂₂} {G₂ = M₂₂} {H₂ = N₂₂} p₂₂)
+    (functor-compose-sigma-maybe p₂₁ p₂₂)
 
 -- ## FunctorSquare
 
@@ -120,26 +128,31 @@ functor-square-sigma-sum
   → {G₁₁ : SplitFunctor D₁₁₁ D₁₂₁}
   → {G₂₁ : SplitFunctor D₂₁₁ D₂₂₁}
   → {H₁₁ : Functor C₁₁₁ C₂₁₁}
+  → {H₂₁ : Functor C₁₂₁ C₂₂₁}
   → {I₁₁ : Functor D₁₁₁ D₂₁₁}
+  → {I₂₁ : Functor D₁₂₁ D₂₂₁}
   → {J₁₁₁ : Functor C₁₁₁ D₁₁₁}
+  → {J₁₂₁ : Functor C₁₂₁ D₁₂₁}
   → {J₂₁₁ : Functor C₂₁₁ D₂₁₁}
-  → {H₂₂ : Dependent₁Functor C₁₂₂ C₂₂₂}
-  → {I₂₂ : Dependent₁Functor D₁₂₂ D₂₂₂}
-  → {J₁₂₂ : Dependent₁Functor C₁₂₂ D₁₂₂}
-  → {J₂₂₂ : Dependent₁Functor C₂₂₂ D₂₂₂}
-  → (s₁ : SplitFunctorSquare H₁₁ (Dependent₁Functor.functor H₂₂) F₁₁ F₂₁)
-  → (t₁ : SplitFunctorSquare I₁₁ (Dependent₁Functor.functor I₂₂) G₁₁ G₂₁)
-  → (u₁₁ : SplitFunctorSquare J₁₁₁ (Dependent₁Functor.functor J₁₂₂) F₁₁ G₁₁)
-  → (u₂₁ : SplitFunctorSquare J₂₁₁ (Dependent₁Functor.functor J₂₂₂) F₂₁ G₂₁)
+  → {J₂₂₁ : Functor C₂₂₁ D₂₂₁}
+  → {H₂₂ : Dependent₁Functor C₁₂₂ C₂₂₂ H₂₁}
+  → {I₂₂ : Dependent₁Functor D₁₂₂ D₂₂₂ I₂₁}
+  → {J₁₂₂ : Dependent₁Functor C₁₂₂ D₁₂₂ J₁₂₁}
+  → {J₂₂₂ : Dependent₁Functor C₂₂₂ D₂₂₂ J₂₂₁}
+  → (s₁ : SplitFunctorSquare H₁₁ H₂₁ F₁₁ F₂₁)
+  → (t₁ : SplitFunctorSquare I₁₁ I₂₁ G₁₁ G₂₁)
+  → (u₁₁ : SplitFunctorSquare J₁₁₁ J₁₂₁ F₁₁ G₁₁)
+  → (u₂₁ : SplitFunctorSquare J₂₁₁ J₂₂₁ F₂₁ G₂₁)
   → FunctorSquare H₁₁ I₁₁ J₁₁₁ J₂₁₁
+  → FunctorSquare H₂₁ I₂₁ J₁₂₁ J₂₂₁
   → Dependent₁FunctorSquare H₂₂ I₂₂ J₁₂₂ J₂₂₂
   → FunctorSquare
-    (functor-sigma-sum {C₂₂ = C₁₂₂} {D₂₂ = C₂₂₂} H₂₂ s₁)
-    (functor-sigma-sum {C₂₂ = D₁₂₂} {D₂₂ = D₂₂₂} I₂₂ t₁)
-    (functor-sigma-sum {C₂₂ = C₁₂₂} {D₂₂ = D₁₂₂} J₁₂₂ u₁₁)
-    (functor-sigma-sum {C₂₂ = C₂₂₂} {D₂₂ = D₂₂₂} J₂₂₂ u₂₁)
+    (functor-sigma-sum H₂₂ s₁)
+    (functor-sigma-sum I₂₂ t₁)
+    (functor-sigma-sum J₁₂₂ u₁₁)
+    (functor-sigma-sum J₂₂₂ u₂₁)
 functor-square-sigma-sum
-  {H₂₂ = H₂₂} {I₂₂ = I₂₂} {J₁₂₂ = J₁₂₂} {J₂₂₂ = J₂₂₂} s₁ t₁ u₁₁ u₂₁ v₁₁ v₂₂
+  {H₂₂ = H₂₂} {I₂₂ = I₂₂} {J₁₂₂ = J₁₂₂} {J₂₂₂ = J₂₂₂} s₁ t₁ u₁₁ u₂₁ v₁₁ v₂₁ v₂₂
   = functor-square-sum
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
@@ -153,6 +166,5 @@ functor-square-sigma-sum
     (functor-square-compose
       (SplitFunctorSquare.functor u₂₁)
       (functor-square-sigma-maybe₁ J₂₂₂)) v₁₁
-    (functor-square-sigma-maybe
-      {F₂ = H₂₂} {G₂ = I₂₂} {H₁₂ = J₁₂₂} {H₂₂ = J₂₂₂} v₂₂)
+    (functor-square-sigma-maybe v₂₁ v₂₂)
 

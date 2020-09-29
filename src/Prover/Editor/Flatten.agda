@@ -5,8 +5,9 @@ open import Prover.Category
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; MainEditor; PartialEditor; SimpleEditor;
-    SplitEditor; ViewStack; ViewStackMap; any; split-editor-partial)
+  using (Editor; EventStack; SimpleEditor; SimpleMainEditor;
+    SimplePartialEditor; SimpleSplitEditor; SplitEditor; ViewStack;
+    ViewStackMap; any)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack)
 open import Prover.Editor.Flat
@@ -189,7 +190,7 @@ module _
   view-stack-map-flatten F
     = record {ViewStackMapFlatten F}
 
--- ## Editors
+-- ## Editors (basic)
 
 -- ### Editor
 
@@ -343,19 +344,7 @@ simple-editor-flatten
 simple-editor-flatten (any e)
   = editor-flatten e
 
--- ### PartialEditor
-
-partial-editor-flatten
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {A : Set}
-  → PartialEditor V E A
-  → FlatEditor
-    (view-stack-flatten V)
-    (event-stack-flatten E) A
-partial-editor-flatten e
-  = flat-editor-map (PartialEditor.base e)
-  $ simple-editor-flatten (PartialEditor.simple-editor e)
+-- ## Editors (nondependent)
 
 -- ### SplitEditor
 
@@ -368,11 +357,39 @@ split-editor-flatten
     (view-stack-flatten V)
     (event-stack-flatten E)
     (Category.Object C)
-split-editor-flatten
-  = partial-editor-flatten
-  ∘ split-editor-partial
+split-editor-flatten e
+  = flat-editor-map (SplitEditor.base e)
+  $ editor-flatten (SplitEditor.editor e)
 
--- ### MainEditor
+-- ### SimplePartialEditor
+
+simple-partial-editor-flatten
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A : Set}
+  → SimplePartialEditor V E A
+  → FlatEditor
+    (view-stack-flatten V)
+    (event-stack-flatten E) A
+simple-partial-editor-flatten e
+  = flat-editor-map (SimplePartialEditor.base e)
+  $ simple-editor-flatten (SimplePartialEditor.editor e)
+
+-- ### SimpleSplitEditor
+
+simple-split-editor-flatten
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A : Set}
+  → SimpleSplitEditor V E A
+  → FlatEditor
+    (view-stack-flatten V)
+    (event-stack-flatten E) A
+simple-split-editor-flatten e
+  = flat-editor-map (SimpleSplitEditor.base e)
+  $ simple-editor-flatten (SimpleSplitEditor.editor e)
+
+-- ### SimpleMainEditor
 
 module _
   {V : ViewStack}
@@ -380,22 +397,22 @@ module _
   {S : Set}
   where
 
-  module MainEditorFlatten
-    (e : MainEditor V E S)
+  module SimpleMainEditorFlatten
+    (e : SimpleMainEditor V E S)
     where
 
     editor
       : Editor V E
-        (category-unit (MainEditor.State e))
+        (category-unit (SimpleMainEditor.State e))
     editor
       = editor-unit
-        (MainEditor.simple-editor e)
+        (SimpleMainEditor.editor e)
 
     flat-editor
       : FlatEditor
         (view-stack-flatten V)
         (event-stack-flatten E)
-        (MainEditor.State e)
+        (SimpleMainEditor.State e)
     flat-editor
       = editor-flatten editor
 
@@ -406,7 +423,7 @@ module _
       : S
       → State
     initial-with s
-      with MainEditor.decode e s
+      with SimpleMainEditor.state-decode e s
     ... | nothing
       = initial
     ... | just s'
@@ -416,7 +433,7 @@ module _
       : (s : S)
       → StatePath (initial-with s)
     initial-path-with s
-      with MainEditor.decode e s
+      with SimpleMainEditor.state-decode e s
     ... | nothing
       = initial-path
     ... | just s'
@@ -448,13 +465,13 @@ module _
       : State
       → S
     handle-save (s , _)
-      = MainEditor.encode e s
+      = SimpleMainEditor.state-encode e s
 
-  main-editor-flatten
-    : MainEditor V E S
+  simple-main-editor-flatten
+    : SimpleMainEditor V E S
     → FlatMainEditor
       (view-stack-flatten V)
       (event-stack-flatten E) S
-  main-editor-flatten e
-    = record {MainEditorFlatten e}
+  simple-main-editor-flatten e
+    = record {SimpleMainEditorFlatten e}
 

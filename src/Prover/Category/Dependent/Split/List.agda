@@ -7,8 +7,7 @@ open import Prover.Category.Dependent
 open import Prover.Category.Dependent.List
   using (dependent-category-list; dependent-functor-list)
 open import Prover.Category.Dependent.Split
-  using (DependentSplitFunctor; DependentSplitFunctorSquare; cons;
-    dependent-split-functor₀; dependent-split-functor-square₀; nil)
+  using (DependentSplitFunctor; DependentSplitFunctorSquare)
 open import Prover.Category.Split.List
   using (split-functor-list; split-functor-square-list)
 open import Prover.Prelude
@@ -49,29 +48,28 @@ dependent-split-functor-square-list
 
 -- ### DependentSplitFunctor
 
-dependent-split-functor-list
-  {n = zero} F
-  = nil
-    (split-functor-list
-      (dependent-split-functor₀ F))
-dependent-split-functor-list
-  {n = suc _} F
-  = cons
-    (λ x → dependent-split-functor-list
-      (DependentSplitFunctor.tail F x))
-    (λ f → dependent-split-functor-square-list
-      (DependentSplitFunctor.dependent-split-functor-square F f))
+dependent-split-functor-list {n = zero} F
+  = split-functor-list F
+
+dependent-split-functor-list {n = suc _} F
+  = record
+  { split-functor
+    = λ x → dependent-split-functor-list
+      (DependentSplitFunctor.split-functor F x)
+  ; split-functor-square
+    = λ f → dependent-split-functor-square-list
+      (DependentSplitFunctor.split-functor-square F f)
+  }
 
 -- ### DependentSplitFunctorSquare
 
-dependent-split-functor-square-list
-  {n = zero} s
-  = nil
-    (split-functor-square-list
-      (dependent-split-functor-square₀ s))
-dependent-split-functor-square-list
-  {n = suc _} s
-  = cons
-    (λ x₁ → dependent-split-functor-square-list
-      (DependentSplitFunctorSquare.tail s x₁))
+dependent-split-functor-square-list {n = zero} s
+  = split-functor-square-list s
+
+dependent-split-functor-square-list {n = suc _} s
+  = record
+  { split-functor
+    = λ x₁ → dependent-split-functor-square-list
+      (DependentSplitFunctorSquare.split-functor s x₁)
+  }
 

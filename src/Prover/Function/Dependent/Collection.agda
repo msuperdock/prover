@@ -3,27 +3,29 @@ module Prover.Function.Dependent.Collection where
 open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Function.Dependent
-  using (DependentSet; cons; nil)
-open import Prover.Function.Dependent.Simple.Relation
-  using (DependentSimpleRelation; dependent-simple-relation₀)
+  using (DependentSet)
+open import Prover.Function.Dependent.Relation
+  using (DependentRelation)
 open import Prover.Prelude
 
--- ## DependentSet
+-- ## Types
 
 dependent-set-collection
   : {n : ℕ}
   → {C : ChainCategory n}
   → {C' : DependentSet C}
-  → DependentSimpleRelation C'
+  → DependentRelation C'
   → DependentSet C
-dependent-set-collection
-  {n = zero} R
-  = nil
-    (Collection
-      (dependent-simple-relation₀ R))
-dependent-set-collection
-  {n = suc _} R
-  = cons
-    (λ x → dependent-set-collection
-      (DependentSimpleRelation.tail R x))
+
+-- ## Definitions
+
+dependent-set-collection {n = zero} R
+  = Collection R
+
+dependent-set-collection {n = suc _} R
+  = record
+  { set
+    = λ x → dependent-set-collection
+      (DependentRelation.relation R x)
+  }
 

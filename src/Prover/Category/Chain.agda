@@ -4,424 +4,85 @@ open import Prover.Category
   using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
 open import Prover.Prelude
 
--- ## Internal
+-- ## Base
 
-module Internal where
+-- ### Chain₀Category
 
-  -- ### Types
-  
-  -- #### ChainCategory
-  
-  data ChainCategory
-    : ℕ
-    → Set₁
-    
-  -- #### ChainFunctor
-  
-  data ChainFunctor
-    : {n : ℕ}
-    → ChainCategory n
-    → ChainCategory n
-    → Set
-    
-  -- #### ChainFunctorIdentity
-  
-  data ChainFunctorIdentity
-    : {n : ℕ}
-    → {C₁ C₂ : ChainCategory n}
-    → ChainFunctor C₁ C₂
-    → Set
-    
-  -- #### ChainFunctorCompose
-  
-  data ChainFunctorCompose
-    : {n : ℕ}
-    → {C D E₁ E₂ : ChainCategory n}
-    → ChainFunctor D E₁
-    → ChainFunctor C D
-    → ChainFunctor C E₂
-    → Set
-    
-  -- #### ChainFunctorSquare
-  
-  data ChainFunctorSquare
-    : {n : ℕ}
-    → {C₁ C₂ D₁ D₂ D₃ : ChainCategory n} 
-    → ChainFunctor C₁ C₂
-    → ChainFunctor D₁ D₃
-    → ChainFunctor C₁ D₁
-    → ChainFunctor C₂ D₂
-    → Set
-  
-  -- ### Interface
+record Chain₀Category
+  : Set₁
+  where
 
-  -- #### ChainCategory
+  no-eta-equality
 
-  chain-category-head
-    : {n : ℕ}
-    → ChainCategory (suc n)
-    → Category
+  constructor
 
-  chain-category-object
-    : {n : ℕ}
-    → ChainCategory (suc n)
-    → Set
-
-  chain-category-arrow
-    : {n : ℕ}
-    → (C : ChainCategory (suc n))
-    → chain-category-object C
-    → chain-category-object C
-    → Set
-
-  chain-category-identity
-    : {n : ℕ}
-    → (C : ChainCategory (suc n))
-    → (x : chain-category-object C)
-    → chain-category-arrow C x x
-
-  chain-category-compose
-    : {n : ℕ}
-    → (C : ChainCategory (suc n))
-    → {x y z : chain-category-object C}
-    → chain-category-arrow C y z
-    → chain-category-arrow C x y
-    → chain-category-arrow C x z
-
-  chain-category-tail
-    : {n : ℕ}
-    → (C : ChainCategory (suc n))
-    → chain-category-object C
-    → ChainCategory n
-
-  chain-category-chain-functor
-    : {n : ℕ}
-    → (C : ChainCategory (suc n))
-    → {x y : chain-category-object C}
-    → chain-category-arrow C x y
-    → ChainFunctor
-      (chain-category-tail C x)
-      (chain-category-tail C y)
-
-  -- #### ChainFunctor
-
-  chain-functor-head
-    : {n : ℕ}
-    → {C D : ChainCategory (suc n)}
-    → ChainFunctor C D
-    → Functor
-      (chain-category-head C)
-      (chain-category-head D)
-
-  chain-functor-base
-    : {n : ℕ}
-    → {C D : ChainCategory (suc n)}
-    → ChainFunctor C D
-    → chain-category-object C
-    → chain-category-object D
-
-  chain-functor-map
-    : {n : ℕ}
-    → {C D : ChainCategory (suc n)}
-    → (F : ChainFunctor C D)
-    → {x y : chain-category-object C}
-    → chain-category-arrow C x y
-    → chain-category-arrow D (chain-functor-base F x) (chain-functor-base F y)
-
-  chain-functor-tail
-    : {n : ℕ}
-    → {C D : ChainCategory (suc n)}
-    → (F : ChainFunctor C D)
-    → (x : chain-category-object C)
-    → ChainFunctor
-      (chain-category-tail C x)
-      (chain-category-tail D (chain-functor-base F x))
-
-  -- ### Definitions
-  
-  -- #### ChainCategory
-  
-  data ChainCategory where
-  
     nil
-      : ChainCategory zero
 
-    cons
-      : {n : ℕ}
-      → (C : Category)
-      → (C' : Category.Object C
-        → ChainCategory n)
-      → (F : {x y : Category.Object C}
-        → Category.Arrow C x y
-        → ChainFunctor (C' x) (C' y))
-      → ((x : Category.Object C)
-        → ChainFunctorIdentity (F (Category.identity C x)))
-      → ({x y z : Category.Object C}
-        → (f : Category.Arrow C y z)
-        → (g : Category.Arrow C x y)
-        → ChainFunctorCompose (F f) (F g) (F (Category.compose C f g)))
-      → ChainCategory (suc n)
-  
-  chain-category-head (cons C _ _ _ _)
-    = C
+-- ### Chain₀Functor
 
-  chain-category-object C
-    = Category.Object
-      (chain-category-head C)
+record Chain₀Functor
+  (C D : Chain₀Category)
+  : Set
+  where
 
-  chain-category-arrow C
-    = Category.Arrow
-      (chain-category-head C)
+  no-eta-equality
 
-  chain-category-identity C
-    = Category.identity
-      (chain-category-head C)
-
-  chain-category-compose C
-    = Category.compose
-      (chain-category-head C)
-
-  chain-category-tail (cons _ C' _ _ _)
-    = C'
-
-  chain-category-chain-functor (cons _ _ F _ _)
-    = F
-
-  -- #### ChainFunctor
-  
-  data ChainFunctor where
-  
-    nil
-      : {C D : ChainCategory zero}
-      → ChainFunctor C D
-
-    cons
-      : {n : ℕ}
-      → {C D : ChainCategory (suc n)}
-      → (F : Functor
-          (chain-category-head C)
-          (chain-category-head D))
-      → (F' : (x : chain-category-object C)
-        → ChainFunctor
-          (chain-category-tail C x)
-          (chain-category-tail D (Functor.base F x)))
-      → ({x y : chain-category-object C}
-        → (f : Category.Arrow (chain-category-head C) x y)
-        → ChainFunctorSquare
-          (chain-category-chain-functor C f)
-          (chain-category-chain-functor D (Functor.map F f))
-          (F' x)
-          (F' y))
-      → ChainFunctor C D
-  
-  chain-functor-head (cons F _ _)
-    = F
-
-  chain-functor-base F
-    = Functor.base
-      (chain-functor-head F)
-
-  chain-functor-map F
-    = Functor.map
-      (chain-functor-head F)
-
-  chain-functor-tail (cons _ F' _)
-    = F'
-  
-  -- #### ChainFunctorIdentity
-  
-  data ChainFunctorIdentity where
-  
-    nil
-      : {C : ChainCategory zero}
-      → {F : ChainFunctor C C}
-      → ChainFunctorIdentity F
-
-    cons
-      : {n : ℕ}
-      → {C : ChainCategory (suc n)}
-      → {F : ChainFunctor C C}
-      → FunctorIdentity
-        (chain-functor-head F)
-      → ((x : chain-category-object C)
-        → ChainFunctorIdentity
-          (chain-functor-tail F x))
-      → ChainFunctorIdentity F
-  
-  -- #### ChainFunctorCompose
-  
-  data ChainFunctorCompose where
-  
-    nil
-      : {C D E : ChainCategory zero}
-      → {F : ChainFunctor D E}
-      → {G : ChainFunctor C D}
-      → {H : ChainFunctor C E}
-      → ChainFunctorCompose F G H
-
-    cons
-      : {n : ℕ}
-      → {C D E : ChainCategory (suc n)}
-      → {F : ChainFunctor D E}
-      → {G : ChainFunctor C D}
-      → {H : ChainFunctor C E}
-      → FunctorCompose
-        (chain-functor-head F)
-        (chain-functor-head G)
-        (chain-functor-head H)
-      → ((x : chain-category-object C)
-        → ChainFunctorCompose
-          (chain-functor-tail F (chain-functor-base G x))
-          (chain-functor-tail G x)
-          (chain-functor-tail H x))
-      → ChainFunctorCompose F G H
-  
-  -- #### ChainFunctorSquare
-  
-  data ChainFunctorSquare where
-  
-    nil
-      : {C₁ C₂ D₁ D₂ : ChainCategory zero}
-      → {F : ChainFunctor C₁ C₂}
-      → {G : ChainFunctor D₁ D₂}
-      → {H₁ : ChainFunctor C₁ D₁}
-      → {H₂ : ChainFunctor C₂ D₂}
-      → ChainFunctorSquare F G H₁ H₂
+  constructor
     
-    cons
-      : {n : ℕ}
-      → {C₁ C₂ D₁ D₂ : ChainCategory (suc n)}
-      → {F : ChainFunctor C₁ C₂}
-      → {G : ChainFunctor D₁ D₂}
-      → {H₁ : ChainFunctor C₁ D₁}
-      → {H₂ : ChainFunctor C₂ D₂}
-      → FunctorSquare
-        (chain-functor-head F)
-        (chain-functor-head G)
-        (chain-functor-head H₁)
-        (chain-functor-head H₂)
-      → ((x₁ : chain-category-object C₁)
-        → ChainFunctorSquare
-          (chain-functor-tail F x₁)
-          (chain-functor-tail G (chain-functor-base H₁ x₁))
-          (chain-functor-tail H₁ x₁)
-          (chain-functor-tail H₂ (chain-functor-base F x₁)))
-      → ChainFunctorSquare F G H₁ H₂
-  
-  -- ### Construction
+    nil
 
-  -- #### ChainCategory
+-- ### Chain₀FunctorIdentity
 
-  chain-category₁
-    : Category
-    → ChainCategory (suc zero)
-  chain-category₁ C
-    = cons C
-      (λ _ → nil)
-      (λ _ → nil)
-      (λ _ → nil)
-      (λ _ _ → nil)
+record Chain₀FunctorIdentity
+  {C₁ C₂ : Chain₀Category}
+  (F : Chain₀Functor C₁ C₂)
+  : Set
+  where
 
-  -- #### ChainFunctor
+  constructor
 
-  chain-functor₁
-    : {C D : Category}
-    → Functor C D
-    → ChainFunctor
-      (chain-category₁ C)
-      (chain-category₁ D)
-  chain-functor₁ F
-    = cons F
-      (λ _ → nil)
-      (λ _ → nil)
+    nil
 
-  -- #### ChainFunctorIdentity
+-- ### Chain₀FunctorCompose
 
-  chain-functor-identity₁
-    : {C : Category}
-    → {F : Functor C C}
-    → FunctorIdentity F
-    → ChainFunctorIdentity
-      (chain-functor₁ F)
-  chain-functor-identity₁ p
-    = cons p
-      (λ _ → nil)
+record Chain₀FunctorCompose
+  {C D E₁ E₂ : Chain₀Category}
+  (F : Chain₀Functor D E₁)
+  (G : Chain₀Functor C D)
+  (H : Chain₀Functor C E₂)
+  : Set
+  where
 
-  -- #### ChainFunctorCompose
+  constructor
 
-  chain-functor-compose₁
-    : {C D E : Category}
-    → {F : Functor D E}
-    → {G : Functor C D}
-    → {H : Functor C E}
-    → FunctorCompose F G H
-    → ChainFunctorCompose
-      (chain-functor₁ F)
-      (chain-functor₁ G)
-      (chain-functor₁ H)
-  chain-functor-compose₁ p
-    = cons p
-      (λ _ → nil)
+    nil
 
-  -- #### ChainFunctorSquare
+-- ### Chain₀FunctorSquare
 
-  chain-functor-square₁
-    : {C₁ C₂ D₁ D₂ : Category}
-    → {F : Functor C₁ C₂}
-    → {G : Functor D₁ D₂}
-    → {H₁ : Functor C₁ D₁}
-    → {H₂ : Functor C₂ D₂}
-    → FunctorSquare F G H₁ H₂
-    → ChainFunctorSquare
-      (chain-functor₁ F)
-      (chain-functor₁ G)
-      (chain-functor₁ H₁)
-      (chain-functor₁ H₂)
-  chain-functor-square₁ s
-    = cons s
-      (λ _ → nil)
+record Chain₀FunctorSquare
+  {C₁ C₂ D₁ D₂ D₃ : Chain₀Category}
+  (F : Chain₀Functor C₁ C₂)
+  (G : Chain₀Functor D₁ D₃)
+  (H₁ : Chain₀Functor C₁ D₁)
+  (H₂ : Chain₀Functor C₂ D₂)
+  : Set
+  where
 
--- ## Modules
+  constructor
 
-open Internal public
-  using (ChainFunctorCompose; ChainFunctorIdentity; ChainFunctorSquare;
-    chain-functor-compose₁; chain-functor-identity₁; chain-functor-square₁)
+    nil
 
-open ChainFunctorCompose public
-open ChainFunctorIdentity public
-open ChainFunctorSquare public
+-- ## Types
 
 -- ### ChainCategory
 
 ChainCategory
   : ℕ
   → Set₁
-ChainCategory
-  = Internal.ChainCategory
-  
-open Internal.ChainCategory public
 
-open Internal public
-  using (chain-category₁)
-
-module ChainCategory where
-
-  open Internal public using () renaming
-    ( chain-category-arrow
-      to Arrow
-    ; chain-category-object
-      to Object
-    ; chain-category-chain-functor
-      to chain-functor
-    ; chain-category-compose
-      to compose
-    ; chain-category-head
-      to head
-    ; chain-category-identity
-      to identity
-    ; chain-category-tail
-      to tail
-    )
+record ChainCategory'
+  (n : ℕ)
+  : Set₁
 
 -- ### ChainFunctor
 
@@ -430,24 +91,350 @@ ChainFunctor
   → ChainCategory n
   → ChainCategory n
   → Set
-ChainFunctor
-  = Internal.ChainFunctor
   
-open Internal.ChainFunctor public
+record ChainFunctor'
+  {n : ℕ}
+  (C : ChainCategory (suc n))
+  (D : ChainCategory (suc n))
+  : Set
 
-open Internal public
-  using (chain-functor₁)
+-- ### ChainFunctorIdentity
 
-module ChainFunctor where
+ChainFunctorIdentity
+  : {n : ℕ}
+  → {C₁ C₂ : ChainCategory n}
+  → ChainFunctor C₁ C₂
+  → Set
   
-  open Internal public using () renaming
-    ( chain-functor-base
-      to base
-    ; chain-functor-head
-      to head
-    ; chain-functor-map
-      to map
-    ; chain-functor-tail
-      to tail
-    )
+record ChainFunctorIdentity'
+  {n : ℕ}
+  {C₁ C₂ : ChainCategory (suc n)}
+  (F : ChainFunctor C₁ C₂)
+  : Set
+  
+-- ### ChainFunctorCompose
+
+ChainFunctorCompose
+  : {n : ℕ}
+  → {C D E₁ E₂ : ChainCategory n}
+  → ChainFunctor D E₁
+  → ChainFunctor C D
+  → ChainFunctor C E₂
+  → Set
+  
+record ChainFunctorCompose'
+  {n : ℕ}
+  {C D E₁ E₂ : ChainCategory (suc n)}
+  (F : ChainFunctor D E₁)
+  (G : ChainFunctor C D)
+  (H : ChainFunctor C E₂)
+  : Set
+  
+-- ### ChainFunctorSquare
+
+ChainFunctorSquare
+  : {n : ℕ}
+  → {C₁ C₂ D₁ D₂ D₃ : ChainCategory n} 
+  → ChainFunctor C₁ C₂
+  → ChainFunctor D₁ D₃
+  → ChainFunctor C₁ D₁
+  → ChainFunctor C₂ D₂
+  → Set
+
+record ChainFunctorSquare'
+  {n : ℕ}
+  {C₁ C₂ D₁ D₂ D₃ : ChainCategory (suc n)} 
+  (F : ChainFunctor C₁ C₂)
+  (G : ChainFunctor D₁ D₃)
+  (H₁ : ChainFunctor C₁ D₁)
+  (H₂ : ChainFunctor C₂ D₂)
+  : Set
+
+-- ## Definitions
+
+-- ### ChainCategory
+
+ChainCategory zero
+  = Chain₀Category
+ChainCategory (suc n)
+  = ChainCategory' n
+
+record ChainCategory' n where
+
+  inductive
+
+  no-eta-equality
+
+  field
+
+    category
+      : Category
+
+  open Category category public
+
+  field
+
+    category'
+      : Object
+      → ChainCategory n
+
+    functor
+      : {x y : Object}
+      → Arrow x y
+      → ChainFunctor
+        (category' x)
+        (category' y)
+
+    functor-identity
+      : (x : Object)
+      → ChainFunctorIdentity
+        (functor (identity x))
+
+    functor-compose
+      : {x y z : Object}
+      → (f : Arrow y z)
+      → (g : Arrow x y)
+      → ChainFunctorCompose
+        (functor f)
+        (functor g)
+        (functor (compose f g))
+
+module ChainCategory
+  = ChainCategory'
+
+-- ### ChainFunctor
+
+ChainFunctor {n = zero}
+  = Chain₀Functor
+ChainFunctor {n = suc _}
+  = ChainFunctor'
+
+record ChainFunctor' C D where
+
+  inductive
+
+  no-eta-equality
+
+  field
+
+    functor
+      : Functor
+        (ChainCategory.category C)
+        (ChainCategory.category D)
+
+  open Functor functor public
+
+  field
+
+    functor'
+      : (x : ChainCategory.Object C)
+      → ChainFunctor
+        (ChainCategory.category' C x)
+        (ChainCategory.category' D (base x))
+
+    functor-square
+      : {x y : ChainCategory.Object C}
+      → (f : ChainCategory.Arrow C x y)
+      → ChainFunctorSquare
+        (ChainCategory.functor C f)
+        (ChainCategory.functor D (map f))
+        (functor' x)
+        (functor' y)
+
+module ChainFunctor
+  = ChainFunctor'
+
+-- ### ChainFunctorIdentity
+
+ChainFunctorIdentity {n = zero}
+  = Chain₀FunctorIdentity
+ChainFunctorIdentity {n = suc _}
+  = ChainFunctorIdentity'
+
+record ChainFunctorIdentity' {_ C} F where
+
+  inductive
+
+  field
+
+    functor
+      : FunctorIdentity
+        (ChainFunctor.functor F)
+
+  open FunctorIdentity functor public
+
+  field
+
+    functor'
+      : (x : ChainCategory.Object C)
+      → ChainFunctorIdentity
+        (ChainFunctor.functor' F x)
+
+module ChainFunctorIdentity
+  = ChainFunctorIdentity'
+
+-- ### ChainFunctorCompose
+
+ChainFunctorCompose {n = zero}
+  = Chain₀FunctorCompose
+ChainFunctorCompose {n = suc _}
+  = ChainFunctorCompose'
+
+record ChainFunctorCompose' {_ C} F G H where
+
+  inductive
+
+  field
+
+    functor
+      : FunctorCompose
+        (ChainFunctor.functor F)
+        (ChainFunctor.functor G)
+        (ChainFunctor.functor H)
+
+  open FunctorCompose functor public
+
+  field
+
+    functor'
+      : (x : ChainCategory.Object C)
+      → ChainFunctorCompose
+        (ChainFunctor.functor' F (ChainFunctor.base G x))
+        (ChainFunctor.functor' G x)
+        (ChainFunctor.functor' H x)
+
+module ChainFunctorCompose
+  = ChainFunctorCompose'
+
+-- ### ChainFunctorSquare
+
+ChainFunctorSquare {n = zero}
+  = Chain₀FunctorSquare
+ChainFunctorSquare {n = suc _}
+  = ChainFunctorSquare'
+
+record ChainFunctorSquare' {_ C₁} F G H₁ H₂ where
+
+  inductive
+
+  field
+
+    functor
+      : FunctorSquare
+        (ChainFunctor.functor F)
+        (ChainFunctor.functor G)
+        (ChainFunctor.functor H₁)
+        (ChainFunctor.functor H₂)
+
+  open FunctorSquare functor public
+
+  field
+
+    functor'
+      : (x₁ : ChainCategory.Object C₁)
+      → ChainFunctorSquare
+        (ChainFunctor.functor' F x₁) 
+        (ChainFunctor.functor' G (ChainFunctor.base H₁ x₁))
+        (ChainFunctor.functor' H₁ x₁) 
+        (ChainFunctor.functor' H₂ (ChainFunctor.base F x₁))
+
+module ChainFunctorSquare
+  = ChainFunctorSquare'
+
+-- ## Construction
+
+-- ### ChainCategory
+
+chain₁-category
+  : Category
+  → ChainCategory (suc zero)
+chain₁-category C
+  = record
+  { category
+    = C
+  ; category'
+    = λ _ → nil
+  ; functor
+    = λ _ → nil
+  ; functor-identity
+    = λ _ → nil
+  ; functor-compose
+    = λ _ _ → nil
+  }
+
+-- ### ChainFunctor
+
+chain₁-functor
+  : {C D : Category}
+  → Functor C D
+  → ChainFunctor
+    (chain₁-category C)
+    (chain₁-category D)
+chain₁-functor F
+  = record
+  { functor
+    = F
+  ; functor'
+    = λ _ → nil
+  ; functor-square
+    = λ _ → nil
+  }
+
+-- ### ChainFunctorIdentity
+
+chain₁-functor-identity
+  : {C : Category}
+  → {F : Functor C C}
+  → FunctorIdentity F
+  → ChainFunctorIdentity
+    (chain₁-functor F)
+chain₁-functor-identity p
+  = record
+  { functor
+    = p
+  ; functor'
+    = λ _ → nil
+  }
+
+-- ### ChainFunctorCompose
+
+chain₁-functor-compose
+  : {C D E : Category}
+  → {F : Functor D E}
+  → {G : Functor C D}
+  → {H : Functor C E}
+  → FunctorCompose F G H
+  → ChainFunctorCompose
+    (chain₁-functor F)
+    (chain₁-functor G)
+    (chain₁-functor H)
+chain₁-functor-compose p
+  = record
+  { functor
+    = p
+  ; functor'
+    = λ _ → nil
+  }
+
+-- ### ChainFunctorSquare
+
+chain₁-functor-square
+  : {C₁ C₂ D₁ D₂ : Category}
+  → {F : Functor C₁ C₂}
+  → {G : Functor D₁ D₂}
+  → {H₁ : Functor C₁ D₁}
+  → {H₂ : Functor C₂ D₂}
+  → FunctorSquare F G H₁ H₂
+  → ChainFunctorSquare
+    (chain₁-functor F)
+    (chain₁-functor G)
+    (chain₁-functor H₁)
+    (chain₁-functor H₂)
+chain₁-functor-square s
+  = record
+  { functor
+    = s
+  ; functor'
+    = λ _ → nil
+  }
 

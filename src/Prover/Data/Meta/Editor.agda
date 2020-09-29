@@ -3,15 +3,15 @@ module Prover.Data.Meta.Editor where
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Number.Editor
-  using (NumberEventStack; number-partial-editor)
+  using (NumberEventStack; number-simple-partial-editor)
 open import Prover.Editor
-  using (PartialEditor; ViewStackMap)
+  using (SimplePartialEditor; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseViewStack; BaseViewStackMap)
 open import Prover.Editor.Lift
   using (view-stack-map-lift)
-open import Prover.Editor.Map
-  using (partial-editor-map-view)
+open import Prover.Editor.Map.View
+  using (simple-partial-editor-map-view)
 open import Prover.View.Style
   using (Style)
 open import Prover.View.Text
@@ -35,7 +35,9 @@ draw-meta-empty
 draw-meta-empty
   = RichText.style Style.meta (RichText.wrap "[" "]" (RichText.string "_"))
 
--- ## Editor
+-- ## Editors
+
+-- ### SimplePartialEditor
 
 module MetaBaseViewStackMap where
 
@@ -80,12 +82,12 @@ meta-view-stack-map
   = view-stack-map-lift
     meta-base-view-stack-map
 
-meta-partial-editor
-  : PartialEditor
+meta-simple-partial-editor
+  : SimplePartialEditor
     RichTextViewStack
     NumberEventStack
     Meta
-meta-partial-editor
-  = partial-editor-map-view meta-view-stack-map
-  $ number-partial-editor
+meta-simple-partial-editor
+  = simple-partial-editor-map-view meta-view-stack-map
+  $ number-simple-partial-editor
 

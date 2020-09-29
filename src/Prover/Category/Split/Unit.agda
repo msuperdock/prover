@@ -1,17 +1,19 @@
 module Prover.Category.Split.Unit where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category; Functor; FunctorSquare)
 open import Prover.Category.Partial
-  using (PartialFunctor)
+  using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Partial.Unit
-  using (partial-functor-unit)
+  using (partial-functor-unit; partial-functor-square-unit)
 open import Prover.Category.Split
-  using (SplitFunctor)
+  using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Category.Unit
-  using (module CategoryUnit; category-unit; functor-unit)
+  using (module CategoryUnit; category-unit; functor-unit; functor-square-unit)
+open import Prover.Function
+  using (Function)
 open import Prover.Function.Split
-  using (SplitFunction)
+  using (SplitFunction; SplitFunctionSquare)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -88,4 +90,48 @@ module _
       (category-unit B)
   split-functor-unit r
     = record {SplitFunctorUnit r}
+
+-- ## SplitFunctorSquare
+
+module _
+  {A₁ A₂ B₁ B₂ : Set}
+  {F : Function A₁ A₂}
+  {G : Function B₁ B₂}
+  {H₁ : SplitFunction A₁ B₁}
+  {H₂ : SplitFunction A₂ B₂}
+  where
+
+  module SplitFunctorSquareUnit
+    (s : SplitFunctionSquare F G H₁ H₂)
+    where
+
+    partial-functor
+      : PartialFunctorSquare
+        (functor-unit F)
+        (functor-unit G)
+        (SplitFunctor.partial-functor (split-functor-unit H₁))
+        (SplitFunctor.partial-functor (split-functor-unit H₂))
+    partial-functor
+      = partial-functor-square-unit
+        (SplitFunctionSquare.partial-function s)
+
+    functor
+      : FunctorSquare
+        (functor-unit G)
+        (functor-unit F)
+        (SplitFunctor.functor (split-functor-unit H₁))
+        (SplitFunctor.functor (split-functor-unit H₂))
+    functor
+      = functor-square-unit
+        (SplitFunctionSquare.function s)
+
+  split-functor-square-unit
+    : SplitFunctionSquare F G H₁ H₂
+    → SplitFunctorSquare
+      (functor-unit F)
+      (functor-unit G)
+      (split-functor-unit H₁)
+      (split-functor-unit H₂)
+  split-functor-square-unit s
+    = record {SplitFunctorSquareUnit s}
 

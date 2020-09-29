@@ -5,62 +5,10 @@ open import Prover.Category.Chain
 open import Prover.Category.Dependent
   using (DependentCategory)
 open import Prover.Category.Dependent.Relation
-  using (DependentRelation; dependent-relation₀)
+  using (DependentRelation)
 open import Prover.Prelude
 
--- ## Internal
-
-module Internal where
-
-  -- ### Definition
-
-  data DependentDecidable
-    : {n : ℕ}
-    → {C : ChainCategory n}
-    → {C' : DependentCategory C}
-    → DependentRelation C'
-    → Set
-    where
-
-    nil
-      : {C : ChainCategory zero}
-      → {C' : DependentCategory C}
-      → {R : DependentRelation C'}
-      → Decidable (dependent-relation₀ R)
-      → DependentDecidable R
-    
-    cons
-      : {n : ℕ}
-      → {C : ChainCategory (suc n)}
-      → {C' : DependentCategory C}
-      → {R : DependentRelation C'}
-      → ((x : ChainCategory.Object C)
-        → DependentDecidable (DependentRelation.tail R x))
-      → DependentDecidable R
-
-  -- ## Interface
-
-  dependent-decidable₀
-    : {C : ChainCategory zero}
-    → {C' : DependentCategory C}
-    → {R : DependentRelation C'}
-    → DependentDecidable R
-    → Decidable (dependent-relation₀ R)
-  dependent-decidable₀ (nil d)
-    = d
-
-  dependent-decidable-tail
-    : {n : ℕ}
-    → {C : ChainCategory (suc n)}
-    → {C' : DependentCategory C}
-    → {R : DependentRelation C'}
-    → DependentDecidable R
-    → (x : ChainCategory.Object C)
-    → DependentDecidable (DependentRelation.tail R x)
-  dependent-decidable-tail (cons d)
-    = d
-
--- ## Module
+-- ## Types
 
 DependentDecidable
   : {n : ℕ}
@@ -68,16 +16,32 @@ DependentDecidable
   → {C' : DependentCategory C}
   → DependentRelation C'
   → Set
-DependentDecidable
-  = Internal.DependentDecidable
 
-open Internal public
-  using (dependent-decidable₀)
+record DependentDecidable'
+  {n : ℕ}
+  {C : ChainCategory (suc n)}
+  {C' : DependentCategory C}
+  (R : DependentRelation C')
+  : Set
 
-module DependentDecidable where
+-- ## Definitions
 
-  open Internal public using () renaming
-    ( dependent-decidable-tail
-      to tail
-    )
+DependentDecidable {n = zero}
+  = Decidable
+DependentDecidable {n = suc _}
+  = DependentDecidable'
+
+record DependentDecidable' {_ C} R where
+
+  inductive
+
+  field
+
+    decidable
+      : (x : ChainCategory.Object C)
+      → DependentDecidable
+        (DependentRelation.relation R x)
+
+module DependentDecidable
+  = DependentDecidable'
 

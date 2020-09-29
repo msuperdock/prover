@@ -4,66 +4,38 @@ open import Prover.Category.Chain
   using (ChainCategory)
 open import Prover.Prelude
 
--- ## Internal
-
-module Internal where
-
-  -- ### Definition
-
-  data DependentSet
-    : {n : ℕ}
-    → ChainCategory n
-    → Set₁
-    where
-
-    nil
-      : {C : ChainCategory zero}
-      → Set
-      → DependentSet C
-
-    cons
-      : {n : ℕ}
-      → {C : ChainCategory (suc n)}
-      → ((x : ChainCategory.Object C)
-        → DependentSet (ChainCategory.tail C x))
-      → DependentSet C
-
-  -- ### Interface
-
-  dependent-set₀
-    : {C : ChainCategory zero}
-    → DependentSet C
-    → Set
-  dependent-set₀ (nil A)
-    = A
-
-  dependent-set-tail
-    : {n : ℕ}
-    → {C : ChainCategory (suc n)}
-    → DependentSet C
-    → (x : ChainCategory.Object C)
-    → DependentSet (ChainCategory.tail C x)
-  dependent-set-tail (cons C')
-    = C'
-
--- ## Module
+-- ## Types
 
 DependentSet
   : {n : ℕ}
   → ChainCategory n
   → Set₁
-DependentSet
-  = Internal.DependentSet
 
-open Internal.DependentSet public
+record DependentSet'
+  {n : ℕ}
+  (C : ChainCategory (suc n))
+  : Set₁
 
-open Internal public
-  using (dependent-set₀)
+-- ## Definitions
 
-module DependentSet where
+DependentSet {n = zero} _
+  = Set
+DependentSet {n = suc _} C
+  = DependentSet' C
 
-  open Internal public using () renaming
-    ( dependent-set-tail
-      to tail
-    )
-  
+record DependentSet' C where
+
+  inductive
+
+  no-eta-equality
+
+  field
+
+    set
+      : (x : ChainCategory.Object C)
+      → DependentSet
+        (ChainCategory.category' C x)
+
+module DependentSet
+  = DependentSet'
+

@@ -23,12 +23,12 @@ open import Prover.Prelude
 dependent-simple-category-sigma-sum
   : {n : ℕ}
   → {C : ChainCategory n}
-  → {C₁' D₁' : DependentCategory C}
-  → DependentSimpleCategory (chain-category-snoc D₁')
-  → DependentSplitFunctor C₁' D₁'
+  → {C₁₁' C₂₁' : DependentCategory C}
+  → DependentSimpleCategory (chain-category-snoc C₂₁')
+  → DependentSplitFunctor C₁₁' C₂₁'
   → DependentSimpleCategory C
-dependent-simple-category-sigma-sum C₂' F₁
+dependent-simple-category-sigma-sum C₂₂' F₁
   = dependent-category-simple
   $ dependent-category-sigma-sum
-    (dependent-category-unit C₂') F₁
+    (dependent-category-unit C₂₂') F₁
 

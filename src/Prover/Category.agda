@@ -298,35 +298,6 @@ record FunctorEqual
       → (f : Category.Arrow C x y)
       → Functor.map F₁ f ≅ Functor.map F₂ f
 
--- ### Reflexivity
-
-module _
-  {C D : Category}
-  where
-
-  module FunctorRefl
-    (F : Functor C D)
-    where
-  
-    base
-      : (x : Category.Object C)
-      → Functor.base F x ≅ Functor.base F x
-    base _
-      = refl
-  
-    map
-      : {x y : Category.Object C}
-      → (f : Category.Arrow C x y)
-      → Functor.map F f ≅ Functor.map F f
-    map _
-      = refl
-  
-  functor-refl
-    : {F : Functor C D}
-    → FunctorEqual F F
-  functor-refl {F = F}
-    = record {FunctorRefl F}
-
 -- ### Symmetry
 
 module _
@@ -641,15 +612,6 @@ module _
       (functor-identity' C₂)
   functor-square-identity F
     = record {FunctorSquareIdentity F}
-
-  functor-square-identity-eq
-    : {F G : Functor C₁ C₂}
-    → FunctorEqual F G
-    → FunctorSquare F G
-      (functor-identity' C₁)
-      (functor-identity' C₂)
-  functor-square-identity-eq p
-    = record {FunctorEqual p}
 
 functor-square-identity'
   : {C D : Category}

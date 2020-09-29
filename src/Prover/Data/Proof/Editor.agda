@@ -1,12 +1,14 @@
 module Prover.Data.Proof.Editor where
 
+open import Prover.Category.Encoding
+  using (Encoding)
 open import Prover.Client.Aeson
   using (Value)
 open import Prover.Data.Formula
   using (Formula; _≟_frm)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent; decode-encode-formula; decode-formula; encode-formula;
-  formula-split-editor)
+    formula-simple-split-editor)
 open import Prover.Data.Identifier
   using (Identifier)
 open import Prover.Data.Identifier.Editor
@@ -30,8 +32,8 @@ open import Prover.Data.Text.Editor
 open import Prover.Data.Variables
   using (Variables)
 open import Prover.Editor
-  using (EventStack; EventStackMap; MainEditor; SimpleEditor; SplitEditor;
-    ViewStack; ViewStackMap)
+  using (EventStack; EventStackMap; SimpleEditor; SimpleMainEditor;
+    SimpleSplitEditor; ViewStack; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
@@ -39,15 +41,13 @@ open import Prover.Editor.Child
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack)
 open import Prover.Editor.Map
-  using (flat-editor-map; simple-editor-map-event; simple-editor-map-view)
+  using (flat-editor-map)
+open import Prover.Editor.Map.Event
+  using (simple-editor-map-event)
+open import Prover.Editor.Map.View
+  using (simple-editor-map-view)
 open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
-open import Prover.Function
-  using (function)
-open import Prover.Function.Partial
-  using (partial-function)
-open import Prover.Function.Split
-  using (SplitFunction)
 open import Prover.View.Command
   using (Command; CommandFlatViewStack; CommandPath)
 open import Prover.View.Line
@@ -191,7 +191,7 @@ module _
     : Formula ss vs true
     → RichText
   draw-formula
-    = SplitEditor.draw-pure (formula-split-editor ss vs true)
+    = SimpleSplitEditor.draw-pure (formula-simple-split-editor ss vs true)
 
   draw-branch
     : List (Formula ss vs false)
@@ -264,7 +264,7 @@ module _
       (draw-branch (Rule.hypotheses r) b)
       (draw-path-branch (Rule.hypotheses r) b bp)
 
--- ## Encode
+-- ## Encoding
 
 -- ### Pattern
 
@@ -472,26 +472,26 @@ decode-encode-proof {rs = rs} {r = r} (proof b q)
 ... | yes _
   = refl
 
--- ### Split
+-- ### Record
 
-proof-split-function
+proof-encoding
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
-  → SplitFunction Value (Proof rs r)
-proof-split-function rs r
+  → Encoding (Proof rs r) Value
+proof-encoding rs r
   = record
-  { partial-function
-    = partial-function (decode-proof rs r)
-  ; function
-    = function encode-proof
-  ; base-unbase
+  { encode
+    = encode-proof
+  ; decode
+    = decode-proof rs r
+  ; decode-encode
     = decode-encode-proof
   }
 
 -- ## Editors
 
--- ### Base
+-- ### SimpleBaseEditor
 
 -- #### View
 
@@ -647,7 +647,7 @@ proof-simple-base-editor
 proof-simple-base-editor rs r
   = record {ProofSimpleBaseEditor rs r}
 
--- ### Child
+-- ### SimpleChildEditor
 
 -- #### Key
 
@@ -840,9 +840,9 @@ proof-simple-child-editor rs r infer
 proof-simple-child-editor rs r meta
   = proof-simple-child-editor-meta rs r
 
--- ### Parent
+-- ### SimpleEditor
 
--- #### View
+-- #### Parent
 
 ProofParentViewStack
   : ViewStack
@@ -851,16 +851,12 @@ ProofParentViewStack
     ProofBaseViewStack
     ProofChildViewStack
 
--- #### Event
-
 ProofParentEventStack
   : EventStack
 ProofParentEventStack
   = event-stack-parent
     ProofBaseEventStack
     ProofChildEventStack
-
--- #### Editor
 
 proof-parent-editor
   : {ss : Symbols}
@@ -876,8 +872,6 @@ proof-parent-editor rs r
     ProofChildEventStack
     (proof-simple-base-editor rs r)
     (proof-simple-child-editor rs r)
-
--- ### Simple
 
 -- #### View
 
@@ -1008,22 +1002,22 @@ proof-simple-editor rs r
   $ simple-editor-map-event proof-event-stack-map
   $ proof-parent-editor rs r
 
--- ### Main
+-- ### SimpleMainEditor
 
-proof-main-editor
+proof-simple-main-editor
   : {ss : Symbols}
   → Rules ss
   → Rule ss
-  → MainEditor
+  → SimpleMainEditor
     ProofViewStack
     ProofEventStack
     Value
-proof-main-editor rs r
+proof-simple-main-editor rs r
   = record
-  { simple-editor
+  { editor
     = proof-simple-editor rs r
-  ; split-function
-    = proof-split-function rs r
+  ; state-encoding
+    = proof-encoding rs r
   ; bool-function
     = Proof.is-complete
   }

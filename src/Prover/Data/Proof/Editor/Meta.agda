@@ -4,11 +4,11 @@ open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent; FormulaEventStack; FormulaViewStack;
-    formula-partial-editor)
+    formula-simple-partial-editor)
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Meta.Editor
-  using (meta-partial-editor)
+  using (meta-simple-partial-editor)
 open import Prover.Data.Number.Editor
   using (NumberEvent; NumberEventStack)
 open import Prover.Data.Symbols
@@ -18,16 +18,18 @@ open import Prover.Data.Text.Editor
 open import Prover.Data.Variables
   using (Variables)
 open import Prover.Editor
-  using (EventStack; EventStackMap; PartialEditor; ViewStack; ViewStackMap)
+  using (EventStack; EventStackMap; SimplePartialEditor; ViewStack;
+    ViewStackMap)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatEventStackMap)
 open import Prover.Editor.Flatten
-  using (event-stack-flatten; partial-editor-flatten)
-open import Prover.Editor.Map
-  using (flat-editor-map-event; partial-editor-map-event;
-    partial-editor-map-view-with)
+  using (event-stack-flatten; simple-partial-editor-flatten)
+open import Prover.Editor.Map.Event
+  using (flat-editor-map-event; simple-partial-editor-map-event)
+open import Prover.Editor.Map.View
+  using (simple-partial-editor-map-view-with)
 open import Prover.Editor.Product
-  using (event-stack-product; partial-editor-product; view-stack-product)
+  using (event-stack-product; simple-partial-editor-product; view-stack-product)
 open import Prover.View.Line
   using (Line)
 open import Prover.View.Text
@@ -106,9 +108,9 @@ ProofMetaFlatEventStack
 
 -- ## Editors
 
--- ### Product
+-- ### SimplePartialEditor
 
--- #### View
+-- #### Product
 
 ProofMetaProductViewStack
   : ViewStack
@@ -117,8 +119,6 @@ ProofMetaProductViewStack
     RichTextViewStack
     FormulaViewStack
 
--- #### Event
-
 ProofMetaProductEventStack
   : EventStack
 ProofMetaProductEventStack
@@ -126,22 +126,17 @@ ProofMetaProductEventStack
     NumberEventStack
     FormulaEventStack
 
--- #### Editor
-
 proof-meta-product-editor
   : (ss : Symbols)
   → (vs : Variables)
-  → PartialEditor
+  → SimplePartialEditor
     ProofMetaProductViewStack
     ProofMetaProductEventStack
     (Meta × Formula ss vs false)
 proof-meta-product-editor ss vs
-  = partial-editor-product
-    Direction.right
-    meta-partial-editor
-    (formula-partial-editor ss vs false)
-
--- ### Partial
+  = simple-partial-editor-product Direction.right
+    meta-simple-partial-editor
+    (formula-simple-partial-editor ss vs false)
 
 -- #### View
 
@@ -293,19 +288,19 @@ proof-meta-event-stack-map
 
 -- #### Editor
 
-proof-meta-partial-editor
+proof-meta-simple-partial-editor
   : (ss : Symbols)
   → (vs : Variables)
-  → PartialEditor
+  → SimplePartialEditor
     WindowViewStack
     ProofMetaEventStack
     (Meta × Formula ss vs false)
-proof-meta-partial-editor ss vs
-  = partial-editor-map-view-with proof-meta-view-stack-map
-  $ partial-editor-map-event proof-meta-event-stack-map
+proof-meta-simple-partial-editor ss vs
+  = simple-partial-editor-map-view-with proof-meta-view-stack-map
+  $ simple-partial-editor-map-event proof-meta-event-stack-map
   $ proof-meta-product-editor ss vs
 
--- ### Flat
+-- ### FlatEditor
 
 -- #### Event
 
@@ -350,6 +345,6 @@ proof-meta-flat-editor
     (Meta × Formula ss vs false)
 proof-meta-flat-editor ss vs
   = flat-editor-map-event proof-meta-flat-event-stack-map
-  $ partial-editor-flatten
-  $ proof-meta-partial-editor ss vs
+  $ simple-partial-editor-flatten
+  $ proof-meta-simple-partial-editor ss vs
 

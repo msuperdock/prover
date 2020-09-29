@@ -2,10 +2,39 @@ module Prover.Editor where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Chain
+  using (ChainCategory; nil)
+open import Prover.Category.Dependent
+  using (DependentCategory)
+open import Prover.Category.Dependent.Bool
+  using (DependentBoolFunction)
+open import Prover.Category.Dependent.Encoding
+  using (DependentEncoding)
+open import Prover.Category.Dependent.Simple
+  using (DependentSimpleCategory; dependent-simple-category-set)
+open import Prover.Category.Dependent.Simple.Bool
+  using (DependentSimpleBoolFunction)
+open import Prover.Category.Dependent.Simple.Convert
+  using (dependent-category-simple)
+open import Prover.Category.Dependent.Simple.Encoding
+  using (DependentSimpleEncoding)
+open import Prover.Category.Dependent.Simple.Encoding.Convert
+  using (dependent-encoding-simple)
+open import Prover.Category.Dependent.Simple.Partial
+  using (DependentSimplePartialFunction; dependent-simple-partial-function-bool)
+open import Prover.Category.Dependent.Simple.Split
+  using (DependentSimpleSplitFunctor; dependent-simple-split-functor-bool;
+    dependent-simple-split-functor-partial)
+open import Prover.Category.Dependent.Simple.Split.Convert
+  using (dependent-split-functor-simple)
+open import Prover.Category.Dependent.Split
+  using (DependentSplitFunctor; dependent-split-functor-bool)
+open import Prover.Category.Encoding
+  using (Encoding)
 open import Prover.Category.Split
   using (SplitFunctor)
-open import Prover.Function.Bool
-  using (BoolFunction)
+open import Prover.Function.Dependent
+  using (DependentSet)
 open import Prover.Function.Partial
   using (PartialFunction)
 open import Prover.Function.Split
@@ -211,7 +240,7 @@ record EventStackMap
       → EventStack.EventInner F (mode-inner m)
       → EventStack.EventInner E m
 
--- ## Editors
+-- ## Editors (basic)
 
 -- ### Editor
 
@@ -403,172 +432,435 @@ data SimpleEditor
     → Editor V E C
     → SimpleEditor V E (Category.Object C)
 
--- ### PartialEditor
+simple-editor-draw
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A : Set}
+  → SimpleEditor V E A
+  → A
+  → ViewStack.View V
+simple-editor-draw (any e)
+  = Editor.draw e
 
-record PartialEditor
+-- ## Editors (dependent)
+
+-- ### DependentEditor
+
+-- #### Types
+
+DependentEditor
+  : {n : ℕ}
+  → ViewStack
+  → EventStack
+  → {C : ChainCategory n}
+  → DependentCategory C
+  → Set₁
+
+record DependentEditor'
+  {n : ℕ}
   (V : ViewStack)
   (E : EventStack)
-  (A : Set)
+  {C : ChainCategory (suc n)}
+  (C' : DependentCategory C)
   : Set₁
-  where
 
-  constructor
+-- #### Definitions
 
-    partial-editor
+DependentEditor {n = zero} V E
+  = Editor V E
+DependentEditor {n = suc _} V E
+  = DependentEditor' V E
+
+record DependentEditor' V E {C} C' where
+
+  inductive
 
   field
 
-    {State}
-      : Set
+    editor
+      : (x : ChainCategory.Object C)
+      → DependentEditor V E
+        (DependentCategory.category C' x)
 
-    simple-editor 
-      : SimpleEditor V E State
+module DependentEditor
+  = DependentEditor'
+
+-- ### DependentSplitEditor
+
+record DependentSplitEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  {C : ChainCategory n}
+  (C' : DependentCategory C)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : DependentCategory C
+
+    editor
+      : DependentEditor V E StateCategory
+
+    split-functor
+      : DependentSplitFunctor StateCategory C'
+
+  bool-function
+    : DependentBoolFunction StateCategory
+  bool-function
+    = dependent-split-functor-bool split-functor
+
+dependent-split-editor-tail
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory (suc n)}
+  → {C' : DependentCategory C}
+  → DependentSplitEditor V E C'
+  → (x : ChainCategory.Object C)
+  → DependentSplitEditor V E
+    (DependentCategory.category C' x)
+dependent-split-editor-tail e x
+  = record
+  { editor
+    = DependentEditor.editor
+      (DependentSplitEditor.editor e) x
+  ; split-functor
+    = DependentSplitFunctor.split-functor
+      (DependentSplitEditor.split-functor e) x
+  }
+
+-- ### DependentInnerEditor
+
+record DependentInnerEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  (S P : Set)
+  {C : ChainCategory n}
+  (C' : DependentCategory C)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : DependentCategory C
+
+    editor
+      : DependentEditor V E StateCategory
+
+    state-encoding
+      : DependentEncoding StateCategory S
+
+    pure-encoding
+      : DependentEncoding C' P
+
+    split-functor
+      : DependentSplitFunctor StateCategory C'
+  
+  split-editor
+    : DependentSplitEditor V E C'
+  split-editor
+    = record
+    { editor
+      = editor
+    ; split-functor
+      = split-functor
+    }
+
+  bool-function
+    : DependentBoolFunction StateCategory
+  bool-function
+    = dependent-split-functor-bool split-functor
+
+-- ### DependentSimpleEditor
+
+-- #### Types
+
+DependentSimpleEditor
+  : {n : ℕ}
+  → ViewStack
+  → EventStack
+  → {C : ChainCategory n}
+  → DependentSimpleCategory C
+  → Set₁
+
+record DependentSimpleEditor'
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  {C : ChainCategory (suc n)}
+  (C' : DependentSimpleCategory C)
+  : Set₁
+
+-- #### Definitions
+
+DependentSimpleEditor {n = zero} V E
+  = SimpleEditor V E
+DependentSimpleEditor {n = suc _} V E
+  = DependentSimpleEditor' V E
+
+record DependentSimpleEditor' V E {C} C' where
+
+  inductive
+
+  field
+
+    editor
+      : (x : ChainCategory.Object C)
+      → DependentSimpleEditor V E
+        (DependentSimpleCategory.category C' x)
+
+module DependentSimpleEditor
+  = DependentSimpleEditor'
+
+-- #### Conversion
+
+dependent-editor-simple
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → DependentEditor V E C'
+  → DependentSimpleEditor V E
+    (dependent-category-simple C')
+
+dependent-editor-simple {n = zero} e
+  = any e
+
+dependent-editor-simple {n = suc _} e
+  = record
+  { editor
+    = λ x → dependent-editor-simple
+      (DependentEditor.editor e x)
+  }
+
+-- ### DependentSimplePartialEditor
+
+record DependentSimplePartialEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  {C : ChainCategory n}
+  (C' : DependentSet C)
+  : Set₁
+  where
+
+  field
+  
+    {StateCategory}
+      : DependentSimpleCategory C
+
+    editor
+      : DependentSimpleEditor V E StateCategory
 
     partial-function
-      : PartialFunction State A
+      : DependentSimplePartialFunction StateCategory C'
 
-  open PartialFunction partial-function public
+  bool-function
+    : DependentSimpleBoolFunction StateCategory
+  bool-function
+    = dependent-simple-partial-function-bool partial-function
+
+-- ### DependentSimpleSplitEditor
+
+-- #### Definition
+
+record DependentSimpleSplitEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  {C : ChainCategory n}
+  (C' : DependentSimpleCategory C)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : DependentSimpleCategory C
+
+    editor
+      : DependentSimpleEditor V E StateCategory
+
+    split-functor
+      : DependentSimpleSplitFunctor StateCategory C'
+
+  partial-editor
+    : DependentSimplePartialEditor V E
+      (dependent-simple-category-set C')
+  partial-editor
+    = record
+    { editor
+      = editor
+    ; partial-function
+      = dependent-simple-split-functor-partial split-functor
+    }
+
+  bool-function
+    : DependentSimpleBoolFunction StateCategory
+  bool-function
+    = dependent-simple-split-functor-bool split-functor
+
+-- #### Conversion
+
+dependent-split-editor-simple
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → DependentSplitEditor V E C'
+  → DependentSimpleSplitEditor V E
+    (dependent-category-simple C')
+dependent-split-editor-simple e
+  = record
+  { editor
+    = dependent-editor-simple
+      (DependentSplitEditor.editor e)
+  ; split-functor
+    = dependent-split-functor-simple
+      (DependentSplitEditor.split-functor e)
+  }
+
+-- ### DependentSimpleMainEditor
+
+record DependentSimpleMainEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  (S : Set)
+  (C : ChainCategory n)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : DependentSimpleCategory C
+
+    editor
+      : DependentSimpleEditor V E StateCategory
+
+    state-encoding
+      : DependentSimpleEncoding StateCategory S
+
+    bool-function
+      : DependentSimpleBoolFunction StateCategory
+
+-- ### DependentSimpleInnerEditor
+
+-- #### Definition
+
+record DependentSimpleInnerEditor
+  {n : ℕ}
+  (V : ViewStack)
+  (E : EventStack)
+  (S P : Set)
+  {C : ChainCategory n}
+  (C' : DependentSimpleCategory C)
+  : Set₁
+  where
+
+  field
+
+    {StateCategory}
+      : DependentSimpleCategory C
+
+    editor
+      : DependentSimpleEditor V E StateCategory
+
+    state-encoding
+      : DependentSimpleEncoding StateCategory S
+
+    pure-encoding
+      : DependentSimpleEncoding C' P
+
+    split-functor
+      : DependentSimpleSplitFunctor StateCategory C'
+
+  split-editor
+    : DependentSimpleSplitEditor V E C'
+  split-editor
+    = record
+    { editor
+      = editor
+    ; split-functor
+      = split-functor
+    }
+
+  partial-editor
+    : DependentSimplePartialEditor V E
+      (dependent-simple-category-set C')
+  partial-editor
+    = record
+    { editor
+      = editor
+    ; partial-function
+      = dependent-simple-split-functor-partial split-functor
+    }
+
+  bool-function
+    : DependentSimpleBoolFunction StateCategory
+  bool-function
+    = dependent-simple-split-functor-bool split-functor
+
+-- #### Conversion
+
+dependent-inner-editor-simple
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → DependentInnerEditor V E S P C'
+  → DependentSimpleInnerEditor V E S P
+    (dependent-category-simple C')
+dependent-inner-editor-simple e
+  = record
+  { editor
+    = dependent-editor-simple
+      (DependentInnerEditor.editor e)
+  ; state-encoding
+    = dependent-encoding-simple
+      (DependentInnerEditor.state-encoding e)
+  ; pure-encoding
+    = dependent-encoding-simple
+      (DependentInnerEditor.pure-encoding e)
+  ; split-functor
+    = dependent-split-functor-simple
+      (DependentInnerEditor.split-functor e)
+  }
+
+-- ## Editors (nondependent)
 
 -- ### SplitEditor
 
 -- #### Definition
 
-record SplitEditor
-  (V : ViewStack)
-  (E : EventStack)
-  (C : Category)
-  : Set₁
-  where
+SplitEditor
+  : ViewStack
+  → EventStack
+  → Category
+  → Set₁
+SplitEditor V E
+  = DependentSplitEditor V E {C = nil}
 
-  constructor
+-- #### Module
 
-    split-editor
-
-  field
-
-    {StateCategory}
-      : Category
-
-  open Category StateCategory public using () renaming
-    ( Object
-      to State
-    ; Arrow
-      to StateArrow
-    ; identity
-      to state-identity
-    ; compose
-      to state-compose
-    ; precompose
-      to state-precompose
-    ; postcompose
-      to state-postcompose
-    ; associative
-      to state-associative
-    )
-
-  field
-
-    editor
-      : Editor V E StateCategory
-
-  open Editor editor public
-
-  field
-
-    split-functor
-      : SplitFunctor StateCategory C
-
-  open SplitFunctor split-functor public
-
-  draw-pure
-    : Category.Object C
-    → ViewStack.View V
-  draw-pure x
-    = draw (unbase x)
-
--- #### Conversion
-
-module _
+module SplitEditor
   {V : ViewStack}
   {E : EventStack}
   {C : Category}
+  (e : SplitEditor V E C)
   where
 
-  module SplitEditorPartial
-    (e : SplitEditor V E C)
-    where
-
-    open SplitEditor e public
-      using (State; partial-function)
-
-    simple-editor 
-      : SimpleEditor V E State
-    simple-editor 
-      = any (SplitEditor.editor e)
-
-  split-editor-partial
-    : SplitEditor V E C
-    → PartialEditor V E (Category.Object C)
-  split-editor-partial e
-    = record {SplitEditorPartial e}
-
--- ### MainEditor
-
-record MainEditor
-  (V : ViewStack)
-  (E : EventStack)
-  (S : Set)
-  : Set₁
-  where
-
-  constructor
-
-    main-editor
-
-  field
-
-    State
-      : Set
-
-    simple-editor
-      : SimpleEditor V E State
-
-    split-function
-      : SplitFunction S State
-
-  open SplitFunction split-function public using () renaming
-    ( base
-      to decode
-    ; unbase
-      to encode
-    ; base-unbase
-      to decode-encode
-    )
-
-  field
-
-    bool-function
-      : BoolFunction State
-
--- ### SplitMainEditor
-
-record SplitMainEditor
-  (V : ViewStack)
-  (E : EventStack)
-  (S : Set)
-  (P : Set)
-  (C : Category)
-  : Set₁
-  where
-
-  constructor
-
-    split-main-editor
-
-  field
-
-    {StateCategory}
-      : Category
+  open DependentSplitEditor e public
 
   open Category StateCategory public using () renaming
     ( Object
@@ -587,51 +879,269 @@ record SplitMainEditor
       to state-associative
     )
 
-  field
-
-    editor
-      : Editor V E StateCategory
-
   open Editor editor public
 
-  field
-
-    state-split-function
-      : SplitFunction S State
-
-  open SplitFunction state-split-function public using () renaming
-    ( base
-      to state-decode
-    ; unbase
-      to state-encode
-    ; base-unbase
-      to state-decode-encode
-    )
-
-  field
-
-    pure-split-function
-      : SplitFunction P (Category.Object C)
-
-  open SplitFunction pure-split-function public using () renaming
-    ( base
-      to pure-decode
-    ; unbase
-      to pure-encode
-    ; base-unbase
-      to pure-decode-encode
-    )
-
-  field
-
-    split-functor
-      : SplitFunctor StateCategory C
-
   open SplitFunctor split-functor public
+    hiding (bool-function)
 
   draw-pure
     : Category.Object C
     → ViewStack.View V
   draw-pure x
     = draw (unbase x)
-  
+
+-- ### InnerEditor
+
+-- #### Definition
+
+InnerEditor
+  : ViewStack
+  → EventStack
+  → Set
+  → Set
+  → Category
+  → Set₁
+InnerEditor V E S P
+  = DependentInnerEditor V E S P {C = nil}
+
+-- #### Module
+
+module InnerEditor
+  {V : ViewStack}
+  {E : EventStack}
+  {S P : Set}
+  {C : Category}
+  (e : InnerEditor V E S P C)
+  where
+
+  open DependentInnerEditor e public
+
+  open Category StateCategory public using () renaming
+    ( Object
+      to State
+    ; Arrow
+      to StateArrow
+    ; identity
+      to state-identity
+    ; compose
+      to state-compose
+    ; precompose
+      to state-precompose
+    ; postcompose
+      to state-postcompose
+    ; associative
+      to state-associative
+    )
+
+  open Editor editor public
+
+  open Encoding state-encoding public using () renaming
+    ( encode
+      to state-encode
+    ; decode
+      to state-decode
+    ; decode-encode
+      to state-decode-encode
+    )
+
+  open Encoding pure-encoding public using () renaming
+    ( encode
+      to pure-encode
+    ; decode
+      to pure-decode
+    ; decode-encode
+      to pure-decode-encode
+    )
+
+  open SplitFunctor split-functor public
+    hiding (bool-function)
+
+  draw-pure
+    : Category.Object C
+    → ViewStack.View V
+  draw-pure x
+    = draw (unbase x)
+
+-- ### SimplePartialEditor
+
+-- #### Definition
+
+SimplePartialEditor
+  : ViewStack
+  → EventStack
+  → Set
+  → Set₁
+SimplePartialEditor V E
+  = DependentSimplePartialEditor V E {C = nil}
+
+-- #### Module
+
+module SimplePartialEditor
+  {V : ViewStack}
+  {E : EventStack}
+  {A : Set}
+  (e : SimplePartialEditor V E A)
+  where
+
+  open DependentSimplePartialEditor e public renaming
+    ( StateCategory
+      to State
+    )
+
+  open PartialFunction partial-function public
+    hiding (bool-function)
+
+-- ### SimpleSplitEditor
+
+-- #### Definition
+
+SimpleSplitEditor
+  : ViewStack
+  → EventStack
+  → Set
+  → Set₁
+SimpleSplitEditor V E
+  = DependentSimpleSplitEditor V E {C = nil}
+
+-- #### Module
+
+module SimpleSplitEditor
+  {V : ViewStack}
+  {E : EventStack}
+  {A : Set}
+  (e : SimpleSplitEditor V E A)
+  where
+
+  open DependentSimpleSplitEditor e public renaming
+    ( StateCategory
+      to State
+    ; split-functor
+      to split-function
+    )
+
+  open SplitFunction split-function public
+    hiding (bool-function)
+
+  draw-pure
+    : A
+    → ViewStack.View V
+  draw-pure x
+    = simple-editor-draw editor (unbase x)
+
+-- #### Conversion
+
+split-editor-simple
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {C : Category}
+  → SplitEditor V E C
+  → SimpleSplitEditor V E
+    (Category.Object C)
+split-editor-simple
+  = dependent-split-editor-simple
+
+-- ### SimpleMainEditor
+
+-- #### Definition
+
+SimpleMainEditor
+  : ViewStack
+  → EventStack
+  → Set
+  → Set₁
+SimpleMainEditor V E S
+  = DependentSimpleMainEditor {n = zero} V E S nil
+
+-- #### Module
+
+module SimpleMainEditor
+  {V : ViewStack}
+  {E : EventStack}
+  {S : Set}
+  (e : SimpleMainEditor V E S)
+  where
+
+  open DependentSimpleMainEditor e public renaming
+    ( StateCategory
+      to State
+    )
+
+  open Encoding state-encoding public using () renaming
+    ( encode
+      to state-encode
+    ; decode
+      to state-decode
+    ; decode-encode
+      to state-decode-encode
+    )
+
+-- ### SimpleInnerEditor
+
+-- #### Definition
+
+SimpleInnerEditor
+  : ViewStack
+  → EventStack
+  → Set
+  → Set
+  → Set
+  → Set₁
+SimpleInnerEditor V E S P
+  = DependentSimpleInnerEditor V E S P {C = nil}
+
+-- #### Module
+
+module SimpleInnerEditor
+  {V : ViewStack}
+  {E : EventStack}
+  {S P A : Set}
+  (e : SimpleInnerEditor V E S P A)
+  where
+
+  open DependentSimpleInnerEditor e public renaming
+    ( StateCategory
+      to State
+    ; split-functor
+      to split-function
+    )
+
+  open Encoding state-encoding public using () renaming
+    ( encode
+      to state-encode
+    ; decode
+      to state-decode
+    ; decode-encode
+      to state-decode-encode
+    )
+
+  open Encoding pure-encoding public using () renaming
+    ( encode
+      to pure-encode
+    ; decode
+      to pure-decode
+    ; decode-encode
+      to pure-decode-encode
+    )
+
+  open SplitFunction split-function public
+    hiding (bool-function)
+
+  draw-pure
+    : A
+    → ViewStack.View V
+  draw-pure x
+    = simple-editor-draw editor (unbase x)
+
+-- #### Conversion
+
+inner-editor-simple
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : Category}
+  → InnerEditor V E S P C
+  → SimpleInnerEditor V E S P
+    (Category.Object C)
+inner-editor-simple
+  = dependent-inner-editor-simple
+

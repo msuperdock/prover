@@ -2,13 +2,11 @@ module Prover.Category.Snoc where
 
 open import Prover.Category.Chain
   using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare; chain-category₁; chain-functor₁; chain-functor-compose₁;
-    chain-functor-identity₁; chain-functor-square₁; cons)
+    ChainFunctorSquare; chain₁-category; chain₁-functor; chain₁-functor-compose;
+    chain₁-functor-identity; chain₁-functor-square)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; dependent-category₀;
-    dependent-functor₀; dependent-functor-compose₀; dependent-functor-identity₀;
-    dependent-functor-square₀)
+    DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Prelude
 
 -- ## Types
@@ -42,6 +40,7 @@ chain-functor-identity-snoc
   → {C' : DependentCategory C}
   → {F : ChainFunctor C C}
   → {F' : DependentFunctor C' C' F}
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → ChainFunctorIdentity
     (chain-functor-snoc F')
@@ -55,6 +54,7 @@ chain-functor-identity-snoc-eq
   → {F : ChainFunctor (C x₁) (C x₂)}
   → {F' : DependentFunctor (C' x₁) (C' x₂) F}
   → x₂ ≡ x₁
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → ChainFunctorIdentity
     (chain-functor-snoc F')
@@ -73,6 +73,7 @@ chain-functor-compose-snoc
   → {F' : DependentFunctor D' E' F}
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' E' H}
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → ChainFunctorCompose
     (chain-functor-snoc F')
@@ -95,6 +96,7 @@ chain-functor-compose-snoc-eq
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' (E' x₂) H}
   → x₂ ≡ x₁
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → ChainFunctorCompose
     (chain-functor-snoc F')
@@ -118,6 +120,7 @@ chain-functor-square-snoc
   → {G' : DependentFunctor D₁' D₂' G}
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' D₂' H₂}
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → ChainFunctorSquare
     (chain-functor-snoc F')
@@ -144,6 +147,7 @@ chain-functor-square-snoc-eq
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' (D₂' x₂) H₂}
   → x₂ ≡ x₁
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → ChainFunctorSquare
     (chain-functor-snoc F')
@@ -155,91 +159,106 @@ chain-functor-square-snoc-eq
 
 -- ### ChainCategory
 
-chain-category-snoc
-  {n = zero} C'
-  = chain-category₁
-    (dependent-category₀ C')
-chain-category-snoc
-  {n = suc _} {C = C} C'
-  = cons
-    (ChainCategory.head C)
-    (λ x → chain-category-snoc
-      (DependentCategory.tail C' x))
-    (λ f → chain-functor-snoc
-      (DependentCategory.dependent-functor C' f))
-    (λ x → chain-functor-identity-snoc
-      (DependentCategory.dependent-functor-identity C' x))
-    (λ f g → chain-functor-compose-snoc
-      (DependentCategory.dependent-functor-compose C' f g))
+chain-category-snoc {n = zero} C'
+  = chain₁-category C'
+
+chain-category-snoc {n = suc _} {C = C} C'
+  = record
+  { category
+    = ChainCategory.category C
+  ; category'
+    = λ x → chain-category-snoc
+      (DependentCategory.category C' x)
+  ; functor
+    = λ f → chain-functor-snoc
+      (DependentCategory.functor C' f)
+  ; functor-identity
+    = λ x → chain-functor-identity-snoc
+      (ChainCategory.functor-identity C x)
+      (DependentCategory.functor-identity C' x)
+  ; functor-compose
+    = λ f g → chain-functor-compose-snoc
+      (ChainCategory.functor-compose C f g)
+      (DependentCategory.functor-compose C' f g)
+  }
 
 -- ### ChainFunctor
 
-chain-functor-snoc
-  {n = zero} F'
-  = chain-functor₁
-    (dependent-functor₀ F')
-chain-functor-snoc
-  {n = suc _} {F = F} F'
-  = cons
-    (ChainFunctor.head F)
-    (λ x → chain-functor-snoc
-      (DependentFunctor.tail F' x))
-    (λ f → chain-functor-square-snoc
-      (DependentFunctor.dependent-functor-square F' f))
+chain-functor-snoc {n = zero} F'
+  = chain₁-functor F'
+
+chain-functor-snoc {n = suc _} {F = F} F'
+  = record
+  { functor
+    = ChainFunctor.functor F
+  ; functor'
+    = λ x → chain-functor-snoc
+      (DependentFunctor.functor F' x)
+  ; functor-square
+    = λ f → chain-functor-square-snoc
+      (ChainFunctor.functor-square F f)
+      (DependentFunctor.functor-square F' f)
+  }
 
 -- ### ChainFunctorIdentity
 
-chain-functor-identity-snoc
-  {n = zero} p
-  = chain-functor-identity₁
-    (dependent-functor-identity₀ p)
-chain-functor-identity-snoc
-  {n = suc _} {C = C} {C' = C'} p
-  = cons
-    (DependentFunctorIdentity.head p)
-    (λ x → chain-functor-identity-snoc-eq
-      (ChainCategory.tail C)
-      (DependentCategory.tail C')
-      (DependentFunctorIdentity.base p x)
-      (DependentFunctorIdentity.tail p x))
+chain-functor-identity-snoc {n = zero} _ p'
+  = chain₁-functor-identity p'
+
+chain-functor-identity-snoc {n = suc _} {C = C} {C' = C'} p p'
+  = record
+  { functor
+    = ChainFunctorIdentity.functor p
+  ; functor'
+    = λ x → chain-functor-identity-snoc-eq
+      (ChainCategory.category' C)
+      (DependentCategory.category C')
+      (ChainFunctorIdentity.base p x)
+      (ChainFunctorIdentity.functor' p x)
+      (DependentFunctorIdentity.functor p' x)
+  }
 
 chain-functor-identity-snoc-eq _ _ refl
   = chain-functor-identity-snoc
 
 -- ### ChainFunctorCompose
 
-chain-functor-compose-snoc
-  {n = zero} p
-  = chain-functor-compose₁
-    (dependent-functor-compose₀ p)
-chain-functor-compose-snoc
-  {n = suc _} {E = E} {E' = E'} p
-  = cons
-    (DependentFunctorCompose.head p)
-    (λ x → chain-functor-compose-snoc-eq
-      (ChainCategory.tail E)
-      (DependentCategory.tail E')
-      (DependentFunctorCompose.base p x)
-      (DependentFunctorCompose.tail p x))
+chain-functor-compose-snoc {n = zero} _ p'
+  = chain₁-functor-compose p'
+
+chain-functor-compose-snoc {n = suc _} {E = E} {E' = E'} p p'
+  = record
+  { functor
+    = ChainFunctorCompose.functor p
+  ; functor'
+    = λ x → chain-functor-compose-snoc-eq
+      (ChainCategory.category' E)
+      (DependentCategory.category E')
+      (ChainFunctorCompose.base p x)
+      (ChainFunctorCompose.functor' p x)
+      (DependentFunctorCompose.functor p' x)
+  }
 
 chain-functor-compose-snoc-eq _ _ refl
   = chain-functor-compose-snoc
 
 -- ### ChainFunctorSquare
 
-chain-functor-square-snoc
-  {n = zero} s
-  = chain-functor-square₁
-    (dependent-functor-square₀ s)
-chain-functor-square-snoc
-  {n = suc _} {D₂ = D₂} {D₂' = D₂'} s
-  = cons
-    (DependentFunctorSquare.head s)
-    (λ x₁ → chain-functor-square-snoc-eq
-      (ChainCategory.tail D₂)
-      (DependentCategory.tail D₂')
-      (DependentFunctorSquare.base s x₁)
-      (DependentFunctorSquare.tail s x₁))
+chain-functor-square-snoc {n = zero} _ s'
+  = chain₁-functor-square s'
+
+chain-functor-square-snoc {n = suc _} {D₂ = D₂} {D₂' = D₂'} s s'
+  = record
+  { functor
+    = ChainFunctorSquare.functor s
+  ; functor'
+    = λ x₁ → chain-functor-square-snoc-eq
+      (ChainCategory.category' D₂)
+      (DependentCategory.category D₂')
+      (ChainFunctorSquare.base s x₁)
+      (ChainFunctorSquare.functor' s x₁)
+      (DependentFunctorSquare.functor s' x₁)
+  }
 
 chain-functor-square-snoc-eq _ _ refl
   = chain-functor-square-snoc

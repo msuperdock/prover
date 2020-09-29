@@ -15,11 +15,11 @@ open import Prover.Client.Flat
 open import Prover.Client.Flatten
   using (client-flatten)
 open import Prover.Editor
-  using (EventStack; MainEditor; ViewStack)
+  using (EventStack; SimpleMainEditor; ViewStack)
 open import Prover.Editor.Flat
   using (FlatEventStack; FlatMainEditor; FlatViewStack)
 open import Prover.Editor.Flatten
-  using (main-editor-flatten)
+  using (simple-main-editor-flatten)
 open import Prover.Prelude
 
 open List
@@ -159,15 +159,15 @@ module _
 
 -- ## MainEditor
 
-main-editor-run
+simple-main-editor-run
   : {V : ViewStack}
   → {E : EventStack}
   → String
-  → MainEditor V E Value
+  → SimpleMainEditor V E Value
   → Client V E
   → IO ⊤
-main-editor-run p e c
+simple-main-editor-run p e c
   = flat-main-editor-run p
-    (main-editor-flatten e)
+    (simple-main-editor-flatten e)
     (client-flatten c)
 

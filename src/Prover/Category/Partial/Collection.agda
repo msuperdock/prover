@@ -10,7 +10,7 @@ open import Prover.Category.List
   using (category-list; functor-list)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
-open import Prover.Function
+open import Prover.Function.Relation
   using (FunctionInjective)
 open import Prover.Prelude
 

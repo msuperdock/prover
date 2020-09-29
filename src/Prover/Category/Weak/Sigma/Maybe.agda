@@ -67,8 +67,8 @@ module _
         → (p₂ : y₁₂ ≡ y₂₂)
         → (f₂ : Dependent₁Category.Arrow
           (dependent₁-category-maybe C₂) x₁ y₂₂ z₂)
-        → Dependent₁Category.compose-eq
-          (dependent₁-category-maybe C₂) x₁ {x' = x₂} p₂ f₂ nothing
+        → Dependent₁Category.compose-eq'
+          (dependent₁-category-maybe C₂) x₁ {x = x₂} p₂ f₂ nothing
         ≡ nothing
       map-unmap₁₂ _ refl nothing
         = refl
@@ -121,10 +121,11 @@ module _
   {C₁₁ C₂₁ : Category}
   {C₁₂ : Dependent₁Category C₁₁}
   {C₂₂ : Dependent₁Category C₂₁}
+  {F₁ : Functor C₁₁ C₂₁}
   where
 
   module WeakFunctorSquareSigmaMay₁
-    (F : Dependent₁Functor C₁₂ C₂₂)
+    (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
     where
 
     map
@@ -134,28 +135,28 @@ module _
         (Functor.base (functor-sigma-maybe₁ C₁₂) y₁))
       → WeakFunctor.map-eq
         (weak-functor-sigma-maybe₁ C₂₂)
-        (Functor.base (functor-sigma-maybe F) x₁)
-        (Functor.base (functor-sigma-maybe F) y₁)
-        (FunctorSquare.base (functor-square-sigma-maybe₁ F) x₁)
-        (FunctorSquare.base (functor-square-sigma-maybe₁ F) y₁)
-        (Functor.map (Dependent₁Functor.functor F) f₁₁)
-      ≡ Functor.map (functor-sigma-maybe F)
+        (Functor.base (functor-sigma-maybe F₂) x₁)
+        (Functor.base (functor-sigma-maybe F₂) y₁)
+        (FunctorSquare.base (functor-square-sigma-maybe₁ F₂) x₁)
+        (FunctorSquare.base (functor-square-sigma-maybe₁ F₂) y₁)
+        (Functor.map F₁ f₁₁)
+      ≡ Functor.map (functor-sigma-maybe F₂)
         (WeakFunctor.map (weak-functor-sigma-maybe₁ C₁₂) x₁ y₁ f₁₁)
     map (_ , x₁₂) y₁ f₁₁
       = CategorySigma.arrow-eq
         (dependent₁-category-maybe C₂₂) p₂₂ refl
         (Maybe.nothing-eq₂
           (Dependent₁Category.Arrow C₂₂
-            (Dependent₁Functor.base F
+            (Functor.base F₁
               (Functor.base (functor-sigma-maybe₁ C₁₂) y₁))) p₂₂ refl)
-      where p₂₂ = sym (Dependent₁Functor.base-commutative F f₁₁ x₁₂)
+      where p₂₂ = sym (Dependent₁Functor.base-square F₂ f₁₁ x₁₂)
 
   weak-functor-square-sigma-maybe₁
-    : (F : Dependent₁Functor C₁₂ C₂₂)
+    : (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
     → WeakFunctorSquare
       (weak-functor-sigma-maybe₁ C₁₂)
       (weak-functor-sigma-maybe₁ C₂₂)
-      (functor-square-sigma-maybe₁ F)
-  weak-functor-square-sigma-maybe₁ F
-    = record {WeakFunctorSquareSigmaMay₁ F}
+      (functor-square-sigma-maybe₁ F₂)
+  weak-functor-square-sigma-maybe₁ F₂
+    = record {WeakFunctorSquareSigmaMay₁ F₂}
 

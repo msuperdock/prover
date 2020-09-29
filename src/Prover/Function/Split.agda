@@ -1,9 +1,9 @@
 module Prover.Function.Split where
 
 open import Prover.Function
-  using (Function)
+  using (Function; FunctionSquare)
 open import Prover.Function.Partial
-  using (PartialFunction)
+  using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
 
 -- ## SplitFunction
@@ -86,4 +86,27 @@ module _
     → SplitFunction A B
   split-function-from-retraction F
     = record {SplitFunctionFromRetraction F}
+
+-- ## SplitFunctionSquare
+
+record SplitFunctionSquare
+  {A₁ A₂ B₁ B₂ : Set}
+  (F : Function A₁ A₂)
+  (G : Function B₁ B₂)
+  (H₁ : SplitFunction A₁ B₁)
+  (H₂ : SplitFunction A₂ B₂)
+  : Set
+  where
+
+  field
+
+    partial-function
+      : PartialFunctionSquare F G
+        (SplitFunction.partial-function H₁)
+        (SplitFunction.partial-function H₂)
+
+    function
+      : FunctionSquare G F
+        (SplitFunction.function H₁)
+        (SplitFunction.function H₂)
 

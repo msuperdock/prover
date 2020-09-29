@@ -4,13 +4,12 @@ open import Prover.Category
   using (Category; Functor; FunctorSquare; functor-compose';
     functor-square-compose)
 open import Prover.Category.Partial
-  using (PartialFunctor; PartialFunctorSquare; PartialFunctorSquare';
-    partial-functor-compose; partial-functor-square';
+  using (PartialFunctor; PartialFunctorSquare; partial-functor-compose; 
     partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Function.Split
-  using (SplitFunction)
+  using (SplitFunction; SplitFunctionSquare)
 open import Prover.Prelude
 
 -- ## SplitFunctor
@@ -43,12 +42,6 @@ record SplitFunctor
       to function
     ; map
       to unmap
-    ; map-identity
-      to unmap-identity
-    ; map-compose
-      to unmap-compose
-    ; map-compose-eq
-      to unmap-compose-eq
     )
 
   field
@@ -326,7 +319,23 @@ record SplitFunctorSquare
   open FunctorSquare functor public using () renaming
     ( base
       to unbase
+    ; function
+      to function
     )
+
+  split-function
+    : SplitFunctionSquare
+      (Functor.function F)
+      (Functor.function G)
+      (SplitFunctor.split-function H₁)
+      (SplitFunctor.split-function H₂)
+  split-function
+    = record
+    { partial-function
+      = partial-function
+    ; function
+      = function
+    }
 
 -- ### Compose
 
@@ -444,70 +453,4 @@ module _
       (SplitFunctorSquare.functor s)
   split-functor-square-weak s
     = record {SplitFunctorSquareWeak s}
-
--- ## SplitFunctorSquare'
-
-module _SplitFunctorSquare' where
-
-  data SplitFunctorSquare'
-    : {C₁ C₂ D₁ D₂ D₃ : Category}
-    → Functor C₁ C₂
-    → Functor D₁ D₃
-    → SplitFunctor C₁ D₁
-    → SplitFunctor C₂ D₂
-    → Set
-    where
-  
-    split-functor-square'
-      : {C₁ C₂ D₁ D₂ : Category}
-      → {F : Functor C₁ C₂}
-      → {G : Functor D₁ D₂}
-      → {H₁ : SplitFunctor C₁ D₁}
-      → {H₂ : SplitFunctor C₂ D₂}
-      → SplitFunctorSquare F G H₁ H₂
-      → SplitFunctorSquare' F G H₁ H₂
-
-SplitFunctorSquare'
-  : {C₁ C₂ D₁ D₂ D₃ : Category}
-  → Functor C₁ C₂
-  → Functor D₁ D₃
-  → SplitFunctor C₁ D₁
-  → SplitFunctor C₂ D₂
-  → Set
-SplitFunctorSquare'
-  = _SplitFunctorSquare'.SplitFunctorSquare'
-
-open _SplitFunctorSquare'.SplitFunctorSquare' public
-
-module SplitFunctorSquare' where
-
-  partial-functor
-    : {C₁ C₂ D₁ D₂ D₃ : Category}
-    → {F : Functor C₁ C₂}
-    → {G : Functor D₁ D₃}
-    → {H₁ : SplitFunctor C₁ D₁}
-    → {H₂ : SplitFunctor C₂ D₂}
-    → SplitFunctorSquare' F G H₁ H₂
-    → PartialFunctorSquare' F G
-      (SplitFunctor.partial-functor H₁)
-      (SplitFunctor.partial-functor H₂)
-  partial-functor (split-functor-square' s)
-    = partial-functor-square' (SplitFunctorSquare.partial-functor s)
-  
-  functor
-    : {A : Set}
-    → {x₁ x₂ : A}
-    → {C₁ D₁ : Category}
-    → (C₂ D₂ : A → Category)
-    → {F : Functor C₁ (C₂ x₁)}
-    → {G : Functor D₁ (D₂ x₂)}
-    → {H₁ : SplitFunctor C₁ D₁}
-    → (H₂ : (x : A) → SplitFunctor (C₂ x) (D₂ x))
-    → x₁ ≡ x₂
-    → SplitFunctorSquare' F G H₁ (H₂ x₁)
-    → FunctorSquare G F
-      (SplitFunctor.functor H₁)
-      (SplitFunctor.functor (H₂ x₂))
-  functor _ _ _ refl (split-functor-square' s)
-    = SplitFunctorSquare.functor s
 

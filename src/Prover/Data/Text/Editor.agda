@@ -1,29 +1,26 @@
 module Prover.Data.Text.Editor where
 
-open import Prover.Category
-  using (Category)
-open import Prover.Category.Unit
-  using (category-unit)
 open import Prover.Client.Aeson
   using (Value)
 open import Prover.Data.Text
   using (Text; TextWith)
 open import Prover.Editor
-  using (EventStack; EventStackMap; SimpleEditor; SplitEditor)
+  using (EventStack; EventStackMap; SimpleEditor; SimpleSplitEditor)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseEventStackMap; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack; FlatViewStackMap)
 open import Prover.Editor.Flatten
   using (base-event-stack-flatten; base-event-stack-flatten-lift;
-    base-view-stack-flatten-lift; split-editor-flatten)
+    base-view-stack-flatten-lift; simple-split-editor-flatten)
 open import Prover.Editor.Lift
   using (event-stack-lift; event-stack-map-lift; simple-editor-lift)
 open import Prover.Editor.Map
-  using (flat-editor-map-event; flat-editor-map-view; split-editor-map-event;
-    split-editor-map-simple)
-open import Prover.Editor.Unit
-  using (split-editor-unit)
+  using (simple-split-editor-map)
+open import Prover.Editor.Map.Event
+  using (flat-editor-map-event; simple-split-editor-map-event)
+open import Prover.Editor.Map.View
+  using (flat-editor-map-view)
 open import Prover.Function
   using (Function)
 open import Prover.Function.Partial
@@ -120,20 +117,7 @@ TextWithState
 TextWithState p
   = List (CharWith p)
 
--- ### Pure
-
-TextWithCategory
-  : (Char → Bool)
-  → Category
-TextWithCategory p
-  = category-unit (TextWith p)
-
-TextCategory
-  : Category
-TextCategory
-  = category-unit Text
-
--- ## Encode
+-- ## Encoding
 
 -- ### Encode
 
@@ -163,7 +147,7 @@ decode-encode-text (c ∷ cs)
 
 -- ## Editors
 
--- ### Base
+-- ### SimpleBaseEditor
 
 -- #### Module
 
@@ -304,7 +288,7 @@ text-with-simple-base-editor
 text-with-simple-base-editor p
   = record {TextWithSimpleBaseEditor p}
 
--- ### Simple
+-- ### SimpleEditor
 
 text-with-simple-editor
   : (p : Char → Bool)
@@ -316,7 +300,7 @@ text-with-simple-editor p
   = simple-editor-lift
     (text-with-simple-base-editor p)
 
--- ### Split
+-- ### SimpleSplitEditor
 
 -- #### TextWith
 
@@ -372,15 +356,19 @@ text-with-split-function
 text-with-split-function p
   = record {TextWithSplitFunction p}
 
-text-with-split-editor
+text-with-simple-split-editor
   : (p : Char → Bool)
-  → SplitEditor
+  → SimpleSplitEditor
     PlainTextViewStack
     (TextWithEventStack p)
-    (TextWithCategory p)
-text-with-split-editor p
-  = split-editor-unit (text-with-split-function p)
-  $ text-with-simple-editor p
+    (TextWith p)
+text-with-simple-split-editor p
+  = record
+  { editor
+    = text-with-simple-editor p
+  ; split-functor
+    = text-with-split-function p
+  }
 
 -- #### Text
 
@@ -418,17 +406,17 @@ text-event-stack-map
   = event-stack-map-lift
     text-base-event-stack-map
 
-text-split-editor
-  : SplitEditor
+text-simple-split-editor
+  : SimpleSplitEditor
     PlainTextViewStack
     TextEventStack
-    TextCategory
-text-split-editor
-  = split-editor-map-event text-event-stack-map
-  $ split-editor-map-simple (split-function-from-retraction Text.retraction)
-  $ text-with-split-editor (const true)
+    Text
+text-simple-split-editor
+  = simple-split-editor-map-event text-event-stack-map
+  $ simple-split-editor-map (split-function-from-retraction Text.retraction)
+  $ text-with-simple-split-editor (const true)
 
--- ### Flat
+-- ### FlatEditor
 
 text-flat-editor
   : FlatEditor
@@ -438,8 +426,8 @@ text-flat-editor
 text-flat-editor
   = flat-editor-map-view (base-view-stack-flatten-lift PlainTextBaseViewStack)
   $ flat-editor-map-event (base-event-stack-flatten-lift TextBaseEventStack)
-  $ split-editor-flatten
-  $ text-split-editor
+  $ simple-split-editor-flatten
+  $ text-simple-split-editor
 
 -- ## Command
 

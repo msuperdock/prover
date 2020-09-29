@@ -1,13 +1,15 @@
 module Prover.Category.Partial.Unit where
 
 open import Prover.Category
-  using (Category)
+  using (Category; Functor)
 open import Prover.Category.Partial
-  using (PartialFunctor)
+  using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Unit
-  using (module CategoryUnit; category-unit)
+  using (module CategoryUnit; category-unit; functor-unit)
+open import Prover.Function
+  using (Function)
 open import Prover.Function.Partial
-  using (PartialFunction)
+  using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -64,4 +66,44 @@ module _
       (category-unit B)
   partial-functor-unit F
     = record {PartialFunctorUnit F}
+
+-- ## PartialFunctorSquare
+
+module _
+  {A₁ A₂ B₁ B₂ : Set}
+  {F : Function A₁ A₂}
+  {G : Function B₁ B₂}
+  {H₁ : PartialFunction A₁ B₁}
+  {H₂ : PartialFunction A₂ B₂}
+  where
+
+  module PartialFunctorSquareUnit
+    (s : PartialFunctionSquare F G H₁ H₂)
+    where
+
+    open PartialFunctionSquare s public
+      using (base)
+
+    map
+      : {x₁ y₁ : Category.Object (category-unit A₁)}
+      → {x₁' y₁' : Category.Object (category-unit B₁)}
+      → (p₁ : PartialFunctor.base (partial-functor-unit H₁) x₁ ≡ just x₁')
+      → (q₁ : PartialFunctor.base (partial-functor-unit H₁) y₁ ≡ just y₁')
+      → (f₁ : Category.Arrow (category-unit A₁) x₁ y₁)
+      → PartialFunctor.map (partial-functor-unit H₂) (base x₁ p₁) (base y₁ q₁)
+        (Functor.map (functor-unit F) f₁)
+      ≡ Functor.map (functor-unit G)
+        (PartialFunctor.map (partial-functor-unit H₁) p₁ q₁ f₁)
+    map _ _ _
+      = refl
+
+  partial-functor-square-unit
+    : PartialFunctionSquare F G H₁ H₂
+    → PartialFunctorSquare
+      (functor-unit F)
+      (functor-unit G)
+      (partial-functor-unit H₁)
+      (partial-functor-unit H₂)
+  partial-functor-square-unit s
+    = record {PartialFunctorSquareUnit s}
 

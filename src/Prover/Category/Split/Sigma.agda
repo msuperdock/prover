@@ -1,7 +1,7 @@
 module Prover.Category.Split.Sigma where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare)
+  using (Category; Functor; FunctorSquare; functor-square-identity)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor)
 open import Prover.Category.Dependent1.Split
@@ -34,7 +34,7 @@ module _
         (category-sigma D₂)
     partial-functor
       = partial-functor-sigma
-        (Dependent₁SplitFunctor.partial-dependent-functor F₂)
+        (Dependent₁SplitFunctor.dependent₁-partial-functor F₂)
 
     open PartialFunctor partial-functor
 
@@ -44,7 +44,7 @@ module _
         (category-sigma C₂)
     functor
       = functor-sigma
-        (Dependent₁SplitFunctor.dependent-functor F₂)
+        (Dependent₁SplitFunctor.dependent₁-functor F₂)
 
     open Functor functor using () renaming
       ( base
@@ -105,9 +105,9 @@ module _
         = CategorySigma.arrow-eq D₂ p₂ refl
           (map-unmap₂ y₁ (trans
             (sub (Dependent₁SplitFunctor.base F₂ y₁) (sym (trans
-              (sym (Dependent₁SplitFunctor.unbase-commutative F₂ f₁ x₂))
+              (sym (Dependent₁SplitFunctor.unbase-square F₂ f₁ x₂))
               (sub (Dependent₁SplitFunctor.unbase F₂ y₁) p₂))))
-            (Dependent₁SplitFunctor.base-commutative F₂ f₁
+            (Dependent₁SplitFunctor.base-square F₂ f₁
               (Dependent₁SplitFunctor.unbase F₂ x₁ x₂) q₂)) r₂ f₂ p₂)
 
       normalize-arrow
@@ -165,7 +165,7 @@ module _
             (trans
               (sub (Dependent₁SplitFunctor.base F₂ x₁)
                 (sym (Dependent₁Category.base-identity C₂ x₁ x₂)))
-              (Dependent₁SplitFunctor.base-commutative F₂
+              (Dependent₁SplitFunctor.base-square F₂
                 (Category.identity C₁ x₁) x₂ p₂)) p₂'
             (sym (Dependent₁Category.base-identity D₂ x₁ x₂')))
 
@@ -183,8 +183,9 @@ module _
   {C₁₁ C₂₁ : Category}
   {C₁₂ D₁₂ : Dependent₁Category C₁₁}
   {C₂₂ D₂₂ : Dependent₁Category C₂₁}
-  {F₂ : Dependent₁Functor C₁₂ C₂₂}
-  {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  {F₁ : Functor C₁₁ C₂₁}
+  {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
+  {G₂ : Dependent₁Functor D₁₂ D₂₂ F₁}
   {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
   {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
   where
@@ -201,7 +202,7 @@ module _
         (SplitFunctor.partial-functor (split-functor-sigma H₂₂))
     partial-functor
       = partial-functor-square-sigma
-        (Dependent₁SplitFunctorSquare.partial-dependent-functor s)
+        (Dependent₁SplitFunctorSquare.dependent₁-partial-functor s)
 
     functor
       : FunctorSquare
@@ -211,7 +212,8 @@ module _
         (SplitFunctor.functor (split-functor-sigma H₂₂))
     functor
       = functor-square-sigma
-        (Dependent₁SplitFunctorSquare.dependent-functor s)
+        (functor-square-identity F₁)
+        (Dependent₁SplitFunctorSquare.dependent₁-functor s)
 
   split-functor-square-sigma
     : Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂

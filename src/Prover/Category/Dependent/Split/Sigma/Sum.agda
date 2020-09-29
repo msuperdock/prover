@@ -3,16 +3,13 @@ module Prover.Category.Dependent.Split.Sigma.Sum where
 open import Prover.Category.Chain
   using (ChainCategory; ChainFunctor)
 open import Prover.Category.Dependent
-  using (DependentCategory; DependentFunctor; dependent-category₀;
-    dependent-category₁; dependent-functor₀; dependent-functor₁)
+  using (DependentCategory; DependentFunctor)
 open import Prover.Category.Dependent.Sigma.Maybe
   using (dependent-category-sigma-maybe; dependent-functor-sigma-maybe)
 open import Prover.Category.Dependent.Sigma.Sum
   using (dependent-category-sigma-sum; dependent-functor-sigma-sum)
 open import Prover.Category.Dependent.Split
-  using (DependentSplitFunctor; DependentSplitFunctorSquare; cons;
-    dependent-split-functor₀; dependent-split-functor₁;
-    dependent-split-functor-square₀; dependent-split-functor-square₁; nil)
+  using (DependentSplitFunctor; DependentSplitFunctorSquare)
 open import Prover.Category.Snoc
   using (chain-category-snoc; chain-functor-snoc)
 open import Prover.Category.Split.Sigma.Sum
@@ -64,58 +61,31 @@ dependent-split-functor-square-sigma-sum
 
 -- ### DependentSplitFunctor
 
-dependent-split-functor-sigma-sum
-  {n = zero}
-  {C₁' = C₁'} {D₁' = D₁'} {C₂' = C₂'} {D₂' = D₂'} F₁ F₂
-  = nil
-    (split-functor-sigma-sum
-      {C₁ = dependent-category₀ C₁'}
-      {D₁ = dependent-category₀ D₁'}
-      {C₂ = dependent-category₁ C₂'}
-      {D₂ = dependent-category₁ D₂'}
-      (dependent-split-functor₀ F₁)
-      (dependent-split-functor₁ F₂))
-dependent-split-functor-sigma-sum
-  {n = suc _} F₁ F₂
-  = cons
-    (λ x → dependent-split-functor-sigma-sum
-      (DependentSplitFunctor.tail F₁ x)
-      (DependentSplitFunctor.tail F₂ x))
-    (λ f → dependent-split-functor-square-sigma-sum
-      (DependentSplitFunctor.dependent-split-functor-square F₁ f)
-      (DependentSplitFunctor.dependent-split-functor-square F₂ f))
+dependent-split-functor-sigma-sum {n = zero} F₁ F₂
+  = split-functor-sigma-sum F₁ F₂
+
+dependent-split-functor-sigma-sum {n = suc _} F₁ F₂
+  = record
+  { split-functor
+    = λ x → dependent-split-functor-sigma-sum
+      (DependentSplitFunctor.split-functor F₁ x)
+      (DependentSplitFunctor.split-functor F₂ x)
+  ; split-functor-square
+    = λ f → dependent-split-functor-square-sigma-sum
+      (DependentSplitFunctor.split-functor-square F₁ f)
+      (DependentSplitFunctor.split-functor-square F₂ f)
+  }
 
 -- ### DependentSplitFunctorSquare
 
-dependent-split-functor-square-sigma-sum
-  {n = zero}
-  {C₁₁' = C₁₁'} {D₁₁' = D₁₁'} {C₂₁' = C₂₁'} {D₂₁' = D₂₁'}
-  {C₁₂' = C₁₂'} {D₁₂' = D₁₂'} {C₂₂' = C₂₂'} {D₂₂' = D₂₂'}
-  {F₁' = F₁'} {F₂' = F₂'} {G₂' = G₂'}
-  {H₁₁ = H₁₁} {H₂₁ = H₂₁} {H₁₂ = H₁₂} {H₂₂ = H₂₂} s₁ s₂
-  = nil
-    (split-functor-square-sigma-sum
-      {C₁₁ = dependent-category₀ C₁₁'}
-      {C₂₁ = dependent-category₀ C₂₁'}
-      {D₁₁ = dependent-category₀ D₁₁'}
-      {D₂₁ = dependent-category₀ D₂₁'}
-      {C₁₂ = dependent-category₁ C₁₂'}
-      {D₁₂ = dependent-category₁ D₁₂'}
-      {C₂₂ = dependent-category₁ C₂₂'}
-      {D₂₂ = dependent-category₁ D₂₂'}
-      {F₁ = dependent-functor₀ F₁'}
-      {F₂ = dependent-functor₁ F₂'}
-      {G₂ = dependent-functor₁ G₂'}
-      {H₁₁ = dependent-split-functor₀ H₁₁}
-      {H₂₁ = dependent-split-functor₀ H₂₁}
-      {H₁₂ = dependent-split-functor₁ H₁₂}
-      {H₂₂ = dependent-split-functor₁ H₂₂}
-      (dependent-split-functor-square₀ s₁)
-      (dependent-split-functor-square₁ s₂))
-dependent-split-functor-square-sigma-sum
-  {n = suc _} s₁ s₂
-  = cons
-    (λ x₁ → dependent-split-functor-square-sigma-sum
-      (DependentSplitFunctorSquare.tail s₁ x₁)
-      (DependentSplitFunctorSquare.tail s₂ x₁))
+dependent-split-functor-square-sigma-sum {n = zero} s₁ s₂
+  = split-functor-square-sigma-sum s₁ s₂
+
+dependent-split-functor-square-sigma-sum {n = suc _} s₁ s₂
+  = record
+  { split-functor
+    = λ x₁ → dependent-split-functor-square-sigma-sum
+      (DependentSplitFunctorSquare.split-functor s₁ x₁)
+      (DependentSplitFunctorSquare.split-functor s₂ x₁)
+  }
 

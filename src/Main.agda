@@ -11,12 +11,12 @@ open import Prover.Client.Brick
 open import Prover.Client.Event
   using (SpecialEvent)
 open import Prover.Client.Run
-  using (main-editor-run)
+  using (simple-main-editor-run)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent)
 open import Prover.Data.Proof.Editor
   using (ProofEvent; ProofEventStack; ProofModeInner; ProofViewInner;
-    ProofViewInnerPath; ProofViewStack; both; command; proof-main-editor;
+    ProofViewInnerPath; ProofViewStack; both; command; proof-simple-main-editor;
     window)
 open import Prover.Data.Rule
   using (Rule)
@@ -27,9 +27,9 @@ open import Prover.Data.Symbols
 open import Prover.Data.Text.Editor
   using (TextEvent; TextWithEvent)
 open import Prover.Editor
-  using (EventStack; MainEditor; ViewStack; ViewStackMap)
-open import Prover.Editor.Map
-  using (main-editor-map-view-with)
+  using (EventStack; SimpleMainEditor; ViewStack; ViewStackMap)
+open import Prover.Editor.Map.View
+  using (simple-main-editor-map-view-with)
 open import Prover.View.Interface
   using (command; interface; nothing; window)
 open import Prover.View.Window
@@ -120,17 +120,17 @@ proof-view-stack-map
 proof-view-stack-map b
   = record {ProofViewStackMap b}
 
-proof-window-main-editor
+proof-window-simple-main-editor
   : {ss : Symbols}
   → Rules ss
   → Rule ss
-  → MainEditor
+  → SimpleMainEditor
     ProofWindowViewStack
     ProofEventStack
     Value
-proof-window-main-editor rs r
-  = main-editor-map-view-with proof-view-stack-map
-  $ proof-main-editor rs r
+proof-window-simple-main-editor rs r
+  = simple-main-editor-map-view-with proof-view-stack-map
+  $ proof-simple-main-editor rs r
 
 -- ## Client
 
@@ -251,8 +251,8 @@ proof-client
 main
   : IO ⊤
 main
-  = main-editor-run
+  = simple-main-editor-run
     "/data/code/prover/test.json"
-    (proof-window-main-editor rules ∧-commutative)
+    (proof-window-simple-main-editor rules ∧-commutative)
     proof-client
 

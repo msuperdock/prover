@@ -15,8 +15,7 @@ open import Prover.Prelude.Direction public
 open import Prover.Prelude.Empty public
   using (¬_; ⊥; ⊥-elim)
 open import Prover.Prelude.Equal public
-  using (Equal; Equal'; _≅_; _≡_; _≢_; irrelevant; rewrite'; refl; sub; sym;
-    trans)
+  using (Equal; _≅_; _≡_; _≢_; irrelevant; rewrite'; refl; sub; sym; trans)
 open import Prover.Prelude.Fin public
   using (Fin; _≟_fin; zero; suc)
 open import Prover.Prelude.FinSet public

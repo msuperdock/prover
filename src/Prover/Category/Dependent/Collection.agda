@@ -1,18 +1,16 @@
 module Prover.Category.Dependent.Collection where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
+    ChainFunctorSquare)
 open import Prover.Category.Collection
   using (category-collection; functor-collection; functor-compose-collection;
     functor-identity-collection; functor-square-collection)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; cons; dependent-category₀;
-    dependent-functor₀; dependent-functor-compose₀; dependent-functor-identity₀;
-    dependent-functor-square₀; nil)
+    DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Dependent.Relation
-  using (DependentFunctorInjective; DependentRelation;
-    dependent-functor-injective₀; dependent-relation₀)
+  using (DependentInjective; DependentRelation)
 open import Prover.Prelude
 
 -- ## Types
@@ -37,7 +35,7 @@ dependent-functor-collection
   → {S : DependentRelation D'}
   → {F : ChainFunctor C D}
   → {F' : DependentFunctor C' D' F}
-  → DependentFunctorInjective R S F'
+  → DependentInjective R S F'
   → DependentFunctor
     (dependent-category-collection R)
     (dependent-category-collection S) F
@@ -51,7 +49,8 @@ dependent-functor-identity-collection
   → {R : DependentRelation C'}
   → {F : ChainFunctor C C}
   → {F' : DependentFunctor C' C' F}
-  → (i : DependentFunctorInjective R R F')
+  → (i : DependentInjective R R F')
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-collection i)
@@ -66,7 +65,8 @@ dependent-functor-identity-collection-eq
   → {F : ChainFunctor (C x₁) (C x₂)}
   → {F' : DependentFunctor (C' x₁) (C' x₂) F}
   → x₂ ≡ x₁
-  → (i : DependentFunctorInjective (R x₁) (R x₂) F')
+  → (i : DependentInjective (R x₁) (R x₂) F')
+  → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-collection i)
@@ -88,9 +88,10 @@ dependent-functor-compose-collection
   → {F' : DependentFunctor D' E' F}
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' E' H}
-  → (i : DependentFunctorInjective S T F')
-  → (j : DependentFunctorInjective R S G')
-  → (k : DependentFunctorInjective R T H')
+  → (i : DependentInjective S T F')
+  → (j : DependentInjective R S G')
+  → (k : DependentInjective R T H')
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-collection i)
@@ -116,9 +117,10 @@ dependent-functor-compose-collection-eq
   → {G' : DependentFunctor C' D' G}
   → {H' : DependentFunctor C' (E' x₂) H}
   → x₂ ≡ x₁
-  → (i : DependentFunctorInjective S (T x₁) F')
-  → (j : DependentFunctorInjective R S G')
-  → (k : DependentFunctorInjective R (T x₂) H')
+  → (i : DependentInjective S (T x₁) F')
+  → (j : DependentInjective R S G')
+  → (k : DependentInjective R (T x₂) H')
+  → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-collection i)
@@ -146,10 +148,11 @@ dependent-functor-square-collection
   → {G' : DependentFunctor D₁' D₂' G}
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' D₂' H₂}
-  → (i : DependentFunctorInjective R₁ R₂ F')
-  → (j : DependentFunctorInjective S₁ S₂ G')
-  → (k₁ : DependentFunctorInjective R₁ S₁ H₁')
-  → (k₂ : DependentFunctorInjective R₂ S₂ H₂')
+  → (i : DependentInjective R₁ R₂ F')
+  → (j : DependentInjective S₁ S₂ G')
+  → (k₁ : DependentInjective R₁ S₁ H₁')
+  → (k₂ : DependentInjective R₂ S₂ H₂')
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-collection i)
@@ -180,10 +183,11 @@ dependent-functor-square-collection-eq
   → {H₁' : DependentFunctor C₁' D₁' H₁}
   → {H₂' : DependentFunctor C₂' (D₂' x₂) H₂}
   → x₂ ≡ x₁
-  → (i : DependentFunctorInjective R₁ R₂ F')
-  → (j : DependentFunctorInjective S₁ (S₂ x₁) G')
-  → (k₁ : DependentFunctorInjective R₁ S₁ H₁')
-  → (k₂ : DependentFunctorInjective R₂ (S₂ x₂) H₂')
+  → (i : DependentInjective R₁ R₂ F')
+  → (j : DependentInjective S₁ (S₂ x₁) G')
+  → (k₁ : DependentInjective R₁ S₁ H₁')
+  → (k₂ : DependentInjective R₂ (S₂ x₂) H₂')
+  → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-collection i)
@@ -195,125 +199,118 @@ dependent-functor-square-collection-eq
 
 -- ### DependentCategory
 
-dependent-category-collection
-  {n = zero} {C' = C'} R
-  = nil
-    (category-collection
-      (dependent-category₀ C')
-      (dependent-relation₀ R))
-dependent-category-collection
-  {n = suc _} {C = C} {C' = C'} R
-  = cons
-    (λ x → dependent-category-collection
-      (DependentRelation.tail R x))
-    (λ f → dependent-functor-collection
-      (DependentRelation.dependent-functor-injective R f))
-    (λ x → dependent-functor-identity-collection
-      (DependentRelation.dependent-functor-injective R
-        (ChainCategory.identity C x))
-      (DependentCategory.dependent-functor-identity C' x))
-    (λ f g → dependent-functor-compose-collection
-      (DependentRelation.dependent-functor-injective R f)
-      (DependentRelation.dependent-functor-injective R g)
-      (DependentRelation.dependent-functor-injective R
-        (ChainCategory.compose C f g))
-      (DependentCategory.dependent-functor-compose C' f g))
+dependent-category-collection {n = zero} {C' = C'} R
+  = category-collection C' R
+
+dependent-category-collection {n = suc _} {C = C} {C' = C'} R
+  = record
+  { category
+    = λ x → dependent-category-collection
+      (DependentRelation.relation R x)
+  ; functor
+    = λ f → dependent-functor-collection
+      (DependentRelation.injective R f)
+  ; functor-identity
+    = λ x → dependent-functor-identity-collection
+      (DependentRelation.injective R (ChainCategory.identity C x))
+      (ChainCategory.functor-identity C x)
+      (DependentCategory.functor-identity C' x)
+  ; functor-compose
+    = λ f g → dependent-functor-compose-collection
+      (DependentRelation.injective R f)
+      (DependentRelation.injective R g)
+      (DependentRelation.injective R (ChainCategory.compose C f g))
+      (ChainCategory.functor-compose C f g)
+      (DependentCategory.functor-compose C' f g)
+  }
 
 -- ### DependentFunctor
 
-dependent-functor-collection
-  {n = zero} {F' = F'} i
-  = nil
-    (functor-collection
-      (dependent-functor₀ F')
-      (dependent-functor-injective₀ i))
-dependent-functor-collection
-  {n = suc _} {R = R} {S = S} {F = F} {F' = F'} i
-  = cons
-    (λ x → dependent-functor-collection
-      (DependentFunctorInjective.tail i x))
-    (λ {x = x} {y = y} f → dependent-functor-square-collection
-      (DependentRelation.dependent-functor-injective R f)
-      (DependentRelation.dependent-functor-injective S (ChainFunctor.map F f))
-      (DependentFunctorInjective.tail i x)
-      (DependentFunctorInjective.tail i y)
-      (DependentFunctor.dependent-functor-square F' f))
+dependent-functor-collection {n = zero} {F' = F'} i
+  = functor-collection F' i
+
+dependent-functor-collection {n = suc _} {R = R} {S = S} {F = F} {F' = F'} i
+  = record
+  { functor
+    = λ x → dependent-functor-collection
+      (DependentInjective.injective i x)
+  ; functor-square
+    = λ {x = x} {y = y} f → dependent-functor-square-collection
+      (DependentRelation.injective R f)
+      (DependentRelation.injective S (ChainFunctor.map F f))
+      (DependentInjective.injective i x)
+      (DependentInjective.injective i y)
+      (ChainFunctor.functor-square F f)
+      (DependentFunctor.functor-square F' f)
+  }
 
 -- ### DependentFunctorIdentity
 
-dependent-functor-identity-collection
-  {n = zero} i p
-  = nil
-    (functor-identity-collection
-      (dependent-functor-injective₀ i)
-      (dependent-functor-identity₀ p))
-dependent-functor-identity-collection
-  {n = suc _} {C = C} {C' = C'} {R = R} i p
-  = cons
-    (DependentFunctorIdentity.head p)
-    (λ x → dependent-functor-identity-collection-eq
-      (ChainCategory.tail C)
-      (DependentCategory.tail C')
-      (DependentRelation.tail R)
-      (DependentFunctorIdentity.base p x)
-      (DependentFunctorInjective.tail i x)
-      (DependentFunctorIdentity.tail p x))
+dependent-functor-identity-collection {n = zero} i _ p'
+  = functor-identity-collection i p'
+
+dependent-functor-identity-collection {n = suc _}
+  {C = C} {C' = C'} {R = R} i p p'
+  = record
+  { functor
+    = λ x → dependent-functor-identity-collection-eq
+      (ChainCategory.category' C)
+      (DependentCategory.category C')
+      (DependentRelation.relation R)
+      (ChainFunctorIdentity.base p x)
+      (DependentInjective.injective i x)
+      (ChainFunctorIdentity.functor' p x)
+      (DependentFunctorIdentity.functor p' x)
+  }
 
 dependent-functor-identity-collection-eq _ _ _ refl
   = dependent-functor-identity-collection
 
 -- ### DependentFunctorCompose
 
-dependent-functor-compose-collection
-  {n = zero} i j k p
-  = nil
-    (functor-compose-collection
-      (dependent-functor-injective₀ i)
-      (dependent-functor-injective₀ j)
-      (dependent-functor-injective₀ k)
-      (dependent-functor-compose₀ p))
-dependent-functor-compose-collection
-  {n = suc _} {E = E} {E' = E'} {T = T} {G = G} i j k p
-  = cons
-    (DependentFunctorCompose.head p)
-    (λ x → dependent-functor-compose-collection-eq
-      (ChainCategory.tail E)
-      (DependentCategory.tail E')
-      (DependentRelation.tail T)
-      (DependentFunctorCompose.base p x)
-      (DependentFunctorInjective.tail i (ChainFunctor.base G x))
-      (DependentFunctorInjective.tail j x)
-      (DependentFunctorInjective.tail k x)
-      (DependentFunctorCompose.tail p x))
+dependent-functor-compose-collection {n = zero} i j k _ p'
+  = functor-compose-collection i j k p'
+
+dependent-functor-compose-collection {n = suc _}
+  {E = E} {E' = E'} {T = T} {G = G} i j k p p'
+  = record
+  { functor
+    = λ x → dependent-functor-compose-collection-eq
+      (ChainCategory.category' E)
+      (DependentCategory.category E')
+      (DependentRelation.relation T)
+      (ChainFunctorCompose.base p x)
+      (DependentInjective.injective i (ChainFunctor.base G x))
+      (DependentInjective.injective j x)
+      (DependentInjective.injective k x)
+      (ChainFunctorCompose.functor' p x)
+      (DependentFunctorCompose.functor p' x)
+  }
 
 dependent-functor-compose-collection-eq _ _ _ refl
   = dependent-functor-compose-collection
 
 -- ### DependentFunctorSquare
 
-dependent-functor-square-collection
-  {n = zero} i j k₁ k₂ s
-  = nil
-    (functor-square-collection
-      (dependent-functor-injective₀ i)
-      (dependent-functor-injective₀ j)
-      (dependent-functor-injective₀ k₁)
-      (dependent-functor-injective₀ k₂)
-      (dependent-functor-square₀ s))
-dependent-functor-square-collection
-  {n = suc _} {D₂ = D₂} {D₂' = D₂'} {S₂ = S₂} {F = F} {H₁ = H₁} i j k₁ k₂ s
-  = cons
-    (DependentFunctorSquare.head s)
-    (λ x₁ → dependent-functor-square-collection-eq
-      (ChainCategory.tail D₂)
-      (DependentCategory.tail D₂')
-      (DependentRelation.tail S₂)
-      (DependentFunctorSquare.base s x₁)
-      (DependentFunctorInjective.tail i x₁)
-      (DependentFunctorInjective.tail j (ChainFunctor.base H₁ x₁))
-      (DependentFunctorInjective.tail k₁ x₁)
-      (DependentFunctorInjective.tail k₂ (ChainFunctor.base F x₁))
-      (DependentFunctorSquare.tail s x₁))
+dependent-functor-square-collection {n = zero} i j k₁ k₂ _ s'
+  = functor-square-collection i j k₁ k₂ s'
+
+dependent-functor-square-collection {n = suc _}
+  {D₂ = D₂} {D₂' = D₂'} {S₂ = S₂} {F = F} {H₁ = H₁} i j k₁ k₂ s s'
+  = record
+  { functor
+    = λ x₁ → dependent-functor-square-collection-eq
+      (ChainCategory.category' D₂)
+      (DependentCategory.category D₂')
+      (DependentRelation.relation S₂)
+      (ChainFunctorSquare.base s x₁)
+      (DependentInjective.injective i x₁)
+      (DependentInjective.injective j (ChainFunctor.base H₁ x₁))
+      (DependentInjective.injective k₁ x₁)
+      (DependentInjective.injective k₂ (ChainFunctor.base F x₁))
+      (ChainFunctorSquare.functor' s x₁)
+      (DependentFunctorSquare.functor s' x₁)
+  }
 
 dependent-functor-square-collection-eq _ _ _ refl
   = dependent-functor-square-collection

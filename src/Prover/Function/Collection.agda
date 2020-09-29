@@ -1,11 +1,12 @@
 module Prover.Function.Collection where
 
 open import Prover.Function
-  using (Function; FunctionCompose; FunctionIdentity; FunctionInjective;
-    FunctionSquare; function)
+  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare; function)
 open import Prover.Function.List
   using (function-compose-list; function-identity-list; function-list;
     function-square-list)
+open import Prover.Function.Relation
+  using (FunctionInjective)
 open import Prover.Prelude
 
 -- ## Function

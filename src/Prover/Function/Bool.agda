@@ -2,6 +2,8 @@ module Prover.Function.Bool where
 
 open import Prover.Prelude
 
+-- ## BoolFunction
+
 BoolFunction
   : Set
   → Set

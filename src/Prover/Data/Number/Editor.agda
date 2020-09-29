@@ -1,21 +1,15 @@
 module Prover.Data.Number.Editor where
 
-open import Prover.Category
-  using (Category)
-open import Prover.Category.Split.Unit
-  using (split-functor-unit)
-open import Prover.Category.Unit
-  using (category-unit)
 open import Prover.Data.Text.Editor
-  using (TextWithEvent; text-with-split-editor)
+  using (TextWithEvent; text-with-simple-split-editor)
 open import Prover.Editor
-  using (EventStack; PartialEditor; SplitEditor; split-editor-partial)
+  using (EventStack; SimplePartialEditor; SimpleSplitEditor)
 open import Prover.Editor.Base
   using (BaseEventStack)
 open import Prover.Editor.Lift
   using (event-stack-lift)
 open import Prover.Editor.Map
-  using (split-editor-map)
+  using (simple-split-editor-map)
 open import Prover.Function.Split
   using (split-function-from-retraction)
 open import Prover.View.Text
@@ -47,36 +41,27 @@ NumberEventStack
   = event-stack-lift
     NumberBaseEventStack
 
--- ### Pure
+-- ## Editors
 
-NumberCategory
-  : Category
-NumberCategory
-  = category-unit ℕ
+-- ### SimpleSplitEditor
 
--- ## Editor
-
--- ### Split
-
-number-split-editor
-  : SplitEditor
-    PlainTextViewStack
-    NumberEventStack
-    NumberCategory
-number-split-editor
-  = split-editor-map
-    (split-functor-unit
-      (split-function-from-retraction
-        CharWith.retraction-digits))
-  $ text-with-split-editor Char.is-digit
-
--- ### Partial
-
-number-partial-editor
-  : PartialEditor
+number-simple-split-editor
+  : SimpleSplitEditor
     PlainTextViewStack
     NumberEventStack
     ℕ
-number-partial-editor
-  = split-editor-partial number-split-editor
+number-simple-split-editor
+  = simple-split-editor-map
+    (split-function-from-retraction CharWith.retraction-digits)
+  $ text-with-simple-split-editor Char.is-digit
+
+-- ### SimplePartialEditor
+
+number-simple-partial-editor
+  : SimplePartialEditor
+    PlainTextViewStack
+    NumberEventStack
+    ℕ
+number-simple-partial-editor
+  = SimpleSplitEditor.partial-editor number-simple-split-editor
 

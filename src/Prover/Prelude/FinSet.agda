@@ -13,7 +13,7 @@ open import Prover.Prelude.Inspect
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
 open import Prover.Prelude.Relation
-  using (Dec; Decidable; Symmetric)
+  using (Decidable; Symmetric)
 
 -- ## Definition
 
@@ -26,6 +26,9 @@ FinSet A
 -- ## Module
 
 module FinSet where
+
+  open Collection public
+    using (IsMember; Member; decidable; empty; is-member?; member)
 
   -- ### Interface
 
@@ -59,52 +62,11 @@ module FinSet where
     ... | just _ | _
       = ⊥-elim (Bool.true≢false p)
 
-  -- ### Construction
-
-  module _
-    {A : Set}
-    where
-
-    empty
-      : FinSet A
-    empty
-      = Collection.empty
-
-  -- ### Equality
-
-  module _
-    {A : Set}
-    where
-
-    decidable
-      : Decidable (Equal A)
-      → Decidable (Equal (FinSet A))
-    decidable
-      = Collection.decidable
-
   -- ### Membership
 
   module _
     {A : Set}
     where
-
-    open Collection public
-      using (Member; member)
-
-    IsMember
-      : FinSet A
-      → A
-      → Set
-    IsMember
-      = Collection.IsMember
-
-    is-member?
-      : (xs : FinSet A)
-      → Decidable (Equal A)
-      → (x : A)
-      → Dec (IsMember xs x)
-    is-member?
-      = Collection.is-member?
 
     find-member
       : (xs : FinSet A)

@@ -13,7 +13,7 @@ open import Prover.Category.Partial.Collection
   using (partial-functor-collection; partial-functor-square-collection)
 open import Prover.Category.Split
   using (SplitFunctor; SplitFunctorSquare)
-open import Prover.Function
+open import Prover.Function.Relation
   using (FunctionInjective)
 open import Prover.Prelude
 

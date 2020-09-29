@@ -1,7 +1,7 @@
 module Prover.Category.Split.Sigma.Maybe where
 
 open import Prover.Category
-  using (Category)
+  using (Category; Functor)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor)
 open import Prover.Category.Dependent1.Split
@@ -34,8 +34,9 @@ split-functor-square-sigma-maybe
   : {C₁₁ C₂₁ : Category}
   → {C₁₂ D₁₂ : Dependent₁Category C₁₁}
   → {C₂₂ D₂₂ : Dependent₁Category C₂₁}
-  → {F₂ : Dependent₁Functor C₁₂ C₂₂}
-  → {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
+  → {G₂ : Dependent₁Functor D₁₂ D₂₂ F₁}
   → {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
   → {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
   → Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂

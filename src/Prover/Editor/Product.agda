@@ -2,27 +2,43 @@ module Prover.Editor.Product where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Chain
+  using (ChainCategory)
+open import Prover.Category.Dependent
+  using (DependentCategory)
+open import Prover.Category.Dependent.Encoding.Product
+  using (dependent-encoding-product)
+open import Prover.Category.Dependent.Product
+  using (dependent-category-product)
+open import Prover.Category.Dependent.Simple
+  using (DependentSimpleCategory)
+open import Prover.Category.Dependent.Simple.Bool.Product
+  using (dependent-simple-bool-function-product)
+open import Prover.Category.Dependent.Simple.Encoding.Product
+  using (dependent-simple-encoding-product)
+open import Prover.Category.Dependent.Simple.Partial.Product
+  using (dependent-simple-partial-function-product)
+open import Prover.Category.Dependent.Simple.Product
+  using (dependent-simple-category-product)
+open import Prover.Category.Dependent.Simple.Split.Product
+  using (dependent-simple-split-functor-product)
+open import Prover.Category.Dependent.Split.Product
+  using (dependent-split-functor-product)
 open import Prover.Category.Product
   using (category-product)
-open import Prover.Category.Split
-  using (SplitFunctor)
-open import Prover.Category.Split.Product
-  using (split-functor-product)
 open import Prover.Editor
-  using (Editor; EventStack; PartialEditor; MainEditor; SimpleEditor;
-    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any)
-open import Prover.Function.Bool
-  using (BoolFunction)
-open import Prover.Function.Bool.Product
-  using (bool-function-product)
-open import Prover.Function.Partial
-  using (PartialFunction)
-open import Prover.Function.Partial.Product
-  using (partial-function-product)
-open import Prover.Function.Split
-  using (SplitFunction)
-open import Prover.Function.Split.Product
-  using (split-function-product)
+  using (DependentEditor; DependentInnerEditor; DependentSimpleEditor;
+    DependentSimpleInnerEditor; DependentSimpleMainEditor;
+    DependentSimplePartialEditor; DependentSimpleSplitEditor;
+    DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleInnerEditor;
+    SimplePartialEditor; SimpleSplitEditor; SimpleMainEditor; SplitEditor;
+    ViewStack; ViewStackMap; dependent-editor-simple)
+open import Prover.Editor.Unit
+  using (dependent-editor-unit)
+open import Prover.Function.Dependent
+  using (DependentSet)
+open import Prover.Function.Dependent.Product
+  using (dependent-set-product)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -190,7 +206,7 @@ module _
   view-stack-map-product F₁ F₂
     = record {ViewStackMapProduct F₁ F₂}
 
--- ## Editors
+-- ## Editors (basic)
 
 -- ### Editor
 
@@ -471,260 +487,358 @@ module _
   editor-product d e₁ e₂
     = record {EditorProduct d e₁ e₂}
 
--- ### SimpleEditor
+-- ## Editors (dependent)
+
+-- ### DependentEditor
 
 -- Takes direction from first to second component.
-simple-editor-product
+dependent-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentCategory C}
+  → Direction
+  → DependentEditor V₁ E₁ C₁'
+  → DependentEditor V₂ E₂ C₂'
+  → DependentEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (dependent-category-product C₁' C₂')
+
+dependent-editor-product {n = zero} d e₁ e₂
+  = editor-product d e₁ e₂
+
+dependent-editor-product {n = suc _} d e₁ e₂
+  = record
+  { editor
+    = λ x → dependent-editor-product d
+      (DependentEditor.editor e₁ x)
+      (DependentEditor.editor e₂ x)
+  }
+
+-- ### DependentSplitEditor
+
+-- Takes direction from first to second component.
+dependent-split-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentCategory C}
+  → Direction
+  → DependentSplitEditor V₁ E₁ C₁'
+  → DependentSplitEditor V₂ E₂ C₂'
+  → DependentSplitEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (dependent-category-product C₁' C₂')
+dependent-split-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-editor-product d
+      (DependentSplitEditor.editor e₁)
+      (DependentSplitEditor.editor e₂)
+  ; split-functor
+    = dependent-split-functor-product
+      (DependentSplitEditor.split-functor e₁)
+      (DependentSplitEditor.split-functor e₂)
+  }
+
+-- ### DependentInnerEditor
+
+-- Takes direction from first to second component.
+dependent-inner-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ : Set}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentCategory C}
+  → Direction
+  → DependentInnerEditor V₁ E₁ S₁ P₁ C₁'
+  → DependentInnerEditor V₂ E₂ S₂ P₂ C₂'
+  → DependentInnerEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂)
+    (P₁ × P₂)
+    (dependent-category-product C₁' C₂')
+dependent-inner-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-editor-product d
+      (DependentInnerEditor.editor e₁)
+      (DependentInnerEditor.editor e₂)
+  ; state-encoding
+    = dependent-encoding-product
+      (DependentInnerEditor.state-encoding e₁)
+      (DependentInnerEditor.state-encoding e₂)
+  ; pure-encoding
+    = dependent-encoding-product
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentInnerEditor.pure-encoding e₂)
+  ; split-functor
+    = dependent-split-functor-product
+      (DependentInnerEditor.split-functor e₁)
+      (DependentInnerEditor.split-functor e₂)
+  }
+
+-- ### DependentSimpleEditor
+
+-- Takes direction from first to second component.
+dependent-simple-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleEditor V₁ E₁ C₁'
+  → DependentSimpleEditor V₂ E₂ C₂'
+  → DependentSimpleEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (dependent-simple-category-product C₁' C₂')
+dependent-simple-editor-product d e₁ e₂
+  = dependent-editor-simple
+  $ dependent-editor-product d
+    (dependent-editor-unit e₁)
+    (dependent-editor-unit e₂)
+
+-- ### DependentSimplePartialEditor
+
+-- Takes direction from first to second component.
+dependent-simple-partial-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentSet C}
+  → Direction
+  → DependentSimplePartialEditor V₁ E₁ C₁'
+  → DependentSimplePartialEditor V₂ E₂ C₂'
+  → DependentSimplePartialEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (dependent-set-product C₁' C₂')
+dependent-simple-partial-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-product d
+      (DependentSimplePartialEditor.editor e₁)
+      (DependentSimplePartialEditor.editor e₂)
+  ; partial-function
+    = dependent-simple-partial-function-product
+      (DependentSimplePartialEditor.partial-function e₁)
+      (DependentSimplePartialEditor.partial-function e₂)
+  }
+
+-- ### DependentSimpleSplitEditor
+
+-- Takes direction from first to second component.
+dependent-simple-split-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleSplitEditor V₁ E₁ C₁'
+  → DependentSimpleSplitEditor V₂ E₂ C₂'
+  → DependentSimpleSplitEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (dependent-simple-category-product C₁' C₂')
+dependent-simple-split-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-product d
+      (DependentSimpleSplitEditor.editor e₁)
+      (DependentSimpleSplitEditor.editor e₂)
+  ; split-functor
+    = dependent-simple-split-functor-product
+      (DependentSimpleSplitEditor.split-functor e₁)
+      (DependentSimpleSplitEditor.split-functor e₂)
+  }
+
+-- ### DependentSimpleMainEditor
+
+-- Takes direction from first to second component.
+dependent-simple-main-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ : Set}
+  → {C : ChainCategory n}
+  → Direction
+  → DependentSimpleMainEditor V₁ E₁ S₁ C
+  → DependentSimpleMainEditor V₂ E₂ S₂ C
+  → DependentSimpleMainEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂) C
+dependent-simple-main-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-product d
+      (DependentSimpleMainEditor.editor e₁)
+      (DependentSimpleMainEditor.editor e₂)
+  ; state-encoding
+    = dependent-simple-encoding-product
+      (DependentSimpleMainEditor.state-encoding e₁)
+      (DependentSimpleMainEditor.state-encoding e₂)
+  ; bool-function
+    = dependent-simple-bool-function-product
+      (DependentSimpleMainEditor.bool-function e₁)
+      (DependentSimpleMainEditor.bool-function e₂)
+  }
+
+-- ### DependentSimpleInnerEditor
+
+-- Takes direction from first to second component.
+dependent-simple-inner-editor-product
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ : Set}
+  → {C : ChainCategory n}
+  → {C₁' C₂' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleInnerEditor V₁ E₁ S₁ P₁ C₁'
+  → DependentSimpleInnerEditor V₂ E₂ S₂ P₂ C₂'
+  → DependentSimpleInnerEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂)
+    (P₁ × P₂)
+    (dependent-simple-category-product C₁' C₂')
+dependent-simple-inner-editor-product d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-product d
+      (DependentSimpleInnerEditor.editor e₁)
+      (DependentSimpleInnerEditor.editor e₂)
+  ; state-encoding
+    = dependent-simple-encoding-product
+      (DependentSimpleInnerEditor.state-encoding e₁)
+      (DependentSimpleInnerEditor.state-encoding e₂)
+  ; pure-encoding
+    = dependent-simple-encoding-product
+      (DependentSimpleInnerEditor.pure-encoding e₁)
+      (DependentSimpleInnerEditor.pure-encoding e₂)
+  ; split-functor
+    = dependent-simple-split-functor-product
+      (DependentSimpleInnerEditor.split-functor e₁)
+      (DependentSimpleInnerEditor.split-functor e₂)
+  }
+
+-- ## Editors (nondependent)
+
+-- ### SplitEditor
+
+-- Takes direction from first to second component.
+split-editor-product
+  : {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C₁ C₂ : Category}
+  → Direction
+  → SplitEditor V₁ E₁ C₁
+  → SplitEditor V₂ E₂ C₂
+  → SplitEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (category-product C₁ C₂)
+split-editor-product
+  = dependent-split-editor-product
+
+-- ### InnerEditor
+
+-- Takes direction from first to second component.
+inner-editor-product
+  : {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ : Set}
+  → {C₁ C₂ : Category}
+  → Direction
+  → InnerEditor V₁ E₁ S₁ P₁ C₁
+  → InnerEditor V₂ E₂ S₂ P₂ C₂
+  → InnerEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂)
+    (P₁ × P₂)
+    (category-product C₁ C₂)
+inner-editor-product
+  = dependent-inner-editor-product
+
+-- ### SimplePartialEditor
+
+-- Takes direction from first to second component.
+simple-partial-editor-product
   : {V₁ V₂ : ViewStack}
   → {E₁ E₂ : EventStack}
   → {A₁ A₂ : Set}
   → Direction
-  → SimpleEditor V₁ E₁ A₁
-  → SimpleEditor V₂ E₂ A₂
-  → SimpleEditor
+  → SimplePartialEditor V₁ E₁ A₁
+  → SimplePartialEditor V₂ E₂ A₂
+  → SimplePartialEditor
     (view-stack-product V₁ V₂)
     (event-stack-product E₁ E₂)
     (A₁ × A₂)
-simple-editor-product d (any e₁) (any e₂)
-  = any (editor-product d e₁ e₂)
+simple-partial-editor-product
+  = dependent-simple-partial-editor-product
 
--- ### PartialEditor
+-- ### SimpleSplitEditor
 
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {A₁ A₂ : Set}
-  where
+-- Takes direction from first to second component.
+simple-split-editor-product
+  : {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {A₁ A₂ : Set}
+  → Direction
+  → SimpleSplitEditor V₁ E₁ A₁
+  → SimpleSplitEditor V₂ E₂ A₂
+  → SimpleSplitEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (A₁ × A₂)
+simple-split-editor-product
+  = dependent-simple-split-editor-product
 
-  module PartialEditorProduct
-    (d : Direction)
-    (e₁ : PartialEditor V₁ E₁ A₁)
-    (e₂ : PartialEditor V₂ E₂ A₂)
-    where
+-- ### SimpleMainEditor
 
-    State
-      : Set
-    State
-      = PartialEditor.State e₁
-      × PartialEditor.State e₂
+-- Takes direction from first to second component.
+simple-main-editor-product
+  : {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ : Set}
+  → Direction
+  → SimpleMainEditor V₁ E₁ S₁
+  → SimpleMainEditor V₂ E₂ S₂
+  → SimpleMainEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂)
+simple-main-editor-product
+  = dependent-simple-main-editor-product
 
-    simple-editor
-      : SimpleEditor
-        (view-stack-product V₁ V₂)
-        (event-stack-product E₁ E₂)
-        State
-    simple-editor
-      = simple-editor-product d
-        (PartialEditor.simple-editor e₁)
-        (PartialEditor.simple-editor e₂)
+-- ### SimpleInnerEditor
 
-    partial-function
-      : PartialFunction
-        State
-        (A₁ × A₂)
-    partial-function
-      = partial-function-product
-        (PartialEditor.partial-function e₁)
-        (PartialEditor.partial-function e₂)
-
-  -- Takes direction from first to second component.
-  partial-editor-product
-    : Direction
-    → PartialEditor V₁ E₁ A₁
-    → PartialEditor V₂ E₂ A₂
-    → PartialEditor
-      (view-stack-product V₁ V₂)
-      (event-stack-product E₁ E₂)
-      (A₁ × A₂)
-  partial-editor-product d e₁ e₂
-    = record {PartialEditorProduct d e₁ e₂}
-
--- ### SplitEditor
-
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {C₁ C₂ : Category}
-  where
-
-  module SplitEditorProduct
-    (d : Direction)
-    (e₁ : SplitEditor V₁ E₁ C₁)
-    (e₂ : SplitEditor V₂ E₂ C₂)
-    where
-
-    StateCategory
-      : Category
-    StateCategory
-      = category-product
-        (SplitEditor.StateCategory e₁)
-        (SplitEditor.StateCategory e₂)
-
-    editor
-      : Editor
-        (view-stack-product V₁ V₂)
-        (event-stack-product E₁ E₂)
-        StateCategory
-    editor
-      = editor-product d
-        (SplitEditor.editor e₁)
-        (SplitEditor.editor e₂)
-
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-product C₁ C₂)
-    split-functor
-      = split-functor-product
-        (SplitEditor.split-functor e₁)
-        (SplitEditor.split-functor e₂)
-
-  -- Takes direction from first to second component.
-  split-editor-product
-    : Direction
-    → SplitEditor V₁ E₁ C₁
-    → SplitEditor V₂ E₂ C₂
-    → SplitEditor
-      (view-stack-product V₁ V₂)
-      (event-stack-product E₁ E₂)
-      (category-product C₁ C₂)
-  split-editor-product d e₁ e₂
-    = record {SplitEditorProduct d e₁ e₂}
-
--- ### MainEditor
-
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {S₁ S₂ : Set}
-  where
-
-  module MainEditorProduct
-    (d : Direction)
-    (e₁ : MainEditor V₁ E₁ S₁)
-    (e₂ : MainEditor V₂ E₂ S₂)
-    where
-
-    State
-      : Set
-    State
-      = MainEditor.State e₁
-      × MainEditor.State e₂
-
-    simple-editor
-      : SimpleEditor
-        (view-stack-product V₁ V₂)
-        (event-stack-product E₁ E₂)
-        State
-    simple-editor
-      = simple-editor-product d
-        (MainEditor.simple-editor e₁)
-        (MainEditor.simple-editor e₂)
-
-    split-function
-      : SplitFunction
-        (S₁ × S₂)
-        State
-    split-function
-      = split-function-product
-        (MainEditor.split-function e₁)
-        (MainEditor.split-function e₂)
-
-    bool-function
-      : BoolFunction
-        State
-    bool-function
-      = bool-function-product
-        (MainEditor.bool-function e₁)
-        (MainEditor.bool-function e₂)
-
-  -- Takes direction from first to second component.
-  main-editor-product
-    : Direction
-    → MainEditor V₁ E₁ S₁
-    → MainEditor V₂ E₂ S₂
-    → MainEditor
-      (view-stack-product V₁ V₂)
-      (event-stack-product E₁ E₂)
-      (S₁ × S₂)
-  main-editor-product d e₁ e₂
-    = record {MainEditorProduct d e₁ e₂}
-
--- ### SplitMainEditor
-
-module _
-  {V₁ V₂ : ViewStack}
-  {E₁ E₂ : EventStack}
-  {S₁ S₂ P₁ P₂ : Set}
-  {C₁ C₂ : Category}
-  where
-
-  module SplitMainEditorProduct
-    (d : Direction)
-    (e₁ : SplitMainEditor V₁ E₁ S₁ P₁ C₁)
-    (e₂ : SplitMainEditor V₂ E₂ S₂ P₂ C₂)
-    where
-
-    StateCategory
-      : Category
-    StateCategory
-      = category-product
-        (SplitMainEditor.StateCategory e₁)
-        (SplitMainEditor.StateCategory e₂)
-
-    open Category StateCategory using () renaming
-      ( Object
-        to State
-      )
-
-    editor
-      : Editor
-        (view-stack-product V₁ V₂)
-        (event-stack-product E₁ E₂)
-        StateCategory
-    editor
-      = editor-product d
-        (SplitMainEditor.editor e₁)
-        (SplitMainEditor.editor e₂)
-
-    state-split-function
-      : SplitFunction
-        (S₁ × S₂)
-        State
-    state-split-function
-      = split-function-product
-        (SplitMainEditor.state-split-function e₁)
-        (SplitMainEditor.state-split-function e₂)
-
-    pure-split-function
-      : SplitFunction
-        (P₁ × P₂)
-        (Category.Object (category-product C₁ C₂))
-    pure-split-function
-      = split-function-product
-        (SplitMainEditor.pure-split-function e₁)
-        (SplitMainEditor.pure-split-function e₂)
-
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-product C₁ C₂)
-    split-functor
-      = split-functor-product
-        (SplitMainEditor.split-functor e₁)
-        (SplitMainEditor.split-functor e₂)
-
-  -- Takes direction from first to second component.
-  split-main-editor-product
-    : Direction
-    → SplitMainEditor V₁ E₁ S₁ P₁ C₁
-    → SplitMainEditor V₂ E₂ S₂ P₂ C₂
-    → SplitMainEditor
-      (view-stack-product V₁ V₂)
-      (event-stack-product E₁ E₂)
-      (S₁ × S₂)
-      (P₁ × P₂)
-      (category-product C₁ C₂)
-  split-main-editor-product d e₁ e₂
-    = record {SplitMainEditorProduct d e₁ e₂}
+-- Takes direction from first to second component.
+simple-inner-editor-product
+  : {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ A₁ A₂ : Set}
+  → Direction
+  → SimpleInnerEditor V₁ E₁ S₁ P₁ A₁
+  → SimpleInnerEditor V₂ E₂ S₂ P₂ A₂
+  → SimpleInnerEditor
+    (view-stack-product V₁ V₂)
+    (event-stack-product E₁ E₂)
+    (S₁ × S₂)
+    (P₁ × P₂)
+    (A₁ × A₂)
+simple-inner-editor-product
+  = dependent-simple-inner-editor-product
 

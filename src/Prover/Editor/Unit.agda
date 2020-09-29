@@ -2,25 +2,34 @@ module Prover.Editor.Unit where
 
 open import Prover.Category
   using (Category)
-open import Prover.Category.Split
-  using (SplitFunctor)
-open import Prover.Category.Split.Unit
-  using (split-functor-unit)
+open import Prover.Category.Chain
+  using (ChainCategory)
+open import Prover.Category.Dependent.Encoding.Unit
+  using (dependent-encoding-unit)
+open import Prover.Category.Dependent.Simple
+  using (DependentSimpleCategory)
+open import Prover.Category.Dependent.Split.Unit
+  using (dependent-split-functor-unit)
+open import Prover.Category.Dependent.Unit
+  using (dependent-category-unit)
 open import Prover.Category.Unit
   using (module CategoryUnit; category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; SplitEditor; ViewStack; any)
+  using (DependentEditor; DependentInnerEditor; DependentSimpleEditor;
+    DependentSimpleInnerEditor; DependentSimpleSplitEditor;
+    DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleEditor;
+    SimpleInnerEditor; SimpleSplitEditor; SplitEditor; ViewStack; any)
 open import Prover.Editor.Base
   using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
   using (ChildEditor; SimpleChildEditor)
 open import Prover.Editor.Flat
   using (FlatEventStack; FlatViewStack)
-open import Prover.Function.Split
-  using (SplitFunction)
 open import Prover.Prelude
 
--- ## Editor
+-- ## Editors (basic)
+
+-- ### Editor
 
 module _
   {V : ViewStack}
@@ -106,42 +115,7 @@ module _
   editor-unit (any e)
     = record {EditorUnit e}
 
--- ## SplitEditor
-
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {A B : Set}
-  where
-
-  module SplitEditorUnit
-    (F : SplitFunction A B)
-    (e : SimpleEditor V E A)
-    where
-
-    StateCategory
-      : Category
-    StateCategory
-      = category-unit A
-
-    editor
-      : Editor V E StateCategory
-    editor
-      = editor-unit e
-
-    split-functor
-      : SplitFunctor StateCategory (category-unit B)
-    split-functor
-      = split-functor-unit F
-
-  split-editor-unit
-    : SplitFunction A B
-    → SimpleEditor V E A
-    → SplitEditor V E (category-unit B)
-  split-editor-unit F e
-    = record {SplitEditorUnit F e}
-
--- ## BaseEditor
+-- ### BaseEditor
 
 module _
   {V : BaseViewStack}
@@ -181,7 +155,7 @@ module _
   base-editor-unit e
     = record {BaseEditorUnit e}
 
--- ## ChildEditor
+-- ### ChildEditor
 
 module _
   {V : BaseViewStack}
@@ -229,4 +203,103 @@ module _
       (base-editor-unit e)
   child-editor-unit e'
     = record {ChildEditorUnit e'}
+
+-- ## Editors (dependent)
+
+-- ### DependentEditor
+
+dependent-editor-unit
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → DependentSimpleEditor V E C'
+  → DependentEditor V E
+    (dependent-category-unit C')
+
+dependent-editor-unit {n = zero} e
+  = editor-unit e
+
+dependent-editor-unit {n = suc _} e
+  = record
+  { editor
+    = λ x → dependent-editor-unit
+      (DependentSimpleEditor.editor e x)
+  }
+
+-- ### DependentSplitEditor
+
+dependent-split-editor-unit
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → DependentSimpleSplitEditor V E C'
+  → DependentSplitEditor V E
+    (dependent-category-unit C')
+dependent-split-editor-unit e
+  = record
+  { editor
+    = dependent-editor-unit
+      (DependentSimpleSplitEditor.editor e)
+  ; split-functor
+    = dependent-split-functor-unit
+      (DependentSimpleSplitEditor.split-functor e)
+  }
+
+-- ### DependentInnerEditor
+
+dependent-inner-editor-unit
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → DependentSimpleInnerEditor V E S P C'
+  → DependentInnerEditor V E S P
+    (dependent-category-unit C')
+dependent-inner-editor-unit e
+  = record
+  { editor
+    = dependent-editor-unit
+      (DependentSimpleInnerEditor.editor e)
+  ; state-encoding
+    = dependent-encoding-unit
+      (DependentSimpleInnerEditor.state-encoding e)
+  ; pure-encoding
+    = dependent-encoding-unit
+      (DependentSimpleInnerEditor.pure-encoding e)
+  ; split-functor
+    = dependent-split-functor-unit
+      (DependentSimpleInnerEditor.split-functor e)
+  }
+
+-- ## Editors (nondependent)
+
+-- ### SplitEditor
+
+split-editor-unit
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A : Set}
+  → SimpleSplitEditor V E A
+  → SplitEditor V E
+    (category-unit A)
+split-editor-unit
+  = dependent-split-editor-unit
+
+-- ### InnerEditor
+
+inner-editor-unit
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P A : Set}
+  → SimpleInnerEditor V E S P A
+  → InnerEditor V E S P
+    (category-unit A)
+inner-editor-unit
+  = dependent-inner-editor-unit
 

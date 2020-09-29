@@ -10,10 +10,12 @@ open import Prover.Category.List
   using (category-list; functor-compose-list; functor-identity-list;
     functor-list; functor-square-list)
 open import Prover.Function
-  using (FunctionInjective; function)
+  using (function)
 open import Prover.Function.Collection
   using (function-compose-collection; function-identity-collection;
     function-square-collection; function-square-collection')
+open import Prover.Function.Relation
+  using (FunctionInjective)
 open import Prover.Prelude
 
 -- ## Category

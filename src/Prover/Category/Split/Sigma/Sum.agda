@@ -46,19 +46,20 @@ split-functor-square-sigma-sum
   → {C₁₂ D₁₂ : Dependent₁Category D₁₁}
   → {C₂₂ D₂₂ : Dependent₁Category D₂₁}
   → {F₁ : Functor C₁₁ C₂₁}
-  → {F₂ : Dependent₁Functor C₁₂ C₂₂}
-  → {G₂ : Dependent₁Functor D₁₂ D₂₂}
+  → {G₁ : Functor D₁₁ D₂₁}
+  → {F₂ : Dependent₁Functor C₁₂ C₂₂ G₁}
+  → {G₂ : Dependent₁Functor D₁₂ D₂₂ G₁}
   → {H₁₁ : SplitFunctor C₁₁ D₁₁}
   → {H₂₁ : SplitFunctor C₂₁ D₂₁}
   → {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
   → {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
-  → (s₁ : SplitFunctorSquare F₁ (Dependent₁Functor.functor F₂) H₁₁ H₂₁)
+  → (s₁ : SplitFunctorSquare F₁ G₁ H₁₁ H₂₁)
   → Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
-    (functor-sigma-sum {C₂₂ = C₁₂} {D₂₂ = C₂₂} F₂ s₁)
+    (functor-sigma-sum F₂ s₁)
     (functor-sigma-maybe G₂)
-    (split-functor-sigma-sum {C₂ = C₁₂} {D₂ = D₁₂} H₁₁ H₁₂)
-    (split-functor-sigma-sum {C₂ = C₂₂} {D₂ = D₂₂} H₂₁ H₂₂)
+    (split-functor-sigma-sum H₁₁ H₁₂)
+    (split-functor-sigma-sum H₂₁ H₂₂)
 split-functor-square-sigma-sum {F₂ = F₂} s₁ s₂
   = split-functor-square-sum₂
     (weak-functor-square-compose

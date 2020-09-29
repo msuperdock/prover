@@ -1,16 +1,15 @@
 module Prover.Category.Dependent.Unit where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
+    ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare; cons; nil)
+    DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Dependent.Simple
   using (DependentSimpleFunctor; DependentSimpleFunctorCompose;
     DependentSimpleFunctorIdentity; DependentSimpleFunctorSquare;
-    DependentSimpleCategory; dependent-simple-category₀;
-    dependent-simple-functor₀; dependent-simple-functor-compose₀;
-    dependent-simple-functor-identity₀; dependent-simple-functor-square₀)
+    DependentSimpleCategory)
 open import Prover.Category.Unit
   using (category-unit; functor-compose-unit; functor-identity-unit;
     functor-square-unit; functor-unit)
@@ -47,6 +46,7 @@ dependent-functor-identity-unit
   → {C' : DependentSimpleCategory C}
   → {F : ChainFunctor C C}
   → {F' : DependentSimpleFunctor C' C' F}
+  → ChainFunctorIdentity F
   → DependentSimpleFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-unit F')
@@ -60,6 +60,7 @@ dependent-functor-identity-unit-eq
   → {F : ChainFunctor (C x₁) (C x₂)}
   → {F' : DependentSimpleFunctor (C' x₁) (C' x₂) F}
   → x₂ ≡ x₁
+  → ChainFunctorIdentity F
   → DependentSimpleFunctorIdentity F'
   → DependentFunctorIdentity
     (dependent-functor-unit F')
@@ -78,6 +79,7 @@ dependent-functor-compose-unit
   → {F' : DependentSimpleFunctor D' E' F}
   → {G' : DependentSimpleFunctor C' D' G}
   → {H' : DependentSimpleFunctor C' E' H}
+  → ChainFunctorCompose F G H
   → DependentSimpleFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-unit F')
@@ -100,6 +102,7 @@ dependent-functor-compose-unit-eq
   → {G' : DependentSimpleFunctor C' D' G}
   → {H' : DependentSimpleFunctor C' (E' x₂) H}
   → x₂ ≡ x₁
+  → ChainFunctorCompose F G H
   → DependentSimpleFunctorCompose F' G' H'
   → DependentFunctorCompose
     (dependent-functor-unit F')
@@ -123,6 +126,7 @@ dependent-functor-square-unit
   → {G' : DependentSimpleFunctor D₁' D₂' G}
   → {H₁' : DependentSimpleFunctor C₁' D₁' H₁}
   → {H₂' : DependentSimpleFunctor C₂' D₂' H₂}
+  → ChainFunctorSquare F G H₁ H₂
   → DependentSimpleFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-unit F')
@@ -149,6 +153,7 @@ dependent-functor-square-unit-eq
   → {H₁' : DependentSimpleFunctor C₁' D₁' H₁}
   → {H₂' : DependentSimpleFunctor C₂' (D₂' x₂) H₂}
   → x₂ ≡ x₁
+  → ChainFunctorSquare F G H₁ H₂
   → DependentSimpleFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare
     (dependent-functor-unit F')
@@ -160,94 +165,96 @@ dependent-functor-square-unit-eq
 
 -- ### DependentCategory
 
-dependent-category-unit
-  {n = zero} C'
-  = nil
-    (category-unit
-      (dependent-simple-category₀ C'))
-dependent-category-unit
-  {n = suc _} C'
-  = cons
-    (λ x → dependent-category-unit
-      (DependentSimpleCategory.tail C' x))
-    (λ f → dependent-functor-unit
-      (DependentSimpleCategory.dependent-simple-functor C' f))
-    (λ x → dependent-functor-identity-unit
-      (DependentSimpleCategory.dependent-simple-functor-identity C' x)) 
-    (λ f g → dependent-functor-compose-unit
-      (DependentSimpleCategory.dependent-simple-functor-compose C' f g))
+dependent-category-unit {n = zero} C'
+  = category-unit C'
+
+dependent-category-unit {n = suc _} {C = C} C'
+  = record
+  { category
+    = λ x → dependent-category-unit
+      (DependentSimpleCategory.category C' x)
+  ; functor
+    = λ f → dependent-functor-unit
+      (DependentSimpleCategory.functor C' f)
+  ; functor-identity
+    = λ x → dependent-functor-identity-unit
+      (ChainCategory.functor-identity C x)
+      (DependentSimpleCategory.functor-identity C' x)
+  ; functor-compose
+    = λ f g → dependent-functor-compose-unit
+      (ChainCategory.functor-compose C f g)
+      (DependentSimpleCategory.functor-compose C' f g)
+  }
 
 -- ### DependentFunctor
 
-dependent-functor-unit
-  {n = zero} F'
-  = nil
-    (functor-unit
-      (dependent-simple-functor₀ F'))
-dependent-functor-unit
-  {n = suc _} F'
-  = cons
-    (λ x → dependent-functor-unit
-      (DependentSimpleFunctor.tail F' x))
-    (λ f → dependent-functor-square-unit
-      (DependentSimpleFunctor.dependent-simple-functor-square F' f))
+dependent-functor-unit {n = zero} F'
+  = functor-unit F'
+
+dependent-functor-unit {n = suc _} {F = F} F'
+  = record
+  { functor
+    = λ x → dependent-functor-unit
+      (DependentSimpleFunctor.functor F' x)
+  ; functor-square
+    = λ f → dependent-functor-square-unit
+      (ChainFunctor.functor-square F f)
+      (DependentSimpleFunctor.functor-square F' f)
+  }
 
 -- ### DependentFunctorIdentity
 
-dependent-functor-identity-unit
-  {n = zero} p
-  = nil
-    (functor-identity-unit
-      (dependent-simple-functor-identity₀ p))
-dependent-functor-identity-unit
-  {n = suc _} {C = C} {C' = C'} p
-  = cons
-    (DependentSimpleFunctorIdentity.head p)
-    (λ x → dependent-functor-identity-unit-eq
-      (ChainCategory.tail C)
-      (DependentSimpleCategory.tail C')
-      (DependentSimpleFunctorIdentity.base p x)
-      (DependentSimpleFunctorIdentity.tail p x))
+dependent-functor-identity-unit {n = zero} _ p'
+  = functor-identity-unit p'
+
+dependent-functor-identity-unit {n = suc _} {C = C} {C' = C'} p p'
+  = record
+  { functor
+    = λ x → dependent-functor-identity-unit-eq
+      (ChainCategory.category' C)
+      (DependentSimpleCategory.category C')
+      (ChainFunctorIdentity.base p x)
+      (ChainFunctorIdentity.functor' p x)
+      (DependentSimpleFunctorIdentity.functor p' x)
+  }
 
 dependent-functor-identity-unit-eq _ _ refl
   = dependent-functor-identity-unit
 
 -- ### DependentFunctorCompose
 
-dependent-functor-compose-unit
-  {n = zero} p
-  = nil
-    (functor-compose-unit
-      (dependent-simple-functor-compose₀ p))
-dependent-functor-compose-unit
-  {n = suc _} {E = E} {E' = E'} p
-  = cons
-    (DependentSimpleFunctorCompose.head p)
-    (λ x → dependent-functor-compose-unit-eq
-      (ChainCategory.tail E)
-      (DependentSimpleCategory.tail E')
-      (DependentSimpleFunctorCompose.base p x)
-      (DependentSimpleFunctorCompose.tail p x))
+dependent-functor-compose-unit {n = zero} _ p'
+  = functor-compose-unit p'
+
+dependent-functor-compose-unit {n = suc _} {E = E} {E' = E'} p p'
+  = record
+  { functor
+    = λ x → dependent-functor-compose-unit-eq
+      (ChainCategory.category' E)
+      (DependentSimpleCategory.category E')
+      (ChainFunctorCompose.base p x)
+      (ChainFunctorCompose.functor' p x)
+      (DependentSimpleFunctorCompose.functor p' x)
+  }
 
 dependent-functor-compose-unit-eq _ _ refl
   = dependent-functor-compose-unit
 
 -- ### DependentFunctorSquare
 
-dependent-functor-square-unit
-  {n = zero} s
-  = nil
-    (functor-square-unit
-      (dependent-simple-functor-square₀ s))
-dependent-functor-square-unit
-  {n = suc _} {D₂ = D₂} {D₂' = D₂'} s
-  = cons
-    (DependentSimpleFunctorSquare.head s)
-    (λ x₁ → dependent-functor-square-unit-eq
-      (ChainCategory.tail D₂)
-      (DependentSimpleCategory.tail D₂')
-      (DependentSimpleFunctorSquare.base s x₁)
-      (DependentSimpleFunctorSquare.tail s x₁))
+dependent-functor-square-unit {n = zero} _ s'
+  = functor-square-unit s'
+
+dependent-functor-square-unit {n = suc _} {D₂ = D₂} {D₂' = D₂'} s s'
+  = record
+  { functor
+    = λ x₁ → dependent-functor-square-unit-eq
+      (ChainCategory.category' D₂)
+      (DependentSimpleCategory.category D₂')
+      (ChainFunctorSquare.base s x₁)
+      (ChainFunctorSquare.functor' s x₁)
+      (DependentSimpleFunctorSquare.functor s' x₁)
+  }
 
 dependent-functor-square-unit-eq _ _ refl
   = dependent-functor-square-unit

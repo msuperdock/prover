@@ -2,27 +2,43 @@ module Prover.Editor.List where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Chain
+  using (ChainCategory)
+open import Prover.Category.Dependent
+  using (DependentCategory)
+open import Prover.Category.Dependent.Encoding.List
+  using (dependent-encoding-list)
+open import Prover.Category.Dependent.List
+  using (dependent-category-list)
+open import Prover.Category.Dependent.Simple
+  using (DependentSimpleCategory)
+open import Prover.Category.Dependent.Simple.Bool.List
+  using (dependent-simple-bool-function-list)
+open import Prover.Category.Dependent.Simple.Encoding.List
+  using (dependent-simple-encoding-list)
+open import Prover.Category.Dependent.Simple.List
+  using (dependent-simple-category-list)
+open import Prover.Category.Dependent.Simple.Partial.List
+  using (dependent-simple-partial-function-list)
+open import Prover.Category.Dependent.Simple.Split.List
+  using (dependent-simple-split-functor-list)
+open import Prover.Category.Dependent.Split.List
+  using (dependent-split-functor-list)
 open import Prover.Category.List
   using (module CategoryList; category-list)
-open import Prover.Category.Split
-  using (SplitFunctor)
-open import Prover.Category.Split.List
-  using (split-functor-list)
 open import Prover.Editor
-  using (Editor; EventStack; MainEditor; PartialEditor; SimpleEditor;
-    SplitEditor; SplitMainEditor; ViewStack; ViewStackMap; any)
-open import Prover.Function.Bool
-  using (BoolFunction)
-open import Prover.Function.Bool.List
-  using (bool-function-list)
-open import Prover.Function.Partial
-  using (PartialFunction)
-open import Prover.Function.Partial.List
-  using (partial-function-list)
-open import Prover.Function.Split
-  using (SplitFunction)
-open import Prover.Function.Split.List
-  using (split-function-list)
+  using (DependentEditor; DependentInnerEditor; DependentSimpleEditor;
+    DependentSimpleInnerEditor; DependentSimpleMainEditor;
+    DependentSimplePartialEditor; DependentSimpleSplitEditor;
+    DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleInnerEditor;
+    SimpleMainEditor; SimplePartialEditor; SimpleSplitEditor; SplitEditor;
+    ViewStack; ViewStackMap; any; dependent-editor-simple)
+open import Prover.Editor.Unit
+  using (dependent-editor-unit)
+open import Prover.Function.Dependent
+  using (DependentSet)
+open import Prover.Function.Dependent.List
+  using (dependent-set-list)
 open import Prover.Prelude
 
 open List
@@ -212,7 +228,7 @@ module _
   view-stack-map-list F
     = record {ViewStackMapList F}
 
--- ## Editors
+-- ## Editors (basic)
 
 -- ### Editor
 
@@ -535,238 +551,325 @@ module _
   editor-list d e
     = record {EditorList d e}
 
--- ### SimpleEditor
+-- ## Editors (dependent)
+
+-- ### DependentEditor
 
 -- Takes direction from earlier to later elements.
-simple-editor-list
+dependent-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → Direction
+  → DependentEditor V E C'
+  → DependentEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (dependent-category-list C')
+
+dependent-editor-list {n = zero} d e
+  = editor-list d e
+
+dependent-editor-list {n = suc _} d e
+  = record
+  { editor
+    = λ x → dependent-editor-list d
+      (DependentEditor.editor e x)
+  }
+
+-- ### DependentSplitEditor
+
+-- Takes direction from earlier to later elements.
+dependent-split-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → Direction
+  → DependentSplitEditor V E C'
+  → DependentSplitEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (dependent-category-list C')
+dependent-split-editor-list d e
+  = record
+  { editor
+    = dependent-editor-list d
+      (DependentSplitEditor.editor e)
+  ; split-functor
+    = dependent-split-functor-list
+      (DependentSplitEditor.split-functor e)
+  }
+
+-- ### DependentInnerEditor
+
+-- Takes direction from earlier to later elements.
+dependent-inner-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : ChainCategory n}
+  → {C' : DependentCategory C}
+  → Direction
+  → DependentInnerEditor V E S P C'
+  → DependentInnerEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S)
+    (List P)
+    (dependent-category-list C')
+dependent-inner-editor-list d e
+  = record
+  { editor
+    = dependent-editor-list d
+      (DependentInnerEditor.editor e)
+  ; state-encoding
+    = dependent-encoding-list
+      (DependentInnerEditor.state-encoding e)
+  ; pure-encoding
+    = dependent-encoding-list
+      (DependentInnerEditor.pure-encoding e)
+  ; split-functor
+    = dependent-split-functor-list
+      (DependentInnerEditor.split-functor e)
+  }
+
+-- ### DependentSimpleEditor
+
+-- Takes direction from earlier to later elements.
+dependent-simple-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleEditor V E C'
+  → DependentSimpleEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (dependent-simple-category-list C')
+dependent-simple-editor-list d e
+  = dependent-editor-simple
+  $ dependent-editor-list d
+    (dependent-editor-unit e)
+
+-- ### DependentSimplePartialEditor
+
+-- Takes direction from earlier to later elements.
+dependent-simple-partial-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentSet C}
+  → Direction
+  → DependentSimplePartialEditor V E C'
+  → DependentSimplePartialEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (dependent-set-list C')
+dependent-simple-partial-editor-list d e
+  = record
+  { editor
+    = dependent-simple-editor-list d
+      (DependentSimplePartialEditor.editor e)
+  ; partial-function
+    = dependent-simple-partial-function-list
+      (DependentSimplePartialEditor.partial-function e)
+  }
+
+-- ### DependentSimpleSplitEditor
+
+-- Takes direction from earlier to later elements.
+dependent-simple-split-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleSplitEditor V E C'
+  → DependentSimpleSplitEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (dependent-simple-category-list C')
+dependent-simple-split-editor-list d e
+  = record
+  { editor
+    = dependent-simple-editor-list d
+      (DependentSimpleSplitEditor.editor e)
+  ; split-functor
+    = dependent-simple-split-functor-list
+      (DependentSimpleSplitEditor.split-functor e)
+  }
+
+-- ### DependentSimpleMainEditor
+
+-- Takes direction from earlier to later elements.
+dependent-simple-main-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {S : Set}
+  → {C : ChainCategory n}
+  → Direction
+  → DependentSimpleMainEditor V E S C
+  → DependentSimpleMainEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S) C
+dependent-simple-main-editor-list d e
+  = record
+  { editor
+    = dependent-simple-editor-list d
+      (DependentSimpleMainEditor.editor e)
+  ; state-encoding
+    = dependent-simple-encoding-list
+      (DependentSimpleMainEditor.state-encoding e)
+  ; bool-function
+    = dependent-simple-bool-function-list
+      (DependentSimpleMainEditor.bool-function e)
+  }
+
+-- ### DependentSimpleInnerEditor
+
+-- Takes direction from earlier to later elements.
+dependent-simple-inner-editor-list
+  : {n : ℕ}
+  → {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → Direction
+  → DependentSimpleInnerEditor V E S P C'
+  → DependentSimpleInnerEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S)
+    (List P)
+    (dependent-simple-category-list C')
+dependent-simple-inner-editor-list d e
+  = record
+  { editor
+    = dependent-simple-editor-list d
+      (DependentSimpleInnerEditor.editor e)
+  ; state-encoding
+    = dependent-simple-encoding-list
+      (DependentSimpleInnerEditor.state-encoding e)
+  ; pure-encoding
+    = dependent-simple-encoding-list
+      (DependentSimpleInnerEditor.pure-encoding e)
+  ; split-functor
+    = dependent-simple-split-functor-list
+      (DependentSimpleInnerEditor.split-functor e)
+  }
+
+-- ## Editors (nondependent)
+
+-- ### SplitEditor
+
+-- Takes direction from earlier to later elements.
+split-editor-list
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {C : Category}
+  → Direction
+  → SplitEditor V E C
+  → SplitEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (category-list C)
+split-editor-list
+  = dependent-split-editor-list
+
+-- ### InnerEditor
+
+-- Takes direction from earlier to later elements.
+inner-editor-list
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : Category}
+  → Direction
+  → InnerEditor V E S P C
+  → InnerEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S)
+    (List P)
+    (category-list C)
+inner-editor-list
+  = dependent-inner-editor-list
+
+-- ### SimplePartialEditor
+
+-- Takes direction from earlier to later elements.
+simple-partial-editor-list
   : {V : ViewStack}
   → {E : EventStack}
   → {A : Set}
   → Direction
-  → SimpleEditor V E A
-  → SimpleEditor
+  → SimplePartialEditor V E A
+  → SimplePartialEditor
     (view-stack-list V)
     (event-stack-list E)
     (List A)
-simple-editor-list d (any e)
-  = any (editor-list d e)
+simple-partial-editor-list
+  = dependent-simple-partial-editor-list
 
--- ### PartialEditor
+-- ### SimpleSplitEditor
 
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {A : Set}
-  where
+-- Takes direction from earlier to later elements.
+simple-split-editor-list
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {A : Set}
+  → Direction
+  → SimpleSplitEditor V E A
+  → SimpleSplitEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List A)
+simple-split-editor-list
+  = dependent-simple-split-editor-list
 
-  module PartialEditorList
-    (d : Direction)
-    (e : PartialEditor V E A)
-    where
+-- ### SimpleMainEditor
 
-    State
-      : Set
-    State
-      = List
-        (PartialEditor.State e)
+-- Takes direction from earlier to later elements.
+simple-main-editor-list
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S : Set}
+  → Direction
+  → SimpleMainEditor V E S
+  → SimpleMainEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S)
+simple-main-editor-list
+  = dependent-simple-main-editor-list
 
-    simple-editor
-      : SimpleEditor
-        (view-stack-list V)
-        (event-stack-list E)
-        State
-    simple-editor
-      = simple-editor-list d
-        (PartialEditor.simple-editor e)
+-- ### SimpleInnerEditor
 
-    partial-function
-      : PartialFunction
-        State
-        (List A)
-    partial-function
-      = partial-function-list
-        (PartialEditor.partial-function e)
-
-  -- Takes direction from earlier to later elements.
-  partial-editor-list
-    : Direction
-    → PartialEditor V E A
-    → PartialEditor
-      (view-stack-list V)
-      (event-stack-list E)
-      (List A)
-  partial-editor-list d e
-    = record {PartialEditorList d e}
-
--- ### SplitEditor
-
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {C : Category}
-  where
-
-  module SplitEditorList
-    (d : Direction)
-    (e : SplitEditor V E C)
-    where
-
-    StateCategory
-      : Category
-    StateCategory
-      = category-list
-        (SplitEditor.StateCategory e)
-
-    editor
-      : Editor
-        (view-stack-list V)
-        (event-stack-list E)
-        StateCategory
-    editor
-      = editor-list d
-        (SplitEditor.editor e)
-
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-list C)
-    split-functor
-      = split-functor-list
-        (SplitEditor.split-functor e)
-
-  -- Takes direction from earlier to later elements.
-  split-editor-list
-    : Direction
-    → SplitEditor V E C
-    → SplitEditor
-      (view-stack-list V)
-      (event-stack-list E)
-      (category-list C)
-  split-editor-list d e
-    = record {SplitEditorList d e}
-
--- ### MainEditor
-
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {S : Set}
-  where
-
-  module MainEditorList
-    (d : Direction)
-    (e : MainEditor V E S)
-    where
-
-    State
-      : Set
-    State
-      = List
-        (MainEditor.State e)
-
-    simple-editor
-      : SimpleEditor
-        (view-stack-list V)
-        (event-stack-list E)
-        State
-    simple-editor
-      = simple-editor-list d
-        (MainEditor.simple-editor e)
-
-    split-function
-      : SplitFunction
-        (List S)
-        State
-    split-function
-      = split-function-list
-        (MainEditor.split-function e)
-
-    bool-function
-      : BoolFunction
-        State
-    bool-function
-      = bool-function-list
-        (MainEditor.bool-function e)
-
-  -- Takes direction from earlier to later elements.
-  main-editor-list
-    : Direction
-    → MainEditor V E S
-    → MainEditor
-      (view-stack-list V)
-      (event-stack-list E)
-      (List S)
-  main-editor-list d e
-    = record {MainEditorList d e}
-
--- ### SplitMainEditor
-
-module _
-  {V : ViewStack}
-  {E : EventStack}
-  {S P : Set}
-  {C : Category}
-  where
-
-  module SplitMainEditorList
-    (d : Direction)
-    (e : SplitMainEditor V E S P C)
-    where
-
-    StateCategory
-      : Category
-    StateCategory
-      = category-list
-        (SplitMainEditor.StateCategory e)
-
-    open Category StateCategory using () renaming
-      ( Object
-        to State
-      )
-
-    editor
-      : Editor
-        (view-stack-list V)
-        (event-stack-list E)
-        StateCategory
-    editor
-      = editor-list d
-        (SplitMainEditor.editor e)
-
-    state-split-function
-      : SplitFunction
-        (List S)
-        State
-    state-split-function
-      = split-function-list
-        (SplitMainEditor.state-split-function e)
-
-    pure-split-function
-      : SplitFunction
-        (List P)
-        (Category.Object (category-list C))
-    pure-split-function
-      = split-function-list
-        (SplitMainEditor.pure-split-function e)
-
-    split-functor
-      : SplitFunctor
-        StateCategory
-        (category-list C)
-    split-functor
-      = split-functor-list
-        (SplitMainEditor.split-functor e)
-
-  -- Takes direction from earlier to later elements.
-  split-main-editor-list
-    : Direction
-    → SplitMainEditor V E S P C
-    → SplitMainEditor
-      (view-stack-list V)
-      (event-stack-list E)
-      (List S)
-      (List P)
-      (category-list C)
-  split-main-editor-list d e
-    = record {SplitMainEditorList d e}
+-- Takes direction from earlier to later elements.
+simple-inner-editor-list
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P A : Set}
+  → Direction
+  → SimpleInnerEditor V E S P A
+  → SimpleInnerEditor
+    (view-stack-list V)
+    (event-stack-list E)
+    (List S)
+    (List P)
+    (List A)
+simple-inner-editor-list
+  = dependent-simple-inner-editor-list
 

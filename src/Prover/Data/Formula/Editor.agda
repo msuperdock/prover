@@ -1,9 +1,5 @@
 module Prover.Data.Formula.Editor where
 
-open import Prover.Category
-  using (Category)
-open import Prover.Category.Unit
-  using (category-unit)
 open import Prover.Client.Aeson
   using (Value)
 open import Prover.Data.Formula
@@ -29,8 +25,8 @@ open import Prover.Data.Token
 open import Prover.Data.Variables
   using (Variables; var_∈?_)
 open import Prover.Editor
-  using (EventStack; EventStackMap; PartialEditor; SimpleEditor; SplitEditor;
-    ViewStack; ViewStackMap; split-editor-partial)
+  using (EventStack; EventStackMap; SimpleEditor; SimplePartialEditor;
+    SimpleSplitEditor; ViewStack; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
@@ -38,11 +34,13 @@ open import Prover.Editor.Child
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack)
 open import Prover.Editor.Map
-  using (flat-editor-map; simple-editor-map-event; simple-editor-map-view)
+  using (flat-editor-map)
+open import Prover.Editor.Map.Event
+  using (simple-editor-map-event)
+open import Prover.Editor.Map.View
+  using (simple-editor-map-view)
 open import Prover.Editor.Parent
   using (event-stack-parent; simple-editor-parent; view-stack-parent)
-open import Prover.Editor.Unit
-  using (split-editor-unit)
 open import Prover.View.Command
   using (Command; CommandFlatViewStack; CommandPath)
 open import Prover.View.Text
@@ -111,16 +109,6 @@ FormulaEventStack
   ; EventInner
     = λ _ → TextEvent
   }
-
--- ### Pure
-
-FormulaCategory
-  : Symbols
-  → Variables
-  → Bool
-  → Category
-FormulaCategory ss vs m
-  = category-unit (Formula ss vs m)
 
 -- ## Draw
 
@@ -276,7 +264,7 @@ module _
   draw-path-sandbox-go (any (SandboxState.cons _ _ s _)) (suc k) fp
     = text (suc (suc zero)) (draw-path-sandbox-go s k fp)
 
--- ## Encode
+-- ## Encoding
 
 -- ### Pattern
 
@@ -458,7 +446,7 @@ decode-encode-formulas {ss = ss} {vs = vs} {m = m} (f ∷ fs)
 
 -- ## Editors
 
--- ### Base
+-- ### SimpleBaseEditor
 
 -- #### View
 
@@ -622,7 +610,7 @@ formula-simple-base-editor
 formula-simple-base-editor ss vs m
   = record {FormulaSimpleBaseEditor ss vs m}
 
--- ### Child
+-- ### SimpleChildEditor
 
 -- #### Key
 
@@ -778,9 +766,9 @@ formula-simple-child-editor ss vs m variable'
 formula-simple-child-editor ss vs m symbol
   = formula-simple-child-editor-symbol ss vs m
 
--- ### Parent
+-- ### SimpleEditor
 
--- #### View
+-- #### Parent
 
 FormulaParentViewStack
   : ViewStack
@@ -789,8 +777,6 @@ FormulaParentViewStack
     FormulaBaseViewStack
     FormulaChildViewStack
 
--- #### Event
-
 FormulaParentEventStack
   : EventStack
 FormulaParentEventStack
@@ -798,9 +784,7 @@ FormulaParentEventStack
     FormulaBaseEventStack
     FormulaChildEventStack
 
--- #### Editor
-
-formula-simple-parent-editor
+formula-parent-editor
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
@@ -808,14 +792,12 @@ formula-simple-parent-editor
     FormulaParentViewStack
     FormulaParentEventStack
     (Any (SandboxState ss vs m))
-formula-simple-parent-editor ss vs m
+formula-parent-editor ss vs m
   = simple-editor-parent
     FormulaChildViewStack
     FormulaChildEventStack
     (formula-simple-base-editor ss vs m)
     (formula-simple-child-editor ss vs m)
-
--- ### Simple
 
 -- #### View
 
@@ -926,33 +908,36 @@ formula-simple-editor
 formula-simple-editor ss vs m
   = simple-editor-map-view formula-view-stack-map
   $ simple-editor-map-event formula-event-stack-map
-  $ formula-simple-parent-editor ss vs m
+  $ formula-parent-editor ss vs m
 
--- ### Split
+-- ### SimpleSplitEditor
 
-formula-split-editor
+formula-simple-split-editor
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
-  → SplitEditor
-    FormulaViewStack
-    FormulaEventStack
-    (FormulaCategory ss vs m)
-formula-split-editor ss vs m
-  = split-editor-unit (SandboxState.split-function ss vs m)
-  $ formula-simple-editor ss vs m
-
--- ### Partial
-
-formula-partial-editor
-  : (ss : Symbols)
-  → (vs : Variables)
-  → (m : Bool)
-  → PartialEditor
+  → SimpleSplitEditor
     FormulaViewStack
     FormulaEventStack
     (Formula ss vs m)
-formula-partial-editor ss vs m
-  = split-editor-partial
-  $ formula-split-editor ss vs m
+formula-simple-split-editor ss vs m
+  = record
+  { editor
+    = formula-simple-editor ss vs m
+  ; split-functor
+    = SandboxState.split-function ss vs m
+  }
+
+-- ### SimplePartialEditor
+
+formula-simple-partial-editor
+  : (ss : Symbols)
+  → (vs : Variables)
+  → (m : Bool)
+  → SimplePartialEditor
+    FormulaViewStack
+    FormulaEventStack
+    (Formula ss vs m)
+formula-simple-partial-editor ss vs m
+  = SimpleSplitEditor.partial-editor (formula-simple-split-editor ss vs m)
 

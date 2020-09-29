@@ -2,16 +2,58 @@ module Prover.Editor.Sigma where
 
 open import Prover.Category
   using (Category)
+open import Prover.Category.Chain
+  using (ChainCategory; nil)
+open import Prover.Category.Dependent
+  using (DependentCategory)
+open import Prover.Category.Dependent.Encoding.Sigma.Maybe
+  using (dependent-encoding-sigma-maybe)
+open import Prover.Category.Dependent.Encoding.Sigma.Sum
+  using (dependent-encoding-sigma-sum)
+open import Prover.Category.Dependent.Sigma.Maybe
+  using (dependent-category-sigma-maybe)
+open import Prover.Category.Dependent.Sigma.Sum
+  using (dependent-category-sigma-sum)
+open import Prover.Category.Dependent.Simple
+  using (DependentSimpleCategory)
+open import Prover.Category.Dependent.Simple.Bool.Sigma.Sum
+  using (dependent-simple-bool-function-sigma-sum)
+open import Prover.Category.Dependent.Simple.Encoding.Sigma
+  using (dependent-simple-encoding-sigma)
+open import Prover.Category.Dependent.Simple.Encoding.Sigma.Sum
+  using (dependent-simple-encoding-sigma-sum)
+open import Prover.Category.Dependent.Simple.Partial.Sigma.Sum
+  using (dependent-simple-partial-function-sigma-sum)
+open import Prover.Category.Dependent.Simple.Sigma
+  using (dependent-simple-category-sigma)
+open import Prover.Category.Dependent.Simple.Sigma.Sum
+  using (dependent-simple-category-sigma-sum)
+open import Prover.Category.Dependent.Simple.Split.Sigma.Sum
+  using (dependent-simple-split-functor-sigma-sum)
+open import Prover.Category.Dependent.Split.Sigma.Sum
+  using (dependent-split-functor-sigma-sum)
 open import Prover.Category.Dependent1
   using (Dependent₁Category)
 open import Prover.Category.Sigma
   using (module CategorySigma)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum)
+open import Prover.Category.Snoc
+  using (chain-category-snoc)
 open import Prover.Category.Sum
   using (module CategorySum)
 open import Prover.Editor
-  using (Editor; EventStack; SplitEditor; ViewStack; ViewStackMap)
+  using (DependentEditor; DependentInnerEditor; DependentSimpleEditor;
+    DependentSimpleInnerEditor; DependentSimpleMainEditor;
+    DependentSimplePartialEditor; DependentSimpleSplitEditor;
+    DependentSplitEditor; Editor; EventStack; SplitEditor; ViewStack;
+    ViewStackMap; dependent-editor-simple; dependent-split-editor-tail)
+open import Prover.Editor.Unit
+  using (dependent-editor-unit)
+open import Prover.Function.Dependent
+  using (DependentSet)
+open import Prover.Function.Dependent.Sigma
+  using (dependent-set-sigma)
 open import Prover.Prelude
 
 -- ## Stacks
@@ -114,25 +156,26 @@ event-stack-sigma
 event-stack-sigma E₁ E₂
   = record {EventStackSigma E₁ E₂}
 
--- ## Editor
+-- ## Editors (basic)
+
+-- ### Editor
 
 module _
   {V₁ V₂ : ViewStack}
   {E₁ E₂ : EventStack}
   {C₁ : Category}
+  {C₂ : Dependent₁Category C₁}
   where
 
-  -- ### Module
+  -- #### Module
 
   module EditorSigma
-    (C₂ : Dependent₁Category C₁)
     (d : Direction)
     (e₁ : SplitEditor V₁ E₁ C₁)
-    (e₂ : (x₁ : Category.Object C₁)
-      → Editor V₂ E₂ (Dependent₁Category.category C₂ x₁))
+    (e₂ : DependentEditor V₂ E₂ C₂)
     where
 
-    -- #### Types
+    -- ##### Types
 
     open ViewStack (view-stack-sigma V₁ V₂)
     open EventStack (event-stack-sigma E₁ E₂)
@@ -150,7 +193,7 @@ module _
         to StateArrow
       )
 
-    -- #### State
+    -- ##### State
 
     StatePath
       : State
@@ -159,7 +202,7 @@ module _
       = SplitEditor.StatePath e₁ s₁
     StatePath (ι₂ (x₁ , s₂))
       = SplitEditor.StatePath e₁ (SplitEditor.unbase e₁ x₁)
-      ⊔ Editor.StatePath (e₂ x₁) s₂
+      ⊔ Editor.StatePath (DependentEditor.editor e₂ x₁) s₂
 
     StateInner
       : (s : State)
@@ -172,7 +215,7 @@ module _
       × f₁ ∈ SplitEditor.StateArrow e₁ (SplitEditor.unbase e₁ x₁) s₁
       × Maybe (Σ (SplitEditor.StatePath e₁ s₁) (SplitEditor.StateInner e₁ s₁))
     StateInner (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      = Editor.StateInner (e₂ x₁) s₂ sp₂
+      = Editor.StateInner (DependentEditor.editor e₂ x₁) s₂ sp₂
 
     StateInnerPath
       : (s : State)
@@ -186,7 +229,7 @@ module _
     StateInnerPath (ι₂ _) (ι₁ _) (s₁ , _ , just (sp₁ , s₁'))
       = SplitEditor.StateInnerPath e₁ s₁ sp₁ s₁'
     StateInnerPath (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂'
-      = Editor.StateInnerPath (e₂ x₁) s₂ sp₂ s₂'
+      = Editor.StateInnerPath (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂'
 
     StateStack
       : ViewStack
@@ -226,9 +269,9 @@ module _
     ... | no _
       = ι₁ (SplitEditor.initial-path-with e₁ (SplitEditor.unbase e₁ x₁) d')
     ... | yes _
-      = ι₂ (Editor.initial-path-with (e₂ x₁) s₂ d')
+      = ι₂ (Editor.initial-path-with (DependentEditor.editor e₂ x₁) s₂ d')
 
-    -- #### Draw
+    -- ##### Draw
 
     draw
       : State
@@ -237,7 +280,7 @@ module _
       = (SplitEditor.draw e₁ s₁ , nothing)
     draw (ι₂ (x₁ , s₂))
       = (SplitEditor.draw e₁ (SplitEditor.unbase e₁ x₁)
-        , just (Editor.draw (e₂ x₁) s₂))
+        , just (Editor.draw (DependentEditor.editor e₂ x₁) s₂))
   
     draw-with
       : (s : State)
@@ -247,10 +290,10 @@ module _
       = (SplitEditor.draw-with e₁ s₁ sp₁ , nothing)
     draw-with (ι₂ (x₁ , s₂)) (ι₁ sp₁)
       = (SplitEditor.draw-with e₁ (SplitEditor.unbase e₁ x₁) sp₁
-        , just (Editor.draw (e₂ x₁) s₂))
+        , just (Editor.draw (DependentEditor.editor e₂ x₁) s₂))
     draw-with (ι₂ (x₁ , s₂)) (ι₂ sp₂)
       = (SplitEditor.draw e₁ (SplitEditor.unbase e₁ x₁)
-        , just (Editor.draw-with (e₂ x₁) s₂ sp₂))
+        , just (Editor.draw-with (DependentEditor.editor e₂ x₁) s₂ sp₂))
 
     draw-path
       : (s : State)
@@ -261,7 +304,7 @@ module _
     draw-path (ι₂ (x₁ , _)) (ι₁ sp₁)
       = ι₁ (SplitEditor.draw-path e₁ (SplitEditor.unbase e₁ x₁) sp₁)
     draw-path (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      = ι₂ (Editor.draw-path (e₂ x₁) s₂ sp₂)
+      = ι₂ (Editor.draw-path (DependentEditor.editor e₂ x₁) s₂ sp₂)
 
     draw-inner-with
       : (s : State)
@@ -278,7 +321,7 @@ module _
         , just (SplitEditor.draw-path e₁ s₁' sp₁'
           , SplitEditor.draw-inner-with e₁ s₁' sp₁' s₁'' sp₁''))
     draw-inner-with (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
-      = Editor.draw-inner-with (e₂ x₁) s₂ sp₂ s₂' sp₂'
+      = Editor.draw-inner-with (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂'
 
     draw-inner-path
       : (s : State)
@@ -296,7 +339,7 @@ module _
     draw-inner-path (ι₂ _) (ι₁ _) (s₁ , _ , just (sp₁ , s₁'))
       = SplitEditor.draw-inner-path e₁ s₁ sp₁ s₁'
     draw-inner-path (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂'
-      = Editor.draw-inner-path (e₂ x₁) s₂ sp₂ s₂'
+      = Editor.draw-inner-path (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂'
 
     draw-stack
       : ViewStackMap StateStack (view-stack-sigma V₁ V₂)
@@ -314,7 +357,7 @@ module _
         = draw-inner-path
       }
 
-    -- #### Mode
+    -- ##### Mode
 
     mode
       : (s : State)
@@ -325,7 +368,7 @@ module _
     mode (ι₂ (x₁ , _)) (ι₁ sp₁)
       = ι₁ (SplitEditor.mode e₁ (SplitEditor.unbase e₁ x₁) sp₁)
     mode (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      = ι₂ (Editor.mode (e₂ x₁) s₂ sp₂)
+      = ι₂ (Editor.mode (DependentEditor.editor e₂ x₁) s₂ sp₂)
 
     mode-inner
       : (s : State)
@@ -340,9 +383,10 @@ module _
     mode-inner (ι₂ _) (ι₁ _) (s₁ , _ , just (sp₁ , s₁')) sp₁'
       = ι₂ (ι₁ (SplitEditor.mode-inner e₁ s₁ sp₁ s₁' sp₁'))
     mode-inner (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
-      = ι₂ (ι₂ (Editor.mode-inner (e₂ x₁) s₂ sp₂ s₂' sp₂'))
+      = ι₂ (ι₂ (Editor.mode-inner
+        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂'))
 
-    -- #### Handle
+    -- ##### Handle
 
     handle
       : (s : State)
@@ -366,7 +410,7 @@ module _
         , just (sp₁ , s₁'))
         , sp₁')
     handle (ι₂ (x₁ , s₂)) (ι₂ sp₂) e₂'
-      with Editor.handle (e₂ x₁) s₂ sp₂ e₂'
+      with Editor.handle (DependentEditor.editor e₂ x₁) s₂ sp₂ e₂'
     ... | ι₁ (s₂' , sp₂' , f₂)
       = ι₁ (ι₂ (x₁ , s₂')
         , ι₂ sp₂'
@@ -406,7 +450,7 @@ module _
         , just (sp₁ , s₁'))
         , sp₁'))
     handle-escape (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      with Editor.handle-escape (e₂ x₁) s₂ sp₂
+      with Editor.handle-escape (DependentEditor.editor e₂ x₁) s₂ sp₂
     ... | nothing
       = just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁)
         , SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁)
@@ -436,8 +480,8 @@ module _
     ... | nothing | nothing | _
       = nothing
     ... | nothing | just x₁ | [ p₁ ]
-      = just (ι₁ (ι₂ (x₁ , Editor.initial (e₂ x₁))
-        , ι₂ (Editor.initial-path' (e₂ x₁))
+      = just (ι₁ (ι₂ (x₁ , Editor.initial (DependentEditor.editor e₂ x₁))
+        , ι₂ (Editor.initial-path' (DependentEditor.editor e₂ x₁))
         , CategorySum.arrow₁ (SplitEditor.normalize-arrow e₁ s₁ p₁)))
     ... | just (ι₁ (s₁' , sp₁' , f₁)) | _ | _
       = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
@@ -455,7 +499,7 @@ module _
         , just (sp₁ , s₁'))
         , sp₁'))
     handle-return (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      with Editor.handle-return (e₂ x₁) s₂ sp₂
+      with Editor.handle-return (DependentEditor.editor e₂ x₁) s₂ sp₂
     ... | nothing
       = nothing
     ... | just (ι₁ (s₂' , sp₂' , f₂))
@@ -482,11 +526,12 @@ module _
     ... | nothing | no _
       = nothing
     ... | nothing | yes _
-      = just (ι₂ (Editor.initial-path-with (e₂ x₁) s₂ (Direction.reverse d')))
+      = just (ι₂ (Editor.initial-path-with (DependentEditor.editor e₂ x₁) s₂
+        (Direction.reverse d')))
     ... | just sp₁' | _
       = just (ι₁ sp₁')
     handle-direction (ι₂ (x₁ , s₂)) (ι₂ sp₂) d'
-      with Editor.handle-direction (e₂ x₁) s₂ sp₂ d'
+      with Editor.handle-direction (DependentEditor.editor e₂ x₁) s₂ sp₂ d'
       | Direction.reverse d' ≟ d dir
     ... | nothing | no _
       = nothing
@@ -513,9 +558,9 @@ module _
     handle-direction-valid _ _ _ | _ | [ refl ] | _ | refl | _
       = refl
     handle-direction-valid (ι₂ (x₁ , s₂)) d' | yes refl | _
-      with Editor.handle-direction (e₂ x₁) s₂
-        (Editor.initial-path-with (e₂ x₁) s₂ d') d'
-      | Editor.handle-direction-valid (e₂ x₁) s₂ d'
+      with Editor.handle-direction (DependentEditor.editor e₂ x₁) s₂
+        (Editor.initial-path-with (DependentEditor.editor e₂ x₁) s₂ d') d'
+      | Editor.handle-direction-valid (DependentEditor.editor e₂ x₁) s₂ d'
       | Direction.reverse d' ≟ d dir
     ... | _ | refl | no _
       = refl
@@ -542,7 +587,7 @@ module _
     ... | (s₁'' , sp₁'')
       = ((s₁ , f₁ , just (sp₁ , s₁'')) , sp₁'')
     handle-inner (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂' e₂'
-      = Editor.handle-inner (e₂ x₁) s₂ sp₂ s₂' sp₂' e₂'
+      = Editor.handle-inner (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂' e₂'
 
     handle-inner-escape
       : (s : State)
@@ -567,7 +612,8 @@ module _
     ... | just (s₁'' , sp₁'')
       = just ((s₁ , f₁ , just (sp₁ , s₁'')) , sp₁'')
     handle-inner-escape (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
-      = Editor.handle-inner-escape (e₂ x₁) s₂ sp₂ s₂' sp₂'
+      = Editor.handle-inner-escape
+        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂'
 
     handle-inner-return
       : (s : State)
@@ -590,7 +636,8 @@ module _
       = ι₁ (ι₁ s₁ , sp₁ , CategorySum.arrow₁ f₁)
     ... | nothing | just x₁' | [ p₁ ]
       = ι₁ (ι₂ (x₁' , s₂')
-        , ι₂ (Editor.initial-path-with (e₂ x₁') s₂' (Direction.reverse d))
+        , ι₂ (Editor.initial-path-with (DependentEditor.editor e₂ x₁') s₂'
+          (Direction.reverse d))
         , CategorySum.arrow₂
           (CategorySigma.arrow s₂' f₁'
             (just (Dependent₁Category.identity C₂ x₁' s₂')) refl))
@@ -608,7 +655,8 @@ module _
     ... | ι₂ (s₁'' , sp₁'')
       = ι₂ ((s₁ , f₁ , just (sp₁ , s₁'')) , sp₁'')
     handle-inner-return (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
-      with Editor.handle-inner-return (e₂ x₁) s₂ sp₂ s₂' sp₂'
+      with Editor.handle-inner-return
+        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂'
     ... | ι₁ (s₂'' , sp₂'' , f₂)
       = ι₁ (ι₂ (x₁ , s₂'')
         , ι₂ sp₂''
@@ -634,21 +682,279 @@ module _
     handle-inner-direction (ι₂ _) (ι₁ _) (s₁ , _ , just (sp₁ , s₁')) sp₁' d'
       = SplitEditor.handle-inner-direction e₁ s₁ sp₁ s₁' sp₁' d'
     handle-inner-direction (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂' d'
-      = Editor.handle-inner-direction (e₂ x₁) s₂ sp₂ s₂' sp₂' d'
+      = Editor.handle-inner-direction
+        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂' d'
 
-  -- ### Function
+  -- #### Function
 
   -- Takes direction from first to second component.
   editor-sigma
-    : (C₂ : Dependent₁Category C₁)
-    → Direction
+    : Direction
     → (e₁ : SplitEditor V₁ E₁ C₁)
-    → ((x₁ : Category.Object C₁)
-      → Editor V₂ E₂ (Dependent₁Category.category C₂ x₁))
+    → DependentEditor V₂ E₂ C₂
     → Editor
       (view-stack-sigma V₁ V₂)
       (event-stack-sigma E₁ E₂)
-      (category-sigma-sum C₂ (SplitEditor.split-functor e₁))
-  editor-sigma C₂ d e₁ e₂
-    = record {EditorSigma C₂ d e₁ e₂}
+      (category-sigma-sum C₂
+        (SplitEditor.split-functor e₁))
+  editor-sigma d e₁ e₂
+    = record {EditorSigma d e₁ e₂}
+
+-- ## Editors (dependent)
+
+-- ### DependentEditor
+
+-- Takes direction from first to second component.
+dependent-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentCategory (chain-category-snoc C₁')}
+  → Direction
+  → (e₁ : DependentSplitEditor V₁ E₁ C₁')
+  → DependentEditor V₂ E₂ C₂'
+  → DependentEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (dependent-category-sigma-sum C₂'
+      (DependentSplitEditor.split-functor e₁))
+
+dependent-editor-sigma {n = zero} {C = nil} d e₁ e₂
+  = editor-sigma d e₁ e₂
+
+dependent-editor-sigma {n = suc _} d e₁ e₂
+  = record
+  { editor
+    = λ x → dependent-editor-sigma d
+      (dependent-split-editor-tail e₁ x)
+      (DependentEditor.editor e₂ x)
+  }
+
+-- ### DependentSplitEditor
+
+-- Takes direction from first to second component.
+dependent-split-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentCategory (chain-category-snoc C₁')}
+  → Direction
+  → DependentSplitEditor V₁ E₁ C₁'
+  → DependentSplitEditor V₂ E₂ C₂'
+  → DependentSplitEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (dependent-category-sigma-maybe C₁' C₂')
+dependent-split-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-editor-sigma d e₁
+      (DependentSplitEditor.editor e₂)
+  ; split-functor
+    = dependent-split-functor-sigma-sum
+      (DependentSplitEditor.split-functor e₁)
+      (DependentSplitEditor.split-functor e₂)
+  }
+
+-- ### DependentInnerEditor
+
+-- Takes direction from first to second component.
+dependent-inner-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ : Set}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentCategory (chain-category-snoc C₁')}
+  → Direction
+  → DependentInnerEditor V₁ E₁ S₁ P₁ C₁'
+  → DependentInnerEditor V₂ E₂ S₂ P₂ C₂'
+  → DependentInnerEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (S₁ ⊔ P₁ × S₂)
+    (P₁ × P₂)
+    (dependent-category-sigma-maybe C₁' C₂')
+dependent-inner-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-editor-sigma d
+      (DependentInnerEditor.split-editor e₁)
+      (DependentInnerEditor.editor e₂)
+  ; state-encoding
+    = dependent-encoding-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentInnerEditor.state-encoding e₁)
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentInnerEditor.state-encoding e₂)
+  ; pure-encoding
+    = dependent-encoding-sigma-maybe
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentInnerEditor.pure-encoding e₂)
+  ; split-functor
+    = dependent-split-functor-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentInnerEditor.split-functor e₂)
+  }
+
+-- ### DependentSimpleEditor
+
+-- Takes direction from first to second component.
+dependent-simple-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentSimpleCategory (chain-category-snoc C₁')}
+  → Direction
+  → (e₁ : DependentSplitEditor V₁ E₁ C₁')
+  → DependentSimpleEditor V₂ E₂ C₂'
+  → DependentSimpleEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (dependent-simple-category-sigma-sum C₂'
+      (DependentSplitEditor.split-functor e₁))
+dependent-simple-editor-sigma d e₁ e₂
+  = dependent-editor-simple
+  $ dependent-editor-sigma d e₁
+    (dependent-editor-unit e₂)
+
+-- ### DependentSimplePartialEditor
+
+-- Takes direction from first to second component.
+dependent-simple-partial-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentSet (chain-category-snoc C₁')}
+  → Direction
+  → DependentSplitEditor V₁ E₁ C₁'
+  → DependentSimplePartialEditor V₂ E₂ C₂'
+  → DependentSimplePartialEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (dependent-set-sigma C₁' C₂')
+dependent-simple-partial-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-sigma d e₁
+      (DependentSimplePartialEditor.editor e₂)
+  ; partial-function
+    = dependent-simple-partial-function-sigma-sum
+      (DependentSplitEditor.split-functor e₁)
+      (DependentSimplePartialEditor.partial-function e₂)
+  }
+
+-- ### DependentSimpleSplitEditor
+
+-- Takes direction from first to second component.
+dependent-simple-split-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentSimpleCategory (chain-category-snoc C₁')}
+  → Direction
+  → DependentSplitEditor V₁ E₁ C₁'
+  → DependentSimpleSplitEditor V₂ E₂ C₂'
+  → DependentSimpleSplitEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (dependent-simple-category-sigma C₁' C₂')
+dependent-simple-split-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-sigma d e₁
+      (DependentSimpleSplitEditor.editor e₂)
+  ; split-functor
+    = dependent-simple-split-functor-sigma-sum
+      (DependentSplitEditor.split-functor e₁)
+      (DependentSimpleSplitEditor.split-functor e₂)
+  }
+
+-- ### DependentSimpleMainEditor
+
+-- Takes direction from first to second component.
+dependent-simple-main-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ : Set}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → Direction
+  → DependentInnerEditor V₁ E₁ S₁ P₁ C₁'
+  → DependentSimpleMainEditor V₂ E₂ S₂ (chain-category-snoc C₁')
+  → DependentSimpleMainEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (S₁ ⊔ P₁ × S₂) C
+dependent-simple-main-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-sigma d
+      (DependentInnerEditor.split-editor e₁)
+      (DependentSimpleMainEditor.editor e₂)
+  ; state-encoding
+    = dependent-simple-encoding-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentInnerEditor.state-encoding e₁)
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentSimpleMainEditor.state-encoding e₂)
+  ; bool-function
+    = dependent-simple-bool-function-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentSimpleMainEditor.bool-function e₂)
+  }
+
+-- ### DependentSimpleInnerEditor
+
+-- Takes direction from first to second component.
+dependent-simple-inner-editor-sigma
+  : {n : ℕ}
+  → {V₁ V₂ : ViewStack}
+  → {E₁ E₂ : EventStack}
+  → {S₁ S₂ P₁ P₂ : Set}
+  → {C : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {C₂' : DependentSimpleCategory (chain-category-snoc C₁')}
+  → Direction
+  → DependentInnerEditor V₁ E₁ S₁ P₁ C₁'
+  → DependentSimpleInnerEditor V₂ E₂ S₂ P₂ C₂'
+  → DependentSimpleInnerEditor
+    (view-stack-sigma V₁ V₂)
+    (event-stack-sigma E₁ E₂)
+    (S₁ ⊔ P₁ × S₂)
+    (P₁ × P₂)
+    (dependent-simple-category-sigma C₁' C₂')
+dependent-simple-inner-editor-sigma d e₁ e₂
+  = record
+  { editor
+    = dependent-simple-editor-sigma d
+      (DependentInnerEditor.split-editor e₁)
+      (DependentSimpleInnerEditor.editor e₂)
+  ; state-encoding
+    = dependent-simple-encoding-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentInnerEditor.state-encoding e₁)
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentSimpleInnerEditor.state-encoding e₂)
+  ; pure-encoding
+    = dependent-simple-encoding-sigma
+      (DependentInnerEditor.pure-encoding e₁)
+      (DependentSimpleInnerEditor.pure-encoding e₂)
+  ; split-functor
+    = dependent-simple-split-functor-sigma-sum
+      (DependentInnerEditor.split-functor e₁)
+      (DependentSimpleInnerEditor.split-functor e₂)
+  }
 

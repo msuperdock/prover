@@ -7,8 +7,7 @@ open import Prover.Category.Dependent
 open import Prover.Category.Dependent.Product
   using (dependent-category-product; dependent-functor-product)
 open import Prover.Category.Dependent.Split
-  using (DependentSplitFunctor; DependentSplitFunctorSquare; cons;
-    dependent-split-functor₀; dependent-split-functor-square₀; nil)
+  using (DependentSplitFunctor; DependentSplitFunctorSquare)
 open import Prover.Category.Split.Product
   using (split-functor-product; split-functor-square-product)
 open import Prover.Prelude
@@ -55,34 +54,31 @@ dependent-split-functor-square-product
 
 -- ### DependentSplitFunctor
 
-dependent-split-functor-product
-  {n = zero} F₁ F₂
-  = nil
-    (split-functor-product
-      (dependent-split-functor₀ F₁)
-      (dependent-split-functor₀ F₂))
-dependent-split-functor-product
-  {n = suc _} F₁ F₂
-  = cons
-    (λ x → dependent-split-functor-product
-      (DependentSplitFunctor.tail F₁ x)
-      (DependentSplitFunctor.tail F₂ x))
-    (λ f → dependent-split-functor-square-product
-      (DependentSplitFunctor.dependent-split-functor-square F₁ f)
-      (DependentSplitFunctor.dependent-split-functor-square F₂ f))
+dependent-split-functor-product {n = zero} F₁ F₂
+  = split-functor-product F₁ F₂
+
+dependent-split-functor-product {n = suc _} F₁ F₂
+  = record
+  { split-functor
+    = λ x → dependent-split-functor-product
+      (DependentSplitFunctor.split-functor F₁ x)
+      (DependentSplitFunctor.split-functor F₂ x)
+  ; split-functor-square
+    = λ f → dependent-split-functor-square-product
+      (DependentSplitFunctor.split-functor-square F₁ f)
+      (DependentSplitFunctor.split-functor-square F₂ f)
+  }
 
 -- ### DependentSplitFunctorSquare
 
-dependent-split-functor-square-product
-  {n = zero} s₁ s₂
-  = nil
-    (split-functor-square-product
-      (dependent-split-functor-square₀ s₁)
-      (dependent-split-functor-square₀ s₂))
-dependent-split-functor-square-product
-  {n = suc _} s₁ s₂
-  = cons
-    (λ x₁ → dependent-split-functor-square-product
-      (DependentSplitFunctorSquare.tail s₁ x₁)
-      (DependentSplitFunctorSquare.tail s₂ x₁))
+dependent-split-functor-square-product {n = zero} s₁ s₂
+  = split-functor-square-product s₁ s₂
+
+dependent-split-functor-square-product {n = suc _} s₁ s₂
+  = record
+  { split-functor
+    = λ x₁ → dependent-split-functor-square-product
+      (DependentSplitFunctorSquare.split-functor s₁ x₁)
+      (DependentSplitFunctorSquare.split-functor s₂ x₁)
+  }
 
