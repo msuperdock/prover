@@ -1,7 +1,7 @@
 module Prover.Prelude.Any where
 
 open import Prover.Prelude.Equal
-  using (Equal; _≡_; refl)
+  using (Equal; _≡_; refl; sub)
 open import Prover.Prelude.Relation
   using (Decidable; no; yes)
 open import Prover.Prelude.Retraction
@@ -9,41 +9,32 @@ open import Prover.Prelude.Retraction
 
 -- ## Definition
 
-module _Any where
+record Any'
+  {A : Set}
+  (B : A → Set)
+  : Set
+  where
 
-  record Any
-    {A : Set}
-    (B : A → Set)
-    : Set
-    where
-  
-    constructor
-  
-      any
-  
-    field
-  
-      {index}
-        : A
-  
-      value
-        : B index
+  constructor
+
+    any
+
+  field
+
+    {index}
+      : A
+
+    value
+      : B index
 
 Any
-  : {A : Set}
-  → (A → Set)
-  → Set
-Any
-  = _Any.Any
-
-open _Any public
-  using (any)
+  = Any'
 
 -- ## Module
 
 module Any where
 
-  open _Any.Any public
+  open Any' public
 
   -- ### Equality
 
@@ -96,10 +87,7 @@ module Any where
         : (z : Any C)
         → to (from z) ≡ z
       to-from (any {x} z)
-        with Retraction.to (F x) (Retraction.from (F x) z)
-        | Retraction.to-from (F x) z
-      ... | _ | refl
-        = refl
+        = sub any (Retraction.to-from (F x) z)
   
     retraction
       : ((x : A) → Retraction (B x) (C x))

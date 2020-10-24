@@ -21,34 +21,27 @@ open import Prover.Prelude.Sum
 
 -- ## Definition
 
-module _Fin where
-  
-  data Fin
-    : ℕ
-    → Set
-    where
-  
-    zero
-      : {n : ℕ}
-      → Fin (suc n)
-    suc
-      : {n : ℕ}
-      → Fin n
-      → Fin (suc n)
-
-Fin
+data Fin'
   : ℕ
   → Set
-Fin
-  = _Fin.Fin
+  where
 
-open _Fin.Fin public
+  zero
+    : {n : ℕ}
+    → Fin' (suc n)
+  suc
+    : {n : ℕ}
+    → Fin' n
+    → Fin' (suc n)
+
+Fin
+  = Fin'
 
 -- ## Module
 
 module Fin where
 
-  open _Fin.Fin public
+  open Fin' public
 
   -- ### Interface
 
@@ -278,10 +271,7 @@ module Fin where
   increment-maximum zero
     = refl
   increment-maximum (suc n)
-    with increment (maximum n)
-    | increment-maximum n
-  ... | _ | refl
-    = refl
+    = sub (Maybe.map suc) (increment-maximum n)
 
   data IsSuc
     : {n : ℕ}

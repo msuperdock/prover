@@ -26,7 +26,7 @@ open import Prover.Function
 open import Prover.Function.Partial
   using (PartialFunction)
 open import Prover.Function.Split
-  using (SplitFunction; split-function-from-retraction)
+  using (SplitFunction; retraction-split)
 open import Prover.View.Command
   using (CommandFlatViewStack; command)
 open import Prover.View.Text
@@ -143,7 +143,7 @@ decode-encode-text
   : (t : Text)
   → decode-text (encode-text t) ≡ just t
 decode-encode-text (c ∷ cs)
-  = sub (λ x → just (c ∷ x)) (List.from-builtin-to-builtin cs)
+  = sub (λ x → just (c ∷ x)) (List.from-to-builtin cs)
 
 -- ## Editors
 
@@ -413,7 +413,7 @@ text-simple-split-editor
     Text
 text-simple-split-editor
   = simple-split-editor-map-event text-event-stack-map
-  $ simple-split-editor-map (split-function-from-retraction Text.retraction)
+  $ simple-split-editor-map (retraction-split Text.retraction)
   $ text-with-simple-split-editor (const true)
 
 -- ### FlatEditor

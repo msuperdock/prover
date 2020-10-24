@@ -1,7 +1,7 @@
 module Prover.Category.Partial.Sigma where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category; Functor; any; any')
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor)
 open import Prover.Category.Dependent1.Partial
@@ -9,7 +9,7 @@ open import Prover.Category.Dependent1.Partial
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Sigma
-  using (module CategorySigma; category-sigma; functor-sigma)
+  using (module CategorySigma; arrow-equal-sigma; category-sigma; functor-sigma)
 open import Prover.Prelude
 
 -- ## PartialFunctor
@@ -46,12 +46,10 @@ module _
       | Dependent₁PartialFunctor.base F₂ y₁ y₂
       | inspect (Dependent₁PartialFunctor.base F₂ y₁) y₂
     map {x = (_ , x₂)} {y = (y₁ , _)} refl refl
-      (CategorySigma.arrow _ f₁ f₂ p₂)
-      | just x₂' | [ q₂ ] | just _ | [ r₂ ]
+      (CategorySigma.arrow f₁ f₂ p₂)
+      | just _ | [ q₂ ] | just _ | [ r₂ ]
       = record
-      { domain
-        = Dependent₁Category.base D₂ f₁ x₂'
-      ; arrow₁
+      { arrow₁
         = f₁
       ; arrow₂
         = Dependent₁PartialFunctor.map F₂ y₁
@@ -63,87 +61,58 @@ module _
 
     abstract
 
-      map-identity₂
-        : (x₁ : Category.Object C₁)
-        → {x₂' x₂'' : Dependent₁Category.Object D₂ x₁}
-        → (x₂ : Dependent₁Category.Object C₂ x₁)
-        → (p₂ : Dependent₁PartialFunctor.base F₂ x₁ x₂ ≡ just x₂'')
-        → (q₂ : Dependent₁PartialFunctor.base F₂ x₁ x₂ ≡ just x₂')
-        → x₂'' ≡ x₂'
-        → Dependent₁PartialFunctor.map F₂ x₁ p₂ q₂
-          (Dependent₁Category.identity C₂ x₁ x₂)
-        ≅ Dependent₁Category.identity D₂ x₁ x₂'
-      map-identity₂ x₁ x₂ p₂ q₂ refl
-        with irrelevant p₂ q₂
-      ... | refl
-        = Dependent₁PartialFunctor.map-identity F₂ x₁ x₂ p₂
-  
+      map-equal
+        : {x y : Category.Object (category-sigma C₂)}
+        → {x' y' : Category.Object (category-sigma D₂)}
+        → {f₁ f₂ : Category.Arrow (category-sigma C₂) x y}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → Category.ArrowEqual (category-sigma C₂) f₁ f₂
+        → Category.ArrowEqual (category-sigma D₂) (map p q f₁) (map p q f₂)
+      map-equal {x = (x₁ , x₂)} {y = (y₁ , y₂)} _ _ _
+        with Dependent₁PartialFunctor.base F₂ x₁ x₂
+        | inspect (Dependent₁PartialFunctor.base F₂ x₁) x₂
+        | Dependent₁PartialFunctor.base F₂ y₁ y₂
+        | inspect (Dependent₁PartialFunctor.base F₂ y₁) y₂
+      map-equal {x = (_ , x₂)} {y = (y₁ , _)}
+        {f₁ = CategorySigma.arrow f₁₁ _ refl}
+        {f₂ = CategorySigma.arrow f₂₁ _ refl} refl refl
+        (CategorySigma.arrow-equal p₁ p₂)
+        | just _ | [ q₂ ] | just _ | [ r₂ ]
+        = record
+        { arrow₁
+          = p₁
+        ; arrow₂
+          = Dependent₁PartialFunctor.map-equal' F₂ y₁
+            (Dependent₁PartialFunctor.base-square F₂ f₁₁ x₂ q₂)
+            (Dependent₁PartialFunctor.base-square F₂ f₂₁ x₂ q₂) r₂ r₂ p₂
+        }
+
       map-identity
         : {x' : Category.Object (category-sigma D₂)}
         → (x : Category.Object (category-sigma C₂))
         → (p : base x ≡ just x')
-        → map p p (Category.identity (category-sigma C₂) x)
-          ≡ Category.identity (category-sigma D₂) x'
+        → Category.ArrowEqual
+          (category-sigma D₂)
+          (map p p (Category.identity (category-sigma C₂) x))
+          (Category.identity (category-sigma D₂) x')
       map-identity (x₁ , x₂) _
         with Dependent₁PartialFunctor.base F₂ x₁ x₂
         | inspect (Dependent₁PartialFunctor.base F₂ x₁) x₂
       map-identity (x₁ , x₂) refl
-        | just x₂' | [ p₂ ]
-        = CategorySigma.arrow-eq D₂
-          (Dependent₁Category.base-identity D₂ x₁ x₂') refl
-          (map-identity₂ x₁ x₂
-            (trans
-              (sub (Dependent₁PartialFunctor.base F₂ x₁)
-                (sym (Dependent₁Category.base-identity C₂ x₁ x₂)))
-              (Dependent₁PartialFunctor.base-square F₂
-                (Category.identity C₁ x₁) x₂ p₂)) p₂
-            (Dependent₁Category.base-identity D₂ x₁ x₂'))
-  
-      map-compose₂
-        : (x₁ : Category.Object C₁)
-        → {w₂ x₂ y₂ z₂ : Dependent₁Category.Object C₂ x₁}
-        → {w₂' w₂'' x₂' z₂' : Dependent₁Category.Object D₂ x₁}
-        → {g₂' : Dependent₁Category.Arrow D₂ x₁ w₂' x₂'}
-        → (p₂ : Dependent₁PartialFunctor.base F₂ x₁ w₂ ≡ just w₂'')
-        → (q₂ : Dependent₁PartialFunctor.base F₂ x₁ x₂ ≡ just x₂')
-        → (r₂ : Dependent₁PartialFunctor.base F₂ x₁ y₂ ≡ just x₂')
-        → (s₂ : Dependent₁PartialFunctor.base F₂ x₁ z₂ ≡ just z₂')
-        → (t₂ : x₂ ≡ y₂)
-        → (f₂ : Dependent₁Category.Arrow C₂ x₁ y₂ z₂)
-        → (g₂ : Dependent₁Category.Arrow C₂ x₁ w₂ x₂)
-        → w₂'' ≡ w₂'
-        → Dependent₁PartialFunctor.map F₂ x₁ p₂ q₂ g₂ ≅ g₂'
-        → Dependent₁PartialFunctor.map F₂ x₁ p₂ s₂
-          (Dependent₁Category.compose-eq' C₂ x₁ t₂ f₂ g₂)
-        ≅ Dependent₁Category.compose D₂ x₁
-          (Dependent₁PartialFunctor.map F₂ x₁ r₂ s₂ f₂) g₂'
-      map-compose₂ x₁ p₂ q₂ r₂ s₂ refl f₂ g₂ refl refl
-        with irrelevant q₂ r₂
-      ... | refl
-        = Dependent₁PartialFunctor.map-compose F₂ x₁ p₂ q₂ s₂ f₂ g₂
-  
-      map-compose₂'
-        : {x₁ y₁ : Category.Object C₁}
-        → {x₂ y₂ : Dependent₁Category.Object C₂ x₁}
-        → {x₂' y₂' : Dependent₁Category.Object D₂ x₁}
-        → {y₂'' : Dependent₁Category.Object D₂ y₁}
-        → (f₁ : Category.Arrow C₁ x₁ y₁)
-        → (p₂ : Dependent₁PartialFunctor.base F₂ x₁ x₂ ≡ just x₂')
-        → (q₂ : Dependent₁PartialFunctor.base F₂ x₁ y₂ ≡ just y₂')
-        → (r₂ : Dependent₁PartialFunctor.base F₂ y₁
-          (Dependent₁Category.base C₂ f₁ x₂)
-          ≡ just y₂'')
-        → (f₂ : Dependent₁Category.Arrow C₂ x₁ x₂ y₂)
-        → Dependent₁Category.base D₂ f₁ x₂' ≡ y₂''
-        → Dependent₁PartialFunctor.map F₂ y₁ r₂
-          (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂)
-          (Dependent₁Category.map C₂ f₁ f₂)
-        ≅ Dependent₁Category.map D₂ f₁
-          (Dependent₁PartialFunctor.map F₂ x₁ p₂ q₂ f₂)
-      map-compose₂' {x₂ = x₂} f₁ p₂ q₂ r₂ f₂ refl
-        with irrelevant r₂ (Dependent₁PartialFunctor.base-square F₂ f₁ x₂ p₂)
-      ... | refl
-        = Dependent₁PartialFunctor.map-square F₂ f₁ p₂ q₂ f₂
+        | just _ | [ p₂ ]
+        = record
+        { arrow₁
+          = Category.arrow-refl C₁
+        ; arrow₂
+          = Dependent₁PartialFunctor.map-identity' F₂ x₁ x₂ p₂' p₂
+        }
+        where
+          p₂' = trans
+            (sub (Dependent₁PartialFunctor.base F₂ x₁)
+              (sym (Dependent₁Category.base-identity C₂ x₁ x₂)))
+            (Dependent₁PartialFunctor.base-square F₂
+              (Category.identity C₁ x₁) x₂ p₂)
   
       map-compose
         : {x y z : Category.Object (category-sigma C₂)}
@@ -153,8 +122,10 @@ module _
         → (r : base z ≡ just z')
         → (f : Category.Arrow (category-sigma C₂) y z)
         → (g : Category.Arrow (category-sigma C₂) x y)
-        → map p r (Category.compose (category-sigma C₂) f g)
-          ≡ Category.compose (category-sigma D₂) (map q r f) (map p q g)
+        → Category.ArrowEqual
+          (category-sigma D₂)
+          (map p r (Category.compose (category-sigma C₂) f g))
+          (Category.compose (category-sigma D₂) (map q r f) (map p q g))
       map-compose {x = (x₁ , x₂)} {y = (y₁ , y₂)} {z = (z₁ , z₂)} _ _ _ _ _
         with Dependent₁PartialFunctor.base F₂ x₁ x₂
         | inspect (Dependent₁PartialFunctor.base F₂ x₁) x₂
@@ -163,28 +134,30 @@ module _
         | Dependent₁PartialFunctor.base F₂ z₁ z₂
         | inspect (Dependent₁PartialFunctor.base F₂ z₁) z₂
       map-compose {x = (_ , x₂)} {y = (y₁ , y₂)} {z = (z₁ , _)} refl refl refl
-        (CategorySigma.arrow _ f₁ f₂ p₂)
-        (CategorySigma.arrow _ g₁ g₂ q₂)
-        | just x₂' | [ p₂' ] | just _ | [ q₂' ] | just _ | [ r₂' ]
-        = CategorySigma.arrow-eq D₂
-          (Dependent₁Category.base-compose D₂ f₁ g₁ x₂') refl
-        $ map-compose₂ z₁ s₂
-          (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂')
-          (trans (sub (Dependent₁PartialFunctor.base F₂ z₁) (sym p₂))
-            (Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂')) r₂' p₂ f₂
-          (Dependent₁Category.map C₂ f₁ g₂)
-          (Dependent₁Category.base-compose D₂ f₁ g₁ x₂')
-        $ map-compose₂' f₁
-          (trans (sub (Dependent₁PartialFunctor.base F₂ y₁) (sym q₂))
-            (Dependent₁PartialFunctor.base-square F₂ g₁ x₂ p₂')) q₂' s₂ g₂
-          (sym (Dependent₁Category.base-compose D₂ f₁ g₁ x₂'))
+        (CategorySigma.arrow f₁ f₂ refl)
+        (CategorySigma.arrow g₁ g₂ refl)
+        | just _ | [ p₂ ] | just _ | [ q₂ ] | just _ | [ r₂ ]
+        = record
+        { arrow₁
+          = Category.arrow-refl C₁
+        ; arrow₂
+          = Dependent₁Category.arrow-trans' D₂ z₁
+            (Dependent₁PartialFunctor.map-compose' F₂ z₁ p₂'' q₂' r₂ f₂
+              (Dependent₁Category.map C₂ f₁ g₂))
+          $ Dependent₁Category.compose-equal' D₂ z₁
+            (Dependent₁PartialFunctor.map-equal' F₂ z₁ q₂' q₂' r₂ r₂
+              (Dependent₁Category.arrow-refl' C₂ z₁))
+            (Dependent₁PartialFunctor.map-square'' F₂ f₁ p₂' q₂ p₂'' q₂' g₂
+              (Dependent₁Category.arrow-refl' C₂ z₁))
+        }
         where
-          s₂ = trans
+          p₂' = Dependent₁PartialFunctor.base-square F₂ g₁ x₂ p₂
+          q₂' = Dependent₁PartialFunctor.base-square F₂ f₁ y₂ q₂
+          p₂'' = trans
             (sub (Dependent₁PartialFunctor.base F₂ z₁)
-              (sym (trans (Dependent₁Category.base-compose C₂ f₁ g₁ x₂)
-                (sub (Dependent₁Category.base C₂ f₁) q₂))))
+              (sym (trans (Dependent₁Category.base-compose C₂ f₁ g₁ x₂) refl)))
             (Dependent₁PartialFunctor.base-square F₂
-              (Category.compose C₁ f₁ g₁) x₂ p₂')
+              (Category.compose C₁ f₁ g₁) x₂ p₂)
 
   partial-functor-sigma
     : Dependent₁PartialFunctor C₂ D₂
@@ -228,62 +201,51 @@ module _
     ... | _ | refl
       = refl
 
-    map-eq
+    map'
       : {x₁ y₁ : Category.Object (category-sigma C₁₂)}
       → {x₂ y₂ : Category.Object (category-sigma C₂₂)}
       → {x₁' y₁' : Category.Object (category-sigma D₁₂)}
       → {x₂' y₂' : Category.Object (category-sigma D₂₂)}
-      → {f₂ : Category.Arrow (category-sigma C₂₂) x₂ y₂}
       → (p₁ : PartialFunctor.base (partial-functor-sigma H₁₂) x₁ ≡ just x₁')
-      → (q₁ : PartialFunctor.base (partial-functor-sigma H₁₂) y₁ ≡ just y₁')
       → (p₂ : PartialFunctor.base (partial-functor-sigma H₂₂) x₂ ≡ just x₂')
+      → (q₁ : PartialFunctor.base (partial-functor-sigma H₁₂) y₁ ≡ just y₁')
       → (q₂ : PartialFunctor.base (partial-functor-sigma H₂₂) y₂ ≡ just y₂')
       → (f₁ : Category.Arrow (category-sigma C₁₂) x₁ y₁)
-      → Functor.base (functor-sigma F₂) x₁ ≡ x₂
-      → Functor.base (functor-sigma F₂) y₁ ≡ y₂
-      → Functor.map (functor-sigma F₂) f₁ ≅ f₂
-      → PartialFunctor.map (partial-functor-sigma H₂₂) p₂ q₂ f₂
-      ≅ Functor.map (functor-sigma G₂)
-        (PartialFunctor.map (partial-functor-sigma H₁₂) p₁ q₁ f₁)
-    map-eq
+      → {f₂ : Category.Arrow (category-sigma C₂₂) x₂ y₂}
+      → Category.ArrowEqual'
+        (category-sigma C₂₂)
+        (Functor.map (functor-sigma F₂) f₁) f₂
+      → Category.ArrowEqual'
+        (category-sigma D₂₂)
+        (PartialFunctor.map (partial-functor-sigma H₂₂) p₂ q₂ f₂)
+        (Functor.map (functor-sigma G₂)
+          (PartialFunctor.map (partial-functor-sigma H₁₂) p₁ q₁ f₁))
+    map'
       {x₁ = (x₁₁ , x₁₂)} {y₁ = (y₁₁ , y₁₂)}
       {x₂ = (x₂₁ , x₂₂)} {y₂ = (y₂₁ , y₂₂)}
-      _ _ _ _ _ _ _ _
+      _ _ _ _ _ _
       with Dependent₁PartialFunctor.base H₁₂ x₁₁ x₁₂
       | inspect (Dependent₁PartialFunctor.base H₁₂ x₁₁) x₁₂
-      | Dependent₁PartialFunctor.base H₁₂ y₁₁ y₁₂
-      | inspect (Dependent₁PartialFunctor.base H₁₂ y₁₁) y₁₂
       | Dependent₁PartialFunctor.base H₂₂ x₂₁ x₂₂
       | inspect (Dependent₁PartialFunctor.base H₂₂ x₂₁) x₂₂
+      | Dependent₁PartialFunctor.base H₁₂ y₁₁ y₁₂
+      | inspect (Dependent₁PartialFunctor.base H₁₂ y₁₁) y₁₂
       | Dependent₁PartialFunctor.base H₂₂ y₂₁ y₂₂
       | inspect (Dependent₁PartialFunctor.base H₂₂ y₂₁) y₂₂
-    map-eq {x₁ = (x₁₁ , x₁₂)} {y₁ = (y₁₁ , y₁₂)}
-      refl refl refl refl (CategorySigma.arrow _ f₁₁ f₁₂ r₂) refl refl refl
-      | just x₁₂' | [ p₁ ] | just _ | [ q₁ ]
-      | just _ | [ p₂ ] | just _ | [ q₂ ]
-      = CategorySigma.arrow-eq' D₂₂
-        (Sigma.comma-eq refl p₂')
-        (Sigma.comma-eq refl q₂') p₂'' refl
-        (Dependent₁PartialFunctorSquare.map-eq s y₁₁
-          (trans
-            (sub (Dependent₁PartialFunctor.base H₁₂ y₁₁) (sym r₂))
-            (Dependent₁PartialFunctor.base-square H₁₂ f₁₁ x₁₂ p₁)) q₁
-          (trans
-            (sub (Dependent₁PartialFunctor.base H₂₂ (Functor.base F₁ y₁₁))
-              (sym (trans (sym (Dependent₁Functor.base-square F₂ f₁₁ x₁₂))
-                (sub (Dependent₁Functor.base F₂ y₁₁) r₂))))
-            (Dependent₁PartialFunctor.base-square H₂₂ (Functor.map F₁ f₁₁)
-              (Dependent₁Functor.base F₂ x₁₁ x₁₂) p₂)) q₂ f₁₂
-          (sym p₂'')
-          (sym q₂'))
-        where
-          p₂' = Maybe.just-injective
-            (trans (sym p₂) (Dependent₁PartialFunctorSquare.base s x₁₁ x₁₂ p₁))
-          q₂' = Maybe.just-injective
-            (trans (sym q₂) (Dependent₁PartialFunctorSquare.base s y₁₁ y₁₂ q₁))
-          p₂'' = trans
-            (sub (Dependent₁Category.base D₂₂ (Functor.map F₁ f₁₁)) p₂')
-            (sym (Dependent₁Functor.base-square G₂ f₁₁ x₁₂'))
+    map'
+      {x₁ = (x₁₁ , x₁₂)} {y₁ = (y₁₁ , _)} refl refl refl refl
+      (CategorySigma.arrow f₁₁ f₁₂ refl)
+      {f₂ = CategorySigma.arrow f₂₁ _ refl}
+      (any (CategorySigma.arrow-equal r₁ r₂))
+      | just _ | [ p₁ ] | just _ | [ p₂ ] | just _ | [ q₁ ] | just _ | [ q₂ ]
+      = arrow-equal-sigma D₂₂
+        (Maybe.just-injective (trans (sym p₂)
+          (Dependent₁PartialFunctorSquare.base s x₁₁ x₁₂ p₁)))
+        (any (Category.arrow-sym C₂₁ r₁))
+        (Dependent₁PartialFunctorSquare.map'' s y₁₁
+          (Dependent₁PartialFunctor.base-square H₁₂ f₁₁ x₁₂ p₁) q₁
+          (Dependent₁PartialFunctor.base-square H₂₂ f₂₁
+            (Dependent₁Functor.base F₂ x₁₁ x₁₂) p₂) q₂ f₁₂ r₂)
 
     map
       : {x₁ y₁ : Category.Object (category-sigma C₁₂)}
@@ -291,12 +253,20 @@ module _
       → (p₁ : PartialFunctor.base (partial-functor-sigma H₁₂) x₁ ≡ just x₁')
       → (q₁ : PartialFunctor.base (partial-functor-sigma H₁₂) y₁ ≡ just y₁')
       → (f₁ : Category.Arrow (category-sigma C₁₂) x₁ y₁)
-      → PartialFunctor.map (partial-functor-sigma H₂₂) (base x₁ p₁) (base y₁ q₁)
-        (Functor.map (functor-sigma F₂) f₁)
-      ≡ Functor.map (functor-sigma G₂)
-        (PartialFunctor.map (partial-functor-sigma H₁₂) p₁ q₁ f₁)
+      → Category.ArrowEqual
+        (category-sigma D₂₂)
+        (PartialFunctor.map
+          (partial-functor-sigma H₂₂)
+          (base x₁ p₁)
+          (base y₁ q₁)
+          (Functor.map (functor-sigma F₂) f₁))
+        (Functor.map
+          (functor-sigma G₂)
+          (PartialFunctor.map (partial-functor-sigma H₁₂) p₁ q₁ f₁))
     map {x₁ = x₁} {y₁ = y₁} p₁ q₁ f₁
-      = map-eq p₁ q₁ (base x₁ p₁) (base y₁ q₁) f₁ refl refl refl
+      = any'
+      $ map' p₁ (base x₁ p₁) q₁ (base y₁ q₁) f₁
+      $ Category.arrow-refl' (category-sigma C₂₂)
 
   partial-functor-square-sigma
     : Dependent₁PartialFunctorSquare F₂ G₂ H₁₂ H₂₂

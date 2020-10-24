@@ -11,7 +11,7 @@ open import Prover.Editor.Lift
 open import Prover.Editor.Map
   using (simple-split-editor-map)
 open import Prover.Function.Split
-  using (split-function-from-retraction)
+  using (retraction-split)
 open import Prover.View.Text
   using (PlainTextViewStack)
 open import Prover.Prelude
@@ -52,7 +52,7 @@ number-simple-split-editor
     ℕ
 number-simple-split-editor
   = simple-split-editor-map
-    (split-function-from-retraction CharWith.retraction-digits)
+    (retraction-split CharWith.retraction-digits)
   $ text-with-simple-split-editor Char.is-digit
 
 -- ### SimplePartialEditor

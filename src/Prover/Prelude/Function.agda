@@ -1,5 +1,7 @@
 module Prover.Prelude.Function where
 
+open import Prover.Prelude.Equal
+  using (_≡_; refl)
 open import Prover.Prelude.Level
   using (Level)
 
@@ -44,4 +46,21 @@ const
   → A
 const x _
   = x
+
+case
+  : {A B : Set}
+  → A
+  → (A → B)
+  → B
+case x f
+  = f x
+
+case-inspect
+  : {A B C : Set}
+  → (f : A → B)
+  → (x : A)
+  → ((x' : B) → f x ≡ x' → C)
+  → C
+case-inspect f x g
+  = g (f x) refl
 

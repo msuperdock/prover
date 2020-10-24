@@ -9,7 +9,7 @@ open import Prover.Prelude.Char public
 open import Prover.Prelude.CharWith public
   using (CharWith; char-with)
 open import Prover.Prelude.Collection public
-  using (Collection; collection; collection-eq)
+  using (Collection; collection; collection-equal)
 open import Prover.Prelude.Direction public
   using (Direction; _≟_dir)
 open import Prover.Prelude.Empty public
@@ -21,7 +21,7 @@ open import Prover.Prelude.Fin public
 open import Prover.Prelude.FinSet public
   using (FinSet)
 open import Prover.Prelude.Function public
-  using (_$_; _∘_; const; id)
+  using (_$_; _∘_; case; case-inspect; const; id)
 open import Prover.Prelude.If public
   using (If; just; nothing)
 open import Prover.Prelude.Inspect public
@@ -47,8 +47,6 @@ open import Prover.Prelude.Retraction public
   using (Retraction)
 open import Prover.Prelude.Sigma public
   using (module Sigma; Σ; _,_; _×_; π₁; π₂)
-open import Prover.Prelude.Setoid public
-  using (Setoid; SetoidIsomorphism)
 open import Prover.Prelude.String public
   using (String)
 open import Prover.Prelude.Sum public

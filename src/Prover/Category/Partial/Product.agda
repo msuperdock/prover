@@ -56,12 +56,36 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object (category-product C₁ C₂)}
+        → {x' y' : Category.Object (category-product D₁ D₂)}
+        → {f₁ f₂ : Category.Arrow (category-product C₁ C₂) x y}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → Category.ArrowEqual (category-product C₁ C₂) f₁ f₂
+        → Category.ArrowEqual (category-product D₁ D₂) (map p q f₁) (map p q f₂)
+      map-equal {x = (x₁ , x₂)} {y = (y₁ , y₂)} _ _ _
+        with PartialFunctor.base F₁ x₁
+        | inspect (PartialFunctor.base F₁) x₁
+        | PartialFunctor.base F₂ x₂
+        | inspect (PartialFunctor.base F₂) x₂
+        | PartialFunctor.base F₁ y₁
+        | inspect (PartialFunctor.base F₁) y₁
+        | PartialFunctor.base F₂ y₂
+        | inspect (PartialFunctor.base F₂) y₂
+      map-equal refl refl (r₁ , r₂)
+        | just _ | [ p₁ ] | just _ | [ p₂ ]
+        | just _ | [ q₁ ] | just _ | [ q₂ ]
+        = PartialFunctor.map-equal F₁ p₁ q₁ r₁
+        , PartialFunctor.map-equal F₂ p₂ q₂ r₂
+
       map-identity
         : {x' : Category.Object (category-product D₁ D₂)}
         → (x : Category.Object (category-product C₁ C₂))
         → (p : base x ≡ just x')
-        → map p p (Category.identity (category-product C₁ C₂) x)
-          ≡ Category.identity (category-product D₁ D₂) x'
+        → Category.ArrowEqual (category-product D₁ D₂)
+          (map p p (Category.identity (category-product C₁ C₂) x))
+          (Category.identity (category-product D₁ D₂) x')
       map-identity (x₁ , x₂) _
         with PartialFunctor.base F₁ x₁
         | inspect (PartialFunctor.base F₁) x₁
@@ -69,9 +93,8 @@ module _
         | inspect (PartialFunctor.base F₂) x₂
       map-identity (x₁ , x₂) refl
         | just _ | [ p₁ ] | just _ | [ p₂ ]
-        = Sigma.comma-eq
-          (PartialFunctor.map-identity F₁ x₁ p₁)
-          (PartialFunctor.map-identity F₂ x₂ p₂)
+        = PartialFunctor.map-identity F₁ x₁ p₁
+        , PartialFunctor.map-identity F₂ x₂ p₂
   
       map-compose
         : {x y z : Category.Object (category-product C₁ C₂)}
@@ -81,8 +104,9 @@ module _
         → (r : base z ≡ just z')
         → (f : Category.Arrow (category-product C₁ C₂) y z)
         → (g : Category.Arrow (category-product C₁ C₂) x y)
-        → map p r (Category.compose (category-product C₁ C₂) f g)
-          ≡ Category.compose (category-product D₁ D₂) (map q r f) (map p q g)
+        → Category.ArrowEqual (category-product D₁ D₂)
+          (map p r (Category.compose (category-product C₁ C₂) f g))
+          (Category.compose (category-product D₁ D₂) (map q r f) (map p q g))
       map-compose {x = (x₁ , x₂)} {y = (y₁ , y₂)} {z = (z₁ , z₂)} _ _ _ _ _
         with PartialFunctor.base F₁ x₁
         | inspect (PartialFunctor.base F₁) x₁
@@ -100,9 +124,8 @@ module _
         | just _ | [ p₁ ] | just _ | [ p₂ ]
         | just _ | [ q₁ ] | just _ | [ q₂ ]
         | just _ | [ r₁ ] | just _ | [ r₂ ]
-        = Sigma.comma-eq
-          (PartialFunctor.map-compose F₁ p₁ q₁ r₁ f₁ g₁)
-          (PartialFunctor.map-compose F₂ p₂ q₂ r₂ f₂ g₂)
+        = PartialFunctor.map-compose F₁ p₁ q₁ r₁ f₁ g₁
+        , PartialFunctor.map-compose F₂ p₂ q₂ r₂ f₂ g₂
 
   partial-functor-product
     : PartialFunctor C₁ D₁
@@ -161,12 +184,14 @@ module _
       → (q₁ : PartialFunctor.base (partial-functor-product H₁₁ H₁₂) y₁
         ≡ just y₁')
       → (f₁ : Category.Arrow (category-product C₁₁ C₁₂) x₁ y₁)
-      → PartialFunctor.map (partial-functor-product H₂₁ H₂₂)
-        (base x₁ p₁)
-        (base y₁ q₁)
-        (Functor.map (functor-product F₁ F₂) f₁)
-      ≡ Functor.map (functor-product G₁ G₂)
-        (PartialFunctor.map (partial-functor-product H₁₁ H₁₂) p₁ q₁ f₁)
+      → Category.ArrowEqual (category-product D₂₁ D₂₂)
+        (PartialFunctor.map
+          (partial-functor-product H₂₁ H₂₂)
+          (base x₁ p₁)
+          (base y₁ q₁)
+          (Functor.map (functor-product F₁ F₂) f₁))
+        (Functor.map (functor-product G₁ G₂)
+          (PartialFunctor.map (partial-functor-product H₁₁ H₁₂) p₁ q₁ f₁))
     map {x₁ = (x₁₁ , x₁₂)} {y₁ = (y₁₁ , y₁₂)} _ _ _
       with PartialFunctor.base H₁₁ x₁₁
       | inspect (PartialFunctor.base H₁₁) x₁₁
@@ -193,12 +218,8 @@ module _
       | PartialFunctorSquare.base s₂ y₁₂ q₁₂
     ... | just _ | [ p₂₁ ] | refl | just _ | [ p₂₂ ] | refl
       | just _ | [ q₂₁ ] | refl | just _ | [ q₂₂ ] | refl
-      with PartialFunctor.map H₂₁ p₂₁ q₂₁ (Functor.map F₁ f₁₁)
-      | PartialFunctorSquare.map' s₁ p₁₁ q₁₁ p₂₁ q₂₁ f₁₁
-      | PartialFunctor.map H₂₂ p₂₂ q₂₂ (Functor.map F₂ f₁₂)
-      | PartialFunctorSquare.map' s₂ p₁₂ q₁₂ p₂₂ q₂₂ f₁₂
-    ... | _ | refl | _ | refl
-      = refl
+      = PartialFunctorSquare.map' s₁ p₁₁ q₁₁ p₂₁ q₂₁ f₁₁
+      , PartialFunctorSquare.map' s₂ p₁₂ q₁₂ p₂₂ q₂₂ f₁₂
 
   partial-functor-square-product
     : PartialFunctorSquare F₁ G₁ H₁₁ H₂₁

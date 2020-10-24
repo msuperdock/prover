@@ -7,34 +7,30 @@ open import Prover.Prelude.Relation
 
 -- ## Definition
 
-module _Direction where
-
-  data Direction
-    : Set
-    where
-  
-    up
-      : Direction
-  
-    down
-      : Direction
-  
-    left
-      : Direction
-  
-    right
-      : Direction
-
-Direction
+data Direction'
   : Set
+  where
+
+  up
+    : Direction'
+
+  down
+    : Direction'
+
+  left
+    : Direction'
+
+  right
+    : Direction'
+
 Direction
-  = _Direction.Direction
+  = Direction'
 
 -- ## Module
 
 module Direction where
 
-  open _Direction.Direction public
+  open Direction' public
 
   reverse
     : Direction

@@ -128,7 +128,7 @@ module Rules where
       → lookup-member rs (Rule.name r) ≡ just m
       → r ≡ Member.value m
     lookup-member-just rs r@(rule n _ _ _) p q
-      = Collection.find-member-just-eq rs
+      = Collection.find-member-just-equal rs
         (Bool.from-decidable _≟_idn n ∘ Rule.name)
         (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) r)
         (Bool.from-decidable-true _≟_idn n n refl)

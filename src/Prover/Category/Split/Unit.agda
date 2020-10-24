@@ -1,9 +1,9 @@
 module Prover.Category.Split.Unit where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare)
+  using (Category; Functor)
 open import Prover.Category.Partial
-  using (PartialFunctor; PartialFunctorSquare)
+  using (PartialFunctor)
 open import Prover.Category.Partial.Unit
   using (partial-functor-unit; partial-functor-square-unit)
 open import Prover.Category.Split
@@ -54,15 +54,16 @@ module _
     abstract
 
       base-unbase
-        : (x' : Category.Object (category-unit B))
-        → base (unbase x') ≡ just x'
+        : (x : Category.Object (category-unit B))
+        → base (unbase x) ≡ just x
       base-unbase
         = SplitFunction.base-unbase F
   
       map-unmap
-        : {x' y' : Category.Object (category-unit B)}
-        → (f' : Category.Arrow (category-unit B) x' y')
-        → map (base-unbase x') (base-unbase y') (unmap f') ≡ f'
+        : {x y : Category.Object (category-unit B)}
+        → (f : Category.Arrow (category-unit B) x y)
+        → Category.ArrowEqual (category-unit B)
+          (map (base-unbase x) (base-unbase y) (unmap f)) f
       map-unmap CategoryUnit.arrow
         = refl
   
@@ -78,8 +79,9 @@ module _
         : {x' : Category.Object (category-unit B)}
         → (x : Category.Object (category-unit A))
         → (p : base x ≡ just x')
-        → map p (base-unbase x') (normalize-arrow x p)
-          ≡ Category.identity (category-unit B) x'
+        → Category.ArrowEqual (category-unit B)
+          (map p (base-unbase x') (normalize-arrow x p))
+          (Category.identity (category-unit B) x')
       normalize-valid _ _
         = refl
 
@@ -93,45 +95,25 @@ module _
 
 -- ## SplitFunctorSquare
 
-module _
-  {A₁ A₂ B₁ B₂ : Set}
-  {F : Function A₁ A₂}
-  {G : Function B₁ B₂}
-  {H₁ : SplitFunction A₁ B₁}
-  {H₂ : SplitFunction A₂ B₂}
-  where
-
-  module SplitFunctorSquareUnit
-    (s : SplitFunctionSquare F G H₁ H₂)
-    where
-
-    partial-functor
-      : PartialFunctorSquare
-        (functor-unit F)
-        (functor-unit G)
-        (SplitFunctor.partial-functor (split-functor-unit H₁))
-        (SplitFunctor.partial-functor (split-functor-unit H₂))
-    partial-functor
-      = partial-functor-square-unit
-        (SplitFunctionSquare.partial-function s)
-
-    functor
-      : FunctorSquare
-        (functor-unit G)
-        (functor-unit F)
-        (SplitFunctor.functor (split-functor-unit H₁))
-        (SplitFunctor.functor (split-functor-unit H₂))
-    functor
-      = functor-square-unit
-        (SplitFunctionSquare.function s)
-
-  split-functor-square-unit
-    : SplitFunctionSquare F G H₁ H₂
-    → SplitFunctorSquare
-      (functor-unit F)
-      (functor-unit G)
-      (split-functor-unit H₁)
-      (split-functor-unit H₂)
-  split-functor-square-unit s
-    = record {SplitFunctorSquareUnit s}
+split-functor-square-unit
+  : {A₁ A₂ B₁ B₂ : Set}
+  → {F : Function A₁ A₂}
+  → {G : Function B₁ B₂}
+  → {H₁ : SplitFunction A₁ B₁}
+  → {H₂ : SplitFunction A₂ B₂}
+  → SplitFunctionSquare F G H₁ H₂
+  → SplitFunctorSquare
+    (functor-unit F)
+    (functor-unit G)
+    (split-functor-unit H₁)
+    (split-functor-unit H₂)
+split-functor-square-unit s
+  = record
+  { partial-functor
+    = partial-functor-square-unit
+      (SplitFunctionSquare.partial-function s)
+  ; functor
+    = functor-square-unit
+      (SplitFunctionSquare.function s)
+  }
 

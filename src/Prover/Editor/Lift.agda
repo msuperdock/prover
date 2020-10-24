@@ -16,56 +16,31 @@ open import Prover.Prelude
 
 -- ### ViewStack
 
-module ViewStackLift
-  (V : BaseViewStack)
-  where
-
-  open BaseViewStack V public
-    using (View; ViewPath)
-
-  ViewInner
-    : (v : View)
-    → ViewPath v
-    → Set
-  ViewInner _ _
-    = ⊥
-
-  ViewInnerPath
-    : (v : View)
-    → (vp : ViewPath v)
-    → ViewInner v vp
-    → Set
-  ViewInnerPath _ _ ()
-
 view-stack-lift
   : BaseViewStack
   → ViewStack
 view-stack-lift V
-  = record {ViewStackLift V}
+  = record
+  { BaseViewStack V
+  ; ViewInner
+    = λ _ _ → ⊥
+  ; ViewInnerPath
+    = λ _ _ ()
+  }
 
 -- ### EventStack
-
-module EventStackLift
-  (E : BaseEventStack)
-  where
-
-  open BaseEventStack E public
-
-  ModeInner
-    : Set
-  ModeInner
-    = ⊥
-
-  EventInner
-    : ModeInner
-    → Set
-  EventInner ()
 
 event-stack-lift
   : BaseEventStack
   → EventStack
 event-stack-lift E
-  = record {EventStackLift E}
+  = record
+  { BaseEventStack E
+  ; ModeInner
+    = ⊥
+  ; EventInner
+    = λ ()
+  }
 
 -- ## StackMaps
 

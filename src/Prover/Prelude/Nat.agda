@@ -25,21 +25,6 @@ module Nat where
   open Builtin public
     using (_+_; _*_)
 
-  -- ### Conversion
-
-  postulate
-    show
-      : ℕ
-      → String
-
-  {-# FOREIGN GHC
-    import Data.Text
-      (pack)
-  #-}
-
-  {-# COMPILE GHC show
-    = pack . show #-}
-
   -- ### Equality
 
   _≟_nat
@@ -56,6 +41,21 @@ module Nat where
     = no (λ ())
   suc _ ≟ zero nat
     = no (λ ())
+
+  -- ### Conversion
+
+  postulate
+    show
+      : ℕ
+      → String
+
+  {-# FOREIGN GHC
+    import Data.Text
+      (pack)
+  #-}
+
+  {-# COMPILE GHC show
+    = pack . show #-}
 
   -- ### Comparison
 

@@ -36,36 +36,28 @@ open import Agda.Builtin.List using () renaming
 
 -- ## Definition
 
-module _Vec where
-
-  data Vec
-    (A : Set)
-    : ℕ
-    → Set
-    where
-
-    nil
-      : Vec A zero
-
-    cons
-      : A
-      → (xs : Any (Vec A))
-      → Vec A (suc (Any.index xs))
-
-Vec
-  : Set
-  → ℕ
+data Vec'
+  (A : Set)
+  : ℕ
   → Set
-Vec
-  = _Vec.Vec
+  where
 
-open _Vec.Vec public
+  nil
+    : Vec' A zero
+
+  cons
+    : A
+    → (xs : Any (Vec' A))
+    → Vec' A (suc (Any.index xs))
+
+Vec
+  = Vec'
 
 -- ## Module
 
 module Vec where
 
-  open _Vec.Vec public
+  open Vec' public
 
   -- ### Interface
 
@@ -199,6 +191,38 @@ module Vec where
   ... | just y | just ys
     = just (y ∷ ys)
 
+  -- ### Equality
+
+  module _
+    {A : Set}
+    where
+
+    decidable
+      : {n : ℕ}
+      → Decidable (Equal A)
+      → Decidable (Equal (Vec A n))
+    decidable _ [] []
+      = yes refl
+    decidable d (x₁ ∷ xs₁) (x₂ ∷ xs₂)
+      with d x₁ x₂
+      | decidable d xs₁ xs₂
+    ... | no ¬p | _
+      = no (λ {refl → ¬p refl})
+    ... | _ | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl | yes refl
+      = yes refl
+
+    cons-equal
+      : {n : ℕ}
+      → {x₁ x₂ : A}
+      → {xs₁ xs₂ : Vec A n}
+      → x₁ ≡ x₂
+      → xs₁ ≡ xs₂
+      → x₁ ∷ xs₁ ≡ x₂ ∷ xs₂
+    cons-equal refl refl
+      = refl
+
   -- ### Construction
 
   module _
@@ -229,38 +253,6 @@ module Vec where
       = nil'
     to-builtin (x ∷ xs)
       = cons' x (to-builtin xs)
-
-  -- ### Equality
-
-  module _
-    {A : Set}
-    where
-
-    decidable
-      : {n : ℕ}
-      → Decidable (Equal A)
-      → Decidable (Equal (Vec A n))
-    decidable _ [] []
-      = yes refl
-    decidable d (x₁ ∷ xs₁) (x₂ ∷ xs₂)
-      with d x₁ x₂
-      | decidable d xs₁ xs₂
-    ... | no ¬p | _
-      = no (λ {refl → ¬p refl})
-    ... | _ | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl | yes refl
-      = yes refl
-
-    cons-eq
-      : {n : ℕ}
-      → {x₁ x₂ : A}
-      → {xs₁ xs₂ : Vec A n}
-      → x₁ ≡ x₂
-      → xs₁ ≡ xs₂
-      → x₁ ∷ xs₁ ≡ x₂ ∷ xs₂
-    cons-eq refl refl
-      = refl
 
   -- ### Retraction
 
@@ -293,7 +285,7 @@ module Vec where
       to-from []
         = refl
       to-from (y ∷ ys)
-        = cons-eq
+        = cons-equal
           (Retraction.to-from F y)
           (to-from ys)
 
@@ -590,17 +582,17 @@ module Vec where
   ... | _ | refl | _ | refl
     = refl
 
-  map-eq
+  map-equal
     : {A B : Set}
     → {n : ℕ}
     → (f₁ f₂ : A → B)
     → ((x : A) → f₁ x ≡ f₂ x)
     → (xs : Vec A n)
     → map f₁ xs ≡ map f₂ xs
-  map-eq _ _ _ []
+  map-equal _ _ _ []
     = refl
-  map-eq f₁ f₂ p (x ∷ xs)
-    = cons-eq (p x) (map-eq f₁ f₂ p xs)
+  map-equal f₁ f₂ p (x ∷ xs)
+    = cons-equal (p x) (map-equal f₁ f₂ p xs)
 
   map-identity
     : {A : Set}
@@ -610,7 +602,7 @@ module Vec where
   map-identity []
     = refl
   map-identity (_ ∷ xs)
-    = cons-eq refl (map-identity xs)
+    = cons-equal refl (map-identity xs)
 
   map-compose
     : {A B C : Set}
@@ -622,7 +614,7 @@ module Vec where
   map-compose _ _ []
     = refl
   map-compose f g (_ ∷ xs)
-    = cons-eq refl (map-compose f g xs)
+    = cons-equal refl (map-compose f g xs)
 
   map-update
     : {A B : Set}
@@ -634,9 +626,9 @@ module Vec where
     → f y ≡ f (xs ! k)
     → map f (update xs k y) ≡ map f xs
   map-update _ (_ ∷ _) zero _ p
-    = cons-eq p refl
+    = cons-equal p refl
   map-update f (_ ∷ xs) (suc k) y p
-    = cons-eq refl (map-update f xs k y p)
+    = cons-equal refl (map-update f xs k y p)
 
   snoc-init-last
     : {A : Set}
@@ -646,7 +638,7 @@ module Vec where
   snoc-init-last (_ ∷ [])
     = refl
   snoc-init-last (_ ∷ xs@(_ ∷ _))
-    = cons-eq refl (snoc-init-last xs)
+    = cons-equal refl (snoc-init-last xs)
 
   -- ### Subvector
 

@@ -1,17 +1,19 @@
 module Prover.Category.Sigma.Maybe where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor; Dependent₁FunctorCompose;
-    Dependent₁FunctorIdentity; Dependent₁FunctorSquare)
+    Dependent₁FunctorEqual; Dependent₁FunctorIdentity; Dependent₁FunctorSquare)
 open import Prover.Category.Dependent1.Maybe
   using (dependent₁-category-maybe; dependent₁-functor-compose-maybe;
-    dependent₁-functor-identity-maybe; dependent₁-functor-maybe;
-    dependent₁-functor-square-maybe)
+    dependent₁-functor-equal-maybe; dependent₁-functor-identity-maybe;
+    dependent₁-functor-maybe; dependent₁-functor-square-maybe)
 open import Prover.Category.Sigma
-  using (category-sigma; functor-compose-sigma; functor-identity-sigma;
-    functor-sigma; functor-sigma₁; functor-square-sigma; functor-square-sigma₁)
+  using (category-sigma; functor-compose-sigma; functor-equal-sigma;
+    functor-identity-sigma; functor-sigma; functor-sigma₁; functor-square-sigma;
+    functor-square-sigma₁)
 
 -- ## Category
 
@@ -47,6 +49,24 @@ functor-sigma-maybe₁
 functor-sigma-maybe₁ C₂
   = functor-sigma₁
     (dependent₁-category-maybe C₂)
+
+-- ## FunctorEqual
+
+functor-equal-sigma-maybe
+  : {C₁ D₁ : Category}
+  → {C₂ : Dependent₁Category C₁}
+  → {D₂ : Dependent₁Category D₁}
+  → {F₁₁ F₂₁ : Functor C₁ D₁}
+  → {F₁₂ : Dependent₁Functor C₂ D₂ F₁₁}
+  → {F₂₂ : Dependent₁Functor C₂ D₂ F₂₁}
+  → FunctorEqual F₁₁ F₂₁
+  → Dependent₁FunctorEqual F₁₂ F₂₂
+  → FunctorEqual
+    (functor-sigma-maybe F₁₂)
+    (functor-sigma-maybe F₂₂)
+functor-equal-sigma-maybe p₁ p₂
+  = functor-equal-sigma p₁
+    (dependent₁-functor-equal-maybe p₁ p₂)
 
 -- ## FunctorIdentity
 

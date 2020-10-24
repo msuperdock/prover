@@ -57,6 +57,21 @@ module Bool where
   true ∧ b
     = b
   
+  -- ### Equality
+
+  _≟_bool
+    : Decidable (Equal Bool)
+  
+  false ≟ false bool
+    = yes refl
+  true ≟ true bool
+    = yes refl
+  
+  false ≟ true bool
+    = no (λ ())
+  true ≟ false bool
+    = no (λ ())
+
   -- ### Conversion
 
   F
@@ -117,21 +132,6 @@ module Bool where
     → T (from-decidable d x₁ x₂)
   from-decidable-true d x₁ x₂
     = from-dec-true (d x₁ x₂)
-
-  -- ### Equality
-
-  _≟_bool
-    : Decidable (Equal Bool)
-  
-  false ≟ false bool
-    = yes refl
-  true ≟ true bool
-    = yes refl
-  
-  false ≟ true bool
-    = no (λ ())
-  true ≟ false bool
-    = no (λ ())
 
   -- ### Properties
   

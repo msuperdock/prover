@@ -7,7 +7,9 @@ open import Prover.Prelude
 
 -- ## Category
 
-record Category
+-- ### Definition
+
+record Category''
   : Set₁
   where
 
@@ -23,6 +25,41 @@ record Category
       → Object
       → Set
 
+    ArrowEqual
+      : {x y : Object}
+      → Arrow x y
+      → Arrow x y
+      → Set
+
+    arrow-refl
+      : {x y : Object}
+      → {f : Arrow x y}
+      → ArrowEqual f f
+
+    arrow-sym
+      : {x y : Object}
+      → {f₁ f₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₁
+
+    arrow-trans
+      : {x y : Object}
+      → {f₁ f₂ f₃ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₃
+      → ArrowEqual f₁ f₃
+
+    simplify
+      : {x y : Object}
+      → Arrow x y
+      → Arrow x y
+
+    simplify-equal
+      : {x y : Object}
+      → (f : Arrow x y)
+      → ArrowEqual
+        (simplify f) f
+
     identity
       : (x : Object)
       → Arrow x x
@@ -33,22 +70,193 @@ record Category
       → Arrow x y
       → Arrow x z
 
+    compose-equal
+      : {x y z : Object}
+      → {f₁ f₂ : Arrow y z}
+      → {g₁ g₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual g₁ g₂
+      → ArrowEqual
+        (compose f₁ g₁)
+        (compose f₂ g₂)
+
     precompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose f (identity x) ≡ f
+      → ArrowEqual
+        (compose f (identity x)) f
 
     postcompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose (identity y) f ≡ f
+      → ArrowEqual
+        (compose (identity y) f) f
 
     associative
       : {w x y z : Object}
       → (f : Arrow y z)
       → (g : Arrow x y)
       → (h : Arrow w x)
-      → compose (compose f g) h ≡ compose f (compose g h)
+      → ArrowEqual
+        (compose (compose f g) h)
+        (compose f (compose g h))
+
+Category
+  = Category''
+
+-- ### Equality
+
+data ArrowEqual''
+  : (C₁ C₂ : Category'')
+  → {x₁ y₁ : Category''.Object C₁}
+  → {x₂ y₂ : Category''.Object C₂}
+  → Category''.Arrow C₁ x₁ y₁
+  → Category''.Arrow C₂ x₂ y₂
+  → Set
+  where
+
+  any
+    : {C : Category''}
+    → {x y : Category''.Object C}
+    → {f₁ f₂ : Category''.Arrow C x y}
+    → Category''.ArrowEqual C f₁ f₂
+    → ArrowEqual'' C C f₁ f₂
+
+any'
+  : {C : Category''}
+  → {x y : Category''.Object C}
+  → {f₁ f₂ : Category''.Arrow C x y}
+  → ArrowEqual'' C C f₁ f₂
+  → Category''.ArrowEqual C f₁ f₂
+any' (any p)
+  = p
+
+-- ### Module
+
+module Category
+  (C : Category)
+  where
+
+  open Category'' C public
+
+  open ArrowEqual'' public
+    using (any)
+
+  ArrowEqual'
+    : {x₁ y₁ : Object}
+    → {x₂ y₂ : Object}
+    → Arrow x₁ y₁
+    → Arrow x₂ y₂
+    → Set
+  ArrowEqual'
+    = ArrowEqual'' C C
+
+  arrow-refl'
+    : {x y : Object}
+    → {f : Arrow x y}
+    → ArrowEqual' f f
+  arrow-refl'
+    = any arrow-refl
+
+  arrow-sym'
+    : {x₁ x₂ y₁ y₂ : Object}
+    → {f₁ : Arrow x₁ y₁}
+    → {f₂ : Arrow x₂ y₂}
+    → ArrowEqual' f₁ f₂
+    → ArrowEqual' f₂ f₁
+  arrow-sym' (any p)
+    = any (arrow-sym p)
+
+  arrow-trans'
+    : {x₁ x₂ x₃ y₁ y₂ y₃ : Object}
+    → {f₁ : Arrow x₁ y₁}
+    → {f₂ : Arrow x₂ y₂}
+    → {f₃ : Arrow x₃ y₃}
+    → ArrowEqual' f₁ f₂
+    → ArrowEqual' f₂ f₃
+    → ArrowEqual' f₁ f₃
+  arrow-trans' (any p₁) (any p₂)
+    = any (arrow-trans p₁ p₂)
+
+  simplify-equal'
+    : {x y : Object}
+    → (f : Arrow x y)
+    → ArrowEqual'
+      (simplify f) f
+  simplify-equal' f
+    = any (simplify-equal f)
+
+  identity-equal
+    : {x₁ x₂ : Object}
+    → x₁ ≡ x₂
+    → ArrowEqual'
+      (identity x₁)
+      (identity x₂)
+  identity-equal refl
+    = arrow-refl'
+
+  compose'
+    : {x y₁ y₂ z : Object}
+    → y₁ ≡ y₂
+    → Arrow y₂ z
+    → Arrow x y₁
+    → Arrow x z
+  compose' refl
+    = compose
+
+  compose-equal'
+    : {x₁ x₂ y₁ y₂ z₁ z₂ : Object}
+    → {f₁ : Arrow y₁ z₁}
+    → {f₂ : Arrow y₂ z₂}
+    → {g₁ : Arrow x₁ y₁}
+    → {g₂ : Arrow x₂ y₂}
+    → ArrowEqual' f₁ f₂
+    → ArrowEqual' g₁ g₂
+    → ArrowEqual'
+      (compose f₁ g₁)
+      (compose f₂ g₂)
+  compose-equal' (any p) (any q)
+    = any (compose-equal p q)
+
+  compose-equal''
+    : {x₁ x₂ y₁ y₂ z : Object}
+    → (p : y₁ ≡ y₂)
+    → (f : Arrow y₂ z)
+    → {g₁ : Arrow x₁ y₁}
+    → {g₂ : Arrow x₂ y₂}
+    → ArrowEqual' g₁ g₂
+    → ArrowEqual'
+      (compose' p f g₁)
+      (compose f g₂)
+  compose-equal'' refl _
+    = compose-equal' arrow-refl'
+
+  precompose'
+    : {x y : Object}
+    → (f : Arrow x y)
+    → ArrowEqual'
+      (compose f (identity x)) f
+  precompose' f
+    = any (precompose f)
+
+  postcompose'
+    : {x y : Object}
+    → (f : Arrow x y)
+    → ArrowEqual'
+      (compose (identity y) f) f
+  postcompose' f
+    = any (postcompose f)
+
+  associative'
+    : {w x y z : Object}
+    → (f : Arrow y z)
+    → (g : Arrow x y)
+    → (h : Arrow w x)
+    → ArrowEqual'
+      (compose (compose f g) h)
+      (compose f (compose g h))
+  associative' f g h
+    = any (associative f g h)
 
   arrow
     : {x₁ x₂ y₁ y₂ : Object}
@@ -59,45 +267,61 @@ record Category
   arrow refl refl
     = id
 
-  arrow-eq
+  arrow-equal
+    : {x₁ x₂ y₁ y₂ : Object}
+    → {f₁ f₂ : Arrow x₂ y₂}
+    → (p : x₁ ≡ x₂)
+    → (q : y₁ ≡ y₂)
+    → ArrowEqual f₁ f₂
+    → ArrowEqual
+      (arrow p q f₁)
+      (arrow p q f₂)
+  arrow-equal refl refl
+    = id
+
+  arrow-equal'
     : {x₁ x₂ y₁ y₂ : Object}
     → (p : x₁ ≡ x₂)
     → (q : y₁ ≡ y₂)
     → (f : Arrow x₂ y₂)
-    → arrow p q f ≅ f
-  arrow-eq refl refl _
-    = refl
+    → ArrowEqual'
+      (arrow p q f) f
+  arrow-equal' refl refl _
+    = arrow-refl'
 
-  identity-eq
-    : {x₁ x₂ : Object}
-    → x₁ ≡ x₂
-    → identity x₁ ≅ identity x₂
-  identity-eq refl
-    = refl
-
-  compose-eq
+  arrow-compose
     : {x₁ x₂ y₁ y₂ z₁ z₂ : Object}
-    → {f₁ : Arrow y₁ z₁}
-    → {f₂ : Arrow y₂ z₂}
-    → {g₁ : Arrow x₁ y₁}
-    → {g₂ : Arrow x₂ y₂}
-    → x₁ ≡ x₂
-    → y₁ ≡ y₂
-    → z₁ ≡ z₂
-    → f₁ ≅ f₂
-    → g₁ ≅ g₂
-    → compose f₁ g₁ ≅ compose f₂ g₂
-  compose-eq refl refl refl refl refl
-    = refl
+    → (p : x₁ ≡ x₂)
+    → (q : y₁ ≡ y₂)
+    → (r : z₁ ≡ z₂)
+    → (f : Arrow y₂ z₂)
+    → (g : Arrow x₂ y₂)
+    → ArrowEqual
+      (arrow p r (compose f g))
+      (compose (arrow q r f) (arrow p q g))
+  arrow-compose refl refl refl _ _
+    = arrow-refl
 
-  compose-eq'
-    : {x y₁ y₂ z : Object}
-    → y₁ ≡ y₂
-    → Arrow y₂ z
-    → Arrow x y₁
-    → Arrow x z
-  compose-eq' refl
-    = compose
+-- ### Module'
+
+module Category' where
+
+  ArrowEqual'
+    = ArrowEqual''
+
+  arrow-trans'
+    : {C₁ C₂ C₃ : Category}
+    → {x₁ y₁ : Category.Object C₁}
+    → {x₂ y₂ : Category.Object C₂}
+    → {x₃ y₃ : Category.Object C₃}
+    → {f₁ : Category.Arrow C₁ x₁ y₁}
+    → {f₂ : Category.Arrow C₂ x₂ y₂}
+    → {f₃ : Category.Arrow C₃ x₃ y₃}
+    → ArrowEqual' C₁ C₂ f₁ f₂
+    → ArrowEqual' C₂ C₃ f₂ f₃
+    → ArrowEqual' C₁ C₃ f₁ f₃
+  arrow-trans' {C₁ = C₁} p₁@(any _) p₂@(any _)
+    = Category.arrow-trans' C₁ p₁ p₂
 
 -- ## Functor
 
@@ -133,37 +357,52 @@ record Functor
       → Category.Arrow C x y
       → Category.Arrow D (base x) (base y)
 
+    map-equal
+      : {x y : Category.Object C}
+      → {f₁ f₂ : Category.Arrow C x y}
+      → Category.ArrowEqual C f₁ f₂
+      → Category.ArrowEqual D (map f₁) (map f₂)
+
     map-identity
       : (x : Category.Object C)
-      → map (Category.identity C x) ≡ Category.identity D (base x)
+      → Category.ArrowEqual D
+        (map (Category.identity C x))
+        (Category.identity D (base x))
 
     map-compose
       : {x y z : Category.Object C}
       → (f : Category.Arrow C y z)
       → (g : Category.Arrow C x y)
-      → map (Category.compose C f g) ≡ Category.compose D (map f) (map g)
+      → Category.ArrowEqual D
+        (map (Category.compose C f g))
+        (Category.compose D (map f) (map g))
 
-  map-eq
+  map-equal'
     : {x₁ x₂ y₁ y₂ : Category.Object C}
     → {f₁ : Category.Arrow C x₁ y₁}
     → {f₂ : Category.Arrow C x₂ y₂}
-    → x₁ ≡ x₂
-    → y₁ ≡ y₂
-    → f₁ ≅ f₂
-    → map f₁ ≅ map f₂
-  map-eq refl refl refl
-    = refl
+    → Category.ArrowEqual' C f₁ f₂
+    → Category.ArrowEqual' D (map f₁) (map f₂)
+  map-equal' (any p)
+    = any (map-equal p)
 
-  map-compose-eq
-    : {x y₁ y₂ z : Category.Object C}
-    → (p : y₁ ≡ y₂)
-    → (q : base y₁ ≡ base y₂)
-    → (f : Category.Arrow C y₂ z)
-    → (g : Category.Arrow C x y₁)
-    → map (Category.compose-eq' C p f g)
-      ≡ Category.compose-eq' D q (map f) (map g)
-  map-compose-eq refl refl
-    = map-compose
+  map-identity'
+    : (x : Category.Object C)
+    → Category.ArrowEqual' D
+      (map (Category.identity C x))
+      (Category.identity D (base x))
+  map-identity' x
+    = any (map-identity x)
+
+  map-compose'
+    : {x y z : Category.Object C}
+    → (f : Category.Arrow C y z)
+    → (g : Category.Arrow C x y)
+    → Category.ArrowEqual' D
+      (map (Category.compose C f g))
+      (Category.compose D (map f) (map g))
+  map-compose' f g
+    = any (map-compose f g)
 
 -- ### Identity
 
@@ -186,19 +425,31 @@ module FunctorIdentity'
 
   abstract
 
+    map-equal
+      : {x y : Category.Object C}
+      → {f₁ f₂ : Category.Arrow C x y}
+      → Category.ArrowEqual C f₁ f₂
+      → Category.ArrowEqual C (map f₁) (map f₂)
+    map-equal
+      = id
+
     map-identity
       : (x : Category.Object C)
-      → map (Category.identity C x) ≡ Category.identity C (base x)
+      → Category.ArrowEqual C
+        (map (Category.identity C x))
+        (Category.identity C (base x))
     map-identity _
-      = refl
+      = Category.arrow-refl C
   
     map-compose
       : {x y z : Category.Object C}
       → (f : Category.Arrow C y z)
       → (g : Category.Arrow C x y)
-      → map (Category.compose C f g) ≡ Category.compose C (map f) (map g)
+      → Category.ArrowEqual C
+        (map (Category.compose C f g))
+        (Category.compose C (map f) (map g))
     map-compose _ _
-      = refl
+      = Category.arrow-refl C
 
 functor-identity'
   : (C : Category)
@@ -234,28 +485,36 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object C}
+        → {f₁ f₂ : Category.Arrow C x y}
+        → Category.ArrowEqual C f₁ f₂
+        → Category.ArrowEqual E (map f₁) (map f₂)
+      map-equal
+        = Functor.map-equal F
+        ∘ Functor.map-equal G
+
       map-identity
         : (x : Category.Object C)
-        → map (Category.identity C x) ≡ Category.identity E (base x)
+        → Category.ArrowEqual E
+          (map (Category.identity C x))
+          (Category.identity E (base x))
       map-identity x
-        with Functor.map G (Category.identity C x)
-        | Functor.map-identity G x
-      ... | _ | refl
-        = Functor.map-identity F
-          (Functor.base G x)
+        = Category.arrow-trans E (Functor.map-equal F
+          (Functor.map-identity G x))
+        $ Functor.map-identity F (Functor.base G x)
   
       map-compose
         : {x y z : Category.Object C}
         → (f : Category.Arrow C y z)
         → (g : Category.Arrow C x y)
-        → map (Category.compose C f g) ≡ Category.compose E (map f) (map g)
+        → Category.ArrowEqual E
+          (map (Category.compose C f g))
+          (Category.compose E (map f) (map g))
       map-compose f g
-        with Functor.map G (Category.compose C f g)
-        | Functor.map-compose G f g
-      ... | _ | refl
-        = Functor.map-compose F
-          (Functor.map G f)
-          (Functor.map G g)
+        = Category.arrow-trans E (Functor.map-equal F
+          (Functor.map-compose G f g))
+        $ Functor.map-compose F (Functor.map G f) (Functor.map G g)
 
   functor-compose'
     : Functor D E 
@@ -296,76 +555,58 @@ record FunctorEqual
     map
       : {x y : Category.Object C}
       → (f : Category.Arrow C x y)
-      → Functor.map F₁ f ≅ Functor.map F₂ f
+      → Category'.ArrowEqual' D₁ D₂
+        (Functor.map F₁ f)
+        (Functor.map F₂ f)
+
+  map'
+    : {x₁ x₂ y₁ y₂ : Category.Object C}
+    → {f₁ : Category.Arrow C x₁ y₁}
+    → {f₂ : Category.Arrow C x₂ y₂}
+    → Category.ArrowEqual' C f₁ f₂
+    → Category'.ArrowEqual' D₁ D₂
+      (Functor.map F₁ f₁)
+      (Functor.map F₂ f₂)
+  map' {f₁ = f₁} p
+    = Category'.arrow-trans' (map f₁)
+    $ Functor.map-equal' F₂ p
 
 -- ### Symmetry
 
-module _
-  {C D₁ D₂ : Category}
-  {F₁ : Functor C D₁}
-  {F₂ : Functor C D₂}
-  where
-
-  module FunctorSym
-    (p : FunctorEqual F₁ F₂)
-    where
-  
-    base
-      : (x : Category.Object C)
-      → Functor.base F₂ x ≅ Functor.base F₁ x
-    base x
-      = sym (FunctorEqual.base p x)
-  
-    map
-      : {x y : Category.Object C}
-      → (f : Category.Arrow C x y)
-      → Functor.map F₂ f ≅ Functor.map F₁ f
-    map f
-      = sym (FunctorEqual.map p f)
-  
-  functor-sym
-    : FunctorEqual F₁ F₂
-    → FunctorEqual F₂ F₁
-  functor-sym p
-    = record {FunctorSym p}
+functor-sym
+  : {C D : Category}
+  → {F₁ F₂ : Functor C D}
+  → FunctorEqual F₁ F₂
+  → FunctorEqual F₂ F₁
+functor-sym {D = D} p
+  = record
+  { base
+    = λ x → sym
+      (FunctorEqual.base p x)
+  ; map
+    = λ f → Category.arrow-sym' D
+      (FunctorEqual.map p f)
+  }
 
 -- ### Transitivity
-
-module _
-  {C D₁ D₂ D₃ : Category}
-  {F₁ : Functor C D₁}
-  {F₂ : Functor C D₂}
-  {F₃ : Functor C D₃}
-  where
-
-  module FunctorTrans
-    (p₁ : FunctorEqual F₁ F₂)
-    (p₂ : FunctorEqual F₂ F₃)
-    where
   
-    base
-      : (x : Category.Object C)
-      → Functor.base F₁ x ≅ Functor.base F₃ x
-    base x
-      = trans
-        (FunctorEqual.base p₁ x)
-        (FunctorEqual.base p₂ x)
-  
-    map
-      : {x y : Category.Object C}
-      → (f : Category.Arrow C x y)
-      → Functor.map F₁ f ≅ Functor.map F₃ f
-    map f
-      = trans
-        (FunctorEqual.map p₁ f)
-        (FunctorEqual.map p₂ f)
-  
-  functor-trans
-    : FunctorEqual F₁ F₂
-    → FunctorEqual F₂ F₃
-    → FunctorEqual F₁ F₃
-  functor-trans p₁ p₂
-    = record {FunctorTrans p₁ p₂}
+functor-trans
+  : {C D : Category}
+  → {F₁ F₂ F₃ : Functor C D}
+  → FunctorEqual F₁ F₂
+  → FunctorEqual F₂ F₃
+  → FunctorEqual F₁ F₃
+functor-trans {D = D} p₁ p₂
+  = record
+  { base
+    = λ x → trans
+      (FunctorEqual.base p₁ x)
+      (FunctorEqual.base p₂ x)
+  ; map
+    = λ f → Category.arrow-trans' D
+      (FunctorEqual.map p₁ f)
+      (FunctorEqual.map p₂ f)
+  }
 
 -- ## FunctorIdentity
 
@@ -397,7 +638,8 @@ record FunctorIdentity
     map
       : {x₁ y₁ : Category.Object C₁}
       → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → Functor.map F f₁ ≅ f₁
+      → Category'.ArrowEqual' C₂ C₁
+        (Functor.map F f₁) f₁
 
 -- ### Equality
 
@@ -453,7 +695,9 @@ record FunctorCompose
     map
       : {x y : Category.Object C}
       → (f : Category.Arrow C x y)
-      → Functor.map H f ≅ Functor.map F (Functor.map G f)
+      → Category'.ArrowEqual' E₂ E₁
+        (Functor.map H f)
+        (Functor.map F (Functor.map G f))
 
 -- ### Equality
 
@@ -493,7 +737,7 @@ record FunctorSquare
   where
 
   field
-
+  
     base
       : (x₁ : Category.Object C₁)
       → Functor.base H₂ (Functor.base F x₁) 
@@ -516,8 +760,9 @@ record FunctorSquare
     map
       : {x₁ y₁ : Category.Object C₁}
       → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → Functor.map H₂ (Functor.map F f₁)
-        ≅ Functor.map G (Functor.map H₁ f₁)
+      → Category'.ArrowEqual' D₂ D₃
+        (Functor.map H₂ (Functor.map F f₁))
+        (Functor.map G (Functor.map H₁ f₁))
 
 -- ### Equality
 
@@ -547,71 +792,39 @@ module _
 
 -- ### Transpose
 
-module _
-  {C₁ C₂ D₁ D₂ : Category}
-  {F : Functor C₁ C₂}
-  {G : Functor D₁ D₂}
-  {H₁ : Functor C₁ D₁}
-  {H₂ : Functor C₂ D₂}
-  where
-
-  module FunctorSquareTranspose
-    (s : FunctorSquare F G H₁ H₂)
-    where
-
-    base
-      : (x₁ : Category.Object C₁)
-      → Functor.base G (Functor.base H₁ x₁) 
-        ≅ Functor.base H₂ (Functor.base F x₁)
-    base x₁
-      = sym (FunctorSquare.base s x₁)
-  
-    map
-      : {x₁ y₁ : Category.Object C₁}
-      → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → Functor.map G (Functor.map H₁ f₁)
-        ≅ Functor.map H₂ (Functor.map F f₁)
-    map f₁
-      = sym (FunctorSquare.map s f₁)
-
-  functor-square-transpose
-    : FunctorSquare F G H₁ H₂
-    → FunctorSquare H₁ H₂ F G
-  functor-square-transpose s
-    = record {FunctorSquareTranspose s}
+functor-square-transpose
+  : {C₁ C₂ D₁ D₂ : Category}
+  → {F : Functor C₁ C₂}
+  → {G : Functor D₁ D₂}
+  → {H₁ : Functor C₁ D₁}
+  → {H₂ : Functor C₂ D₂}
+  → FunctorSquare F G H₁ H₂
+  → FunctorSquare H₁ H₂ F G
+functor-square-transpose {D₂ = D₂} s
+  = record
+  { base
+    = λ x₁ → sym
+      (FunctorSquare.base s x₁)
+  ; map
+    = λ f₁ → Category.arrow-sym' D₂
+      (FunctorSquare.map s f₁)
+  }
 
 -- ### Identity
 
-module _
-  {C₁ C₂ : Category}
-  where
-
-  module FunctorSquareIdentity
-    (F : Functor C₁ C₂)
-    where
-
-    base
-      : (x₁ : Category.Object C₁)
-      → Functor.base (functor-identity' C₂) (Functor.base F x₁) 
-        ≅ Functor.base F (Functor.base (functor-identity' C₁) x₁)
-    base _
-      = refl
-  
-    map
-      : {x₁ y₁ : Category.Object C₁}
-      → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → Functor.map (functor-identity' C₂) (Functor.map F f₁)
-        ≅ Functor.map F (Functor.map (functor-identity' C₁) f₁)
-    map _
-      = refl
-
-  functor-square-identity
-    : (F : Functor C₁ C₂)
-    → FunctorSquare F F
-      (functor-identity' C₁)
-      (functor-identity' C₂)
-  functor-square-identity F
-    = record {FunctorSquareIdentity F}
+functor-square-identity
+  : {C₁ C₂ : Category}
+  → (F : Functor C₁ C₂)
+  → FunctorSquare F F
+    (functor-identity' C₁)
+    (functor-identity' C₂)
+functor-square-identity {C₂ = C₂} _
+  = record
+  { base
+    = λ _ → refl
+  ; map
+    = λ _ → Category.arrow-refl' C₂
+  }
 
 functor-square-identity'
   : {C D : Category}
@@ -625,57 +838,31 @@ functor-square-identity' F
 
 -- ### Compose
 
-module _
-  {C₁ C₂ D₁ D₂ E₁ E₂ : Category}
-  {F : Functor C₁ C₂}
-  {G : Functor D₁ D₂}
-  {H : Functor E₁ E₂}
-  {I₁ : Functor D₁ E₁}
-  {I₂ : Functor D₂ E₂}
-  {J₁ : Functor C₁ D₁}
-  {J₂ : Functor C₂ D₂}
-  where
-
-  module FunctorSquareCompose
-    (s : FunctorSquare G H I₁ I₂)
-    (t : FunctorSquare F G J₁ J₂)
-    where
-
-    base
-      : (x₁ : Category.Object C₁)
-      → Functor.base (functor-compose' I₂ J₂) (Functor.base F x₁) 
-        ≅ Functor.base H (Functor.base (functor-compose' I₁ J₁) x₁)
-    base x₁
-      with Functor.base J₂ (Functor.base F x₁)
-      | FunctorSquare.base t x₁
-    ... | _ | refl
-      = FunctorSquare.base s
-        (Functor.base J₁ x₁)
-  
-    map
-      : {x₁ y₁ : Category.Object C₁}
-      → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → Functor.map (functor-compose' I₂ J₂) (Functor.map F f₁)
-        ≅ Functor.map H (Functor.map (functor-compose' I₁ J₁) f₁)
-    map {x₁ = x₁} {y₁ = y₁} f₁
-      with Functor.base J₂ (Functor.base F x₁)
-      | FunctorSquare.base t x₁
-      | Functor.base J₂ (Functor.base F y₁)
-      | FunctorSquare.base t y₁
-      | Functor.map J₂ (Functor.map F f₁)
-      | FunctorSquare.map t f₁
-    ... | _ | refl | _ | refl | _ | refl
-      = FunctorSquare.map s
-        (Functor.map J₁ f₁)
-
-  functor-square-compose
-    : FunctorSquare G H I₁ I₂
-    → FunctorSquare F G J₁ J₂
-    → FunctorSquare F H
-      (functor-compose' I₁ J₁)
-      (functor-compose' I₂ J₂)
-  functor-square-compose s t
-    = record {FunctorSquareCompose s t}
+functor-square-compose
+  : {C₁ C₂ D₁ D₂ E₁ E₂ : Category}
+  → {F : Functor C₁ C₂}
+  → {G : Functor D₁ D₂}
+  → {H : Functor E₁ E₂}
+  → {I₁ : Functor D₁ E₁}
+  → {I₂ : Functor D₂ E₂}
+  → {J₁ : Functor C₁ D₁}
+  → {J₂ : Functor C₂ D₂}
+  → FunctorSquare G H I₁ I₂
+  → FunctorSquare F G J₁ J₂
+  → FunctorSquare F H
+    (functor-compose' I₁ J₁)
+    (functor-compose' I₂ J₂)
+functor-square-compose {E₂ = E₂} {I₂ = I₂} {J₁ = J₁} s t
+  = record
+  { base
+    = λ x₁
+    → trans (sub (Functor.base I₂) (FunctorSquare.base t x₁))
+    $ FunctorSquare.base s (Functor.base J₁ x₁)
+  ; map
+    = λ f₁
+    → Category.arrow-trans' E₂ (Functor.map-equal' I₂ (FunctorSquare.map t f₁))
+    $ FunctorSquare.map s (Functor.map J₁ f₁)
+  }
 
 functor-square-compose'
   : {C₁ C₂ C₃ D₁ D₂ D₃ : Category}

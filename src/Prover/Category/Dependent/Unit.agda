@@ -1,18 +1,18 @@
 module Prover.Category.Dependent.Unit where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorEqual;
+    ChainFunctorIdentity; ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Dependent.Simple
-  using (DependentSimpleFunctor; DependentSimpleFunctorCompose;
-    DependentSimpleFunctorIdentity; DependentSimpleFunctorSquare;
-    DependentSimpleCategory)
+  using (DependentSimpleCategory; DependentSimpleFunctor;
+    DependentSimpleFunctorCompose; DependentSimpleFunctorEqual;
+    DependentSimpleFunctorIdentity; DependentSimpleFunctorSquare)
 open import Prover.Category.Unit
-  using (category-unit; functor-compose-unit; functor-identity-unit;
-    functor-square-unit; functor-unit)
+  using (category-unit; functor-compose-unit; functor-equal-unit;
+    functor-identity-unit; functor-square-unit; functor-unit)
 open import Prover.Prelude
 
 -- ## Types
@@ -38,6 +38,41 @@ dependent-functor-unit
     (dependent-category-unit C')
     (dependent-category-unit D') F
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-unit
+  : {n : ℕ}
+  → {C D : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → {D' : DependentSimpleCategory D}
+  → {F₁ F₂ : ChainFunctor C D}
+  → {F₁' : DependentSimpleFunctor C' D' F₁}
+  → {F₂' : DependentSimpleFunctor C' D' F₂}
+  → ChainFunctorEqual F₁ F₂
+  → DependentSimpleFunctorEqual F₁' F₂'
+  → DependentFunctorEqual
+    (dependent-functor-unit F₁')
+    (dependent-functor-unit F₂')
+
+dependent-functor-equal-unit'
+  : {A : Set}
+  → {x₁ x₂ : A}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → (D : A → ChainCategory n)
+  → {C' : DependentSimpleCategory C}
+  → (D' : (x : A) → DependentSimpleCategory (D x))
+  → {F₁ : ChainFunctor C (D x₁)}
+  → {F₂ : ChainFunctor C (D x₂)}
+  → {F₁' : DependentSimpleFunctor C' (D' x₁) F₁}
+  → {F₂' : DependentSimpleFunctor C' (D' x₂) F₂}
+  → x₁ ≡ x₂
+  → ChainFunctorEqual F₁ F₂
+  → DependentSimpleFunctorEqual F₁' F₂'
+  → DependentFunctorEqual
+    (dependent-functor-unit F₁')
+    (dependent-functor-unit F₂')
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-unit
@@ -51,7 +86,7 @@ dependent-functor-identity-unit
   → DependentFunctorIdentity
     (dependent-functor-unit F')
 
-dependent-functor-identity-unit-eq
+dependent-functor-identity-unit'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -86,7 +121,7 @@ dependent-functor-compose-unit
     (dependent-functor-unit G')
     (dependent-functor-unit H')
 
-dependent-functor-compose-unit-eq
+dependent-functor-compose-unit'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -134,7 +169,7 @@ dependent-functor-square-unit
     (dependent-functor-unit H₁')
     (dependent-functor-unit H₂')
 
-dependent-functor-square-unit-eq
+dependent-functor-square-unit'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -176,6 +211,10 @@ dependent-category-unit {n = suc _} {C = C} C'
   ; functor
     = λ f → dependent-functor-unit
       (DependentSimpleCategory.functor C' f)
+  ; functor-equal
+    = λ p → dependent-functor-equal-unit
+      (ChainCategory.functor-equal C p)
+      (DependentSimpleCategory.functor-equal C' p)
   ; functor-identity
     = λ x → dependent-functor-identity-unit
       (ChainCategory.functor-identity C x)
@@ -202,6 +241,25 @@ dependent-functor-unit {n = suc _} {F = F} F'
       (DependentSimpleFunctor.functor-square F' f)
   }
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-unit {n = zero} _ p'
+  = functor-equal-unit p'
+
+dependent-functor-equal-unit {n = suc _} {D = D} {D' = D'} p p'
+  = record
+  { functor
+    = λ x → dependent-functor-equal-unit'
+      (ChainCategory.category' D)
+      (DependentSimpleCategory.category D') 
+      (ChainFunctorEqual.base p x)
+      (ChainFunctorEqual.functor' p x)
+      (DependentSimpleFunctorEqual.functor p' x)
+  }
+
+dependent-functor-equal-unit' _ _ refl
+  = dependent-functor-equal-unit
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-unit {n = zero} _ p'
@@ -210,7 +268,7 @@ dependent-functor-identity-unit {n = zero} _ p'
 dependent-functor-identity-unit {n = suc _} {C = C} {C' = C'} p p'
   = record
   { functor
-    = λ x → dependent-functor-identity-unit-eq
+    = λ x → dependent-functor-identity-unit'
       (ChainCategory.category' C)
       (DependentSimpleCategory.category C')
       (ChainFunctorIdentity.base p x)
@@ -218,7 +276,7 @@ dependent-functor-identity-unit {n = suc _} {C = C} {C' = C'} p p'
       (DependentSimpleFunctorIdentity.functor p' x)
   }
 
-dependent-functor-identity-unit-eq _ _ refl
+dependent-functor-identity-unit' _ _ refl
   = dependent-functor-identity-unit
 
 -- ### DependentFunctorCompose
@@ -229,7 +287,7 @@ dependent-functor-compose-unit {n = zero} _ p'
 dependent-functor-compose-unit {n = suc _} {E = E} {E' = E'} p p'
   = record
   { functor
-    = λ x → dependent-functor-compose-unit-eq
+    = λ x → dependent-functor-compose-unit'
       (ChainCategory.category' E)
       (DependentSimpleCategory.category E')
       (ChainFunctorCompose.base p x)
@@ -237,7 +295,7 @@ dependent-functor-compose-unit {n = suc _} {E = E} {E' = E'} p p'
       (DependentSimpleFunctorCompose.functor p' x)
   }
 
-dependent-functor-compose-unit-eq _ _ refl
+dependent-functor-compose-unit' _ _ refl
   = dependent-functor-compose-unit
 
 -- ### DependentFunctorSquare
@@ -248,7 +306,7 @@ dependent-functor-square-unit {n = zero} _ s'
 dependent-functor-square-unit {n = suc _} {D₂ = D₂} {D₂' = D₂'} s s'
   = record
   { functor
-    = λ x₁ → dependent-functor-square-unit-eq
+    = λ x₁ → dependent-functor-square-unit'
       (ChainCategory.category' D₂)
       (DependentSimpleCategory.category D₂')
       (ChainFunctorSquare.base s x₁)
@@ -256,6 +314,6 @@ dependent-functor-square-unit {n = suc _} {D₂ = D₂} {D₂' = D₂'} s s'
       (DependentSimpleFunctorSquare.functor s' x₁)
   }
 
-dependent-functor-square-unit-eq _ _ refl
+dependent-functor-square-unit' _ _ refl
   = dependent-functor-square-unit
 

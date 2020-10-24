@@ -3,7 +3,8 @@ module Prover.Category.Dependent.Simple where
 open import Prover.Category.Chain
   using (ChainCategory; ChainFunctor)
 open import Prover.Function
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
+  using (Function; FunctionCompose; FunctionEqual; FunctionIdentity;
+    FunctionSquare)
 open import Prover.Function.Dependent
   using (DependentSet)
 open import Prover.Prelude
@@ -38,6 +39,32 @@ record DependentSimpleFunctor'
   (C' : DependentSimpleCategory C)
   (D' : DependentSimpleCategory D)
   (F : ChainFunctor C D)
+  : Set
+
+-- ### DependentSimpleFunctorEqual
+
+DependentSimpleFunctorEqual
+  : {n : ℕ}
+  → {C D₁ D₂ : ChainCategory n}
+  → {C' : DependentSimpleCategory C}
+  → {D₁' : DependentSimpleCategory D₁}
+  → {D₂' : DependentSimpleCategory D₂}
+  → {F₁ : ChainFunctor C D₁}
+  → {F₂ : ChainFunctor C D₂}
+  → DependentSimpleFunctor C' D₁' F₁
+  → DependentSimpleFunctor C' D₂' F₂
+  → Set
+
+record DependentSimpleFunctorEqual'
+  {n : ℕ}
+  {C D₁ D₂ : ChainCategory (suc n)}
+  {C' : DependentSimpleCategory C}
+  {D₁' : DependentSimpleCategory D₁}
+  {D₂' : DependentSimpleCategory D₂}
+  {F₁ : ChainFunctor C D₁}
+  {F₂ : ChainFunctor C D₂}
+  (F₁' : DependentSimpleFunctor C' D₁' F₁)
+  (F₂' : DependentSimpleFunctor C' D₂' F₂)
   : Set
 
 -- ### DependentSimpleFunctorIdentity
@@ -160,6 +187,14 @@ record DependentSimpleCategory' C where
         (category y)
         (ChainCategory.functor C f)
 
+    functor-equal
+      : {x y : ChainCategory.Object C}
+      → {f₁ f₂ : ChainCategory.Arrow C x y}
+      → ChainCategory.ArrowEqual C f₁ f₂
+      → DependentSimpleFunctorEqual
+        (functor f₁)
+        (functor f₂)
+
     functor-identity
       : (x : ChainCategory.Object C)
       → DependentSimpleFunctorIdentity
@@ -210,6 +245,28 @@ record DependentSimpleFunctor' {_ C} C' D' F where
 
 module DependentSimpleFunctor
   = DependentSimpleFunctor'
+
+-- ### DependentSimpleFunctorEqual
+
+DependentSimpleFunctorEqual {n = zero}
+  = FunctionEqual
+DependentSimpleFunctorEqual {n = suc _}
+  = DependentSimpleFunctorEqual'
+
+record DependentSimpleFunctorEqual' {_ C} F₁' F₂' where
+
+  inductive
+
+  field
+
+    functor
+      : (x : ChainCategory.Object C)
+      → DependentSimpleFunctorEqual
+        (DependentSimpleFunctor.functor F₁' x)
+        (DependentSimpleFunctor.functor F₂' x)
+
+module DependentSimpleFunctorEqual
+  = DependentSimpleFunctorEqual'
 
 -- ### DependentSimpleFunctorIdentity
 

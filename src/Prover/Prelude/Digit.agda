@@ -306,8 +306,6 @@ module Internal where
 -- ### Digit
 
 Digit
-  : Set
-Digit
   = Internal.Digit
 
 open Internal public

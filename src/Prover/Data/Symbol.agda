@@ -36,61 +36,51 @@ data SymbolValid
     : {ca : ℕ}
     → SymbolValid true true ca (suc (suc ca))
 
-module _Symbol where
-
-  record Symbol
-    : Set
-    where
-
-    constructor
-      
-      symbol
-
-    field
-
-      {arity}
-        : ℕ
-
-      {has-left}
-        : Bool
-
-      {has-right}
-        : Bool
-
-      {center-arity}
-        : ℕ
-
-      valid
-        : SymbolValid has-left has-right center-arity arity
-
-      name
-        : Identifier
-
-      tokens
-        : Vec Token (suc center-arity)
-
-      precedence
-        : If Precedence (has-left ∨ has-right)
-
-      associativity
-        : If Associativity (has-left ∧ has-right)
-
-Symbol
+record Symbol'
   : Set
-Symbol
-  = _Symbol.Symbol
+  where
 
-open _Symbol public
-  using (symbol)
+  constructor
+    
+    symbol
+
+  field
+
+    {arity}
+      : ℕ
+
+    {has-left}
+      : Bool
+
+    {has-right}
+      : Bool
+
+    {center-arity}
+      : ℕ
+
+    valid
+      : SymbolValid has-left has-right center-arity arity
+
+    name
+      : Identifier
+
+    tokens
+      : Vec Token (suc center-arity)
+
+    precedence
+      : If Precedence (has-left ∨ has-right)
+
+    associativity
+      : If Associativity (has-left ∧ has-right)
+
+Symbol
+  = Symbol'
 
 -- ## Module
 
 module Symbol where
 
-  open _Symbol.Symbol public
-
-  open _Symbol public
-    using (symbol)
+  open Symbol' public
 
   data HasLeft
     : Symbol
@@ -168,18 +158,18 @@ module Symbol where
       → {ia : If Associativity (hl ∧ false)}
       → ¬HasRight (symbol v n ts ip ia)
 
-  valid-eq
+  valid-equal
     : {a ca : ℕ}
     → {hl hr : Bool}
     → (v₁ v₂ : SymbolValid hl hr ca a)
     → v₁ ≡ v₂
-  valid-eq neither neither
+  valid-equal neither neither
     = refl
-  valid-eq left left
+  valid-equal left left
     = refl
-  valid-eq right right
+  valid-equal right right
     = refl
-  valid-eq both both
+  valid-equal both both
     = refl
 
   _≟_tkns
@@ -219,7 +209,7 @@ module Symbol where
   ... | _ | _ | _ | no ¬p
     = no (λ {refl → ¬p refl})
   ... | yes refl | yes refl | yes refl | yes refl
-    with valid-eq v₁ v₂
+    with valid-equal v₁ v₂
     | n₁ ≟ n₂ idn
     | ts₁ ≟ ts₂ tkns
     | ip₁ ≟ ip₂ prc?

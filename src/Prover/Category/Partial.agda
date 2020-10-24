@@ -1,7 +1,7 @@
 module Prover.Category.Partial where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category; Functor; any)
 open import Prover.Function.Partial
   using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
@@ -46,12 +46,22 @@ record PartialFunctor
       → Category.Arrow C x y
       → Category.Arrow D x' y'
 
+    map-equal
+      : {x y : Category.Object C}
+      → {x' y' : Category.Object D}
+      → {f₁ f₂ : Category.Arrow C x y}
+      → (p : base x ≡ just x')
+      → (q : base y ≡ just y')
+      → Category.ArrowEqual C f₁ f₂
+      → Category.ArrowEqual D (map p q f₁) (map p q f₂)
+
     map-identity
       : {x' : Category.Object D}
       → (x : Category.Object C)
       → (p : base x ≡ just x')
-      → map p p (Category.identity C x)
-        ≡ Category.identity D x'
+      → Category.ArrowEqual D
+        (map p p (Category.identity C x))
+        (Category.identity D x')
 
     map-compose
       : {x y z : Category.Object C}
@@ -61,27 +71,58 @@ record PartialFunctor
       → (r : base z ≡ just z')
       → (f : Category.Arrow C y z)
       → (g : Category.Arrow C x y)
-      → map p r (Category.compose C f g)
-        ≡ Category.compose D (map q r f) (map p q g)
+      → Category.ArrowEqual D
+        (map p r (Category.compose C f g))
+        (Category.compose D (map q r f) (map p q g))
 
-  map-eq
+  map-equal'
     : {x₁ x₂ y₁ y₂ : Category.Object C}
-    → {x' y' : Category.Object D}
+    → {x₁' x₂' y₁' y₂' : Category.Object D}
     → {f₁ : Category.Arrow C x₁ y₁}
     → {f₂ : Category.Arrow C x₂ y₂}
-    → (p₁ : base x₁ ≡ just x')
-    → (p₂ : base x₂ ≡ just x')
-    → (q₁ : base y₁ ≡ just y')
-    → (q₂ : base y₂ ≡ just y')
-    → x₁ ≡ x₂
-    → y₁ ≡ y₂
-    → f₁ ≅ f₂
-    → map p₁ q₁ f₁ ≡ map p₂ q₂ f₂
-  map-eq p₁ p₂ q₁ q₂ refl refl refl
+    → (p₁ : base x₁ ≡ just x₁')
+    → (p₂ : base x₂ ≡ just x₂')
+    → (q₁ : base y₁ ≡ just y₁')
+    → (q₂ : base y₂ ≡ just y₂')
+    → Category.ArrowEqual' C f₁ f₂
+    → Category.ArrowEqual' D (map p₁ q₁ f₁) (map p₂ q₂ f₂)
+  map-equal' p₁ p₂ q₁ q₂ (any r)
+    with trans (sym p₁) p₂
+    | trans (sym q₁) q₂
+  ... | refl | refl
     with irrelevant p₁ p₂
     | irrelevant q₁ q₂
   ... | refl | refl
-    = refl
+    = any (map-equal p₁ q₁ r)
+
+  map-identity'
+    : {x₁' x₂' : Category.Object D}
+    → (x : Category.Object C)
+    → (p₁ : base x ≡ just x₁')
+    → (p₂ : base x ≡ just x₂')
+    → Category.ArrowEqual' D
+      (map p₁ p₂ (Category.identity C x))
+      (Category.identity D x₂')
+  map-identity' x p₁ p₂
+    with trans (sym p₁) p₂
+  ... | refl
+    with irrelevant p₁ p₂
+  ... | refl
+    = any (map-identity x p₁)
+
+  map-compose'
+    : {x y z : Category.Object C}
+    → {x' y' z' : Category.Object D}
+    → (p : base x ≡ just x')
+    → (q : base y ≡ just y')
+    → (r : base z ≡ just z')
+    → (f : Category.Arrow C y z)
+    → (g : Category.Arrow C x y)
+    → Category.ArrowEqual' D
+      (map p r (Category.compose C f g))
+      (Category.compose D (map q r f) (map p q g))
+  map-compose' p q r f g
+    = any (map-compose p q r f g)
 
 -- ### Compose
 
@@ -122,19 +163,37 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object C}
+        → {x' y' : Category.Object E}
+        → {f₁ f₂ : Category.Arrow C x y}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → Category.ArrowEqual C f₁ f₂
+        → Category.ArrowEqual E (map p q f₁) (map p q f₂)
+      map-equal {x = x} {y = y} p' q'
+        with PartialFunctor.base G x
+        | inspect (PartialFunctor.base G) x
+        | PartialFunctor.base G y
+        | inspect (PartialFunctor.base G) y
+      ... | just _ | [ p ] | just _ | [ q ]
+        = PartialFunctor.map-equal F p' q'
+        ∘ PartialFunctor.map-equal G p q
+
       map-identity
         : {x' : Category.Object E}
         → (x : Category.Object C)
         → (p : base x ≡ just x')
-        → map p p (Category.identity C x) ≡ Category.identity E x'
+        → Category.ArrowEqual E
+          (map p p (Category.identity C x))
+          (Category.identity E x')
       map-identity x p'
         with PartialFunctor.base G x
         | inspect (PartialFunctor.base G) x
       ... | just x' | [ p ]
-        with PartialFunctor.map G p p (Category.identity C x)
-        | PartialFunctor.map-identity G x p
-      ... | _ | refl
-        = PartialFunctor.map-identity F x' p'
+        = Category.arrow-trans E (PartialFunctor.map-equal F p' p'
+          (PartialFunctor.map-identity G x p))
+        $ PartialFunctor.map-identity F x' p'
   
       map-compose
         : {x y z : Category.Object C}
@@ -144,8 +203,9 @@ module _
         → (r : base z ≡ just z')
         → (f : Category.Arrow C y z)
         → (g : Category.Arrow C x y)
-        → map p r (Category.compose C f g)
-          ≡ Category.compose E (map q r f) (map p q g)
+        → Category.ArrowEqual E
+          (map p r (Category.compose C f g))
+          (Category.compose E (map q r f) (map p q g))
       map-compose {x = x} {y = y} {z = z} p' q' r' f g
         with PartialFunctor.base G x
         | inspect (PartialFunctor.base G) x
@@ -154,10 +214,9 @@ module _
         | PartialFunctor.base G z
         | inspect (PartialFunctor.base G) z
       ... | just _ | [ p ] | just _ | [ q ] | just _ | [ r ]
-        with PartialFunctor.map G p r (Category.compose C f g)
-        | PartialFunctor.map-compose G p q r f g
-      ... | _ | refl
-        = PartialFunctor.map-compose F p' q' r'
+        = Category.arrow-trans E (PartialFunctor.map-equal F p' r'
+          (PartialFunctor.map-compose G p q r f g))
+        $ PartialFunctor.map-compose F p' q' r'
           (PartialFunctor.map G q r f)
           (PartialFunctor.map G p q g)
 
@@ -210,8 +269,9 @@ record PartialFunctorSquare
       → (p₁ : PartialFunctor.base H₁ x₁ ≡ just x₁')
       → (q₁ : PartialFunctor.base H₁ y₁ ≡ just y₁')
       → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → PartialFunctor.map H₂ (base x₁ p₁) (base y₁ q₁) (Functor.map F f₁)
-        ≡ Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁)
+      → Category.ArrowEqual D₂
+        (PartialFunctor.map H₂ (base x₁ p₁) (base y₁ q₁) (Functor.map F f₁))
+        (Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁))
 
   map'
     : {x₁ y₁ : Category.Object C₁}
@@ -223,29 +283,34 @@ record PartialFunctorSquare
     → (q₂ : PartialFunctor.base H₂ (Functor.base F y₁)
       ≡ just (Functor.base G y₁'))
     → (f₁ : Category.Arrow C₁ x₁ y₁)
-    → PartialFunctor.map H₂ p₂ q₂ (Functor.map F f₁)
-      ≡ Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁)
+    → Category.ArrowEqual D₂
+      (PartialFunctor.map H₂ p₂ q₂ (Functor.map F f₁))
+      (Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁))
   map' {x₁ = x₁} {y₁ = y₁} p₁ q₁ p₂ q₂
     with irrelevant p₂ (base x₁ p₁)
     | irrelevant q₂ (base y₁ q₁)
   ... | refl | refl
     = map p₁ q₁
 
-  map-eq
+  map''
     : {x₁ y₁ : Category.Object C₁}
+    → {x₂ y₂ : Category.Object C₂}
     → {x₁' y₁' : Category.Object D₁}
     → {x₂' y₂' : Category.Object D₂}
     → (p₁ : PartialFunctor.base H₁ x₁ ≡ just x₁')
     → (q₁ : PartialFunctor.base H₁ y₁ ≡ just y₁')
-    → (p₂ : PartialFunctor.base H₂ (Functor.base F x₁) ≡ just x₂')
-    → (q₂ : PartialFunctor.base H₂ (Functor.base F y₁) ≡ just y₂')
+    → (p₂ : PartialFunctor.base H₂ x₂ ≡ just x₂')
+    → (q₂ : PartialFunctor.base H₂ y₂ ≡ just y₂')
     → (f₁ : Category.Arrow C₁ x₁ y₁)
-    → Functor.base G x₁' ≡ x₂'
-    → Functor.base G y₁' ≡ y₂'
-    → PartialFunctor.map H₂ p₂ q₂ (Functor.map F f₁)
-      ≅ Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁)
-  map-eq p₁ q₁ p₂ q₂ f₁ refl refl
-    = map' p₁ q₁ p₂ q₂ f₁
+    → {f₂ : Category.Arrow C₂ x₂ y₂}
+    → Category.ArrowEqual' C₂ (Functor.map F f₁) f₂
+    → Category.ArrowEqual' D₂
+      (PartialFunctor.map H₂ p₂ q₂ f₂)
+      (Functor.map G (PartialFunctor.map H₁ p₁ q₁ f₁))
+  map'' {x₁ = x₁} {y₁ = y₁} p₁ q₁ p₂ q₂ f₁ r
+    = Category.arrow-trans' D₂ (Category.arrow-sym' D₂
+      (PartialFunctor.map-equal' H₂ (base x₁ p₁) p₂ (base y₁ q₁) q₂ r))
+    $ any (map p₁ q₁ f₁)
 
   map-arrow
     : {x₁ y₁ : Category.Object C₁}
@@ -261,8 +326,9 @@ record PartialFunctorSquare
     → (r₂ : PartialFunctor.base H₂ x₂ ≡ just x₂')
     → (s₂ : PartialFunctor.base H₂ y₂ ≡ just y₂')
     → (f₁ : Category.Arrow C₁ x₁ y₁)
-    → PartialFunctor.map H₂ r₂ s₂ (Category.arrow C₂ p q (Functor.map F f₁))
-      ≡ Category.arrow D₂ p' q' (Functor.map G (PartialFunctor.map H₁ r₁ s₁ f₁))
+    → Category.ArrowEqual D₂
+      (PartialFunctor.map H₂ r₂ s₂ (Category.arrow C₂ p q (Functor.map F f₁)))
+      (Category.arrow D₂ p' q' (Functor.map G (PartialFunctor.map H₁ r₁ s₁ f₁)))
   map-arrow refl refl refl refl
     = map'
 
@@ -307,13 +373,14 @@ module _
       → (p₁ : PartialFunctor.base (partial-functor-compose I₁ J₁) x₁ ≡ just x₁')
       → (q₁ : PartialFunctor.base (partial-functor-compose I₁ J₁) y₁ ≡ just y₁')
       → (f₁ : Category.Arrow C₁ x₁ y₁)
-      → PartialFunctor.map
-        (partial-functor-compose I₂ J₂)
-        (base x₁ p₁)
-        (base y₁ q₁)
-        (Functor.map F f₁)
-      ≡ Functor.map H
-        (PartialFunctor.map (partial-functor-compose I₁ J₁) p₁ q₁ f₁)
+      → Category.ArrowEqual E₂
+        (PartialFunctor.map
+          (partial-functor-compose I₂ J₂)
+          (base x₁ p₁)
+          (base y₁ q₁)
+          (Functor.map F f₁))
+        (Functor.map H
+          (PartialFunctor.map (partial-functor-compose I₁ J₁) p₁ q₁ f₁))
     map {x₁ = x₁} {y₁ = y₁} p₁' q₁' f₁
       with base x₁ p₁'
       | base y₁ q₁'
@@ -330,11 +397,10 @@ module _
       | inspect (PartialFunctor.base J₂) (Functor.base F y₁)
       | PartialFunctorSquare.base t y₁ q₁
     ... | _ | [ p₂ ] | refl | _ | [ q₂ ] | refl
-      = trans
-        (sub (PartialFunctor.map I₂ p₂' q₂')
-          (PartialFunctorSquare.map' t p₁ q₁ p₂ q₂ f₁))
-        (PartialFunctorSquare.map' s p₁' q₁' p₂' q₂'
-          (PartialFunctor.map J₁ p₁ q₁ f₁))
+      = Category.arrow-trans E₂ (PartialFunctor.map-equal I₂ p₂' q₂'
+        (PartialFunctorSquare.map' t p₁ q₁ p₂ q₂ f₁))
+      $ PartialFunctorSquare.map' s p₁' q₁' p₂' q₂'
+        (PartialFunctor.map J₁ p₁ q₁ f₁)
 
   partial-functor-square-compose
     : PartialFunctorSquare G H I₁ I₂

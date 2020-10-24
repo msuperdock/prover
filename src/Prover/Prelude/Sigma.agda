@@ -57,7 +57,7 @@ module Sigma where
 
   -- ### Equality
 
-  comma-eq
+  comma-equal
     : {A₁ : Set}
     → {A₂ : A₁ → Set}
     → {x₁₁ x₂₁ : A₁}
@@ -66,7 +66,7 @@ module Sigma where
     → x₁₁ ≡ x₂₁
     → x₁₂ ≅ x₂₂
     → (x₁₁ , x₁₂) ≡ (x₂₁ , x₂₂)
-  comma-eq refl refl
+  comma-equal refl refl
     = refl
 
   -- ### Properties

@@ -1,14 +1,17 @@
 module Prover.Category.Product where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
-    FunctorSquare; functor-compose'; functor-compose-from-equal;
-    functor-compose-to-equal; functor-identity'; functor-identity-from-equal;
-    functor-identity-to-equal; functor-square-from-equal;
-    functor-square-to-equal; functor-sym; functor-trans)
+  using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
+    FunctorIdentity; FunctorSquare; any; functor-compose';
+    functor-compose-from-equal; functor-compose-to-equal; functor-identity';
+    functor-identity-from-equal; functor-identity-to-equal;
+    functor-square-from-equal; functor-square-to-equal; functor-sym;
+    functor-trans)
 open import Prover.Prelude
 
 -- ## Category
+
+-- ### Function
 
 module CategoryProduct
   (C₁ : Category)
@@ -29,6 +32,61 @@ module CategoryProduct
     = Category.Arrow C₁ x₁ y₁
     × Category.Arrow C₂ x₂ y₂
 
+  ArrowEqual
+    : {x y : Object}
+    → Arrow x y
+    → Arrow x y
+    → Set
+  ArrowEqual (x₁ , x₂) (y₁ , y₂)
+    = Category.ArrowEqual C₁ x₁ y₁
+    × Category.ArrowEqual C₂ x₂ y₂
+
+  abstract
+
+    arrow-refl
+      : {x y : Object}
+      → {f : Arrow x y}
+      → ArrowEqual f f
+    arrow-refl
+      = Category.arrow-refl C₁
+      , Category.arrow-refl C₂
+
+    arrow-sym
+      : {x y : Object}
+      → {f₁ f₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₁
+    arrow-sym (p₁ , p₂)
+      = Category.arrow-sym C₁ p₁
+      , Category.arrow-sym C₂ p₂
+
+    arrow-trans
+      : {x y : Object}
+      → {f₁ f₂ f₃ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₃
+      → ArrowEqual f₁ f₃
+    arrow-trans (p₁₁ , p₁₂) (p₂₁ , p₂₂)
+      = Category.arrow-trans C₁ p₁₁ p₂₁
+      , Category.arrow-trans C₂ p₁₂ p₂₂
+
+    simplify
+      : {x y : Object}
+      → Arrow x y
+      → Arrow x y
+    simplify (f₁ , f₂)
+      = Category.simplify C₁ f₁
+      , Category.simplify C₂ f₂
+
+    simplify-equal
+      : {x y : Object}
+      → (f : Arrow x y)
+      → ArrowEqual
+        (simplify f) f
+    simplify-equal (f₁ , f₂)
+      = Category.simplify-equal C₁ f₁
+      , Category.simplify-equal C₂ f₂
+
   identity
     : (x : Object)
     → Arrow x x
@@ -47,42 +105,72 @@ module CategoryProduct
 
   abstract
 
+    compose-equal
+      : {x y z : Object}
+      → {f₁ f₂ : Arrow y z}
+      → {g₁ g₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual g₁ g₂
+      → ArrowEqual
+        (compose f₁ g₁)
+        (compose f₂ g₂)
+    compose-equal (p₁ , p₂) (q₁ , q₂)
+      = Category.compose-equal C₁ p₁ q₁
+      , Category.compose-equal C₂ p₂ q₂
+
     precompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose f (identity x) ≡ f
+      → ArrowEqual
+        (compose f (identity x)) f
     precompose (f₁ , f₂)
-      = Sigma.comma-eq
-        (Category.precompose C₁ f₁)
-        (Category.precompose C₂ f₂)
-  
+      = Category.precompose C₁ f₁
+      , Category.precompose C₂ f₂
+
     postcompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose (identity y) f ≡ f
+      → ArrowEqual
+        (compose (identity y) f) f
     postcompose (f₁ , f₂)
-      = Sigma.comma-eq
-        (Category.postcompose C₁ f₁)
-        (Category.postcompose C₂ f₂)
-  
+      = Category.postcompose C₁ f₁
+      , Category.postcompose C₂ f₂
+
     associative
-      : {x y z w : Object}
-      → (f : Arrow z w)
-      → (g : Arrow y z)
-      → (h : Arrow x y)
-      → compose (compose f g) h ≡ compose f (compose g h)
+      : {w x y z : Object}
+      → (f : Arrow y z)
+      → (g : Arrow x y)
+      → (h : Arrow w x)
+      → ArrowEqual
+        (compose (compose f g) h)
+        (compose f (compose g h))
     associative (f₁ , f₂) (g₁ , g₂) (h₁ , h₂)
-      = Sigma.comma-eq
-        (Category.associative C₁ f₁ g₁ h₁)
-        (Category.associative C₂ f₂ g₂ h₂)
-  
+      = Category.associative C₁ f₁ g₁ h₁
+      , Category.associative C₂ f₂ g₂ h₂
+
 category-product
   : Category
   → Category
   → Category
 category-product C₁ C₂
   = record {CategoryProduct C₁ C₂}
-  
+
+-- ### Equality
+
+arrow-equal-product
+  : {C₁ C₂ : Category}
+  → {x₁₁ x₂₁ y₁₁ y₂₁ : Category.Object C₁}
+  → {x₁₂ x₂₂ y₁₂ y₂₂ : Category.Object C₂}
+  → {f₁₁ : Category.Arrow C₁ x₁₁ y₁₁}
+  → {f₁₂ : Category.Arrow C₂ x₁₂ y₁₂}
+  → {f₂₁ : Category.Arrow C₁ x₂₁ y₂₁}
+  → {f₂₂ : Category.Arrow C₂ x₂₂ y₂₂}
+  → Category.ArrowEqual' C₁ f₁₁ f₂₁
+  → Category.ArrowEqual' C₂ f₁₂ f₂₂
+  → Category.ArrowEqual' (category-product C₁ C₂) (f₁₁ , f₁₂) (f₂₁ , f₂₂)
+arrow-equal-product (any p₁) (any p₂)
+  = any (p₁ , p₂)
+
 -- ## Functor
 
 -- ### Function
@@ -113,25 +201,34 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object (category-product C₁ C₂)}
+        → {f₁ f₂ : Category.Arrow (category-product C₁ C₂) x y}
+        → Category.ArrowEqual (category-product C₁ C₂) f₁ f₂
+        → Category.ArrowEqual (category-product D₁ D₂) (map f₁) (map f₂)
+      map-equal (p₁ , p₂)
+        = Functor.map-equal F₁ p₁
+        , Functor.map-equal F₂ p₂
+
       map-identity
         : (x : Category.Object (category-product C₁ C₂))
-        → map (Category.identity (category-product C₁ C₂) x)
-          ≡ Category.identity (category-product D₁ D₂) (base x)
+        → Category.ArrowEqual (category-product D₁ D₂)
+          (map (Category.identity (category-product C₁ C₂) x))
+          (Category.identity (category-product D₁ D₂) (base x))
       map-identity (x₁ , x₂)
-        = Sigma.comma-eq
-          (Functor.map-identity F₁ x₁)
-          (Functor.map-identity F₂ x₂)
-  
+        = Functor.map-identity F₁ x₁
+        , Functor.map-identity F₂ x₂
+
       map-compose
         : {x y z : Category.Object (category-product C₁ C₂)}
         → (f : Category.Arrow (category-product C₁ C₂) y z)
         → (g : Category.Arrow (category-product C₁ C₂) x y)
-        → map (Category.compose (category-product C₁ C₂) f g)
-          ≡ Category.compose (category-product D₁ D₂) (map f) (map g)
+        → Category.ArrowEqual (category-product D₁ D₂)
+          (map (Category.compose (category-product C₁ C₂) f g))
+          (Category.compose (category-product D₁ D₂) (map f) (map g))
       map-compose (f₁ , f₂) (g₁ , g₂)
-        = Sigma.comma-eq
-          (Functor.map-compose F₁ f₁ g₁)
-          (Functor.map-compose F₂ f₂ g₂)
+        = Functor.map-compose F₁ f₁ g₁
+        , Functor.map-compose F₂ f₂ g₂
 
   functor-product
     : Functor C₁ D₁
@@ -144,78 +241,37 @@ module _
 
 -- ### Identity
 
-module FunctorProductIdentity
-  (C₁ C₂ : Category)
-  where
-
-  base
-    : (x : Category.Object (category-product C₁ C₂))
-    → Functor.base
-      (functor-product (functor-identity' C₁) (functor-identity' C₂)) x
-    ≡ Functor.base
-      (functor-identity' (category-product C₁ C₂)) x
-  base _
-    = refl
-
-  map
-    : {x y : Category.Object (category-product C₁ C₂)}
-    → (f : Category.Arrow (category-product C₁ C₂) x y)
-    → Functor.map
-      (functor-product (functor-identity' C₁) (functor-identity' C₂)) f
-    ≅ Functor.map (functor-identity' (category-product C₁ C₂)) f
-  map _
-    = refl
-
 functor-product-identity
   : (C₁ C₂ : Category)
   → FunctorEqual
     (functor-product (functor-identity' C₁) (functor-identity' C₂))
     (functor-identity' (category-product C₁ C₂))
 functor-product-identity C₁ C₂
-  = record {FunctorProductIdentity C₁ C₂}
+  = record
+  { base
+    = λ _ → refl
+  ; map
+    = λ _ → Category.arrow-refl' (category-product C₁ C₂)
+  }
 
 -- ### Compose
 
-module _
-  {C₁ C₂ D₁ D₂ E₁ E₂ : Category}
-  where
-
-  module FunctorProductCompose
-    (F₁ : Functor D₁ E₁)
-    (F₂ : Functor D₂ E₂)
-    (G₁ : Functor C₁ D₁)
-    (G₂ : Functor C₂ D₂)
-    where
-  
-    base
-      : (x : Category.Object (category-product C₁ C₂))
-      → Functor.base
-        (functor-product (functor-compose' F₁ G₁) (functor-compose' F₂ G₂)) x
-      ≡ Functor.base
-        (functor-compose' (functor-product F₁ F₂) (functor-product G₁ G₂)) x
-    base _
-      = refl
-  
-    map
-      : {x y : Category.Object (category-product C₁ C₂)}
-      → (f : Category.Arrow (category-product C₁ C₂) x y)
-      → Functor.map
-        (functor-product (functor-compose' F₁ G₁) (functor-compose' F₂ G₂)) f
-      ≅ Functor.map
-        (functor-compose' (functor-product F₁ F₂) (functor-product G₁ G₂)) f
-    map _
-      = refl
-
-  functor-product-compose
-    : (F₁ : Functor D₁ E₁)
-    → (F₂ : Functor D₂ E₂)
-    → (G₁ : Functor C₁ D₁)
-    → (G₂ : Functor C₂ D₂)
-    → FunctorEqual
-      (functor-product (functor-compose' F₁ G₁) (functor-compose' F₂ G₂))
-      (functor-compose' (functor-product F₁ F₂) (functor-product G₁ G₂))
-  functor-product-compose F₁ F₂ G₁ G₂
-    = record {FunctorProductCompose F₁ F₂ G₁ G₂}
+functor-product-compose
+  : {C₁ C₂ D₁ D₂ E₁ E₂ : Category}
+  → (F₁ : Functor D₁ E₁)
+  → (F₂ : Functor D₂ E₂)
+  → (G₁ : Functor C₁ D₁)
+  → (G₂ : Functor C₂ D₂)
+  → FunctorEqual
+    (functor-product (functor-compose' F₁ G₁) (functor-compose' F₂ G₂))
+    (functor-compose' (functor-product F₁ F₂) (functor-product G₁ G₂))
+functor-product-compose {E₁ = E₁} {E₂ = E₂} _ _ _ _
+  = record
+  { base
+    = λ _ → refl
+  ; map
+    = λ _ → Category.arrow-refl' (category-product E₁ E₂)
+  }
 
 -- ## FunctorEqual
 
@@ -235,33 +291,22 @@ module _
       → Functor.base (functor-product F₁₁ F₁₂) x
         ≅ Functor.base (functor-product F₂₁ F₂₂) x
     base (x₁ , x₂)
-      with Functor.base F₁₁ x₁
-      | FunctorEqual.base p₁ x₁
-      | Functor.base F₁₂ x₂
-      | FunctorEqual.base p₂ x₂
-    ... | _ | refl | _ | refl
-      = refl
-
+      = Sigma.comma-equal
+        (FunctorEqual.base p₁ x₁)
+        (FunctorEqual.base p₂ x₂)
+  
     map
       : {x y : Category.Object (category-product C₁ C₂)}
       → (f : Category.Arrow (category-product C₁ C₂) x y)
-      → Functor.map (functor-product F₁₁ F₁₂) f
-        ≅ Functor.map (functor-product F₂₁ F₂₂) f
-    map {x = (x₁ , x₂)} {y = (y₁ , y₂)} (f₁ , f₂)
-      with Functor.base F₁₁ x₁
-      | FunctorEqual.base p₁ x₁
-      | Functor.base F₁₂ x₂
-      | FunctorEqual.base p₂ x₂
-      | Functor.base F₁₁ y₁
-      | FunctorEqual.base p₁ y₁
-      | Functor.base F₁₂ y₂
-      | FunctorEqual.base p₂ y₂
-      | Functor.map F₁₁ f₁
-      | FunctorEqual.map p₁ f₁
-      | Functor.map F₁₂ f₂
-      | FunctorEqual.map p₂ f₂
-    ... | _ | refl | _ | refl | _ | refl | _ | refl | _ | refl | _ | refl
-      = refl
+      → Category'.ArrowEqual'
+        (category-product D₁ D₂)
+        (category-product D₁ D₂)
+        (Functor.map (functor-product F₁₁ F₁₂) f)
+        (Functor.map (functor-product F₂₁ F₂₂) f)
+    map (f₁ , f₂)
+      = arrow-equal-product
+        (FunctorEqual.map p₁ f₁)
+        (FunctorEqual.map p₂ f₂)
 
   functor-equal-product
     : FunctorEqual F₁₁ F₂₁

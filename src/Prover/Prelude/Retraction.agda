@@ -1,9 +1,9 @@
 module Prover.Prelude.Retraction where
 
 open import Prover.Prelude.Equal
-  using (_≡_; refl)
+  using (_≡_; sub; trans)
 open import Prover.Prelude.Function
-  using (_∘_)
+  using (_$_; _∘_)
 
 -- ## Definition
 
@@ -23,47 +23,27 @@ record Retraction
       → A
 
     to-from
-      : (y : B)
-      → to (from y) ≡ y
+      : (x : B)
+      → to (from x) ≡ x
 
 -- ## Compose
 
-module _
-  {A B C : Set}
-  where
-
-  module RetractionCompose
-    (F : Retraction B C)
-    (G : Retraction A B)
-    where
-
-    to
-      : A
-      → C
-    to
-      = Retraction.to F
-      ∘ Retraction.to G
-  
-    from
-      : C
-      → A
-    from
-      = Retraction.from G
-      ∘ Retraction.from F
-  
-    to-from
-      : (z : C)
-      → to (from z) ≡ z
-    to-from z
-      with Retraction.to G (Retraction.from G (Retraction.from F z))
-      | Retraction.to-from G (Retraction.from F z)
-    ... | _ | refl
-      = Retraction.to-from F z
-
-  retraction-compose
-    : Retraction B C
-    → Retraction A B
-    → Retraction A C
-  retraction-compose F G
-    = record {RetractionCompose F G}
+retraction-compose
+  : {A B C : Set}
+  → Retraction B C
+  → Retraction A B
+  → Retraction A C
+retraction-compose F G
+  = record
+  { to
+    = Retraction.to F
+    ∘ Retraction.to G
+  ; from
+    = Retraction.from G
+    ∘ Retraction.from F
+  ; to-from
+    = λ x
+    → trans (sub (Retraction.to F) (Retraction.to-from G (Retraction.from F x)))
+    $ Retraction.to-from F x
+  }
 

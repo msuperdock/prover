@@ -1,9 +1,9 @@
 module Prover.Function.Partial.List where
 
-open import Prover.Category.Partial.Setoid
-  using (PartialSetoidFunctor)
-open import Prover.Category.Partial.Setoid.List
-  using (partial-setoid-functor-list)
+open import Prover.Category.Partial
+  using (PartialFunctor)
+open import Prover.Category.Partial.List
+  using (partial-functor-list)
 open import Prover.Category.Partial.Unit
   using (partial-functor-unit)
 open import Prover.Function.Partial
@@ -17,7 +17,7 @@ partial-function-list
   → PartialFunction A B
   → PartialFunction (List A) (List B)
 partial-function-list F
-  = PartialSetoidFunctor.partial-function
-  $ partial-setoid-functor-list
+  = PartialFunctor.partial-function
+  $ partial-functor-list
     (partial-functor-unit F)
 

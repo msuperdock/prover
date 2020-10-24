@@ -113,7 +113,7 @@ module Symbols where
     → lookup-member ss (Symbol.name s) ≡ just m
     → s ≡ Member.value m
   lookup-member-just ss s@(symbol _ n _ _ _) p q
-    = Collection.find-member-just-eq ss
+    = Collection.find-member-just-equal ss
       (Bool.from-decidable _≟_idn n ∘ Symbol.name)
       (Unique.decidable symmetric transitive decidable s)
       (Bool.from-decidable-true _≟_idn n n refl)

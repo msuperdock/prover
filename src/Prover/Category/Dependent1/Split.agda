@@ -33,7 +33,7 @@ module Dependent₁SplitFunctor
     = SplitFunctor (split-functor x)
     public
   
-  open module SplitFunctorSquare' {x = x} {y = y} f
+  open module SplitFunctorSquare' {x} {y} f
     = SplitFunctorSquare (split-functor-square {x = x} {y = y} f)
     public using () renaming
     ( partial-functor

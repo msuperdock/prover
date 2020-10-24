@@ -9,7 +9,7 @@ open import Prover.Category.Chain
   using (chain₁-category; chain₁-functor)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 
 -- ## Dependent₁Category
 
@@ -31,17 +31,17 @@ module Dependent₁Category
     = Category (category x)
     public
 
-  open module Functor' {x = x} {y = y} f
+  open module Functor' {x} {y} f
     = Functor (functor {x = x} {y = y} f)
+    public using (base; map; map-compose'; map-identity')
+
+  open module FunctorEqual' {x} {y} {f₁} {f₂} p
+    = FunctorEqual (functor-equal {x = x} {y = y} {f₁ = f₁} {f₂ = f₂} p)
     public using () renaming
     ( base
-      to base
-    ; map
-      to map
-    ; map-identity
-      to map-identity'
-    ; map-compose-eq
-      to map-compose-eq
+      to base-equal
+    ; map'
+      to map-equal
     )
 
   open module FunctorIdentity' x
@@ -53,7 +53,7 @@ module Dependent₁Category
       to map-identity
     )
 
-  open module FunctorCompose' {x = x} {y = y} {z = z} f g
+  open module FunctorCompose' {x} {y} {z} f g
     = FunctorCompose (functor-compose {x = x} {y = y} {z = z} f g)
     public using () renaming
     ( base
@@ -88,9 +88,20 @@ module Dependent₁Functor
 
   open module Functor' x
     = Functor (functor x)
-    public
+    public using () renaming
+    ( base
+      to base
+    ; map
+      to map
+    ; map-equal'
+      to map-equal
+    ; map-identity'
+      to map-identity
+    ; map-compose'
+      to map-compose
+    )
 
-  open module FunctorSquare' {x = x} {y = y} f
+  open module FunctorSquare' {x} {y} f
     = FunctorSquare (functor-square {x = x} {y = y} f)
     public using () renaming
     ( base
@@ -141,39 +152,32 @@ dependent₁-functor-compose {G = G} F' G'
 
 -- ## Dependent₁FunctorEqual
 
-record Dependent₁FunctorEqual
+Dependent₁FunctorEqual
+  : {C D : Category}
+  → {C' : Dependent₁Category C}
+  → {D' : Dependent₁Category D}
+  → {F₁ F₂ : Functor C D}
+  → Dependent₁Functor C' D' F₁
+  → Dependent₁Functor C' D' F₂
+  → Set
+Dependent₁FunctorEqual
+  = DependentFunctorEqual
+
+module Dependent₁FunctorEqual
   {C D : Category}
   {C' : Dependent₁Category C}
   {D' : Dependent₁Category D}
   {F₁ F₂ : Functor C D}
-  (F₁' : Dependent₁Functor C' D' F₁)
-  (F₂' : Dependent₁Functor C' D' F₂)
-  : Set
+  {F₁' : Dependent₁Functor C' D' F₁}
+  {F₂' : Dependent₁Functor C' D' F₂}
+  (p : Dependent₁FunctorEqual F₁' F₂')
   where
 
-  field
+  open DependentFunctorEqual p public
 
-    functor
-      : FunctorEqual F₁ F₂
-
-  open FunctorEqual functor public
-
-  field
-
-    functor'
-      : (x : Category.Object C)
-      → FunctorEqual
-        (Dependent₁Functor.functor F₁' x)
-        (Dependent₁Functor.functor F₂' x)
-
-  open module Functor' x
-    = FunctorEqual (functor' x)
-    public using () renaming
-    ( base
-      to base'
-    ; map
-      to map'
-    )
+  open module FunctorEqual' x
+    = FunctorEqual (functor x)
+    public
 
 -- ## Dependent₁FunctorIdentity
 
@@ -205,17 +209,14 @@ dependent₁-functor-identity-to-equal
   → {C' : Dependent₁Category C}
   → {F : Functor C C}
   → {F' : Dependent₁Functor C' C' F}
-  → FunctorIdentity F
   → Dependent₁FunctorIdentity F'
   → Dependent₁FunctorEqual F'
     (dependent₁-functor-identity C')
-dependent₁-functor-identity-to-equal p p'
+dependent₁-functor-identity-to-equal p
   = record
   { functor
-    = functor-identity-to-equal p
-  ; functor'
     = λ x → functor-identity-to-equal
-      (Dependent₁FunctorIdentity.functor p' x)
+      (Dependent₁FunctorIdentity.functor p x)
   }
 
 -- ## Dependent₁FunctorCompose
@@ -266,17 +267,14 @@ dependent₁-functor-compose-to-equal
   → {F' : Dependent₁Functor D' E' F}
   → {G' : Dependent₁Functor C' D' G}
   → {H' : Dependent₁Functor C' E' H}
-  → FunctorCompose F G H
   → Dependent₁FunctorCompose F' G' H'
   → Dependent₁FunctorEqual H'
     (dependent₁-functor-compose F' G')
-dependent₁-functor-compose-to-equal p p'
+dependent₁-functor-compose-to-equal p
   = record
   { functor
-    = functor-compose-to-equal p
-  ; functor'
     = λ x → functor-compose-to-equal
-      (Dependent₁FunctorCompose.functor p' x)
+      (Dependent₁FunctorCompose.functor p x)
   }
 
 -- ## Dependent₁FunctorSquare
@@ -336,17 +334,14 @@ dependent₁-functor-square-to-equal
   → {G' : Dependent₁Functor D₁' D₂' G}
   → {H₁' : Dependent₁Functor C₁' D₁' H₁}
   → {H₂' : Dependent₁Functor C₂' D₂' H₂}
-  → FunctorSquare F G H₁ H₂
   → Dependent₁FunctorSquare F' G' H₁' H₂'
   → Dependent₁FunctorEqual
     (dependent₁-functor-compose H₂' F')
     (dependent₁-functor-compose G' H₁')
-dependent₁-functor-square-to-equal s s'
+dependent₁-functor-square-to-equal s
   = record
   { functor
-    = functor-square-to-equal s
-  ; functor'
     = λ x → functor-square-to-equal
-      (Dependent₁FunctorSquare.functor s' x)
+      (Dependent₁FunctorSquare.functor s x)
   }
 

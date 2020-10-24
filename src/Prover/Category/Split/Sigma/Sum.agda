@@ -1,18 +1,18 @@
 module Prover.Category.Split.Sigma.Sum where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category; Functor; functor-square-compose)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor)
 open import Prover.Category.Dependent1.Split
   using (Dependent₁SplitFunctor; Dependent₁SplitFunctorSquare)
 open import Prover.Category.Sigma.Maybe
-  using (category-sigma-maybe; functor-sigma-maybe)
+  using (category-sigma-maybe; functor-sigma-maybe; functor-square-sigma-maybe₁)
 open import Prover.Category.Sigma.Sum
   using (category-sigma-sum; functor-sigma-sum)
 open import Prover.Category.Split
-  using (SplitFunctor; SplitFunctorSquare; split-functor-weak;
-    split-functor-square-weak)
+  using (SplitFunctor; SplitFunctorSquare; split-functor-compose;
+    split-functor-square-compose; split-functor-square-weak; split-functor-weak)
 open import Prover.Category.Split.Sigma.Maybe
   using (split-functor-sigma-maybe; split-functor-square-sigma-maybe)
 open import Prover.Category.Split.Sum
@@ -33,11 +33,12 @@ split-functor-sigma-sum
     (category-sigma-sum C₂ F₁)
     (category-sigma-maybe D₂)
 split-functor-sigma-sum {C₂ = C₂} F₁ F₂
-  = split-functor-sum₂
-    (weak-functor-compose
-      (weak-functor-sigma-maybe₁ C₂)
-      (split-functor-weak F₁))
+  = split-functor-compose
     (split-functor-sigma-maybe F₂)
+    (split-functor-sum₂
+      (weak-functor-compose
+        (weak-functor-sigma-maybe₁ C₂)
+        (split-functor-weak F₁)))
 
 -- ## SplitFunctorSquare
 
@@ -61,9 +62,15 @@ split-functor-square-sigma-sum
     (split-functor-sigma-sum H₁₁ H₁₂)
     (split-functor-sigma-sum H₂₁ H₂₂)
 split-functor-square-sigma-sum {F₂ = F₂} s₁ s₂
-  = split-functor-square-sum₂
-    (weak-functor-square-compose
-      (weak-functor-square-sigma-maybe₁ F₂)
-      (split-functor-square-weak s₁))
+  = split-functor-square-compose
     (split-functor-square-sigma-maybe s₂)
+    (split-functor-square-sum₂
+      (functor-square-compose
+        (SplitFunctorSquare.functor s₁)
+        (functor-square-sigma-maybe₁ F₂))
+      (weak-functor-square-compose
+        (functor-square-sigma-maybe₁ F₂)
+        (SplitFunctorSquare.functor s₁)
+        (weak-functor-square-sigma-maybe₁ F₂)
+        (split-functor-square-weak s₁)))
 

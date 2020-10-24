@@ -923,15 +923,16 @@ module InnerEditor
       to StateArrow
     ; identity
       to state-identity
-    ; compose
-      to state-compose
-    ; precompose
-      to state-precompose
-    ; postcompose
-      to state-postcompose
-    ; associative
-      to state-associative
     )
+
+  state-compose
+    : {s t u : State}
+    → StateArrow t u
+    → StateArrow s t
+    → StateArrow s u
+  state-compose f g
+    = Category.simplify StateCategory
+      (Category.compose StateCategory f g)
 
   open Editor editor public
 

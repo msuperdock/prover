@@ -167,6 +167,27 @@ module List where
   concat (xs ∷ xss)
     = append xs (concat xss)
 
+  -- ### Equality
+
+  module _
+    {A : Set}
+    where
+
+    decidable
+      : Decidable (Equal A)
+      → Decidable (Equal (List A))
+    decidable d
+      = Any.decidable (Vec A) _≟_nat (Vec.decidable d)
+
+    cons-equal
+      : {x₁ x₂ : A}
+      → {xs₁ xs₂ : List A}
+      → x₁ ≡ x₂
+      → xs₁ ≡ xs₂
+      → Equal (List A) (x₁ ∷ xs₁) (x₂ ∷ xs₂)
+    cons-equal refl refl
+      = refl
+
   -- ### Construction
 
   module _
@@ -206,28 +227,13 @@ module List where
     to-builtin (any xs)
       = Vec.to-builtin xs
   
-    from-builtin-to-builtin
+    from-to-builtin
       : (xs : List A)
       → from-builtin (to-builtin xs) ≡ xs
-    from-builtin-to-builtin (any nil)
+    from-to-builtin (any nil)
       = refl
-    from-builtin-to-builtin (any (cons _ xs))
-      with from-builtin (to-builtin xs)
-      | from-builtin-to-builtin xs
-    ... | _ | refl
-      = refl
-
-  -- ### Equality
-
-  module _
-    {A : Set}
-    where
-
-    decidable
-      : Decidable (Equal A)
-      → Decidable (Equal (List A))
-    decidable d
-      = Any.decidable (Vec A) _≟_nat (Vec.decidable d)
+    from-to-builtin (any (cons _ xs))
+      = cons-equal refl (from-to-builtin xs)
 
   -- ### Membership
 
@@ -399,14 +405,14 @@ module List where
   lookup-map f (any xs)
     = Vec.lookup-map f xs
 
-  map-eq
+  map-equal
     : {A B : Set}
     → (f₁ f₂ : A → B)
     → ((x : A) → f₁ x ≡ f₂ x)
     → (xs : List A)
     → map f₁ xs ≡ map f₂ xs
-  map-eq f₁ f₂ p (any xs)
-    = sub any (Vec.map-eq f₁ f₂ p xs)
+  map-equal f₁ f₂ p (any xs)
+    = sub any (Vec.map-equal f₁ f₂ p xs)
 
   map-identity
     : {A : Set}

@@ -48,6 +48,17 @@ module Char where
   {-# COMPILE GHC is-space
     = isSpace #-}
 
+  -- ### Equality
+
+  _≟_char
+    : Decidable (Equal Char)
+  c₁ ≟ c₂ char
+    with to-nat c₁ ≟ to-nat c₂ nat
+  ... | no ¬p
+    = no (λ {refl → ¬p refl})
+  ... | yes p
+    = yes (from-builtin (to-nat-injective c₁ c₂ (to-builtin p)))
+  
   -- ### Conversion
 
   from-digit
@@ -142,17 +153,6 @@ module Char where
   is-digit-from-digit 9d
     = refl
 
-  -- ### Equality
-
-  _≟_char
-    : Decidable (Equal Char)
-  c₁ ≟ c₂ char
-    with to-nat c₁ ≟ to-nat c₂ nat
-  ... | no ¬p
-    = no (λ {refl → ¬p refl})
-  ... | yes p
-    = yes (from-builtin (to-nat-injective c₁ c₂ (to-builtin p)))
-  
 -- ## Exports
 
 open Char public

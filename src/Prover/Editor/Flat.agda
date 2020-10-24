@@ -59,39 +59,22 @@ record FlatViewStackMap
 
 -- #### Compose
 
-module _
-  {V W X : FlatViewStack}
-  where
-
-  module FlatViewStackMapCompose
-    (F : FlatViewStackMap W X)
-    (G : FlatViewStackMap V W)
-    where
-
-    view-with
-      : (v : FlatViewStack.View V)
-      → FlatViewStack.ViewPath V v
-      → FlatViewStack.View X
-    view-with v vp
-      = FlatViewStackMap.view-with F
-        (FlatViewStackMap.view-with G v vp)
-        (FlatViewStackMap.view-path G v vp)
-    
-    view-path
-      : (v : FlatViewStack.View V)
-      → (vp : FlatViewStack.ViewPath V v)
-      → FlatViewStack.ViewPath X (view-with v vp)
-    view-path v vp
-      = FlatViewStackMap.view-path F
-        (FlatViewStackMap.view-with G v vp)
-        (FlatViewStackMap.view-path G v vp)
-
-  flat-view-stack-map-compose
-    : FlatViewStackMap W X
-    → FlatViewStackMap V W
-    → FlatViewStackMap V X
-  flat-view-stack-map-compose F G
-    = record {FlatViewStackMapCompose F G}
+flat-view-stack-map-compose
+  : {V W X : FlatViewStack}
+  → FlatViewStackMap W X
+  → FlatViewStackMap V W
+  → FlatViewStackMap V X
+flat-view-stack-map-compose F G
+  = record
+  { view-with
+    = λ v vp → FlatViewStackMap.view-with F
+      (FlatViewStackMap.view-with G v vp)
+      (FlatViewStackMap.view-path G v vp)
+  ; view-path
+    = λ v vp → FlatViewStackMap.view-path F
+      (FlatViewStackMap.view-with G v vp)
+      (FlatViewStackMap.view-path G v vp)
+  }
 
 -- ### FlatEventStackMap
 

@@ -1183,11 +1183,6 @@ module Right where
 -- ### FormulaState
 
 FormulaState
-  : Symbols
-  → Variables
-  → Bool
-  → Set
-FormulaState
   = Internal.FormulaState
 
 open Internal.FormulaStateHasLeft public
@@ -1221,12 +1216,6 @@ module FormulaState where
 -- ### FormulaStatePath
 
 FormulaStatePath
-  : {ss : Symbols}
-  → {vs : Variables}
-  → {m : Bool}
-  → FormulaState ss vs m
-  → Set
-FormulaStatePath
   = Internal.FormulaStatePath
 
 open Internal.FormulaStatePath public
@@ -1246,12 +1235,6 @@ module FormulaStatePath where
 
 -- ### SandboxState
 
-SandboxState
-  : Symbols
-  → Variables
-  → Bool
-  → ℕ
-  → Set
 SandboxState
   = Internal.SandboxState
 
@@ -1277,12 +1260,6 @@ module SandboxState where
 
 -- ### SandboxStatePath
 
-SandboxStatePath
-  : {ss : Symbols}
-  → {vs : Variables}
-  → {m : Bool}
-  → Any (SandboxState ss vs m)
-  → Set
 SandboxStatePath
   = Internal.SandboxStatePath
 

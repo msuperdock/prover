@@ -4,8 +4,6 @@ open import Agda.Builtin.Equality
   using (refl)
 open import Prover.Prelude.Empty
   using (¬_)
-open import Prover.Prelude.Function
-  using (id)
 
 open Agda.Builtin.Equality using () renaming
   ( _≡_
@@ -35,14 +33,6 @@ Equal
   → A
   → Set
 Equal _ x₁ x₂
-  = x₁ ≅ x₂
-
-Equal'
-  : (A B : Set)
-  → A
-  → B
-  → Set
-Equal' _ _ x₁ x₂
   = x₁ ≅ x₂
 
 _≡_
@@ -80,8 +70,8 @@ trans
   → x₁ ≅ x₂
   → x₂ ≅ x₃
   → x₁ ≅ x₃
-trans refl refl
-  = refl
+trans refl p
+  = p
 
 sub
   : {A B : Set}
@@ -130,8 +120,8 @@ rewrite'
   → x₁ ≡ x₂
   → P x₂
   → P x₁
-rewrite' _ refl
-  = id
+rewrite' _ refl p
+  = p
 
 rewrite₂
   : {A B : Set}
@@ -142,6 +132,6 @@ rewrite₂
   → y₁ ≡ y₂
   → P x₂ y₂
   → P x₁ y₁
-rewrite₂ _ refl refl
-  = id
+rewrite₂ _ refl refl p
+  = p
 

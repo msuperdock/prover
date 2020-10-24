@@ -15,7 +15,7 @@ open import Prover.Data.Symbol
 open import Prover.Data.Symbols
   using (Symbols; sym_∈?_)
 open import Prover.Data.Token
-  using (Token; token)
+  using (IsValid; Token; token)
 open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
@@ -90,7 +90,7 @@ postulate
 
   is-valid
     : (s : String)
-    → Token.IsValid (String.to-list s)
+    → IsValid (String.to-list s)
 
 token'
   : String

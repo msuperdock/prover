@@ -65,11 +65,11 @@ record Encoding
 
 -- ## Conversion
 
-encoding-from-split-function
+split-function-encoding
   : {A B : Set}
   → SplitFunction A B
   → Encoding B A
-encoding-from-split-function F
+split-function-encoding F
   = record
   { encode
     = SplitFunction.unbase F
@@ -87,7 +87,7 @@ encoding-map
   → Encoding A B
   → Encoding C B
 encoding-map F e
-  = encoding-from-split-function
+  = split-function-encoding
   $ split-function-compose F
     (Encoding.split-function e)
 
@@ -97,7 +97,7 @@ encoding-comap
   → Encoding A B
   → Encoding A C
 encoding-comap F e
-  = encoding-from-split-function
+  = split-function-encoding
   $ split-function-compose
     (Encoding.split-function e) F
 

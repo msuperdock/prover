@@ -40,13 +40,13 @@ record Dependent₁PartialFunctor
         (partial-functor x)
         (partial-functor y)
 
-  open module PartialFunctorSquare' {x = x} {y = y} f
+  open module PartialFunctorSquare' {x} {y} f
     = PartialFunctorSquare (partial-functor-square {x = x} {y = y} f)
     public using () renaming
     ( base
       to base-square
-    ; map
-      to map-square
+    ; map''
+      to map-square''
     )
 
 -- ## Dependent₁PartialFunctorSquare

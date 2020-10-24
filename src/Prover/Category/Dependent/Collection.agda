@@ -1,14 +1,15 @@
 module Prover.Category.Dependent.Collection where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorEqual;
+    ChainFunctorIdentity; ChainFunctorSquare)
 open import Prover.Category.Collection
   using (category-collection; functor-collection; functor-compose-collection;
-    functor-identity-collection; functor-square-collection)
+    functor-equal-collection; functor-identity-collection;
+    functor-square-collection)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Dependent.Relation
   using (DependentInjective; DependentRelation)
 open import Prover.Prelude
@@ -39,6 +40,49 @@ dependent-functor-collection
   → DependentFunctor
     (dependent-category-collection R)
     (dependent-category-collection S) F
+
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-collection
+  : {n : ℕ}
+  → {C D : ChainCategory n}
+  → {C' : DependentCategory C}
+  → {D' : DependentCategory D}
+  → {R : DependentRelation C'}
+  → {S : DependentRelation D'}
+  → {F₁ F₂ : ChainFunctor C D}
+  → {F₁' : DependentFunctor C' D' F₁}
+  → {F₂' : DependentFunctor C' D' F₂}
+  → (i₁ : DependentInjective R S F₁')
+  → (i₂ : DependentInjective R S F₂')
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁' F₂'
+  → DependentFunctorEqual
+    (dependent-functor-collection i₁)
+    (dependent-functor-collection i₂)
+
+dependent-functor-equal-collection'
+  : {A : Set}
+  → {x₁ x₂ : A}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → (D : A → ChainCategory n)
+  → {C' : DependentCategory C}
+  → (D' : (x : A) → DependentCategory (D x))
+  → {R : DependentRelation C'}
+  → (S : (x : A) → DependentRelation (D' x))
+  → {F₁ : ChainFunctor C (D x₁)}
+  → {F₂ : ChainFunctor C (D x₂)}
+  → {F₁' : DependentFunctor C' (D' x₁) F₁}
+  → {F₂' : DependentFunctor C' (D' x₂) F₂}
+  → (i₁ : DependentInjective R (S x₁) F₁')
+  → (i₂ : DependentInjective R (S x₂) F₂')
+  → x₁ ≡ x₂
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁' F₂'
+  → DependentFunctorEqual
+    (dependent-functor-collection i₁)
+    (dependent-functor-collection i₂)
 
 -- ### DependentFunctorIdentity
 
@@ -210,6 +254,12 @@ dependent-category-collection {n = suc _} {C = C} {C' = C'} R
   ; functor
     = λ f → dependent-functor-collection
       (DependentRelation.injective R f)
+  ; functor-equal
+    = λ {_} {_} {f₁} {f₂} p → dependent-functor-equal-collection
+      (DependentRelation.injective R f₁)
+      (DependentRelation.injective R f₂)
+      (ChainCategory.functor-equal C p)
+      (DependentCategory.functor-equal C' p)
   ; functor-identity
     = λ x → dependent-functor-identity-collection
       (DependentRelation.injective R (ChainCategory.identity C x))
@@ -243,6 +293,29 @@ dependent-functor-collection {n = suc _} {R = R} {S = S} {F = F} {F' = F'} i
       (ChainFunctor.functor-square F f)
       (DependentFunctor.functor-square F' f)
   }
+
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-collection {n = zero} i₁ i₂ _ p'
+  = functor-equal-collection i₁ i₂ p'
+
+dependent-functor-equal-collection {n = suc _}
+  {D = D} {D' = D'} {S = S} i₁ i₂ p p'
+  = record
+  { functor
+    = λ x → dependent-functor-equal-collection'
+      (ChainCategory.category' D)
+      (DependentCategory.category D')
+      (DependentRelation.relation S)
+      (DependentInjective.injective i₁ x)
+      (DependentInjective.injective i₂ x)
+      (ChainFunctorEqual.base p x)
+      (ChainFunctorEqual.functor' p x)
+      (DependentFunctorEqual.functor p' x)
+  }
+
+dependent-functor-equal-collection' _ _ _ i₁ i₂ refl
+  = dependent-functor-equal-collection i₁ i₂
 
 -- ### DependentFunctorIdentity
 

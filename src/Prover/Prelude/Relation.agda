@@ -86,27 +86,20 @@ module Transitive where
 
 -- ## Decidable
 
-module _Dec where
-
-  data Dec
-    (P : Set)
-    : Set
-    where
-
-    yes
-      : P
-      → Dec P
-    no
-      : ¬ P
-      → Dec P
-
-Dec
+data Dec'
+  (P : Set)
   : Set
-  → Set
-Dec
-  = _Dec.Dec
+  where
 
-open _Dec.Dec public
+  yes
+    : P
+    → Dec' P
+  no
+    : ¬ P
+    → Dec' P
+
+Dec
+  = Dec'
 
 module Dec where
 

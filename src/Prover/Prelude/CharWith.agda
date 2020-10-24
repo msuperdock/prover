@@ -23,33 +23,25 @@ open import Prover.Prelude.Retraction
 
 -- ## Definition
 
-module _CharWith where
+record CharWith'
+  (p : Char → Bool)
+  : Set
+  where
 
-  record CharWith
-    (p : Char → Bool)
-    : Set
-    where
+  constructor
   
-    constructor
-    
-      char-with
+    char-with
+
+  field
   
-    field
-    
-      char
-        : Char
-  
-      IsValid
-        : T (p char)
+    char
+      : Char
+
+    IsValid
+      : T (p char)
 
 CharWith
-  : (Char → Bool)
-  → Set
-CharWith
-  = _CharWith.CharWith
-
-open _CharWith public
-  using (char-with)
+  = CharWith'
 
 -- ## Module
 
@@ -57,32 +49,19 @@ module CharWith where
 
   -- ### Characters
 
-  open _CharWith.CharWith public
+  open CharWith' public
 
-  module CharWithRetraction where
-  
-    to
-      : CharWith (const true)
-      → Char
-    to
-      = char
-    
-    from
-      : Char
-      → CharWith (const true)
-    from c
-      = char-with c refl
-  
-    to-from
-      : (c : Char)
-      → to (from c) ≡ c
-    to-from _
-      = refl
-  
   retraction
     : Retraction (CharWith (const true)) Char
   retraction
-    = record {CharWithRetraction}
+    = record
+    { to
+      = char
+    ; from
+      = λ c → char-with c refl
+    ; to-from
+      = λ _ → refl
+    }
 
   -- ### Digits
 

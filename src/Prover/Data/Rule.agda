@@ -17,58 +17,47 @@ open Vec
 
 -- ## Definition
 
-module _Rule where
+record Rule'
+  (ss : Symbols)
+  : Set
+  where
 
-  record Rule
-    (ss : Symbols)
-    : Set
-    where
+  constructor
+  
+    rule
 
-    constructor
-    
-      rule
+  field
 
-    field
+    name
+      : Identifier
 
-      name
-        : Identifier
+    variables
+      : Variables
 
-      variables
-        : Variables
+    hypotheses
+      : List (Formula ss variables false)
 
-      hypotheses
-        : List (Formula ss variables false)
+    conclusion
+      : Formula ss variables false
 
-      conclusion
-        : Formula ss variables false
+  arity
+    : ℕ
+  arity
+    = List.length hypotheses
 
-    arity
-      : ℕ
-    arity
-      = List.length hypotheses
-
-    hypotheses-vec
-      : Vec (Formula ss variables false) arity
-    hypotheses-vec
-      = List.to-vec hypotheses
+  hypotheses-vec
+    : Vec (Formula ss variables false) arity
+  hypotheses-vec
+    = List.to-vec hypotheses
 
 Rule
-  : Symbols
-  → Set
-Rule
-  = _Rule.Rule
-
-open _Rule public
-  using (rule)
+  = Rule'
 
 -- ## Module
 
 module Rule where
 
-  open _Rule.Rule public
-
-  open _Rule public
-    using (rule)
+  open Rule' public
 
   -- ### Equality
 

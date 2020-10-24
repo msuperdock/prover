@@ -6,6 +6,16 @@ open import Prover.Function.Partial
   using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
 
+open Prover.Function using () renaming
+  ( function
+    to function'
+  )
+
+open Prover.Function.Partial using () renaming
+  ( partial-function
+    to partial-function'
+  )
+
 -- ## SplitFunction
 
 -- ### Definition
@@ -35,57 +45,24 @@ record SplitFunction
   field
 
     base-unbase
-      : (x' : B)
-      → base (unbase x') ≡ just x'
+      : (x : B)
+      → base (unbase x) ≡ just x
 
 -- ### Conversion
 
-module _
-  {A B : Set}
-  where
-
-  module SplitFunctionFromRetraction
-    (F : Retraction A B)
-    where
-
-    open Retraction F public using () renaming
-      ( from
-        to unbase
-      )
-
-    base
-      : A
-      → Maybe B
-    base x
-      = just (Retraction.to F x)
-
-    partial-function
-      : PartialFunction A B
-    partial-function
-      = record
-      { base
-        = base
-      }
-
-    function
-      : Function B A
-    function
-      = record
-      { base
-        = unbase
-      }
-
-    base-unbase
-      : (x' : B)
-      → base (unbase x') ≡ just x'
-    base-unbase x'
-      = sub just (Retraction.to-from F x')
-
-  split-function-from-retraction
-    : Retraction A B
-    → SplitFunction A B
-  split-function-from-retraction F
-    = record {SplitFunctionFromRetraction F}
+retraction-split
+  : {A B : Set}
+  → Retraction A B
+  → SplitFunction A B
+retraction-split F
+  = record
+  { partial-function
+    = partial-function' (just ∘ Retraction.to F)
+  ; function
+    = function' (Retraction.from F)
+  ; base-unbase
+    = sub just ∘ Retraction.to-from F
+  }
 
 -- ## SplitFunctionSquare
 

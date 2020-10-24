@@ -142,8 +142,6 @@ open Internal public
 -- ### RichText
 
 RichText
-  : Set
-RichText
   = Internal.RichText
 
 open Internal public

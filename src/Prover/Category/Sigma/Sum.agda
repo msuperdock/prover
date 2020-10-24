@@ -1,20 +1,20 @@
 module Prover.Category.Sigma.Sum where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare;
-    functor-compose'; functor-square-compose)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare; functor-compose'; functor-square-compose)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor; Dependent₁FunctorCompose;
-    Dependent₁FunctorIdentity; Dependent₁FunctorSquare)
+    Dependent₁FunctorEqual; Dependent₁FunctorIdentity; Dependent₁FunctorSquare)
 open import Prover.Category.Sigma.Maybe
-  using (functor-compose-sigma-maybe; functor-identity-sigma-maybe;
-    functor-sigma-maybe₁; functor-square-sigma-maybe;
-    functor-square-sigma-maybe₁)
+  using (functor-compose-sigma-maybe; functor-equal-sigma-maybe;
+    functor-identity-sigma-maybe; functor-sigma-maybe₁;
+    functor-square-sigma-maybe; functor-square-sigma-maybe₁)
 open import Prover.Category.Split
   using (SplitFunctor; SplitFunctorSquare)
 open import Prover.Category.Sum
-  using (category-sum; functor-sum; functor-compose-sum; functor-identity-sum;
-    functor-square-sum)
+  using (category-sum; functor-sum; functor-compose-sum; functor-equal-sum;
+    functor-identity-sum; functor-square-sum)
 
 -- ## Category
 
@@ -49,6 +49,36 @@ functor-sigma-sum H₂₂ s₁
     (functor-square-compose
       (SplitFunctorSquare.functor s₁)
       (functor-square-sigma-maybe₁ H₂₂))
+
+-- ## FunctorEqual
+
+functor-equal-sigma-sum
+  : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {D₂₂ : Dependent₁Category D₂₁}
+  → {F₁ : SplitFunctor C₁₁ C₂₁}
+  → {G₁ : SplitFunctor D₁₁ D₂₁}
+  → {H₁₁₁ H₂₁₁ : Functor C₁₁ D₁₁}
+  → {H₁₂₁ H₂₂₁ : Functor C₂₁ D₂₁}
+  → {H₁₂₂ : Dependent₁Functor C₂₂ D₂₂ H₁₂₁}
+  → {H₂₂₂ : Dependent₁Functor C₂₂ D₂₂ H₂₂₁}
+  → (s₁₁ : SplitFunctorSquare H₁₁₁ H₁₂₁ F₁ G₁)
+  → (s₂₁ : SplitFunctorSquare H₂₁₁ H₂₂₁ F₁ G₁)
+  → FunctorEqual H₁₁₁ H₂₁₁
+  → FunctorEqual H₁₂₁ H₂₂₁
+  → Dependent₁FunctorEqual H₁₂₂ H₂₂₂
+  → FunctorEqual
+    (functor-sigma-sum H₁₂₂ s₁₁)
+    (functor-sigma-sum H₂₂₂ s₂₁)
+functor-equal-sigma-sum {H₁₂₂ = H₁₂₂} {H₂₂₂ = H₂₂₂} s₁₁ s₂₁ p₁₁ p₂₁ p₂₂
+  = functor-equal-sum
+    (functor-square-compose
+      (SplitFunctorSquare.functor s₁₁)
+      (functor-square-sigma-maybe₁ H₁₂₂))
+    (functor-square-compose
+      (SplitFunctorSquare.functor s₂₁)
+      (functor-square-sigma-maybe₁ H₂₂₂)) p₁₁
+    (functor-equal-sigma-maybe p₂₁ p₂₂)
 
 -- ## FunctorIdentity
 

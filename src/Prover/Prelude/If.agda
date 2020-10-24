@@ -9,29 +9,21 @@ open import Prover.Prelude.Relation
 
 -- ## Definition
 
-module _If where
-
-  data If
-    (A : Set)
-    : Bool
-    → Set
-    where
-  
-    nothing
-      : If A false
-  
-    just
-      : A
-      → If A true
-
-If
-  : Set
-  → Bool
+data If'
+  (A : Set)
+  : Bool
   → Set
-If
-  = _If.If
+  where
 
-open _If.If public
+  nothing
+    : If' A false
+
+  just
+    : A
+    → If' A true
+
+If
+  = If'
 
 -- ## Module
 

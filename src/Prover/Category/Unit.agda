@@ -1,12 +1,16 @@
 module Prover.Category.Unit where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare)
 open import Prover.Function
-  using (Function; FunctionCompose; FunctionIdentity; FunctionSquare)
+  using (Function; FunctionCompose; FunctionEqual; FunctionIdentity;
+    FunctionSquare)
 open import Prover.Prelude
 
 -- ## Category
+
+-- ### Function
 
 module CategoryUnit
   (A : Set)
@@ -18,14 +22,62 @@ module CategoryUnit
     = A
 
   record Arrow
-    (x : Object)
-    (y : Object)
+    (x y : Object)
     : Set
     where
 
     constructor
 
       arrow
+
+  ArrowEqual
+    : {x y : Object}
+    → Arrow x y
+    → Arrow x y
+    → Set
+  ArrowEqual f₁ f₂
+    = f₁ ≡ f₂
+
+  abstract
+
+    arrow-refl
+      : {x y : Object}
+      → {f : Arrow x y}
+      → ArrowEqual f f
+    arrow-refl
+      = refl
+
+    arrow-sym
+      : {x y : Object}
+      → {f₁ f₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₁
+    arrow-sym
+      = sym
+
+    arrow-trans
+      : {x y : Object}
+      → {f₁ f₂ f₃ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₃
+      → ArrowEqual f₁ f₃
+    arrow-trans
+      = trans
+
+    simplify
+      : {x y : Object}
+      → Arrow x y
+      → Arrow x y
+    simplify
+      = id
+
+    simplify-equal
+      : {x y : Object}
+      → (f : Arrow x y)
+      → ArrowEqual
+        (simplify f) f
+    simplify-equal _
+      = arrow-refl
 
   identity
     : (x : Object)
@@ -43,27 +95,43 @@ module CategoryUnit
 
   abstract
 
+    compose-equal
+      : {x y z : Object}
+      → {f₁ f₂ : Arrow y z}
+      → {g₁ g₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual g₁ g₂
+      → ArrowEqual
+        (compose f₁ g₁)
+        (compose f₂ g₂)
+    compose-equal _ _
+      = refl
+
     precompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose f (identity x) ≡ f
-    precompose arrow
+      → ArrowEqual
+        (compose f (identity x)) f
+    precompose _
       = refl
-  
+
     postcompose
       : {x y : Object}
       → (f : Arrow x y)
-      → compose (identity y) f ≡ f
-    postcompose arrow
+      → ArrowEqual
+        (compose (identity y) f) f
+    postcompose _
       = refl
-  
+
     associative
       : {w x y z : Object}
       → (f : Arrow y z)
       → (g : Arrow x y)
       → (h : Arrow w x)
-      → compose (compose f g) h ≡ compose f (compose g h)
-    associative arrow arrow arrow
+      → ArrowEqual
+        (compose (compose f g) h)
+        (compose f (compose g h))
+    associative _ _ _
       = refl
 
 category-unit
@@ -71,6 +139,19 @@ category-unit
   → Category
 category-unit A
   = record {CategoryUnit A}
+
+-- ### Equality
+
+arrow-equal-unit
+  : {A : Set}
+  → {x₁ x₂ y₁ y₂ : A}
+  → {f₁ : CategoryUnit.Arrow A x₁ y₁}
+  → {f₂ : CategoryUnit.Arrow A x₂ y₂}
+  → x₁ ≡ x₂
+  → y₁ ≡ y₂
+  → Category.ArrowEqual' (category-unit A) f₁ f₂
+arrow-equal-unit {A = A} refl refl
+  = Category.arrow-refl' (category-unit A)
 
 -- ## Functor
 
@@ -94,19 +175,29 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object (category-unit A)}
+        → {f₁ f₂ : Category.Arrow (category-unit A) x y}
+        → Category.ArrowEqual (category-unit A) f₁ f₂
+        → Category.ArrowEqual (category-unit B) (map f₁) (map f₂)
+      map-equal _
+        = refl
+
       map-identity
         : (x : Category.Object (category-unit A))
-        → map (Category.identity (category-unit A) x)
-          ≡ Category.identity (category-unit B) (base x)
+        → Category.ArrowEqual (category-unit B)
+          (map (Category.identity (category-unit A) x))
+          (Category.identity (category-unit B) (base x))
       map-identity _
         = refl
-  
+
       map-compose
         : {x y z : Category.Object (category-unit A)}
         → (f : Category.Arrow (category-unit A) y z)
         → (g : Category.Arrow (category-unit A) x y)
-        → map (Category.compose (category-unit A) f g)
-          ≡ Category.compose (category-unit B) (map f) (map g)
+        → Category.ArrowEqual (category-unit B)
+          (map (Category.compose (category-unit A) f g))
+          (Category.compose (category-unit B) (map f) (map g))
       map-compose _ _
         = refl
 
@@ -117,112 +208,83 @@ module _
       (category-unit B)
   functor-unit F
     = record {FunctorUnit F}
-  
+
+-- ## FunctorEqual
+
+functor-equal-unit
+  : {A B : Set}
+  → {F₁ F₂ : Function A B}
+  → FunctionEqual F₁ F₂
+  → FunctorEqual
+    (functor-unit F₁)
+    (functor-unit F₂)
+functor-equal-unit p
+  = record
+  { FunctionEqual p
+  ; map
+    = λ {x₁ = x} {y₁ = y} _ → arrow-equal-unit
+      (FunctionEqual.base p x)
+      (FunctionEqual.base p y)
+  }
+
 -- ## FunctorIdentity
 
-module _
-  {A : Set}
-  {F : Function A A}
-  where
-
-  module FunctorIdentityUnit
-    (p : FunctionIdentity F)
-    where
-
-    open FunctionIdentity p public
-      using (base)
-
-    map
-      : {x y : Category.Object (category-unit A)}
-      → (f : Category.Arrow (category-unit A) x y)
-      → Functor.map (functor-unit F) f ≅ f
-    map {x = x} {y = y} CategoryUnit.arrow
-      = Category.arrow-eq
-        (category-unit A)
-        (base x)
-        (base y)
-        CategoryUnit.arrow
-
-  functor-identity-unit
-    : FunctionIdentity F
-    → FunctorIdentity
-      (functor-unit F)
-  functor-identity-unit p
-    = record {FunctorIdentityUnit p}
+functor-identity-unit
+  : {A : Set}
+  → {F : Function A A}
+  → FunctionIdentity F
+  → FunctorIdentity
+    (functor-unit F)
+functor-identity-unit p
+  = record
+  { FunctionIdentity p
+  ; map
+    = λ {x₁ = x} {y₁ = y} _ → arrow-equal-unit
+      (FunctionIdentity.base p x)
+      (FunctionIdentity.base p y)
+  }
 
 -- ## FunctorCompose
 
-module _
-  {A B C : Set}
-  {F : Function B C}
-  {G : Function A B}
-  {H : Function A C}
-  where
-
-  module FunctorComposeUnit
-    (p : FunctionCompose F G H)
-    where
-
-    open FunctionCompose p public
-      using (base)
-
-    map
-      : {x y : Category.Object (category-unit A)}
-      → (f : Category.Arrow (category-unit A) x y)
-      → Functor.map (functor-unit H) f
-        ≅ Functor.map (functor-unit F) (Functor.map (functor-unit G) f)
-    map {x = x} {y = y} _
-      = Category.arrow-eq
-        (category-unit C)
-        (base x)
-        (base y)
-        CategoryUnit.arrow
-
-  functor-compose-unit
-    : FunctionCompose F G H
-    → FunctorCompose
-      (functor-unit F)
-      (functor-unit G)
-      (functor-unit H)
-  functor-compose-unit p
-    = record {FunctorComposeUnit p}
+functor-compose-unit
+  : {A B C : Set}
+  → {F : Function B C}
+  → {G : Function A B}
+  → {H : Function A C}
+  → FunctionCompose F G H
+  → FunctorCompose
+    (functor-unit F)
+    (functor-unit G)
+    (functor-unit H)
+functor-compose-unit p
+  = record
+  { FunctionCompose p
+  ; map
+    = λ {x} {y} _ → arrow-equal-unit
+      (FunctionCompose.base p x)
+      (FunctionCompose.base p y)
+  }
 
 -- ## FunctorSquare
 
-module _
-  {A₁ A₂ B₁ B₂ : Set}
-  {F : Function A₁ A₂}
-  {G : Function B₁ B₂}
-  {H₁ : Function A₁ B₁}
-  {H₂ : Function A₂ B₂}
-  where
-
-  module FunctorSquareUnit
-    (s : FunctionSquare F G H₁ H₂)
-    where
-
-    open FunctionSquare s public
-      using (base)
-  
-    map
-      : {x₁ y₁ : Category.Object (category-unit A₁)}
-      → (f₁ : Category.Arrow (category-unit A₁) x₁ y₁)
-      → Functor.map (functor-unit H₂) (Functor.map (functor-unit F) f₁)
-        ≅ Functor.map (functor-unit G) (Functor.map (functor-unit H₁) f₁)
-    map {x₁ = x₁} {y₁ = y₁} _
-      = Category.arrow-eq
-        (category-unit B₂)
-        (base x₁)
-        (base y₁)
-        CategoryUnit.arrow
-
-  functor-square-unit
-    : FunctionSquare F G H₁ H₂
-    → FunctorSquare
-      (functor-unit F)
-      (functor-unit G)
-      (functor-unit H₁)
-      (functor-unit H₂)
-  functor-square-unit s
-    = record {FunctorSquareUnit s}
+functor-square-unit
+  : {A₁ A₂ B₁ B₂ : Set}
+  → {F : Function A₁ A₂}
+  → {G : Function B₁ B₂}
+  → {H₁ : Function A₁ B₁}
+  → {H₂ : Function A₂ B₂}
+  → FunctionSquare F G H₁ H₂
+  → FunctorSquare
+    (functor-unit F)
+    (functor-unit G)
+    (functor-unit H₁)
+    (functor-unit H₂)
+functor-square-unit s
+  = record
+  { FunctionSquare s
+  ; map
+    = λ {x₁ = x₁} {y₁ = y₁} _ → arrow-equal-unit
+      (FunctionSquare.base s x₁)
+      (FunctionSquare.base s y₁)
+  }
 

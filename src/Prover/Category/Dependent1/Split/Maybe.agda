@@ -57,43 +57,25 @@ module _
 
 -- ## Dependent₁SplitFunctorSquare
 
-module _
-  {C₁ C₂ : Category}
-  {C₁' D₁' : Dependent₁Category C₁}
-  {C₂' D₂' : Dependent₁Category C₂}
-  {F : Functor C₁ C₂}
-  {F' : Dependent₁Functor C₁' C₂' F}
-  {G' : Dependent₁Functor D₁' D₂' F}
-  {H₁ : Dependent₁SplitFunctor C₁' D₁'}
-  {H₂ : Dependent₁SplitFunctor C₂' D₂'}
-  where
-
-  module Dependent₁SplitFunctorSquareMaybe
-    (s : Dependent₁SplitFunctorSquare F' G' H₁ H₂)
-    where
-
-    split-functor
-      : (x₁ : Category.Object C₁)
-      → SplitFunctorSquare
-        (Dependent₁Functor.functor
-          (dependent₁-functor-maybe F') x₁)
-        (Dependent₁Functor.functor
-          (dependent₁-functor-maybe G') x₁)
-        (Dependent₁SplitFunctor.split-functor
-          (dependent₁-split-functor-maybe H₁) x₁)
-        (Dependent₁SplitFunctor.split-functor
-          (dependent₁-split-functor-maybe H₂) (Functor.base F x₁))
-    split-functor x₁
-      = split-functor-square-maybe
-        (Dependent₁SplitFunctorSquare.split-functor s x₁)
-
-  dependent₁-split-functor-square-maybe
-    : Dependent₁SplitFunctorSquare F' G' H₁ H₂
-    → Dependent₁SplitFunctorSquare
-      (dependent₁-functor-maybe F')
-      (dependent₁-functor-maybe G')
-      (dependent₁-split-functor-maybe H₁)
-      (dependent₁-split-functor-maybe H₂)
-  dependent₁-split-functor-square-maybe s
-    = record {Dependent₁SplitFunctorSquareMaybe s}
+dependent₁-split-functor-square-maybe
+  : {C₁ C₂ : Category}
+  → {C₁' D₁' : Dependent₁Category C₁}
+  → {C₂' D₂' : Dependent₁Category C₂}
+  → {F : Functor C₁ C₂}
+  → {F' : Dependent₁Functor C₁' C₂' F}
+  → {G' : Dependent₁Functor D₁' D₂' F}
+  → {H₁ : Dependent₁SplitFunctor C₁' D₁'}
+  → {H₂ : Dependent₁SplitFunctor C₂' D₂'}
+  → Dependent₁SplitFunctorSquare F' G' H₁ H₂
+  → Dependent₁SplitFunctorSquare
+    (dependent₁-functor-maybe F')
+    (dependent₁-functor-maybe G')
+    (dependent₁-split-functor-maybe H₁)
+    (dependent₁-split-functor-maybe H₂)
+dependent₁-split-functor-square-maybe s
+  = record
+  { split-functor
+    = λ x₁ → split-functor-square-maybe
+      (Dependent₁SplitFunctorSquare.split-functor s x₁)
+  }
 

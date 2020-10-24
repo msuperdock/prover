@@ -3,45 +3,38 @@ module Prover.Prelude.Maybe where
 open import Prover.Prelude.Bool
   using (Bool; false; true)
 open import Prover.Prelude.Equal
-  using (Equal'; _≅_; _≡_; _≢_; refl)
+  using (_≡_; _≢_; refl)
 open import Prover.Prelude.Sigma
   using (Σ; _,_)
 
 -- ## Definition
 
-module _Maybe where
-
-  data Maybe
-    (A : Set)
-    : Set
-    where
-  
-    nothing
-      : Maybe A
-  
-    just
-      : A
-      → Maybe A
-  
-  {-# COMPILE GHC Maybe = data Maybe
-    ( Nothing
-    | Just
-    )
-  #-}
-
-Maybe
+data Maybe'
+  (A : Set)
   : Set
-  → Set
-Maybe
-  = _Maybe.Maybe
+  where
 
-open _Maybe.Maybe public
+  nothing
+    : Maybe' A
+
+  just
+    : A
+    → Maybe' A
+
+{-# COMPILE GHC Maybe' = data Maybe
+  ( Nothing
+  | Just
+  )
+#-}
+
+Maybe
+  = Maybe'
 
 -- ## Module
 
 module Maybe where
 
-  open _Maybe.Maybe public
+  open Maybe' public
 
   -- ### Interface
 
@@ -74,33 +67,6 @@ module Maybe where
     = nothing
   map f (just x)
     = just (f x)
-
-  -- ### Equality
-
-  nothing-eq₂
-    : {A B : Set}
-    → {x₁ x₂ : A}
-    → {y₁ y₂ : B}
-    → (P : A → B → Set)
-    → x₁ ≡ x₂
-    → y₁ ≡ y₂
-    → Equal' (Maybe (P x₁ y₁)) (Maybe (P x₂ y₂)) nothing nothing
-  nothing-eq₂ _ refl refl
-    = refl
-  
-  just-eq₂
-    : {A B : Set}
-    → {x₁ x₂ : A}
-    → {y₁ y₂ : B}
-    → (P : A → B → Set)
-    → {p₁ : P x₁ y₁}
-    → {p₂ : P x₂ y₂}
-    → x₁ ≡ x₂
-    → y₁ ≡ y₂
-    → p₁ ≅ p₂
-    → just p₁ ≅ just p₂
-  just-eq₂ _ refl refl refl
-    = refl
 
   -- ### Properties
 

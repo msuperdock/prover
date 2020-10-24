@@ -1,14 +1,14 @@
 module Prover.Category.Dependent.Product where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorEqual;
+    ChainFunctorIdentity; ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Product
-  using (category-product; functor-compose-product; functor-identity-product;
-    functor-product; functor-square-product)
+  using (category-product; functor-compose-product; functor-equal-product;
+    functor-identity-product; functor-product; functor-square-product)
 open import Prover.Prelude
 
 -- ## Types
@@ -36,6 +36,47 @@ dependent-functor-product
     (dependent-category-product C₁' C₂')
     (dependent-category-product D₁' D₂') F
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-product
+  : {n : ℕ}
+  → {C D : ChainCategory n}
+  → {C₁' C₂' : DependentCategory C}
+  → {D₁' D₂' : DependentCategory D}
+  → {F₁ F₂ : ChainFunctor C D}
+  → {F₁₁' : DependentFunctor C₁' D₁' F₁}
+  → {F₁₂' : DependentFunctor C₂' D₂' F₁}
+  → {F₂₁' : DependentFunctor C₁' D₁' F₂}
+  → {F₂₂' : DependentFunctor C₂' D₂' F₂}
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-product F₁₁' F₁₂')
+    (dependent-functor-product F₂₁' F₂₂')
+
+dependent-functor-equal-product'
+  : {A : Set}
+  → {x₁ x₂ : A}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → (D : A → ChainCategory n)
+  → {C₁' C₂' : DependentCategory C}
+  → (D₁' D₂' : (x : A) → DependentCategory (D x))
+  → {F₁ : ChainFunctor C (D x₁)}
+  → {F₂ : ChainFunctor C (D x₂)}
+  → {F₁₁' : DependentFunctor C₁' (D₁' x₁) F₁}
+  → {F₁₂' : DependentFunctor C₂' (D₂' x₁) F₁}
+  → {F₂₁' : DependentFunctor C₁' (D₁' x₂) F₂}
+  → {F₂₂' : DependentFunctor C₂' (D₂' x₂) F₂}
+  → x₁ ≡ x₂
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-product F₁₁' F₁₂')
+    (dependent-functor-product F₂₁' F₂₂')
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-product
@@ -51,7 +92,7 @@ dependent-functor-identity-product
   → DependentFunctorIdentity
     (dependent-functor-product F₁' F₂')
 
-dependent-functor-identity-product-eq
+dependent-functor-identity-product'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -92,7 +133,7 @@ dependent-functor-compose-product
     (dependent-functor-product G₁' G₂')
     (dependent-functor-product H₁' H₂')
 
-dependent-functor-compose-product-eq
+dependent-functor-compose-product'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -149,7 +190,7 @@ dependent-functor-square-product
     (dependent-functor-product H₁₁' H₁₂')
     (dependent-functor-product H₂₁' H₂₂')
 
-dependent-functor-square-product-eq
+dependent-functor-square-product'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -198,6 +239,11 @@ dependent-category-product {n = suc _} {C = C} C₁' C₂'
     = λ f → dependent-functor-product
       (DependentCategory.functor C₁' f)
       (DependentCategory.functor C₂' f)
+  ; functor-equal
+    = λ p → dependent-functor-equal-product
+      (ChainCategory.functor-equal C p)
+      (DependentCategory.functor-equal C₁' p)
+      (DependentCategory.functor-equal C₂' p)
   ; functor-identity
     = λ x → dependent-functor-identity-product
       (ChainCategory.functor-identity C x)
@@ -228,6 +274,28 @@ dependent-functor-product {n = suc _} {F = F} F₁' F₂'
       (DependentFunctor.functor-square F₂' f)
   }
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-product {n = zero} _ p₁' p₂'
+  = functor-equal-product p₁' p₂'
+
+dependent-functor-equal-product {n = suc _}
+  {D = D} {D₁' = D₁'} {D₂' = D₂'} p p₁' p₂'
+  = record
+  { functor
+    = λ x → dependent-functor-equal-product'
+      (ChainCategory.category' D)
+      (DependentCategory.category D₁')
+      (DependentCategory.category D₂')
+      (ChainFunctorEqual.base p x)
+      (ChainFunctorEqual.functor' p x)
+      (DependentFunctorEqual.functor p₁' x)
+      (DependentFunctorEqual.functor p₂' x)
+  }
+
+dependent-functor-equal-product' _ _ _ refl
+  = dependent-functor-equal-product
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-product {n = zero} _ p₁' p₂'
@@ -237,7 +305,7 @@ dependent-functor-identity-product {n = suc _}
   {C = C} {C₁' = C₁'} {C₂' = C₂'} p p₁' p₂'
   = record
   { functor
-    = λ x → dependent-functor-identity-product-eq
+    = λ x → dependent-functor-identity-product'
       (ChainCategory.category' C)
       (DependentCategory.category C₁')
       (DependentCategory.category C₂')
@@ -247,7 +315,7 @@ dependent-functor-identity-product {n = suc _}
       (DependentFunctorIdentity.functor p₂' x)
   }
 
-dependent-functor-identity-product-eq _ _ _ refl
+dependent-functor-identity-product' _ _ _ refl
   = dependent-functor-identity-product
 
 -- ### DependentFunctorCompose
@@ -259,7 +327,7 @@ dependent-functor-compose-product {n = suc _}
   {E = E} {E₁' = E₁'} {E₂' = E₂'} p p₁' p₂'
   = record
   { functor
-    = λ x → dependent-functor-compose-product-eq
+    = λ x → dependent-functor-compose-product'
       (ChainCategory.category' E)
       (DependentCategory.category E₁')
       (DependentCategory.category E₂')
@@ -269,7 +337,7 @@ dependent-functor-compose-product {n = suc _}
       (DependentFunctorCompose.functor p₂' x)
   }
 
-dependent-functor-compose-product-eq _ _ _ refl
+dependent-functor-compose-product' _ _ _ refl
   = dependent-functor-compose-product
 
 -- ### DependentFunctorSquare
@@ -281,7 +349,7 @@ dependent-functor-square-product {n = suc _}
   {D₂ = D₂} {D₂₁' = D₂₁'} {D₂₂' = D₂₂'} s s₁' s₂'
   = record
   { functor
-    = λ x₁ → dependent-functor-square-product-eq
+    = λ x₁ → dependent-functor-square-product'
       (ChainCategory.category' D₂)
       (DependentCategory.category D₂₁')
       (DependentCategory.category D₂₂')
@@ -291,6 +359,6 @@ dependent-functor-square-product {n = suc _}
       (DependentFunctorSquare.functor s₂' x₁)
   }
 
-dependent-functor-square-product-eq _ _ _ refl
+dependent-functor-square-product' _ _ _ refl
   = dependent-functor-square-product
 

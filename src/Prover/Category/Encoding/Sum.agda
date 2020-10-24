@@ -35,15 +35,9 @@ module _
       : (x : A₁ ⊔ A₂)
       → decode (encode x) ≡ just x
     decode-encode (ι₁ x₁)
-      with Encoding.decode e₁ (Encoding.encode e₁ x₁)
-      | Encoding.decode-encode e₁ x₁
-    ... | _ | refl
-      = refl
+      = sub (Maybe.map ι₁) (Encoding.decode-encode e₁ x₁)
     decode-encode (ι₂ x₂)
-      with Encoding.decode e₂ (Encoding.encode e₂ x₂)
-      | Encoding.decode-encode e₂ x₂
-    ... | _ | refl
-      = refl
+      = sub (Maybe.map ι₂) (Encoding.decode-encode e₂ x₂)
 
   encoding-sum
     : Encoding A₁ B₁

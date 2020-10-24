@@ -314,8 +314,6 @@ module Internal where
 -- ### Construct
 
 Construct
-  : Set
-Construct
   = Internal.Construct
 
 module Construct where
@@ -340,10 +338,6 @@ module Construct where
 -- ### LeftSubconstruct
 
 LeftSubconstruct
-  : Construct
-  → Construct
-  → Set
-LeftSubconstruct
   = Internal.LeftSubconstruct
 
 module LeftSubconstruct where
@@ -357,10 +351,6 @@ module LeftSubconstruct where
 
 -- ### RightSubconstruct
 
-RightSubconstruct
-  : Construct
-  → Construct
-  → Set
 RightSubconstruct
   = Internal.RightSubconstruct
 

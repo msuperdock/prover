@@ -1,7 +1,7 @@
 module Prover.Category.Encoding.List where
 
 open import Prover.Category.Encoding
-  using (Encoding; encoding-from-split-function)
+  using (Encoding; split-function-encoding)
 open import Prover.Function.Split.List
   using (split-function-list)
 open import Prover.Prelude
@@ -13,7 +13,7 @@ encoding-list
   → Encoding A B
   → Encoding (List A) (List B)
 encoding-list e
-  = encoding-from-split-function
+  = split-function-encoding
   $ split-function-list
     (Encoding.split-function e)
 

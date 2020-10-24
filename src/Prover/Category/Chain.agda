@@ -1,7 +1,8 @@
 module Prover.Category.Chain where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare)
 open import Prover.Prelude
 
 -- ## Base
@@ -29,6 +30,19 @@ record Chain₀Functor
 
   constructor
     
+    nil
+
+-- ### Chain₀FunctorEqual
+
+record Chain₀FunctorEqual
+  {C D₁ D₂ : Chain₀Category}
+  (F₁ : Chain₀Functor C D₁)
+  (F₂ : Chain₀Functor C D₂)
+  : Set
+  where
+
+  constructor
+
     nil
 
 -- ### Chain₀FunctorIdentity
@@ -96,6 +110,22 @@ record ChainFunctor'
   {n : ℕ}
   (C : ChainCategory (suc n))
   (D : ChainCategory (suc n))
+  : Set
+
+-- ### ChainFunctorEqual
+
+ChainFunctorEqual
+  : {n : ℕ}
+  → {C D₁ D₂ : ChainCategory n}
+  → ChainFunctor C D₁
+  → ChainFunctor C D₂
+  → Set
+
+record ChainFunctorEqual'
+  {n : ℕ}
+  {C D₁ D₂ : ChainCategory (suc n)}
+  (F₁ : ChainFunctor C D₁)
+  (F₂ : ChainFunctor C D₂)
   : Set
 
 -- ### ChainFunctorIdentity
@@ -185,6 +215,14 @@ record ChainCategory' n where
         (category' x)
         (category' y)
 
+    functor-equal
+      : {x y : Object}
+      → {f₁ f₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ChainFunctorEqual
+        (functor f₁)
+        (functor f₂)
+
     functor-identity
       : (x : Object)
       → ChainFunctorIdentity
@@ -243,6 +281,37 @@ record ChainFunctor' C D where
 
 module ChainFunctor
   = ChainFunctor'
+
+-- ### ChainFunctorEqual
+
+ChainFunctorEqual {n = zero}
+  = Chain₀FunctorEqual
+ChainFunctorEqual {n = suc _}
+  = ChainFunctorEqual'
+
+record ChainFunctorEqual' {_ C} F₁ F₂ where
+
+  inductive
+
+  field
+
+    functor
+      : FunctorEqual
+        (ChainFunctor.functor F₁)
+        (ChainFunctor.functor F₂)
+
+  open FunctorEqual functor public
+
+  field
+
+    functor'
+      : (x : ChainCategory.Object C)
+      → ChainFunctorEqual
+        (ChainFunctor.functor' F₁ x)
+        (ChainFunctor.functor' F₂ x)
+
+module ChainFunctorEqual
+  = ChainFunctorEqual'
 
 -- ### ChainFunctorIdentity
 
@@ -356,6 +425,8 @@ chain₁-category C
     = λ _ → nil
   ; functor
     = λ _ → nil
+  ; functor-equal
+    = λ _ → nil
   ; functor-identity
     = λ _ → nil
   ; functor-compose
@@ -377,6 +448,23 @@ chain₁-functor F
   ; functor'
     = λ _ → nil
   ; functor-square
+    = λ _ → nil
+  }
+
+-- ### ChainFunctorEqual
+
+chain₁-functor-equal
+  : {C D : Category}
+  → {F₁ F₂ : Functor C D}
+  → FunctorEqual F₁ F₂
+  → ChainFunctorEqual
+    (chain₁-functor F₁)
+    (chain₁-functor F₂)
+chain₁-functor-equal p
+  = record
+  { functor
+    = p
+  ; functor'
     = λ _ → nil
   }
 

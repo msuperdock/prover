@@ -444,7 +444,7 @@ module Internal where
     branch-conclusions-assumptions [] _
       = refl
     branch-conclusions-assumptions (_ ∷ fs) rs
-      = Vec.cons-eq refl (branch-conclusions-assumptions fs rs)
+      = Vec.cons-equal refl (branch-conclusions-assumptions fs rs)
 
   -- ### Meta-substitution
 
@@ -497,9 +497,9 @@ module Internal where
     branch-conclusions-substitutes [] _ _
       = refl
     branch-conclusions-substitutes (assumption _ ∷ bs) m f
-      = Vec.cons-eq refl (branch-conclusions-substitutes bs m f)
+      = Vec.cons-equal refl (branch-conclusions-substitutes bs m f)
     branch-conclusions-substitutes (rule _ _ _ _ _ ∷ bs) m f
-      = Vec.cons-eq refl (branch-conclusions-substitutes bs m f)
+      = Vec.cons-equal refl (branch-conclusions-substitutes bs m f)
     
     branch-conclusion-substitute
       : {vs : Variables}

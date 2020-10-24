@@ -23,39 +23,32 @@ open Vec
 
 -- ## Definition
 
-module _Formula where
-
-  data Formula
-    (ss : Symbols)
-    (vs : Variables)
-    : Bool
-    → Set
-    where
-  
-    meta
-      : Meta
-      → Formula ss vs true
-  
-    variable'
-      : {m : Bool}
-      → (v : Variable)
-      → .(var v ∈ vs)
-      → Formula ss vs m
-  
-    symbol
-      : {m : Bool}
-      → (s : Symbol)
-      → .(sym s ∈ ss)
-      → Vec (Formula ss vs m) (Symbol.arity s)
-      → Formula ss vs m
-
-Formula
-  : Symbols
-  → Variables
-  → Bool
+data Formula'
+  (ss : Symbols)
+  (vs : Variables)
+  : Bool
   → Set
+  where
+
+  meta
+    : Meta
+    → Formula' ss vs true
+
+  variable'
+    : {m : Bool}
+    → (v : Variable)
+    → .(var v ∈ vs)
+    → Formula' ss vs m
+
+  symbol
+    : {m : Bool}
+    → (s : Symbol)
+    → .(sym s ∈ ss)
+    → Vec (Formula' ss vs m) (Symbol.arity s)
+    → Formula' ss vs m
+
 Formula
-  = _Formula.Formula
+  = Formula'
 
 Substitutions
   : Symbols
@@ -68,7 +61,7 @@ Substitutions ss vs
 
 module Formula where
 
-  open _Formula.Formula public
+  open Formula' public
 
   -- ### Metas
 
@@ -100,6 +93,74 @@ module Formula where
     metas-withs (f ∷ fs)
       = metas-withs fs
       ∘ metas-with f
+
+  -- ### Equality
+  
+  module _
+    {ss : Symbols}
+    {vs : Variables}
+    {m : Bool}
+    where
+
+    _≟_frm
+      : Decidable (Equal (Formula ss vs m))
+    
+    _≟_frms
+      : {n : ℕ}
+      → Decidable (Equal (Vec (Formula ss vs m) n))
+
+    meta m₁ ≟ meta m₂ frm
+      with m₁ ≟ m₂ met
+    ... | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl
+      = yes refl
+    variable' v₁ _ ≟ variable' v₂ _ frm
+      with v₁ ≟ v₂ idn
+    ... | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl
+      = yes refl
+    symbol s₁ _ fs₁ ≟ symbol s₂ _ fs₂ frm
+      with s₁ ≟ s₂ sym
+    ... | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl
+      with fs₁ ≟ fs₂ frms
+    ... | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl
+      = yes refl
+
+    meta _ ≟ variable' _ _ frm
+      = no (λ ())
+    meta _ ≟ symbol _ _ _ frm
+      = no (λ ())
+    variable' _ _ ≟ meta _ frm
+      = no (λ ())
+    variable' _ _ ≟ symbol _ _ _ frm
+      = no (λ ())
+    symbol _ _ _ ≟ meta _ frm
+      = no (λ ())
+    symbol _ _ _ ≟ variable' _ _ frm
+      = no (λ ())
+    
+    [] ≟ [] frms
+      = yes refl
+    (x₁ ∷ xs₁) ≟ (x₂ ∷ xs₂) frms
+      with x₁ ≟ x₂ frm
+      | xs₁ ≟ xs₂ frms
+    ... | no ¬p | _
+      = no (λ {refl → ¬p refl})
+    ... | _ | no ¬p
+      = no (λ {refl → ¬p refl})
+    ... | yes refl | yes refl
+      = yes refl
+
+    _≟_frms'
+      : Decidable (Equal (List (Formula ss vs m)))
+    _≟_frms'
+      = List.decidable _≟_frm
 
   -- ### Completeness
 
@@ -196,74 +257,6 @@ module Formula where
     to-meta-formulas (f ∷ fs)
       = to-meta-formula f ∷ to-meta-formulas fs
   
-  -- ### Equality
-  
-  module _
-    {ss : Symbols}
-    {vs : Variables}
-    {m : Bool}
-    where
-
-    _≟_frm
-      : Decidable (Equal (Formula ss vs m))
-    
-    _≟_frms
-      : {n : ℕ}
-      → Decidable (Equal (Vec (Formula ss vs m) n))
-
-    meta m₁ ≟ meta m₂ frm
-      with m₁ ≟ m₂ met
-    ... | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl
-      = yes refl
-    variable' v₁ _ ≟ variable' v₂ _ frm
-      with v₁ ≟ v₂ idn
-    ... | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl
-      = yes refl
-    symbol s₁ _ fs₁ ≟ symbol s₂ _ fs₂ frm
-      with s₁ ≟ s₂ sym
-    ... | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl
-      with fs₁ ≟ fs₂ frms
-    ... | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl
-      = yes refl
-
-    meta _ ≟ variable' _ _ frm
-      = no (λ ())
-    meta _ ≟ symbol _ _ _ frm
-      = no (λ ())
-    variable' _ _ ≟ meta _ frm
-      = no (λ ())
-    variable' _ _ ≟ symbol _ _ _ frm
-      = no (λ ())
-    symbol _ _ _ ≟ meta _ frm
-      = no (λ ())
-    symbol _ _ _ ≟ variable' _ _ frm
-      = no (λ ())
-    
-    [] ≟ [] frms
-      = yes refl
-    (x₁ ∷ xs₁) ≟ (x₂ ∷ xs₂) frms
-      with x₁ ≟ x₂ frm
-      | xs₁ ≟ xs₂ frms
-    ... | no ¬p | _
-      = no (λ {refl → ¬p refl})
-    ... | _ | no ¬p
-      = no (λ {refl → ¬p refl})
-    ... | yes refl | yes refl
-      = yes refl
-
-    _≟_frms'
-      : Decidable (Equal (List (Formula ss vs m)))
-    _≟_frms'
-      = List.decidable _≟_frm
-
   -- ### Membership
   
   module _
@@ -654,7 +647,7 @@ module Formula where
     substitute-meta-to-meta-formulas [] _ _
       = refl
     substitute-meta-to-meta-formulas (f ∷ fs) m f'
-      = Vec.cons-eq
+      = Vec.cons-equal
         (substitute-meta-to-meta-formula f m f')
         (substitute-meta-to-meta-formulas fs m f')
     

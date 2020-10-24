@@ -1,15 +1,15 @@
 module Prover.Category.Dependent.Sigma.Maybe where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorEqual;
+    ChainFunctorIdentity; ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Sigma.Maybe
   using (category-sigma-maybe; functor-compose-sigma-maybe;
-    functor-identity-sigma-maybe; functor-sigma-maybe;
-    functor-square-sigma-maybe)
+    functor-equal-sigma-maybe; functor-identity-sigma-maybe;
+    functor-sigma-maybe; functor-square-sigma-maybe)
 open import Prover.Category.Snoc
   using (chain-category-snoc; chain-functor-snoc)
 open import Prover.Prelude
@@ -41,6 +41,51 @@ dependent-functor-sigma-maybe
     (dependent-category-sigma-maybe C₁' C₂')
     (dependent-category-sigma-maybe D₁' D₂') F
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-sigma-maybe
+  : {n : ℕ}
+  → {C D : ChainCategory n}
+  → {C₁' : DependentCategory C}
+  → {D₁' : DependentCategory D}
+  → {C₂' : DependentCategory (chain-category-snoc C₁')}
+  → {D₂' : DependentCategory (chain-category-snoc D₁')}
+  → {F₁ F₂ : ChainFunctor C D}
+  → {F₁₁' : DependentFunctor C₁' D₁' F₁}
+  → {F₂₁' : DependentFunctor C₁' D₁' F₂}
+  → {F₁₂' : DependentFunctor C₂' D₂' (chain-functor-snoc F₁₁')}
+  → {F₂₂' : DependentFunctor C₂' D₂' (chain-functor-snoc F₂₁')}
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-sigma-maybe F₁₁' F₁₂')
+    (dependent-functor-sigma-maybe F₂₁' F₂₂')
+
+dependent-functor-equal-sigma-maybe'
+  : {A : Set}
+  → {x₁ x₂ : A}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → (D : A → ChainCategory n)
+  → {C₁' : DependentCategory C}
+  → (D₁' : (x : A) → DependentCategory (D x))
+  → {C₂' : DependentCategory (chain-category-snoc C₁')}
+  → (D₂' : (x : A) → DependentCategory (chain-category-snoc (D₁' x)))
+  → {F₁ : ChainFunctor C (D x₁)}
+  → {F₂ : ChainFunctor C (D x₂)}
+  → {F₁₁' : DependentFunctor C₁' (D₁' x₁) F₁}
+  → {F₂₁' : DependentFunctor C₁' (D₁' x₂) F₂}
+  → {F₁₂' : DependentFunctor C₂' (D₂' x₁) (chain-functor-snoc F₁₁')}
+  → {F₂₂' : DependentFunctor C₂' (D₂' x₂) (chain-functor-snoc F₂₁')}
+  → x₁ ≡ x₂
+  → ChainFunctorEqual F₁ F₂
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-sigma-maybe F₁₁' F₁₂')
+    (dependent-functor-sigma-maybe F₂₁' F₂₂')
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-sigma-maybe
@@ -57,7 +102,7 @@ dependent-functor-identity-sigma-maybe
   → DependentFunctorIdentity
     (dependent-functor-sigma-maybe F₁' F₂')
 
-dependent-functor-identity-sigma-maybe-eq
+dependent-functor-identity-sigma-maybe'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -102,7 +147,7 @@ dependent-functor-compose-sigma-maybe
     (dependent-functor-sigma-maybe G₁' G₂')
     (dependent-functor-sigma-maybe H₁' H₂')
 
-dependent-functor-compose-sigma-maybe-eq
+dependent-functor-compose-sigma-maybe'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -166,7 +211,7 @@ dependent-functor-square-sigma-maybe
     (dependent-functor-sigma-maybe H₁₁' H₁₂')
     (dependent-functor-sigma-maybe H₂₁' H₂₂')
 
-dependent-functor-square-sigma-maybe-eq
+dependent-functor-square-sigma-maybe'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -219,6 +264,11 @@ dependent-category-sigma-maybe {n = suc _} {C = C} C₁' C₂'
     = λ f → dependent-functor-sigma-maybe
       (DependentCategory.functor C₁' f)
       (DependentCategory.functor C₂' f)
+  ; functor-equal
+    = λ p → dependent-functor-equal-sigma-maybe
+      (ChainCategory.functor-equal C p)
+      (DependentCategory.functor-equal C₁' p)
+      (DependentCategory.functor-equal C₂' p)
   ; functor-identity
     = λ x → dependent-functor-identity-sigma-maybe
       (ChainCategory.functor-identity C x)
@@ -249,6 +299,28 @@ dependent-functor-sigma-maybe {n = suc _} {F = F} F₁' F₂'
       (DependentFunctor.functor-square F₂' f)
   }
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-sigma-maybe {n = zero} _ p₁' p₂'
+  = functor-equal-sigma-maybe p₁' p₂'
+
+dependent-functor-equal-sigma-maybe {n = suc _}
+  {D = D} {D₁' = D₁'} {D₂' = D₂'} p p₁' p₂'
+  = record
+  { functor
+    = λ x → dependent-functor-equal-sigma-maybe'
+      (ChainCategory.category' D)
+      (DependentCategory.category D₁')
+      (DependentCategory.category D₂')
+      (ChainFunctorEqual.base p x)
+      (ChainFunctorEqual.functor' p x)
+      (DependentFunctorEqual.functor p₁' x)
+      (DependentFunctorEqual.functor p₂' x)
+  }
+
+dependent-functor-equal-sigma-maybe' _ _ _ refl
+  = dependent-functor-equal-sigma-maybe
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-sigma-maybe {n = zero} _ p₁' p₂'
@@ -258,7 +330,7 @@ dependent-functor-identity-sigma-maybe {n = suc _}
   {C = C} {C₁' = C₁'} {C₂' = C₂'} p p₁' p₂'
   = record
   { functor
-    = λ x → dependent-functor-identity-sigma-maybe-eq
+    = λ x → dependent-functor-identity-sigma-maybe'
       (ChainCategory.category' C)
       (DependentCategory.category C₁')
       (DependentCategory.category C₂')
@@ -268,7 +340,7 @@ dependent-functor-identity-sigma-maybe {n = suc _}
       (DependentFunctorIdentity.functor p₂' x)
   }
 
-dependent-functor-identity-sigma-maybe-eq _ _ _ refl
+dependent-functor-identity-sigma-maybe' _ _ _ refl
   = dependent-functor-identity-sigma-maybe
 
 -- ### DependentFunctorCompose
@@ -280,7 +352,7 @@ dependent-functor-compose-sigma-maybe {n = suc _}
   {E = E} {E₁' = E₁'} {E₂' = E₂'} p p₁' p₂'
   = record
   { functor
-    = λ x → dependent-functor-compose-sigma-maybe-eq
+    = λ x → dependent-functor-compose-sigma-maybe'
       (ChainCategory.category' E)
       (DependentCategory.category E₁')
       (DependentCategory.category E₂')
@@ -290,7 +362,7 @@ dependent-functor-compose-sigma-maybe {n = suc _}
       (DependentFunctorCompose.functor p₂' x)
   }
 
-dependent-functor-compose-sigma-maybe-eq _ _ _ refl
+dependent-functor-compose-sigma-maybe' _ _ _ refl
   = dependent-functor-compose-sigma-maybe
 
 -- ### DependentFunctorSquare
@@ -302,7 +374,7 @@ dependent-functor-square-sigma-maybe {n = suc _}
   {D₂ = D₂} {D₂₁' = D₂₁'} {D₂₂' = D₂₂'} s s₁' s₂'
   = record
   { functor
-    = λ x₁ → dependent-functor-square-sigma-maybe-eq
+    = λ x₁ → dependent-functor-square-sigma-maybe'
       (ChainCategory.category' D₂)
       (DependentCategory.category D₂₁')
       (DependentCategory.category D₂₂')
@@ -312,6 +384,6 @@ dependent-functor-square-sigma-maybe {n = suc _}
       (DependentFunctorSquare.functor s₂' x₁)
   }
 
-dependent-functor-square-sigma-maybe-eq _ _ _ refl
+dependent-functor-square-sigma-maybe' _ _ _ refl
   = dependent-functor-square-sigma-maybe
 

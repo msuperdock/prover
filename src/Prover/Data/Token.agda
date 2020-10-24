@@ -7,60 +7,52 @@ open List
 
 -- ## Definition
 
-module _Token where
+is-valid
+  : List Char
+  → Bool
+is-valid []
+  = false
+is-valid (c ∷ cs)
+  = not (Char.is-space c) ∨ is-valid cs
 
-  is-valid
-    : List Char
-    → Bool
-  is-valid []
-    = false
-  is-valid (c ∷ cs)
-    = not (Char.is-space c) ∨ is-valid cs
+IsValid
+  : List Char
+  → Set
+IsValid cs
+  = T (is-valid cs)
 
-  IsValid
-    : List Char
-    → Set
-  IsValid cs
-    = T (is-valid cs)
-
-  record Token
-    : Set
-    where
-  
-    constructor
-    
-      token
-
-    field
-  
-      characters
-        : List Char
-  
-      .valid
-        : T (is-valid characters)
-
-    length
-      : ℕ
-    length
-      = List.length characters
-
-Token
+record Token'
   : Set
-Token
-  = _Token.Token
+  where
 
-open _Token public
-  using (token)
+  constructor
+  
+    token
+
+  field
+
+    characters
+      : List Char
+
+    .valid
+      : IsValid characters
+
+Token
+  = Token'
 
 -- ## Module
 
 module Token where
 
-  open _Token public
-    using (IsValid; is-valid; token)
-  open _Token.Token public
+  open Token' public
 
   -- ### Interface
+
+  length
+    : Token
+    → ℕ
+  length t
+    = List.length (characters t)
 
   index'
     : (cs : List Char)

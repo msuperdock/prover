@@ -395,32 +395,35 @@ module _
       → (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s')
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
     handle (ι₁ s₁) sp₁ e₁'
-      with SplitEditor.handle e₁ s₁ sp₁ e₁'
-    ... | ι₁ (s₁' , sp₁' , f₁)
-      = ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁)
-    ... | ι₂ s₁'
-      = ι₂ s₁'
+      = case (SplitEditor.handle e₁ s₁ sp₁ e₁') λ
+      { (ι₁ (s₁' , sp₁' , f₁))
+        → ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁)
+      ; (ι₂ s₁')
+        → ι₂ s₁'
+      }
     handle (ι₂ (x₁ , _)) (ι₁ sp₁) e₁'
-      with SplitEditor.handle e₁ (SplitEditor.unbase e₁ x₁) sp₁ e₁'
-    ... | ι₁ (s₁' , sp₁' , f₁)
-      = ι₂ ((s₁' , f₁ , nothing) , sp₁')
-    ... | ι₂ (s₁' , sp₁')
-      = ι₂ ((SplitEditor.unbase e₁ x₁
-        , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
-        , just (sp₁ , s₁'))
-        , sp₁')
+      = case (SplitEditor.handle e₁ (SplitEditor.unbase e₁ x₁) sp₁ e₁') λ
+      { (ι₁ (s₁' , sp₁' , f₁))
+        → ι₂ ((s₁' , f₁ , nothing) , sp₁')
+      ; (ι₂ (s₁' , sp₁'))
+        → ι₂ ((SplitEditor.unbase e₁ x₁
+          , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
+          , just (sp₁ , s₁'))
+          , sp₁')
+      }
     handle (ι₂ (x₁ , s₂)) (ι₂ sp₂) e₂'
-      with Editor.handle (DependentEditor.editor e₂ x₁) s₂ sp₂ e₂'
-    ... | ι₁ (s₂' , sp₂' , f₂)
-      = ι₁ (ι₂ (x₁ , s₂')
-        , ι₂ sp₂'
-        , CategorySum.arrow₂
-          (CategorySigma.arrow s₂
-            (Category.identity C₁ x₁)
-            (just f₂)
-            (Dependent₁Category.base-identity C₂ x₁ s₂)))
-    ... | ι₂ s₂'
-      = ι₂ s₂'
+      = case (Editor.handle (DependentEditor.editor e₂ x₁) s₂ sp₂ e₂') λ
+      { (ι₁ (s₂' , sp₂' , f₂))
+        → ι₁ (ι₂ (x₁ , s₂')
+          , ι₂ sp₂'
+          , CategorySum.arrow₂
+            (CategorySigma.arrow
+              (Category.identity C₁ x₁)
+              (just f₂)
+              (Dependent₁Category.base-identity C₂ x₁ s₂)))
+      ; (ι₂ s₂')
+        → ι₂ s₂'
+      }
 
     handle-escape
       : (s : State)
@@ -428,45 +431,48 @@ module _
       → Maybe (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
     handle-escape (ι₁ s₁) sp₁
-      with SplitEditor.handle-escape e₁ s₁ sp₁
-    ... | nothing
-      = nothing
-    ... | just (ι₁ (s₁' , sp₁' , f₁))
-      = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
-    ... | just (ι₂ s₁')
-      = just (ι₂ s₁')
+      = case (SplitEditor.handle-escape e₁ s₁ sp₁) λ
+      { nothing
+        → nothing
+      ; (just (ι₁ (s₁' , sp₁' , f₁)))
+        → just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
+      ; (just (ι₂ s₁'))
+        → just (ι₂ s₁')
+      }
     handle-escape (ι₂ (x₁ , _)) (ι₁ sp₁)
-      with SplitEditor.handle-escape e₁ (SplitEditor.unbase e₁ x₁) sp₁
-    ... | nothing
-      = just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁) , sp₁
-        , CategorySum.arrow₁
-          (SplitEditor.state-identity e₁
-            (SplitEditor.unbase e₁ x₁))))
-    ... | just (ι₁ (s₁' , sp₁' , f₁))
-      = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
-    ... | just (ι₂ (s₁' , sp₁'))
-      = just (ι₂ ((SplitEditor.unbase e₁ x₁
-        , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
-        , just (sp₁ , s₁'))
-        , sp₁'))
+      = case (SplitEditor.handle-escape e₁ (SplitEditor.unbase e₁ x₁) sp₁) λ
+      { nothing
+        → just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁) , sp₁
+          , CategorySum.arrow₁
+            (SplitEditor.state-identity e₁
+              (SplitEditor.unbase e₁ x₁))))
+      ; (just (ι₁ (s₁' , sp₁' , f₁)))
+        → just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
+      ; (just (ι₂ (s₁' , sp₁')))
+        → just (ι₂ ((SplitEditor.unbase e₁ x₁
+          , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
+          , just (sp₁ , s₁'))
+          , sp₁'))
+      }
     handle-escape (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      with Editor.handle-escape (DependentEditor.editor e₂ x₁) s₂ sp₂
-    ... | nothing
-      = just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁)
-        , SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁)
-        , CategorySum.arrow₁
-          (SplitEditor.state-identity e₁
-            (SplitEditor.unbase e₁ x₁))))
-    ... | just (ι₁ (s₂' , sp₂' , f₂))
-      = just (ι₁ (ι₂ (x₁ , s₂')
-        , ι₂ sp₂'
-        , CategorySum.arrow₂
-          (CategorySigma.arrow s₂
-            (Category.identity C₁ x₁)
-            (just f₂)
-            (Dependent₁Category.base-identity C₂ x₁ s₂))))
-    ... | just (ι₂ s₂')
-      = just (ι₂ s₂')
+      = case (Editor.handle-escape (DependentEditor.editor e₂ x₁) s₂ sp₂) λ
+      { nothing
+        → just (ι₁ (ι₁ (SplitEditor.unbase e₁ x₁)
+          , SplitEditor.initial-path e₁ (SplitEditor.unbase e₁ x₁)
+          , CategorySum.arrow₁
+            (SplitEditor.state-identity e₁
+              (SplitEditor.unbase e₁ x₁))))
+      ; (just (ι₁ (s₂' , sp₂' , f₂)))
+        → just (ι₁ (ι₂ (x₁ , s₂')
+          , ι₂ sp₂'
+          , CategorySum.arrow₂
+            (CategorySigma.arrow
+              (Category.identity C₁ x₁)
+              (just f₂)
+              (Dependent₁Category.base-identity C₂ x₁ s₂))))
+      ; (just (ι₂ s₂'))
+        → just (ι₂ s₂')
+      }
 
     handle-return
       : (s : State)
@@ -474,44 +480,48 @@ module _
       → Maybe (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
     handle-return (ι₁ s₁) sp₁
-      with SplitEditor.handle-return e₁ s₁ sp₁
-      | SplitEditor.base e₁ s₁
-      | inspect (SplitEditor.base e₁) s₁
-    ... | nothing | nothing | _
-      = nothing
-    ... | nothing | just x₁ | [ p₁ ]
-      = just (ι₁ (ι₂ (x₁ , Editor.initial (DependentEditor.editor e₂ x₁))
-        , ι₂ (Editor.initial-path' (DependentEditor.editor e₂ x₁))
-        , CategorySum.arrow₁ (SplitEditor.normalize-arrow e₁ s₁ p₁)))
-    ... | just (ι₁ (s₁' , sp₁' , f₁)) | _ | _
-      = just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
-    ... | just (ι₂ s₁') | _ | _
-      = just (ι₂ s₁')
+      = case (SplitEditor.handle-return e₁ s₁ sp₁) λ
+      { nothing
+        → case-inspect (SplitEditor.base e₁) s₁ λ
+        { nothing _
+          → nothing
+        ; (just x₁) p₁
+          → just (ι₁ (ι₂ (x₁ , Editor.initial (DependentEditor.editor e₂ x₁))
+            , ι₂ (Editor.initial-path' (DependentEditor.editor e₂ x₁))
+            , CategorySum.arrow₁ (SplitEditor.normalize-arrow e₁ s₁ p₁)))
+        }
+      ; (just (ι₁ (s₁' , sp₁' , f₁)))
+        → just (ι₁ (ι₁ s₁' , sp₁' , CategorySum.arrow₁ f₁))
+      ; (just (ι₂ s₁'))
+        → just (ι₂ s₁')
+      }
     handle-return (ι₂ (x₁ , _)) (ι₁ sp₁)
-      with SplitEditor.handle-return e₁ (SplitEditor.unbase e₁ x₁) sp₁
-    ... | nothing
-      = nothing
-    ... | just (ι₁ (s₁' , sp₁' , f₁))
-      = just (ι₂ ((s₁' , f₁ , nothing) , sp₁'))
-    ... | just (ι₂ (s₁' , sp₁'))
-      = just (ι₂ ((SplitEditor.unbase e₁ x₁
-        , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
-        , just (sp₁ , s₁'))
-        , sp₁'))
+      = case (SplitEditor.handle-return e₁ (SplitEditor.unbase e₁ x₁) sp₁) λ
+      { nothing
+        → nothing
+      ; (just (ι₁ (s₁' , sp₁' , f₁)))
+        → just (ι₂ ((s₁' , f₁ , nothing) , sp₁'))
+      ; (just (ι₂ (s₁' , sp₁')))
+        → just (ι₂ ((SplitEditor.unbase e₁ x₁
+          , SplitEditor.state-identity e₁ (SplitEditor.unbase e₁ x₁)
+          , just (sp₁ , s₁'))
+          , sp₁'))
+      }
     handle-return (ι₂ (x₁ , s₂)) (ι₂ sp₂)
-      with Editor.handle-return (DependentEditor.editor e₂ x₁) s₂ sp₂
-    ... | nothing
-      = nothing
-    ... | just (ι₁ (s₂' , sp₂' , f₂))
-      = just (ι₁ (ι₂ (x₁ , s₂')
-        , ι₂ sp₂'
-        , CategorySum.arrow₂
-          (CategorySigma.arrow s₂
-            (Category.identity C₁ x₁)
-            (just f₂)
-            (Dependent₁Category.base-identity C₂ x₁ s₂))))
-    ... | just (ι₂ s₂')
-      = just (ι₂ s₂')
+      = case (Editor.handle-return (DependentEditor.editor e₂ x₁) s₂ sp₂) λ
+      { nothing
+        → nothing
+      ; (just (ι₁ (s₂' , sp₂' , f₂)))
+        → just (ι₁ (ι₂ (x₁ , s₂')
+          , ι₂ sp₂'
+          , CategorySum.arrow₂
+            (CategorySigma.arrow
+              (Category.identity C₁ x₁)
+              (just f₂)
+              (Dependent₁Category.base-identity C₂ x₁ s₂))))
+      ; (just (ι₂ s₂'))
+        → just (ι₂ s₂')
+      }
 
     handle-direction
       : (s : State)
@@ -623,50 +633,64 @@ module _
       → (s'' ∈ State × sp'' ∈ StatePath s'' × StateArrow s s'')
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
     handle-inner-return (ι₁ s₁) sp₁ s₁' sp₁'
-      with SplitEditor.handle-inner-return e₁ s₁ sp₁ s₁' sp₁'
-    ... | ι₁ (s₁'' , sp₁'' , f₁)
-      = ι₁ (ι₁ s₁'' , sp₁'' , CategorySum.arrow₁ f₁)
-    ... | ι₂ s₁''
-      = ι₂ s₁''
+      = case (SplitEditor.handle-inner-return e₁ s₁ sp₁ s₁' sp₁') λ
+      { (ι₁ (s₁'' , sp₁'' , f₁))
+        → ι₁ (ι₁ s₁'' , sp₁'' , CategorySum.arrow₁ f₁)
+      ; (ι₂ s₁'')
+        → ι₂ s₁''
+      }
     handle-inner-return (ι₂ (x₁ , s₂)) (ι₁ _) (s₁ , f₁ , nothing) sp₁
-      with SplitEditor.handle-return e₁ s₁ sp₁
-      | SplitEditor.base e₁ s₁
-      | inspect (SplitEditor.base e₁) s₁
-    ... | nothing | nothing | _
-      = ι₁ (ι₁ s₁ , sp₁ , CategorySum.arrow₁ f₁)
-    ... | nothing | just x₁' | [ p₁ ]
-      = ι₁ (ι₂ (x₁' , s₂')
-        , ι₂ (Editor.initial-path-with (DependentEditor.editor e₂ x₁') s₂'
-          (Direction.reverse d))
-        , CategorySum.arrow₂
-          (CategorySigma.arrow s₂' f₁'
-            (just (Dependent₁Category.identity C₂ x₁' s₂')) refl))
-      where
-        f₁' = SplitEditor.map e₁ (SplitEditor.base-unbase e₁ x₁) p₁ f₁
-        s₂' = Dependent₁Category.base C₂ f₁' s₂
-    ... | just (ι₁ (s₁' , sp₁' , f₁')) | _ | _
-      = ι₂ ((s₁' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁')
-    ... | just (ι₂ (s₁' , sp₁')) | _ | _
-      = ι₂ ((s₁ , f₁ , just (sp₁ , s₁')) , sp₁')
+      = case (SplitEditor.handle-return e₁ s₁ sp₁) λ
+      { nothing
+        → case-inspect (SplitEditor.base e₁) s₁ λ
+        { nothing _
+          → ι₁ (ι₁ s₁ , sp₁ , CategorySum.arrow₁ f₁)
+        ; (just x₁') p₁
+          → ι₁ (ι₂ (x₁'
+            , Dependent₁Category.base C₂
+              (SplitEditor.map e₁
+                (SplitEditor.base-unbase e₁ x₁) p₁ f₁) s₂)
+            , ι₂ (Editor.initial-path-with
+              (DependentEditor.editor e₂ x₁')
+              (Dependent₁Category.base C₂
+                (SplitEditor.map e₁
+                  (SplitEditor.base-unbase e₁ x₁) p₁ f₁) s₂)
+              (Direction.reverse d))
+            , CategorySum.arrow₂
+              (CategorySigma.arrow
+                (SplitEditor.map e₁
+                  (SplitEditor.base-unbase e₁ x₁) p₁ f₁)
+                (just (Dependent₁Category.identity C₂ x₁'
+                  (Dependent₁Category.base C₂
+                    (SplitEditor.map e₁
+                      (SplitEditor.base-unbase e₁ x₁) p₁ f₁) s₂))) refl))
+        }
+      ; (just (ι₁ (s₁' , sp₁' , f₁')))
+        → ι₂ ((s₁' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁')
+      ; (just (ι₂ (s₁' , sp₁')))
+        → ι₂ ((s₁ , f₁ , just (sp₁ , s₁')) , sp₁')
+      }
     handle-inner-return (ι₂ _) (ι₁ _) (s₁ , f₁ , just (sp₁ , s₁')) sp₁'
-      with SplitEditor.handle-inner-return e₁ s₁ sp₁ s₁' sp₁'
-    ... | ι₁ (s₁'' , sp₁'' , f₁')
-      = ι₂ ((s₁'' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁'')
-    ... | ι₂ (s₁'' , sp₁'')
-      = ι₂ ((s₁ , f₁ , just (sp₁ , s₁'')) , sp₁'')
+      = case (SplitEditor.handle-inner-return e₁ s₁ sp₁ s₁' sp₁') λ
+      { (ι₁ (s₁'' , sp₁'' , f₁'))
+        → ι₂ ((s₁'' , SplitEditor.state-compose e₁ f₁' f₁ , nothing) , sp₁'')
+      ; (ι₂ (s₁'' , sp₁''))
+        → ι₂ ((s₁ , f₁ , just (sp₁ , s₁'')) , sp₁'')
+      }
     handle-inner-return (ι₂ (x₁ , s₂)) (ι₂ sp₂) s₂' sp₂'
-      with Editor.handle-inner-return
-        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂'
-    ... | ι₁ (s₂'' , sp₂'' , f₂)
-      = ι₁ (ι₂ (x₁ , s₂'')
-        , ι₂ sp₂''
-        , CategorySum.arrow₂
-          (CategorySigma.arrow s₂
-            (Category.identity C₁ x₁)
-            (just f₂)
-            (Dependent₁Category.base-identity C₂ x₁ s₂)))
-    ... | ι₂ s₂''
-      = ι₂ s₂''
+      = case (Editor.handle-inner-return
+        (DependentEditor.editor e₂ x₁) s₂ sp₂ s₂' sp₂') λ
+      { (ι₁ (s₂'' , sp₂'' , f₂))
+        → ι₁ (ι₂ (x₁ , s₂'')
+          , ι₂ sp₂''
+          , CategorySum.arrow₂
+            (CategorySigma.arrow
+              (Category.identity C₁ x₁)
+              (just f₂)
+              (Dependent₁Category.base-identity C₂ x₁ s₂)))
+      ; (ι₂ s₂'')
+        → ι₂ s₂''
+      }
 
     handle-inner-direction
       : (s : State)

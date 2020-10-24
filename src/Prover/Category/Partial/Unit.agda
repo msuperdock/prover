@@ -1,7 +1,7 @@
 module Prover.Category.Partial.Unit where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (Category)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare)
 open import Prover.Category.Unit
@@ -37,12 +37,24 @@ module _
 
     abstract
 
+      map-equal
+        : {x y : Category.Object (category-unit A)}
+        → {x' y' : Category.Object (category-unit B)}
+        → {f₁ f₂ : Category.Arrow (category-unit A) x y}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → Category.ArrowEqual (category-unit A) f₁ f₂
+        → Category.ArrowEqual (category-unit B) (map p q f₁) (map p q f₂)
+      map-equal _ _ _
+        = refl
+
       map-identity
         : {x' : Category.Object (category-unit B)}
         → (x : Category.Object (category-unit A))
         → (p : base x ≡ just x')
-        → map p p (Category.identity (category-unit A) x)
-          ≡ Category.identity (category-unit B) x'
+        → Category.ArrowEqual (category-unit B)
+          (map p p (Category.identity (category-unit A) x))
+          (Category.identity (category-unit B) x')
       map-identity _ _
         = refl
   
@@ -54,8 +66,9 @@ module _
         → (r : base z ≡ just z')
         → (f : Category.Arrow (category-unit A) y z)
         → (g : Category.Arrow (category-unit A) x y)
-        → map p r (Category.compose (category-unit A) f g)
-          ≡ Category.compose (category-unit B) (map q r f) (map p q g)
+        → Category.ArrowEqual (category-unit B)
+          (map p r (Category.compose (category-unit A) f g))
+          (Category.compose (category-unit B) (map q r f) (map p q g))
       map-compose _ _ _ _ _
         = refl
 
@@ -69,41 +82,22 @@ module _
 
 -- ## PartialFunctorSquare
 
-module _
-  {A₁ A₂ B₁ B₂ : Set}
-  {F : Function A₁ A₂}
-  {G : Function B₁ B₂}
-  {H₁ : PartialFunction A₁ B₁}
-  {H₂ : PartialFunction A₂ B₂}
-  where
-
-  module PartialFunctorSquareUnit
-    (s : PartialFunctionSquare F G H₁ H₂)
-    where
-
-    open PartialFunctionSquare s public
-      using (base)
-
-    map
-      : {x₁ y₁ : Category.Object (category-unit A₁)}
-      → {x₁' y₁' : Category.Object (category-unit B₁)}
-      → (p₁ : PartialFunctor.base (partial-functor-unit H₁) x₁ ≡ just x₁')
-      → (q₁ : PartialFunctor.base (partial-functor-unit H₁) y₁ ≡ just y₁')
-      → (f₁ : Category.Arrow (category-unit A₁) x₁ y₁)
-      → PartialFunctor.map (partial-functor-unit H₂) (base x₁ p₁) (base y₁ q₁)
-        (Functor.map (functor-unit F) f₁)
-      ≡ Functor.map (functor-unit G)
-        (PartialFunctor.map (partial-functor-unit H₁) p₁ q₁ f₁)
-    map _ _ _
-      = refl
-
-  partial-functor-square-unit
-    : PartialFunctionSquare F G H₁ H₂
-    → PartialFunctorSquare
-      (functor-unit F)
-      (functor-unit G)
-      (partial-functor-unit H₁)
-      (partial-functor-unit H₂)
-  partial-functor-square-unit s
-    = record {PartialFunctorSquareUnit s}
+partial-functor-square-unit
+  : {A₁ A₂ B₁ B₂ : Set}
+  → {F : Function A₁ A₂}
+  → {G : Function B₁ B₂}
+  → {H₁ : PartialFunction A₁ B₁}
+  → {H₂ : PartialFunction A₂ B₂}
+  → PartialFunctionSquare F G H₁ H₂
+  → PartialFunctorSquare
+    (functor-unit F)
+    (functor-unit G)
+    (partial-functor-unit H₁)
+    (partial-functor-unit H₂)
+partial-functor-square-unit s
+  = record
+  { PartialFunctionSquare s
+  ; map
+    = λ _ _ _ → refl
+  }
 

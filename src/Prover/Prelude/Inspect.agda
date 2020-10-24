@@ -8,16 +8,21 @@ module _
   {B : A → Set}
   where
 
-  data Inspect
+  record Inspect
     (f : (x : A) → B x)
     (x : A)
     (y : B x)
     : Set
     where
   
-    [_]
-      : f x ≡ y
-      → Inspect f x y
+    constructor
+
+      [_]
+
+    field
+
+      equal
+        : f x ≡ y
   
   inspect
     : (f : (x : A) → B x)

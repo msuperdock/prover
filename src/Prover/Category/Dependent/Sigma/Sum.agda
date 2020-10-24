@@ -1,15 +1,15 @@
 module Prover.Category.Dependent.Sigma.Sum where
 
 open import Prover.Category.Chain
-  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorIdentity;
-    ChainFunctorSquare)
+  using (ChainCategory; ChainFunctor; ChainFunctorCompose; ChainFunctorEqual;
+    ChainFunctorIdentity; ChainFunctorSquare)
 open import Prover.Category.Dependent
   using (DependentCategory; DependentFunctor; DependentFunctorCompose;
-    DependentFunctorIdentity; DependentFunctorSquare)
+    DependentFunctorEqual; DependentFunctorIdentity; DependentFunctorSquare)
 open import Prover.Category.Dependent.Split
   using (DependentSplitFunctor; DependentSplitFunctorSquare)
 open import Prover.Category.Sigma.Sum
-  using (category-sigma-sum; functor-compose-sigma-sum;
+  using (category-sigma-sum; functor-compose-sigma-sum; functor-equal-sigma-sum;
     functor-identity-sigma-sum; functor-sigma-sum; functor-square-sigma-sum)
 open import Prover.Category.Snoc
   using (chain-category-snoc; chain-functor-snoc)
@@ -47,6 +47,65 @@ dependent-functor-sigma-sum
     (dependent-category-sigma-sum C₂₂' F₁)
     (dependent-category-sigma-sum D₂₂' G₁) H
 
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-sigma-sum
+  : {n : ℕ}
+  → {C D : ChainCategory n}
+  → {C₁₁' C₂₁' : DependentCategory C}
+  → {D₁₁' D₂₁' : DependentCategory D}
+  → {C₂₂' : DependentCategory (chain-category-snoc C₂₁')}
+  → {D₂₂' : DependentCategory (chain-category-snoc D₂₁')}
+  → {F₁ : DependentSplitFunctor C₁₁' C₂₁'}
+  → {G₁ : DependentSplitFunctor D₁₁' D₂₁'}
+  → {H₁ H₂ : ChainFunctor C D}
+  → {H₁₁₁' : DependentFunctor C₁₁' D₁₁' H₁}
+  → {H₁₂₁' : DependentFunctor C₂₁' D₂₁' H₁}
+  → {H₂₁₁' : DependentFunctor C₁₁' D₁₁' H₂}
+  → {H₂₂₁' : DependentFunctor C₂₁' D₂₁' H₂}
+  → {H₁₂₂' : DependentFunctor C₂₂' D₂₂' (chain-functor-snoc H₁₂₁')}
+  → {H₂₂₂' : DependentFunctor C₂₂' D₂₂' (chain-functor-snoc H₂₂₁')}
+  → (s₁₁ : DependentSplitFunctorSquare H₁₁₁' H₁₂₁' F₁ G₁)
+  → (s₂₁ : DependentSplitFunctorSquare H₂₁₁' H₂₂₁' F₁ G₁)
+  → ChainFunctorEqual H₁ H₂
+  → DependentFunctorEqual H₁₁₁' H₂₁₁'
+  → DependentFunctorEqual H₁₂₁' H₂₂₁'
+  → DependentFunctorEqual H₁₂₂' H₂₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-sigma-sum H₁₂₂' s₁₁)
+    (dependent-functor-sigma-sum H₂₂₂' s₂₁)
+
+dependent-functor-equal-sigma-sum'
+  : {A : Set}
+  → {x₁ x₂ : A}
+  → {n : ℕ}
+  → {C : ChainCategory n}
+  → (D : A → ChainCategory n)
+  → {C₁₁' C₂₁' : DependentCategory C}
+  → (D₁₁' D₂₁' : (x : A) → DependentCategory (D x))
+  → {C₂₂' : DependentCategory (chain-category-snoc C₂₁')}
+  → (D₂₂' : (x : A) → DependentCategory (chain-category-snoc (D₂₁' x)))
+  → {F₁ : DependentSplitFunctor C₁₁' C₂₁'}
+  → (G₁ : (x : A) → DependentSplitFunctor (D₁₁' x) (D₂₁' x))
+  → {H₁ : ChainFunctor C (D x₁)}
+  → {H₂ : ChainFunctor C (D x₂)}
+  → {H₁₁₁' : DependentFunctor C₁₁' (D₁₁' x₁) H₁}
+  → {H₁₂₁' : DependentFunctor C₂₁' (D₂₁' x₁) H₁}
+  → {H₂₁₁' : DependentFunctor C₁₁' (D₁₁' x₂) H₂}
+  → {H₂₂₁' : DependentFunctor C₂₁' (D₂₁' x₂) H₂}
+  → {H₁₂₂' : DependentFunctor C₂₂' (D₂₂' x₁) (chain-functor-snoc H₁₂₁')}
+  → {H₂₂₂' : DependentFunctor C₂₂' (D₂₂' x₂) (chain-functor-snoc H₂₂₁')}
+  → (s₁₁ : DependentSplitFunctorSquare H₁₁₁' H₁₂₁' F₁ (G₁ x₁))
+  → (s₂₁ : DependentSplitFunctorSquare H₂₁₁' H₂₂₁' F₁ (G₁ x₂))
+  → x₁ ≡ x₂
+  → ChainFunctorEqual H₁ H₂
+  → DependentFunctorEqual H₁₁₁' H₂₁₁'
+  → DependentFunctorEqual H₁₂₁' H₂₂₁'
+  → DependentFunctorEqual H₁₂₂' H₂₂₂'
+  → DependentFunctorEqual
+    (dependent-functor-sigma-sum H₁₂₂' s₁₁)
+    (dependent-functor-sigma-sum H₂₂₂' s₂₁)
+
 -- ### DependentFunctorIdentity
 
 dependent-functor-identity-sigma-sum
@@ -67,7 +126,7 @@ dependent-functor-identity-sigma-sum
   → DependentFunctorIdentity
     (dependent-functor-sigma-sum G₂₂' s₁)
 
-dependent-functor-identity-sigma-sum-eq
+dependent-functor-identity-sigma-sum'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -126,7 +185,7 @@ dependent-functor-compose-sigma-sum
     (dependent-functor-sigma-sum J₂₂' t₁)
     (dependent-functor-sigma-sum K₂₂' u₁)
 
-dependent-functor-compose-sigma-sum-eq
+dependent-functor-compose-sigma-sum'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -213,7 +272,7 @@ dependent-functor-square-sigma-sum
     (dependent-functor-sigma-sum J₁₂₂' u₁₁)
     (dependent-functor-sigma-sum J₂₂₂' u₂₁)
 
-dependent-functor-square-sigma-sum-eq
+dependent-functor-square-sigma-sum'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -280,6 +339,14 @@ dependent-category-sigma-sum {n = suc _}
     = λ f → dependent-functor-sigma-sum
       (DependentCategory.functor C₂₂' f)
       (DependentSplitFunctor.split-functor-square F₁ f)
+  ; functor-equal
+    = λ {_} {_} {f₁} {f₂} p → dependent-functor-equal-sigma-sum
+      (DependentSplitFunctor.split-functor-square F₁ f₁)
+      (DependentSplitFunctor.split-functor-square F₁ f₂)
+      (ChainCategory.functor-equal C p)
+      (DependentCategory.functor-equal C₁₁' p)
+      (DependentCategory.functor-equal C₂₁' p)
+      (DependentCategory.functor-equal C₂₂' p)
   ; functor-identity
     = λ x → dependent-functor-identity-sigma-sum
       (DependentSplitFunctor.split-functor-square F₁
@@ -313,7 +380,7 @@ dependent-functor-sigma-sum {n = suc _}
       (DependentFunctor.functor H₂₂' x)
       (DependentSplitFunctorSquare.split-functor s₁ x)
   ; functor-square
-    = λ {x = x} {y = y} f → dependent-functor-square-sigma-sum
+    = λ {x} {y} f → dependent-functor-square-sigma-sum
       (DependentSplitFunctor.split-functor-square F₁ f)
       (DependentSplitFunctor.split-functor-square G₁ (ChainFunctor.map H f))
       (DependentSplitFunctorSquare.split-functor s₁ x)
@@ -323,6 +390,34 @@ dependent-functor-sigma-sum {n = suc _}
       (DependentFunctor.functor-square H₂₁' f)
       (DependentFunctor.functor-square H₂₂' f)
   }
+
+-- ### DependentFunctorEqual
+
+dependent-functor-equal-sigma-sum {n = zero} s₁₁ s₂₁ _ p₁₁' p₂₁' p₂₂'
+  = functor-equal-sigma-sum s₁₁ s₂₁ p₁₁' p₂₁' p₂₂'
+
+dependent-functor-equal-sigma-sum {n = suc _}
+  {D = D} {D₁₁' = D₁₁'} {D₂₁' = D₂₁'} {D₂₂' = D₂₂'} 
+  {G₁ = G₁} s₁₁ s₂₁ p p₁₁' p₂₁' p₂₂'
+  = record
+  { functor
+    = λ x → dependent-functor-equal-sigma-sum'
+      (ChainCategory.category' D)
+      (DependentCategory.category D₁₁')
+      (DependentCategory.category D₂₁')
+      (DependentCategory.category D₂₂')
+      (DependentSplitFunctor.split-functor G₁)
+      (DependentSplitFunctorSquare.split-functor s₁₁ x)
+      (DependentSplitFunctorSquare.split-functor s₂₁ x)
+      (ChainFunctorEqual.base p x)
+      (ChainFunctorEqual.functor' p x)
+      (DependentFunctorEqual.functor p₁₁' x)
+      (DependentFunctorEqual.functor p₂₁' x)
+      (DependentFunctorEqual.functor p₂₂' x)
+  }
+
+dependent-functor-equal-sigma-sum' _ _ _ _ _ s₁₁ s₂₁ refl
+  = dependent-functor-equal-sigma-sum s₁₁ s₂₁
 
 -- ### DependentFunctorIdentity
 
@@ -334,7 +429,7 @@ dependent-functor-identity-sigma-sum {n = suc _}
   {F₁ = F₁} s₁ p p₁₁' p₂₁' p₂₂'
   = record
   { functor
-    = λ x → dependent-functor-identity-sigma-sum-eq
+    = λ x → dependent-functor-identity-sigma-sum'
       (ChainCategory.category' C)
       (DependentCategory.category C₁₁')
       (DependentCategory.category C₂₁')
@@ -348,7 +443,7 @@ dependent-functor-identity-sigma-sum {n = suc _}
       (DependentFunctorIdentity.functor p₂₂' x)
   }
 
-dependent-functor-identity-sigma-sum-eq _ _ _ _ _ s₁ refl
+dependent-functor-identity-sigma-sum' _ _ _ _ _ s₁ refl
   = dependent-functor-identity-sigma-sum s₁
 
 -- ### DependentFunctorCompose
@@ -361,7 +456,7 @@ dependent-functor-compose-sigma-sum {n = suc _}
   {H₁ = H₁} {J = J} s₁ t₁ u₁ p p₁₁' p₂₁' p₂₂'
   = record
   { functor
-    = λ x → dependent-functor-compose-sigma-sum-eq
+    = λ x → dependent-functor-compose-sigma-sum'
       (ChainCategory.category' E)
       (DependentCategory.category E₁₁')
       (DependentCategory.category E₂₁')
@@ -377,7 +472,7 @@ dependent-functor-compose-sigma-sum {n = suc _}
       (DependentFunctorCompose.functor p₂₂' x)
   }
 
-dependent-functor-compose-sigma-sum-eq _ _ _ _ _ s₁ t₁ u₁ refl
+dependent-functor-compose-sigma-sum' _ _ _ _ _ s₁ t₁ u₁ refl
   = dependent-functor-compose-sigma-sum s₁ t₁ u₁
 
 -- ### DependentFunctorSquare
@@ -386,11 +481,11 @@ dependent-functor-square-sigma-sum {n = zero} s₁ t₁ u₁₁ u₂₁ _ v₁�
   = functor-square-sigma-sum s₁ t₁ u₁₁ u₂₁ v₁₁' v₂₁' v₂₂'
 
 dependent-functor-square-sigma-sum {n = suc _}
-  {D₂ = D₂} {D₂₁₁' = D₂₁₁'} {D₂₂₁' = D₂₂₁'} {D₂₂₂' = D₂₂₂'} {G₂₁ = G₂₁}
-  {H = H} {J₁ = J₁} s₁ t₁ u₁₁ u₂₁ v v₁₁' v₂₁' v₂₂'
+  {D₂ = D₂} {D₂₁₁' = D₂₁₁'} {D₂₂₁' = D₂₂₁'} {D₂₂₂' = D₂₂₂'}
+  {G₂₁ = G₂₁} {H = H} {J₁ = J₁} s₁ t₁ u₁₁ u₂₁ v v₁₁' v₂₁' v₂₂'
   = record
   { functor
-    = λ x₁ → dependent-functor-square-sigma-sum-eq
+    = λ x₁ → dependent-functor-square-sigma-sum'
       (ChainCategory.category' D₂)
       (DependentCategory.category D₂₁₁')
       (DependentCategory.category D₂₂₁')
@@ -407,6 +502,6 @@ dependent-functor-square-sigma-sum {n = suc _}
       (DependentFunctorSquare.functor v₂₂' x₁)
   }
 
-dependent-functor-square-sigma-sum-eq _ _ _ _ _ s₁ t₁ u₁₁ u₂₁ refl
+dependent-functor-square-sigma-sum' _ _ _ _ _ s₁ t₁ u₁₁ u₂₁ refl
   = dependent-functor-square-sigma-sum s₁ t₁ u₁₁ u₂₁
 

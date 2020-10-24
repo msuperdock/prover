@@ -1,7 +1,8 @@
 module Prover.Category.Dependent where
 
 open import Prover.Category
-  using (Category; Functor; FunctorCompose; FunctorIdentity; FunctorSquare)
+  using (Category; Functor; FunctorCompose; FunctorEqual; FunctorIdentity;
+    FunctorSquare)
 open import Prover.Category.Chain
   using (ChainCategory; ChainFunctor)
 open import Prover.Prelude
@@ -36,6 +37,32 @@ record DependentFunctor'
   (C' : DependentCategory C)
   (D' : DependentCategory D)
   (F : ChainFunctor C D)
+  : Set
+
+-- ### DependentFunctorEqual
+
+DependentFunctorEqual
+  : {n : ℕ}
+  → {C D₁ D₂ : ChainCategory n}
+  → {C' : DependentCategory C}
+  → {D₁' : DependentCategory D₁}
+  → {D₂' : DependentCategory D₂}
+  → {F₁ : ChainFunctor C D₁}
+  → {F₂ : ChainFunctor C D₂}
+  → DependentFunctor C' D₁' F₁
+  → DependentFunctor C' D₂' F₂
+  → Set
+
+record DependentFunctorEqual'
+  {n : ℕ}
+  {C D₁ D₂ : ChainCategory (suc n)}
+  {C' : DependentCategory C}
+  {D₁' : DependentCategory D₁}
+  {D₂' : DependentCategory D₂}
+  {F₁ : ChainFunctor C D₁}
+  {F₂ : ChainFunctor C D₂}
+  (F₁' : DependentFunctor C' D₁' F₁)
+  (F₂' : DependentFunctor C' D₂' F₂)
   : Set
 
 -- ### DependentFunctorIdentity
@@ -158,6 +185,14 @@ record DependentCategory' C where
         (category y)
         (ChainCategory.functor C f)
 
+    functor-equal
+      : {x y : ChainCategory.Object C}
+      → {f₁ f₂ : ChainCategory.Arrow C x y}
+      → ChainCategory.ArrowEqual C f₁ f₂
+      → DependentFunctorEqual
+        (functor f₁)
+        (functor f₂)
+
     functor-identity
       : (x : ChainCategory.Object C)
       → DependentFunctorIdentity
@@ -208,6 +243,28 @@ record DependentFunctor' {_ C} C' D' F where
 
 module DependentFunctor
   = DependentFunctor'
+
+-- ### DependentFunctorEqual
+
+DependentFunctorEqual {n = zero}
+  = FunctorEqual
+DependentFunctorEqual {n = suc _}
+  = DependentFunctorEqual'
+
+record DependentFunctorEqual' {_ C} F₁' F₂' where
+
+  inductive
+
+  field
+
+    functor
+      : (x : ChainCategory.Object C)
+      → DependentFunctorEqual
+        (DependentFunctor.functor F₁' x)
+        (DependentFunctor.functor F₂' x)
+
+module DependentFunctorEqual
+  = DependentFunctorEqual'
 
 -- ### DependentFunctorIdentity
 

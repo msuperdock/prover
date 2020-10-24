@@ -4,31 +4,27 @@ open import Prover.Prelude
 
 -- ## Definition
 
-module _Associativity where
-
-  data Associativity
-    : Set
-    where
-  
-    none
-      : Associativity
-
-    left
-      : Associativity
-  
-    right
-      : Associativity
-
-Associativity
+data Associativity'
   : Set
+  where
+
+  none
+    : Associativity'
+
+  left
+    : Associativity'
+
+  right
+    : Associativity'
+
 Associativity
-  = _Associativity.Associativity
+  = Associativity'
 
 -- ## Module
 
 module Associativity where
   
-  open _Associativity.Associativity public
+  open Associativity' public
 
   _≟_ass
     : Decidable (Equal Associativity)

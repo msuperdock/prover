@@ -26,57 +26,48 @@ open List
 
 -- ## Definition
 
-module _Collection where
-
-  record Collection
-    {A : Set}
-    (R : Relation A)
-    : Set
-    where
-    
-    constructor
-
-      collection
-
-    field
-    
-      elements
-        : List A
-      
-    size
-      : ℕ
-    size
-      = List.length elements
+record Collection'
+  {A : Set}
+  (R : Relation A)
+  : Set
+  where
   
-    field
-  
-      .valid
-        : (k₁ k₂ : Fin size)
-        → R (elements ! k₁) (elements ! k₂)
-        → k₁ ≡ k₂
+  constructor
 
-    valid'
+    collection
+
+  field
+  
+    elements
+      : List A
+    
+  size
+    : ℕ
+  size
+    = List.length elements
+
+  field
+
+    .valid
       : (k₁ k₂ : Fin size)
       → R (elements ! k₁) (elements ! k₂)
       → k₁ ≡ k₂
-    valid' k₁ k₂ r
-      = Dec.recompute (k₁ ≟ k₂ fin) (valid k₁ k₂ r)
+
+  valid'
+    : (k₁ k₂ : Fin size)
+    → R (elements ! k₁) (elements ! k₂)
+    → k₁ ≡ k₂
+  valid' k₁ k₂ r
+    = Dec.recompute (k₁ ≟ k₂ fin) (valid k₁ k₂ r)
 
 Collection
-  : {A : Set}
-  → Relation A
-  → Set
-Collection
-  = _Collection.Collection
-
-open _Collection public
-  using (collection)
+  = Collection'
 
 -- ## Module
 
 module Collection where
 
-  open _Collection.Collection public
+  open Collection' public
 
   -- ### Interface
 
@@ -151,6 +142,30 @@ module Collection where
         (sym (List.lookup-map f xs' k₂))
     }
 
+  -- ### Equality
+
+  module _
+    {A : Set}
+    {R : Relation A}
+    where
+
+    decidable
+      : Decidable (Equal A)
+      → Decidable (Equal (Collection R))
+    decidable d (collection xs₁ _) (collection xs₂ _)
+      with List.decidable d xs₁ xs₂
+    ... | no ¬p
+      = no λ {refl → ¬p refl}
+    ... | yes refl
+      = yes refl
+
+    collection-equal
+      : {xs₁ xs₂ : Collection R}
+      → elements xs₁ ≡ elements xs₂
+      → xs₁ ≡ xs₂
+    collection-equal refl
+      = refl
+
   -- ### Construction
 
   empty
@@ -201,30 +216,6 @@ module Collection where
   ... | yes f
     = just (collection xs f)
 
-  -- ### Equality
-
-  module _
-    {A : Set}
-    {R : Relation A}
-    where
-
-    decidable
-      : Decidable (Equal A)
-      → Decidable (Equal (Collection R))
-    decidable d (collection xs₁ _) (collection xs₂ _)
-      with List.decidable d xs₁ xs₂
-    ... | no ¬p
-      = no λ {refl → ¬p refl}
-    ... | yes refl
-      = yes refl
-
-    collection-eq
-      : {xs₁ xs₂ : Collection R}
-      → elements xs₁ ≡ elements xs₂
-      → xs₁ ≡ xs₂
-    collection-eq refl
-      = refl
-
   -- ### Membership
 
   module _
@@ -250,14 +241,14 @@ module Collection where
     is-member? (collection xs _)
       = List.is-member? xs
 
-    is-member-eq
+    is-member-equal
       : {x₁ x₂ : A}
       → (xs : Collection R)
       → IsMember xs x₁
       → IsMember xs x₂
       → R x₁ x₂
       → x₁ ≡ x₂
-    is-member-eq xs@(collection xs' _) (is-member k₁ p₁) (is-member k₂ p₂) r
+    is-member-equal xs@(collection xs' _) (is-member k₁ p₁) (is-member k₂ p₂) r
       = trans (sym p₁)
       $ trans (sub (List.lookup xs') (valid' xs k₁ k₂ (rewrite₂ R p₁ p₂ r)))
       $ p₂
@@ -358,7 +349,7 @@ module Collection where
   ... | (z , q)
     = trans q
     $ sub just
-    $ is-member-eq xs
+    $ is-member-equal xs
       (find-just xs f q) m
       (u z y (find-true xs f q) p)
 
@@ -385,7 +376,7 @@ module Collection where
   find-member-just (collection xs _)
     = List.find-member-just xs
 
-  find-member-just-eq
+  find-member-just-equal
     : {A : Set}
     → {R : Relation A}
     → {y : A}
@@ -397,7 +388,7 @@ module Collection where
     → IsMember xs y
     → find-member xs f ≡ just m
     → y ≡ Member.value m
-  find-member-just-eq xs f u p m q
+  find-member-just-equal xs f u p m q
     = Maybe.just-injective
     $ trans (sym (member-find-unique xs f u p m))
     $ find-member-just xs f q
@@ -483,5 +474,5 @@ module Collection where
 -- ## Exports
 
 open Collection public
-  using (collection-eq)
+  using (collection-equal)
 
