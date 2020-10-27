@@ -1,9 +1,5 @@
 function agda-unused $argv
-  command agda-unused --root /data/code/prover/src
-end
-
-function echo-space $argv
-  echo; echo $argv; echo
+  command agda-unused --root "$NIX_ROOT/src"
 end
 
 function with-dir
@@ -13,63 +9,29 @@ function with-dir
 end
 
 function check-agda
-  argparse --name=check-agda 'a/all' -- $argv
+  echo; echo 'Checking Agda code:'; echo
 
-  if test $_flag_all
-    echo-space 'Checking Agda code:'
-  end
+  with-dir "$NIX_ROOT/src" \
+    agda \
+    --local-interfaces \
+    --no-libraries \
+    --include-path=. \
+    Check.agda
+  or return $status
+  echo 'All done.'
 
-  set modules (agda-roots --root /data/code/prover/src); or return $status
-
-  for module in $modules
-    echo-space "Checking $module:"
-    with-dir /data/code/prover/src agda \
-      --local-interfaces \
-      --no-libraries \
-      --include-path=. \
-      $module
-    or return $status
-  end
-
+  echo; echo 'Checking for unused code:'; echo
   agda-unused
 end
 
 function build-agda
-  argparse --name=build-agda 'a/all' -- $argv
-
-  if test $_flag_all
-    check-agda --all; or return $status
-    echo-space 'Building Agda code:'
-  end
-
-  with-dir /data/code/prover/src agda \
+  with-dir "$NIX_ROOT/src" \
+    agda \
     --compile \
     --ghc-dont-call-ghc \
     --local-interfaces \
     --no-libraries \
     --include-path=. \
     Main.agda
-end
-
-function build-hs
-  argparse --name=build-exe 'a/all' -- $argv
-
-  if test $_flag_all
-    build-agda --all; or return $status
-    echo-space 'Building Haskell code:'
-  end
-
-  with-dir /data/code/prover cabal new-build prover
-end
-
-function run
-  argparse --name=run 'a/all' -- $argv
-
-  if test $_flag_all
-    build-agda --all; or return $status
-    echo-space 'Running Haskell executable:'
-  end
-
-  with-dir /data/code/prover cabal new-run
 end
 
