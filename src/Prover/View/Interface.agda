@@ -6,7 +6,7 @@ open import Prover.View.Window
   using (Window; WindowPath)
 open import Prover.Prelude
 
-open Vec
+open List
   using (_!_)
 
 record Interface
@@ -19,14 +19,11 @@ record Interface
 
   field
 
-    {length}
-      : ℕ
-  
     command
       : Maybe Command
 
     windows
-      : Vec Window length
+      : List Window
 
 data InterfacePath
   : Interface
@@ -34,21 +31,18 @@ data InterfacePath
   where
 
   nothing
-    : {n : ℕ}
-    → {ws : Vec Window n}
+    : {ws : List Window}
     → InterfacePath (interface nothing ws)
 
   window
-    : {n : ℕ}
-    → {ws : Vec Window n}
-    → (k : Fin n)
+    : {ws : List Window}
+    → (k : Fin (List.length ws))
     → WindowPath (ws ! k)
     → InterfacePath (interface nothing ws)
 
   command
-    : {n : ℕ}
-    → {c : Command}
-    → {ws : Vec Window n}
+    : {c : Command}
+    → {ws : List Window}
     → CommandPath c
     → InterfacePath (interface (just c) ws)
   

@@ -14,7 +14,7 @@ open import Prover.View.Style
   using (Style)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_; _!_)
 
 -- ## Internal
@@ -48,8 +48,7 @@ module Internal where
       → RichText
   
     texts
-      : {n : ℕ}
-      → Vec RichText n
+      : List RichText
       → RichText
     
   data RichTextPath
@@ -69,9 +68,8 @@ module Internal where
       → RichTextPath (style s t)
   
     text
-      : {n : ℕ}
-      → {ts : Vec RichText n}
-      → (k : Fin n)
+      : {ts : List RichText}
+      → (k : Fin (List.length ts))
       → RichTextPath (ts ! k)
       → RichTextPath (texts ts)
     

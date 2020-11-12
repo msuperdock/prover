@@ -8,15 +8,8 @@ open import Prover.View.Text
   using (PlainText; RichText)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_; _!_)
-
-open List using () renaming
-  ( []
-    to []'
-  ; _∷_
-    to _∷'_
-  )
 
 -- ## Definitions
 
@@ -29,8 +22,7 @@ data Tree
     → Tree
 
   node
-    : {n : ℕ}
-    → Vec Tree (suc n)
+    : List Tree
     → Line
     → Tree
 
@@ -44,10 +36,9 @@ data TreePath
     → TreePath t
 
   go
-    : {n : ℕ}
-    → {ts : Vec Tree (suc n)}
+    : {ts : List Tree}
     → {l : Line}
-    → (k : Fin (suc n))
+    → (k : Fin (List.length ts))
     → TreePath (ts ! k)
     → TreePath (node ts l)
 
@@ -68,37 +59,40 @@ indent-line t (line s t')
   }
 
 indent-lines
-  : {n : ℕ}
+  : PlainText
   → PlainText
-  → PlainText
-  → Vec Line n
-  → Vec Line n
+  → List Line
+  → List Line
 indent-lines _ _ []
   = []
 indent-lines _ t (l ∷ [])
   = indent-line t l ∷ []
-indent-lines t t' (l ∷ ls@(_ ∷ _))
+indent-lines t t' (l ∷ ls)
   = indent-line t l ∷ indent-lines t t' ls
 
 indent-head
   : List Line
   → List Line
-indent-head (any ls)
-  = any (indent-lines (String.to-list "  ") (String.to-list "┌╸") ls)
+indent-head
+  = indent-lines
+    (String.to-list "  ")
+    (String.to-list "┌╸")
 
 indent-tail
   : List Line
   → List Line
-indent-tail (any ls)
-  = any (indent-lines (String.to-list "│ ") (String.to-list "├╸") ls)
+indent-tail
+  = indent-lines
+    (String.to-list "│ ")
+    (String.to-list "├╸")
 
 indent-trees
   : List (List Line)
   → List Line
-indent-trees []'
-  = []'
-indent-trees (t ∷' ts)
-  = List.concat (indent-head t ∷' List.map indent-tail ts)
+indent-trees []
+  = []
+indent-trees (t ∷ ts)
+  = List.concat (indent-head t ∷ List.map indent-tail ts)
 
 -- ### draw
 
@@ -107,19 +101,18 @@ draw-tree
   → List Line
 
 draw-trees
-  : {n : ℕ}
-  → Vec Tree n
+  : List Tree
   → List (List Line)
 
 draw-tree (leaf l)
-  = l ∷' []'
+  = l ∷ []
 draw-tree (node ts l)
   = List.snoc (indent-trees (draw-trees ts)) l
 
 draw-trees []
-  = []'
+  = []
 draw-trees (t ∷ ts)
-  = draw-tree t ∷' draw-trees ts
+  = draw-tree t ∷ draw-trees ts
 
 -- ### draw-with
 
@@ -129,14 +122,13 @@ draw-tree-with
   → List Line
 
 draw-trees-with
-  : {n : ℕ}
-  → (ts : Vec Tree n)
-  → (k : Fin n)
+  : (ts : List Tree)
+  → (k : Fin (List.length ts))
   → TreePath (ts ! k)
   → List (List Line)
 
 draw-tree-with (leaf (line s t)) stop
-  = line s (RichText.style Style.highlight t) ∷' []'
+  = line s (RichText.style Style.highlight t) ∷ []
 draw-tree-with (node ts (line s t)) stop
   = List.snoc (indent-trees (draw-trees ts))
     (line s (RichText.style Style.highlight t))
@@ -144,7 +136,7 @@ draw-tree-with (node ts l) (go k tp)
   = List.snoc (indent-trees (draw-trees-with ts k tp)) l
 
 draw-trees-with (t ∷ ts) zero tp
-  = draw-tree-with t tp ∷' draw-trees ts
+  = draw-tree-with t tp ∷ draw-trees ts
 draw-trees-with (t ∷ ts) (suc k) tp
-  = draw-tree t ∷' draw-trees-with ts k tp
+  = draw-tree t ∷ draw-trees-with ts k tp
 

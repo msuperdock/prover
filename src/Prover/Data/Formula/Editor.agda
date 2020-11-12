@@ -154,6 +154,7 @@ module _
     = RichText.plain (any cs)
   draw-formula (FormulaState.symbol s _ l r cs)
     = RichText.texts
+    $ any
     $ draw-formula-left l
     ∷ draw-formula-center (Symbol.tokens s) cs
     ∷ draw-formula-right r
@@ -173,6 +174,7 @@ module _
     = RichText.plain (Token.characters t)
   draw-formula-center (t ∷ ts@(_ ∷ _)) (s ∷ ss)
     = RichText.texts
+    $ any
     $ RichText.plain (Token.characters t)
     ∷ draw-sandbox s
     ∷ draw-formula-center ts ss
@@ -182,6 +184,7 @@ module _
     = draw-formula f
   draw-sandbox (any (SandboxState.cons f _ s _))
     = RichText.texts
+    $ any
     $ draw-formula f
     ∷ RichText.plain (String.to-list "   ")
     ∷ draw-sandbox s

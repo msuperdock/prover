@@ -38,7 +38,7 @@ open import Prover.View.Window
   using (Window; WindowFlatViewStack; WindowViewStack; go)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_)
 
 -- ## Types

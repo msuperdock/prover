@@ -209,7 +209,7 @@ module _
   draw-branch _ (Branch.rule _ _ [] c _)
     = Tree.leaf (line true (draw-formula c))
   draw-branch hs (Branch.rule _ _ bs@(_ ∷ _) c _)
-    = Tree.node (draw-branches hs bs) (line true (draw-formula c))
+    = Tree.node (any (draw-branches hs bs)) (line true (draw-formula c))
 
   draw-branches _ []
     = []

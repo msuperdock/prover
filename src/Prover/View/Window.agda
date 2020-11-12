@@ -12,7 +12,7 @@ open import Prover.View.Line
   using (Line; LinePath)
 open import Prover.Prelude
 
-open Vec
+open List
   using (_!_)
 
 -- ## Definitions
@@ -27,9 +27,6 @@ record Window
 
   field
 
-    {length}
-      : ℕ
-
     name
       : String
 
@@ -38,7 +35,7 @@ record Window
       : Bool
 
     lines
-      : Vec Line length
+      : List Line
 
 data WindowPath
   (w : Window)
@@ -46,7 +43,7 @@ data WindowPath
   where
 
   go
-    : (k : Fin (Window.length w))
+    : (k : Fin (List.length (Window.lines w)))
     → LinePath (Window.lines w ! k)
     → WindowPath w
 

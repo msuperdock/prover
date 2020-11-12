@@ -14,7 +14,7 @@ open import Prover.View.Window
   using (Window; WindowPath; go; window)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_; _!_)
 
 -- ## Types
@@ -466,10 +466,9 @@ attribute-foreground
   = with-foreground default-attribute
 
 attribute-list
-  : List' (Pair AttributeName Attribute)
+  : List (Pair AttributeName Attribute)
 attribute-list
-  = Vec.to-builtin
-  $ pair attribute-complete
+  = pair attribute-complete
     (attribute-foreground green)
   ∷ pair attribute-highlight
     (attribute-background black)
@@ -486,7 +485,7 @@ attribute-list
 attributes
   : AttributeMap
 attributes
-  = attribute-map default-attribute attribute-list
+  = attribute-map default-attribute (List.to-builtin attribute-list)
 
 -- ## Widgets
 
@@ -502,18 +501,16 @@ pad-right
   = pad-right-with padding-max
 
 horizontal-box
-  : {n : ℕ}
-  → Vec Widget n
+  : List Widget
   → Widget
 horizontal-box ws
-  = horizontal-box' (Vec.to-builtin ws)
+  = horizontal-box' (List.to-builtin ws)
 
 vertical-box
-  : {n : ℕ}
-  → Vec Widget n
+  : List Widget
   → Widget
 vertical-box ws
-  = vertical-box' (Vec.to-builtin ws)
+  = vertical-box' (List.to-builtin ws)
 
 flag
   : Bool
@@ -586,9 +583,8 @@ draw-rich-text
   → Widget
 
 draw-rich-texts
-  : {n : ℕ}
-  → Vec RichText n
-  → Vec Widget n
+  : List RichText
+  → List Widget
 
 draw-rich-text (RichText.plain t)
   = draw-plain-text t
@@ -608,11 +604,10 @@ draw-rich-text-with
   → Widget
 
 draw-rich-texts-with
-  : {n : ℕ}
-  → (ts : Vec RichText n)
-  → (k : Fin n)
+  : (ts : List RichText)
+  → (k : Fin (List.length ts))
   → RichTextPath (ts ! k)
-  → Vec Widget n
+  → List Widget
 
 draw-rich-text-with (RichText.plain t) (plain tp)
   = draw-plain-text-with t tp
@@ -635,11 +630,10 @@ draw-line (line s t)
   = horizontal-box (margin s ∷ string " " ∷ draw-rich-text t ∷ [])
 
 draw-lines
-  : {n : ℕ}
-  → Vec Line n
-  → Vec Widget n
+  : List Line
+  → List Widget
 draw-lines
-  = Vec.map draw-line
+  = List.map draw-line
 
 draw-line-with
   : (l : Line)
@@ -649,11 +643,10 @@ draw-line-with (line s t) lp
   = horizontal-box (margin s ∷ string " " ∷ draw-rich-text-with t lp ∷ [])
 
 draw-lines-with
-  : {n : ℕ}
-  → (ls : Vec Line n)
-  → (k : Fin n)
+  : (ls : List Line)
+  → (k : Fin (List.length ls))
   → LinePath (ls ! k)
-  → Vec Widget n
+  → List Widget
 draw-lines-with (l ∷ ls) zero lp
   = draw-line-with l lp ∷ draw-lines ls
 draw-lines-with (l ∷ ls) (suc k) lp
@@ -680,16 +673,14 @@ draw-window-tail (window n c ls)
   ∷ []
 
 draw-windows-tail
-  : {n : ℕ}
-  → Vec Window n
-  → Vec Widget n
+  : List Window
+  → List Widget
 draw-windows-tail
-  = Vec.map draw-window-tail
+  = List.map draw-window-tail
 
 draw-windows
-  : {n : ℕ}
-  → Vec Window n
-  → Vec Widget n
+  : List Window
+  → List Widget
 draw-windows []
   = []
 draw-windows (p ∷ ps)
@@ -716,22 +707,20 @@ draw-window-tail-with (window n c ls) (go k lp)
   ∷ []
 
 draw-windows-tail-with
-  : {n : ℕ}
-  → (ps : Vec Window n)
-  → (k : Fin n)
+  : (ps : List Window)
+  → (k : Fin (List.length ps))
   → WindowPath (ps ! k)
-  → Vec Widget n
+  → List Widget
 draw-windows-tail-with (p ∷ ps) zero pp
   = draw-window-tail-with p pp ∷ draw-windows-tail ps
 draw-windows-tail-with (p ∷ ps) (suc k) pp
   = draw-window-tail p ∷ draw-windows-tail-with ps k pp
 
 draw-windows-with
-  : {n : ℕ}
-  → (ps : Vec Window n)
-  → (k : Fin n)
+  : (ps : List Window)
+  → (k : Fin (List.length ps))
   → WindowPath (ps ! k)
-  → Vec Widget n
+  → List Widget
 draw-windows-with (p ∷ ps) zero pp
   = draw-window-head-with p pp ∷ draw-windows-tail ps
 draw-windows-with (p ∷ ps) (suc k) pp
@@ -753,9 +742,9 @@ draw-interface-with
   → InterfacePath w
   → Widget
 draw-interface-with (interface nothing ps) nothing
-  = vertical-box (Vec.snoc (draw-windows ps) empty-line)
+  = vertical-box (List.snoc (draw-windows ps) empty-line)
 draw-interface-with (interface nothing ps) (window k pp)
-  = vertical-box (Vec.snoc (draw-windows-with ps k pp) empty-line)
+  = vertical-box (List.snoc (draw-windows-with ps k pp) empty-line)
 draw-interface-with (interface (just c) ps) (command cp)
-  = vertical-box (Vec.snoc (draw-windows ps) (draw-command-with c cp))
+  = vertical-box (List.snoc (draw-windows ps) (draw-command-with c cp))
 

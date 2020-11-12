@@ -36,7 +36,7 @@ open import Prover.View.Window
   using (Window)
 open import Prover.Prelude
 
-open Vec
+open List
   using ([]; _∷_)
 
 -- ## Types
@@ -64,7 +64,7 @@ module ProofViewStackMap
   view
     : ViewStack.View ProofViewStack
     → ViewStack.View ProofWindowViewStack
-  view (any ls)
+  view ls
     = record
     { name
       = "proof"
