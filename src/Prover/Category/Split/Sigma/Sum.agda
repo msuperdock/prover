@@ -43,24 +43,24 @@ split-functor-sigma-sum {C₂ = C₂} F₁ F₂
 -- ## SplitFunctorSquare
 
 split-functor-square-sigma-sum
-  : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
-  → {C₁₂ D₁₂ : Dependent₁Category D₁₁}
-  → {C₂₂ D₂₂ : Dependent₁Category D₂₁}
-  → {F₁ : Functor C₁₁ C₂₁}
-  → {G₁ : Functor D₁₁ D₂₁}
-  → {F₂ : Dependent₁Functor C₁₂ C₂₂ G₁}
-  → {G₂ : Dependent₁Functor D₁₂ D₂₂ G₁}
+  : {C₁₁ C₁₂ D₁₁ D₁₂ : Category}
+  → {C₂₁ D₂₁ : Dependent₁Category D₁₁}
+  → {C₂₂ D₂₂ : Dependent₁Category D₁₂}
+  → {F₁ : Functor C₁₁ C₁₂}
+  → {G₁ : Functor D₁₁ D₁₂}
+  → {F₂ : Dependent₁Functor C₂₁ C₂₂ G₁}
+  → {G₂ : Dependent₁Functor D₂₁ D₂₂ G₁}
   → {H₁₁ : SplitFunctor C₁₁ D₁₁}
-  → {H₂₁ : SplitFunctor C₂₁ D₂₁}
-  → {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
+  → {H₁₂ : SplitFunctor C₁₂ D₁₂}
+  → {H₂₁ : Dependent₁SplitFunctor C₂₁ D₂₁}
   → {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
-  → (s₁ : SplitFunctorSquare F₁ G₁ H₁₁ H₂₁)
-  → Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
+  → (s₁ : SplitFunctorSquare F₁ G₁ H₁₁ H₁₂)
+  → Dependent₁SplitFunctorSquare F₂ G₂ H₂₁ H₂₂
   → SplitFunctorSquare
     (functor-sigma-sum F₂ s₁)
     (functor-sigma-maybe G₂)
-    (split-functor-sigma-sum H₁₁ H₁₂)
-    (split-functor-sigma-sum H₂₁ H₂₂)
+    (split-functor-sigma-sum H₁₁ H₂₁)
+    (split-functor-sigma-sum H₁₂ H₂₂)
 split-functor-square-sigma-sum {F₂ = F₂} s₁ s₂
   = split-functor-square-compose
     (split-functor-square-sigma-maybe s₂)

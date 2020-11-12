@@ -61,15 +61,15 @@ module _
 
       arrow₁-equal
         : {x y : Object}
-        → {f₁₁ f₂₁ : Category.Arrow C₁ (object₁ x) (object₁ y)}
-        → Category.ArrowEqual C₁ f₁₁ f₂₁
-        → ArrowEqual {x = x} {y = y} (arrow₁ f₁₁) (arrow₁ f₂₁)
+        → {f₁₁ f₁₂ : Category.Arrow C₁ (object₁ x) (object₁ y)}
+        → Category.ArrowEqual C₁ f₁₁ f₁₂
+        → ArrowEqual {x = x} {y = y} (arrow₁ f₁₁) (arrow₁ f₁₂)
 
       arrow₂-equal
         : {x₂ y₂ : Category.Object C₂}
-        → {f₁₂ f₂₂ : Category.Arrow C₂ x₂ y₂}
-        → Category.ArrowEqual C₂ f₁₂ f₂₂
-        → ArrowEqual (arrow₂ f₁₂) (arrow₂ f₂₂)
+        → {f₂₁ f₂₂ : Category.Arrow C₂ x₂ y₂}
+        → Category.ArrowEqual C₂ f₂₁ f₂₂
+        → ArrowEqual (arrow₂ f₂₁) (arrow₂ f₂₂)
 
     abstract
 
@@ -102,12 +102,12 @@ module _
         → ArrowEqual f₁ f₂
         → ArrowEqual f₂ f₃
         → ArrowEqual f₁ f₃
-      arrow-trans (arrow₁-equal p₁₁) (arrow₁-equal p₂₁)
+      arrow-trans (arrow₁-equal p₁₁) (arrow₁-equal p₁₂)
         = arrow₁-equal
-        $ Category.arrow-trans C₁ p₁₁ p₂₁
-      arrow-trans (arrow₂-equal p₁₂) (arrow₂-equal p₂₂)
+        $ Category.arrow-trans C₁ p₁₁ p₁₂
+      arrow-trans (arrow₂-equal p₂₁) (arrow₂-equal p₂₂)
         = arrow₂-equal
-        $ Category.arrow-trans C₂ p₁₂ p₂₂
+        $ Category.arrow-trans C₂ p₂₁ p₂₂
 
       simplify
         : {x y : Object}
@@ -299,13 +299,13 @@ arrow-equal₁ _ refl refl (any p₁)
 arrow-equal₂
   : {C₁ C₂ : Category}
   → (F : Functor C₂ C₁)
-  → {x₁₂ x₂₂ y₁₂ y₂₂ : Category.Object C₂}
-  → {f₁₂ : Category.Arrow C₂ x₁₂ y₁₂}
+  → {x₂₁ x₂₂ y₂₁ y₂₂ : Category.Object C₂}
+  → {f₂₁ : Category.Arrow C₂ x₂₁ y₂₁}
   → {f₂₂ : Category.Arrow C₂ x₂₂ y₂₂}
-  → Category.ArrowEqual' C₂ f₁₂ f₂₂
+  → Category.ArrowEqual' C₂ f₂₁ f₂₂
   → Category.ArrowEqual'
     (category-sum F)
-    (CategorySum.arrow₂ f₁₂)
+    (CategorySum.arrow₂ f₂₁)
     (CategorySum.arrow₂ f₂₂)
 arrow-equal₂ _ (any p)
   = any (CategorySum.arrow₂-equal p)
@@ -643,15 +643,15 @@ module _
   {C₁ C₂ D₁ D₂ : Category}
   {F : Functor C₂ C₁}
   {G : Functor D₂ D₁}
-  {H₁₁ H₂₁ : Functor C₁ D₁}
-  {H₁₂ H₂₂ : Functor C₂ D₂}
+  {H₁₁ H₁₂ : Functor C₁ D₁}
+  {H₂₁ H₂₂ : Functor C₂ D₂}
   where
 
   module FunctorEqualSum
-    (s₁ : FunctorSquare H₁₂ H₁₁ F G)
-    (s₂ : FunctorSquare H₂₂ H₂₁ F G)
-    (p₁ : FunctorEqual H₁₁ H₂₁)
-    (p₂ : FunctorEqual H₁₂ H₂₂)
+    (s₁ : FunctorSquare H₂₁ H₁₁ F G)
+    (s₂ : FunctorSquare H₂₂ H₁₂ F G)
+    (p₁ : FunctorEqual H₁₁ H₁₂)
+    (p₂ : FunctorEqual H₂₁ H₂₂)
     where
 
     base
@@ -680,15 +680,15 @@ module _
       $ Category.arrow-sym' D₁ (Category.arrow-equal' D₁
         (FunctorSum.base-equal s₂ x)
         (FunctorSum.base-equal s₂ y)
-        (Functor.map H₂₁ f₁))
+        (Functor.map H₁₂ f₁))
     map (CategorySum.arrow₂ f₂)
       = arrow-equal₂ G (FunctorEqual.map p₂ f₂)
 
   functor-equal-sum
-    : (s₁ : FunctorSquare H₁₂ H₁₁ F G)
-    → (s₂ : FunctorSquare H₂₂ H₂₁ F G)
-    → FunctorEqual H₁₁ H₂₁
-    → FunctorEqual H₁₂ H₂₂
+    : (s₁ : FunctorSquare H₂₁ H₁₁ F G)
+    → (s₂ : FunctorSquare H₂₂ H₁₂ F G)
+    → FunctorEqual H₁₁ H₁₂
+    → FunctorEqual H₂₁ H₂₂
     → FunctorEqual
       (functor-sum s₁)
       (functor-sum s₂)
@@ -751,24 +751,24 @@ functor-compose-sum s t u p₁ p₂
 
 functor-square-sum
   : {C₁₁ C₁₂ C₂₁ C₂₂ D₁₁ D₁₂ D₂₁ D₂₂ : Category}
-  → {F₁ : Functor C₁₂ C₁₁}
-  → {F₂ : Functor C₂₂ C₂₁}
-  → {G₁ : Functor D₁₂ D₁₁}
-  → {G₂ : Functor D₂₂ D₂₁}
-  → {H₁ : Functor C₁₁ C₂₁}
-  → {H₂ : Functor C₁₂ C₂₂}
-  → {I₁ : Functor D₁₁ D₂₁}
-  → {I₂ : Functor D₁₂ D₂₂}
+  → {F₁ : Functor C₂₁ C₁₁}
+  → {F₂ : Functor C₂₂ C₁₂}
+  → {G₁ : Functor D₂₁ D₁₁}
+  → {G₂ : Functor D₂₂ D₁₂}
+  → {H₁ : Functor C₁₁ C₁₂}
+  → {H₂ : Functor C₂₁ C₂₂}
+  → {I₁ : Functor D₁₁ D₁₂}
+  → {I₂ : Functor D₂₁ D₂₂}
   → {J₁₁ : Functor C₁₁ D₁₁}
   → {J₁₂ : Functor C₁₂ D₁₂}
   → {J₂₁ : Functor C₂₁ D₂₁}
   → {J₂₂ : Functor C₂₂ D₂₂}
   → (s : FunctorSquare H₂ H₁ F₁ F₂)
   → (t : FunctorSquare I₂ I₁ G₁ G₂)
-  → (u₁ : FunctorSquare J₁₂ J₁₁ F₁ G₁)
-  → (u₂ : FunctorSquare J₂₂ J₂₁ F₂ G₂)
-  → FunctorSquare H₁ I₁ J₁₁ J₂₁
-  → FunctorSquare H₂ I₂ J₁₂ J₂₂
+  → (u₁ : FunctorSquare J₂₁ J₁₁ F₁ G₁)
+  → (u₂ : FunctorSquare J₂₂ J₁₂ F₂ G₂)
+  → FunctorSquare H₁ I₁ J₁₁ J₁₂
+  → FunctorSquare H₂ I₂ J₂₁ J₂₂
   → FunctorSquare
     (functor-sum s)
     (functor-sum t)
@@ -793,10 +793,10 @@ functor-square-sum s t u₁ u₂ p₁ p₂
 
 functor-square-sum₂
   : {C₁₁ C₁₂ C₂₁ C₂₂ : Category}
-  → {F₁ : Functor C₁₂ C₁₁}
-  → {F₂ : Functor C₂₂ C₂₁}
-  → {G₁ : Functor C₁₁ C₂₁}
-  → {G₂ : Functor C₁₂ C₂₂}
+  → {F₁ : Functor C₂₁ C₁₁}
+  → {F₂ : Functor C₂₂ C₁₂}
+  → {G₁ : Functor C₁₁ C₁₂}
+  → {G₂ : Functor C₂₁ C₂₂}
   → (s : FunctorSquare G₂ G₁ F₁ F₂)
   → FunctorSquare G₂
     (functor-sum s)

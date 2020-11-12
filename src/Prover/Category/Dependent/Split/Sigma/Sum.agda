@@ -37,25 +37,25 @@ dependent-split-functor-square-sigma-sum
   : {n : ℕ}
   → {C₁ C₂ : ChainCategory n}
   → {C₁₁' D₁₁' : DependentCategory C₁}
-  → {C₂₁' D₂₁' : DependentCategory C₂}
-  → {C₁₂' D₁₂' : DependentCategory (chain-category-snoc D₁₁')}
-  → {C₂₂' D₂₂' : DependentCategory (chain-category-snoc D₂₁')}
+  → {C₁₂' D₁₂' : DependentCategory C₂}
+  → {C₂₁' D₂₁' : DependentCategory (chain-category-snoc D₁₁')}
+  → {C₂₂' D₂₂' : DependentCategory (chain-category-snoc D₁₂')}
   → {F : ChainFunctor C₁ C₂}
-  → {F₁' : DependentFunctor C₁₁' C₂₁' F}
-  → {G₁' : DependentFunctor D₁₁' D₂₁' F}
-  → {F₂' : DependentFunctor C₁₂' C₂₂' (chain-functor-snoc G₁')}
-  → {G₂' : DependentFunctor D₁₂' D₂₂' (chain-functor-snoc G₁')}
+  → {F₁' : DependentFunctor C₁₁' C₁₂' F}
+  → {G₁' : DependentFunctor D₁₁' D₁₂' F}
+  → {F₂' : DependentFunctor C₂₁' C₂₂' (chain-functor-snoc G₁')}
+  → {G₂' : DependentFunctor D₂₁' D₂₂' (chain-functor-snoc G₁')}
   → {H₁₁ : DependentSplitFunctor C₁₁' D₁₁'}
-  → {H₂₁ : DependentSplitFunctor C₂₁' D₂₁'}
   → {H₁₂ : DependentSplitFunctor C₁₂' D₁₂'}
+  → {H₂₁ : DependentSplitFunctor C₂₁' D₂₁'}
   → {H₂₂ : DependentSplitFunctor C₂₂' D₂₂'}
-  → (s₁ : DependentSplitFunctorSquare F₁' G₁' H₁₁ H₂₁)
-  → DependentSplitFunctorSquare F₂' G₂' H₁₂ H₂₂
+  → (s₁ : DependentSplitFunctorSquare F₁' G₁' H₁₁ H₁₂)
+  → DependentSplitFunctorSquare F₂' G₂' H₂₁ H₂₂
   → DependentSplitFunctorSquare
     (dependent-functor-sigma-sum F₂' s₁)
     (dependent-functor-sigma-maybe G₁' G₂')
-    (dependent-split-functor-sigma-sum H₁₁ H₁₂)
-    (dependent-split-functor-sigma-sum H₂₁ H₂₂)
+    (dependent-split-functor-sigma-sum H₁₁ H₂₁)
+    (dependent-split-functor-sigma-sum H₁₂ H₂₂)
 
 -- ## Definitions
 

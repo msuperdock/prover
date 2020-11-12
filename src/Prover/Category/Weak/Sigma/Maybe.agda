@@ -51,12 +51,12 @@ module _
 
       map-equal
         : (x y : Category.Object (category-sigma-maybe C₂))
-        → {f₁₁ f₂₁ : Category.Arrow C₁ (unbase x) (unbase y)}
-        → Category.ArrowEqual C₁ f₁₁ f₂₁
+        → {f₁₁ f₁₂ : Category.Arrow C₁ (unbase x) (unbase y)}
+        → Category.ArrowEqual C₁ f₁₁ f₁₂
         → Category.ArrowEqual
           (category-sigma-maybe C₂)
           (map x y f₁₁)
-          (map x y f₂₁)
+          (map x y f₁₂)
       map-equal (_ , x₂) (y₁ , _) p₁
         = record
         { arrow₁
@@ -145,27 +145,27 @@ module _
 -- ## WeakFunctorSquare₁
 
 module _
-  {C₁₁ C₂₁ : Category}
-  {C₁₂ : Dependent₁Category C₁₁}
-  {C₂₂ : Dependent₁Category C₂₁}
-  {F₁ : Functor C₁₁ C₂₁}
+  {C₁₁ C₁₂ : Category}
+  {C₂₁ : Dependent₁Category C₁₁}
+  {C₂₂ : Dependent₁Category C₁₂}
+  {F₁ : Functor C₁₁ C₁₂}
   where
 
   module WeakFunctorSquareSigmaMaybe₁
-    (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
+    (F₂ : Dependent₁Functor C₂₁ C₂₂ F₁)
     where
 
     map
-      : (x₁ y₁ : Category.Object (category-sigma-maybe C₁₂))
+      : (x₁ y₁ : Category.Object (category-sigma-maybe C₂₁))
       → (p : Functor.base (functor-sigma-maybe₁ C₂₂)
         (Functor.base (functor-sigma-maybe F₂) x₁)
-        ≡ Functor.base F₁ (Functor.base (functor-sigma-maybe₁ C₁₂) x₁))
+        ≡ Functor.base F₁ (Functor.base (functor-sigma-maybe₁ C₂₁) x₁))
       → (q : Functor.base (functor-sigma-maybe₁ C₂₂)
         (Functor.base (functor-sigma-maybe F₂) y₁)
-        ≡ Functor.base F₁ (Functor.base (functor-sigma-maybe₁ C₁₂) y₁))
+        ≡ Functor.base F₁ (Functor.base (functor-sigma-maybe₁ C₂₁) y₁))
       → (f₁₁ : Category.Arrow C₁₁
-        (Functor.base (functor-sigma-maybe₁ C₁₂) x₁)
-        (Functor.base (functor-sigma-maybe₁ C₁₂) y₁))
+        (Functor.base (functor-sigma-maybe₁ C₂₁) x₁)
+        (Functor.base (functor-sigma-maybe₁ C₂₁) y₁))
       → Category.ArrowEqual
         (category-sigma-maybe C₂₂)
         (WeakFunctor.map'
@@ -175,22 +175,22 @@ module _
           (Functor.map F₁ f₁₁))
         (Functor.map
           (functor-sigma-maybe F₂)
-          (WeakFunctor.map (weak-functor-sigma-maybe₁ C₁₂) x₁ y₁ f₁₁))
-    map (_ , x₁₂) (y₁₁ , _) refl refl f₁₁
+          (WeakFunctor.map (weak-functor-sigma-maybe₁ C₂₁) x₁ y₁ f₁₁))
+    map (_ , x₂₁) (y₁₁ , _) refl refl f₁₁
       = record
       { arrow₁
-        = Category.arrow-refl C₂₁
+        = Category.arrow-refl C₁₂
       ; arrow₂
         = arrow-equal-nothing
           (Dependent₁Category.category C₂₂ (Functor.base F₁ y₁₁))
-          (sym (Dependent₁Functor.base-square F₂ f₁₁ x₁₂)) refl
+          (sym (Dependent₁Functor.base-square F₂ f₁₁ x₂₁)) refl
       }
 
   weak-functor-square-sigma-maybe₁
-    : (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
+    : (F₂ : Dependent₁Functor C₂₁ C₂₂ F₁)
     → WeakFunctorSquare F₁
       (functor-sigma-maybe F₂)
-      (weak-functor-sigma-maybe₁ C₁₂)
+      (weak-functor-sigma-maybe₁ C₂₁)
       (weak-functor-sigma-maybe₁ C₂₂)
   weak-functor-square-sigma-maybe₁ F₂
     = record {WeakFunctorSquareSigmaMaybe₁ F₂}

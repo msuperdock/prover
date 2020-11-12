@@ -290,26 +290,26 @@ module _
 arrow-equal-sigma
   : {C₁ : Category}
   → (C₂ : Dependent₁Category C₁)
-  → {x₁₁ x₂₁ y₁₁ y₂₁ : Category.Object C₁}
-  → {x₁₂ : Dependent₁Category.Object C₂ x₁₁}
-  → {x₂₂ : Dependent₁Category.Object C₂ x₂₁}
-  → {y₁₂ y₁₂' : Dependent₁Category.Object C₂ y₁₁}
-  → {y₂₂ y₂₂' : Dependent₁Category.Object C₂ y₂₁}
+  → {x₁₁ x₁₂ y₁₁ y₁₂ : Category.Object C₁}
+  → {x₂₁ : Dependent₁Category.Object C₂ x₁₁}
+  → {x₂₂ : Dependent₁Category.Object C₂ x₁₂}
+  → {y₂₁ y₂₁' : Dependent₁Category.Object C₂ y₁₁}
+  → {y₂₂ y₂₂' : Dependent₁Category.Object C₂ y₁₂}
   → {f₁₁ : Category.Arrow C₁ x₁₁ y₁₁}
-  → {f₂₁ : Category.Arrow C₁ x₂₁ y₂₁}
-  → {f₁₂ : Dependent₁Category.Arrow C₂ y₁₁ y₁₂' y₁₂}
-  → {f₂₂ : Dependent₁Category.Arrow C₂ y₂₁ y₂₂' y₂₂}
-  → {p₁₂ : Dependent₁Category.base C₂ f₁₁ x₁₂ ≡ y₁₂'}
-  → {p₂₂ : Dependent₁Category.base C₂ f₂₁ x₂₂ ≡ y₂₂'}
-  → x₁₂ ≅ x₂₂
-  → Category.ArrowEqual' C₁ f₁₁ f₂₁
+  → {f₁₂ : Category.Arrow C₁ x₁₂ y₁₂}
+  → {f₂₁ : Dependent₁Category.Arrow C₂ y₁₁ y₂₁' y₂₁}
+  → {f₂₂ : Dependent₁Category.Arrow C₂ y₁₂ y₂₂' y₂₂}
+  → {p₂₁ : Dependent₁Category.base C₂ f₁₁ x₂₁ ≡ y₂₁'}
+  → {p₂₂ : Dependent₁Category.base C₂ f₁₂ x₂₂ ≡ y₂₂'}
+  → x₂₁ ≅ x₂₂
+  → Category.ArrowEqual' C₁ f₁₁ f₁₂
   → Category'.ArrowEqual'
     (Dependent₁Category.category C₂ y₁₁)
-    (Dependent₁Category.category C₂ y₂₁) f₁₂ f₂₂
+    (Dependent₁Category.category C₂ y₁₂) f₂₁ f₂₂
   → Category.ArrowEqual'
     (category-sigma C₂)
-    (CategorySigma.arrow f₁₁ f₁₂ p₁₂)
-    (CategorySigma.arrow f₂₁ f₂₂ p₂₂)
+    (CategorySigma.arrow f₁₁ f₂₁ p₂₁)
+    (CategorySigma.arrow f₁₂ f₂₂ p₂₂)
 arrow-equal-sigma _ refl (any q₁) q₂@(any _)
   = any (CategorySigma.arrow-equal q₁ q₂)
 
@@ -564,19 +564,19 @@ module _
   {C₁ D₁ : Category}
   {C₂ : Dependent₁Category C₁}
   {D₂ : Dependent₁Category D₁}
-  {F₁₁ F₂₁ : Functor C₁ D₁}
-  {F₁₂ : Dependent₁Functor C₂ D₂ F₁₁}
-  {F₂₂ : Dependent₁Functor C₂ D₂ F₂₁}
+  {F₁₁ F₁₂ : Functor C₁ D₁}
+  {F₂₁ : Dependent₁Functor C₂ D₂ F₁₁}
+  {F₂₂ : Dependent₁Functor C₂ D₂ F₁₂}
   where
   
   module FunctorEqualSigma
-    (p₁ : FunctorEqual F₁₁ F₂₁)
-    (p₂ : Dependent₁FunctorEqual F₁₂ F₂₂)
+    (p₁ : FunctorEqual F₁₁ F₁₂)
+    (p₂ : Dependent₁FunctorEqual F₂₁ F₂₂)
     where
 
     base
       : (x : Category.Object (category-sigma C₂))
-      → Functor.base (functor-sigma F₁₂) x ≅ Functor.base (functor-sigma F₂₂) x
+      → Functor.base (functor-sigma F₂₁) x ≅ Functor.base (functor-sigma F₂₂) x
     base (x₁ , x₂)
       = Sigma.comma-equal
         (FunctorEqual.base p₁ x₁)
@@ -588,7 +588,7 @@ module _
       → Category'.ArrowEqual'
         (category-sigma D₂)
         (category-sigma D₂)
-        (Functor.map (functor-sigma F₁₂) f)
+        (Functor.map (functor-sigma F₂₁) f)
         (Functor.map (functor-sigma F₂₂) f)
     map {x = (x₁ , x₂)} {y = (y₁ , _)} (CategorySigma.arrow f₁ f₂ _)
       = arrow-equal-sigma D₂
@@ -597,10 +597,10 @@ module _
         (Dependent₁FunctorEqual.map p₂ y₁ f₂)
 
   functor-equal-sigma
-    : FunctorEqual F₁₁ F₂₁
-    → Dependent₁FunctorEqual F₁₂ F₂₂
+    : FunctorEqual F₁₁ F₁₂
+    → Dependent₁FunctorEqual F₂₁ F₂₂
     → FunctorEqual
-      (functor-sigma F₁₂)
+      (functor-sigma F₂₁)
       (functor-sigma F₂₂)
   functor-equal-sigma p₁ p₂
     = record {FunctorEqualSigma p₁ p₂}
@@ -654,56 +654,56 @@ functor-compose-sigma {F₂ = F₂} {G₂ = G₂} p₁ p₂
 -- ## FunctorSquare
 
 functor-square-sigma
-  : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
-  → {C₁₂ : Dependent₁Category C₁₁}
-  → {C₂₂ : Dependent₁Category C₂₁}
-  → {D₁₂ : Dependent₁Category D₁₁}
-  → {D₂₂ : Dependent₁Category D₂₁}
-  → {F₁ : Functor C₁₁ C₂₁}
-  → {G₁ : Functor D₁₁ D₂₁}
+  : {C₁₁ C₁₂ D₁₁ D₁₂ : Category}
+  → {C₂₁ : Dependent₁Category C₁₁}
+  → {C₂₂ : Dependent₁Category C₁₂}
+  → {D₂₁ : Dependent₁Category D₁₁}
+  → {D₂₂ : Dependent₁Category D₁₂}
+  → {F₁ : Functor C₁₁ C₁₂}
+  → {G₁ : Functor D₁₁ D₁₂}
   → {H₁₁ : Functor C₁₁ D₁₁}
-  → {H₂₁ : Functor C₂₁ D₂₁}
-  → {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
-  → {G₂ : Dependent₁Functor D₁₂ D₂₂ G₁}
-  → {H₁₂ : Dependent₁Functor C₁₂ D₁₂ H₁₁}
-  → {H₂₂ : Dependent₁Functor C₂₂ D₂₂ H₂₁}
-  → FunctorSquare F₁ G₁ H₁₁ H₂₁
-  → Dependent₁FunctorSquare F₂ G₂ H₁₂ H₂₂
+  → {H₁₂ : Functor C₁₂ D₁₂}
+  → {F₂ : Dependent₁Functor C₂₁ C₂₂ F₁}
+  → {G₂ : Dependent₁Functor D₂₁ D₂₂ G₁}
+  → {H₂₁ : Dependent₁Functor C₂₁ D₂₁ H₁₁}
+  → {H₂₂ : Dependent₁Functor C₂₂ D₂₂ H₁₂}
+  → FunctorSquare F₁ G₁ H₁₁ H₁₂
+  → Dependent₁FunctorSquare F₂ G₂ H₂₁ H₂₂
   → FunctorSquare
     (functor-sigma F₂)
     (functor-sigma G₂)
-    (functor-sigma H₁₂)
+    (functor-sigma H₂₁)
     (functor-sigma H₂₂)
-functor-square-sigma {F₂ = F₂} {G₂ = G₂} {H₁₂ = H₁₂} {H₂₂ = H₂₂} s₁ s₂
+functor-square-sigma {F₂ = F₂} {G₂ = G₂} {H₂₁ = H₂₁} {H₂₂ = H₂₂} s₁ s₂
   = functor-square-from-equal
     (functor-sigma F₂)
     (functor-sigma G₂)
-    (functor-sigma H₁₂)
+    (functor-sigma H₂₁)
     (functor-sigma H₂₂)
   $ functor-trans (functor-sym
     (functor-sigma-compose H₂₂ F₂))
   $ functor-trans (functor-equal-sigma
     (functor-square-to-equal s₁)
     (dependent₁-functor-square-to-equal s₂))
-  $ functor-sigma-compose G₂ H₁₂
+  $ functor-sigma-compose G₂ H₂₁
 
 -- ## FunctorSquare₁
 
 functor-square-sigma₁
-  : {C₁₁ C₂₁ : Category}
-  → {C₁₂ : Dependent₁Category C₁₁}
-  → {C₂₂ : Dependent₁Category C₂₁}
-  → {F₁ : Functor C₁₁ C₂₁}
-  → (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
+  : {C₁₁ C₁₂ : Category}
+  → {C₂₁ : Dependent₁Category C₁₁}
+  → {C₂₂ : Dependent₁Category C₁₂}
+  → {F₁ : Functor C₁₁ C₁₂}
+  → (F₂ : Dependent₁Functor C₂₁ C₂₂ F₁)
   → FunctorSquare
     (functor-sigma F₂) F₁
-    (functor-sigma₁ C₁₂)
+    (functor-sigma₁ C₂₁)
     (functor-sigma₁ C₂₂)
-functor-square-sigma₁ {C₂₁ = C₂₁} _
+functor-square-sigma₁ {C₁₂ = C₁₂} _
   = record
   { base
     = λ _ → refl
   ; map
-    = λ _ → Category.arrow-refl' C₂₁
+    = λ _ → Category.arrow-refl' C₁₂
   }
   

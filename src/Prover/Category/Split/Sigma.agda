@@ -157,19 +157,19 @@ module _
 -- ## SplitFunctorSquare
 
 split-functor-square-sigma
-  : {C₁₁ C₂₁ : Category}
-  → {C₁₂ D₁₂ : Dependent₁Category C₁₁}
-  → {C₂₂ D₂₂ : Dependent₁Category C₂₁}
-  → {F₁ : Functor C₁₁ C₂₁}
-  → {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
-  → {G₂ : Dependent₁Functor D₁₂ D₂₂ F₁}
-  → {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
+  : {C₁₁ C₁₂ : Category}
+  → {C₂₁ D₂₁ : Dependent₁Category C₁₁}
+  → {C₂₂ D₂₂ : Dependent₁Category C₁₂}
+  → {F₁ : Functor C₁₁ C₁₂}
+  → {F₂ : Dependent₁Functor C₂₁ C₂₂ F₁}
+  → {G₂ : Dependent₁Functor D₂₁ D₂₂ F₁}
+  → {H₂₁ : Dependent₁SplitFunctor C₂₁ D₂₁}
   → {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
-  → Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
+  → Dependent₁SplitFunctorSquare F₂ G₂ H₂₁ H₂₂
   → SplitFunctorSquare
     (functor-sigma F₂)
     (functor-sigma G₂)
-    (split-functor-sigma H₁₂)
+    (split-functor-sigma H₂₁)
     (split-functor-sigma H₂₂)
 split-functor-square-sigma {F₁ = F₁} s
   = record
