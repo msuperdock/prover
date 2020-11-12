@@ -926,7 +926,7 @@ module _
     ; map-left
       = id
     ; map-right
-      = const FormulaStatePath.rightmost
+      = const (FormulaStatePath.rightmost f')
     }
 
   formula-state-insert-left f@(FormulaState.symbol _ _ (left f'' _) _ _) f'
@@ -975,7 +975,7 @@ module _
     ; right-closed
       = id
     ; map-left
-      = const FormulaStatePath.rightmost
+      = const (FormulaStatePath.rightmost f')
     ; map-right
       = id
     }
@@ -1072,7 +1072,7 @@ module _
       { (go zero path)
         → go zero path
       ; end
-        → go (suc zero) FormulaStatePath.leftmost
+        → go (suc zero) (FormulaStatePath.leftmost f₂)
       }
     ; map-right
       = SandboxStatePath.cons
@@ -1089,7 +1089,7 @@ module _
       { (go zero path)
         → go zero (g₁ path)
       ; end
-        → go zero (g₂ FormulaStatePath.leftmost)
+        → go zero (g₂ (FormulaStatePath.leftmost f₂))
       }
     ; map-right
       = λ
@@ -1117,7 +1117,7 @@ module _
       { (go zero path)
         → go zero path
       ; end
-        → go (suc zero) FormulaStatePath.leftmost
+        → go (suc zero) (FormulaStatePath.leftmost f₂)
       }
     ; map-right
       = SandboxStatePath.cons
@@ -1134,7 +1134,7 @@ module _
       { (go zero path)
         → go zero (g₁ path)
       ; end
-        → go zero (g₂ FormulaStatePath.leftmost)
+        → go zero (g₂ (FormulaStatePath.leftmost f₂))
       }
     ; map-right
       = λ

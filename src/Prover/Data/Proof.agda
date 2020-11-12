@@ -268,14 +268,14 @@ module Internal where
     where
 
     branch-path-top
-      : {b : Branch rs vs}
+      : (b : Branch rs vs)
       → BranchPath b
-    branch-path-top {b = assumption _}
+    branch-path-top (assumption _)
       = stop
-    branch-path-top {b = rule _ _ [] _ _}
+    branch-path-top (rule _ _ [] _ _)
       = stop
-    branch-path-top {b = rule _ _ (b ∷ _) _ _}
-      = go zero (branch-path-top {b = b})
+    branch-path-top (rule _ _ (b ∷ _) _ _)
+      = go zero (branch-path-top b)
   
     branch-path-up
       : {b : Branch rs vs}
@@ -303,26 +303,26 @@ module Internal where
       → Maybe (BranchPath b)
     branch-path-down stop
       = nothing
-    branch-path-down (go k bp)
+    branch-path-down {b = rule _ _ bs _ _} (go k bp)
       with branch-path-down bp
       | Fin.increment k
     ... | nothing | nothing
       = just stop
     ... | nothing | just k'
-      = just (go k' branch-path-top)
+      = just (go k' (branch-path-top (bs ! k')))
     ... | just bp' | _
       = just (go k bp')
   
     branch-path-up-top
-      : {b : Branch rs vs}
-      → branch-path-up (branch-path-top {b = b}) ≡ nothing
-    branch-path-up-top {b = assumption _}
+      : (b : Branch rs vs)
+      → branch-path-up (branch-path-top b) ≡ nothing
+    branch-path-up-top (assumption _)
       = refl
-    branch-path-up-top {b = rule _ _ [] _ _}
+    branch-path-up-top (rule _ _ [] _ _)
       = refl
-    branch-path-up-top {b = rule _ _ (b ∷ _) _ _}
-      with branch-path-up (branch-path-top {b = b})
-      | branch-path-up-top {b = b}
+    branch-path-up-top (rule _ _ (b ∷ _) _ _)
+      with branch-path-up (branch-path-top b)
+      | branch-path-up-top b
     ... | _ | refl
       = refl
 
@@ -337,8 +337,8 @@ module Internal where
     proof-path-top
       : (p : Proof rs r)
       → ProofPath p
-    proof-path-top _
-      = branch-path-top
+    proof-path-top (proof b _)
+      = branch-path-top b
   
     proof-path-up
       : (p : Proof rs r)
@@ -357,8 +357,8 @@ module Internal where
     proof-path-up-top
       : (p : Proof rs r)
       → proof-path-up p (proof-path-top p) ≡ nothing
-    proof-path-up-top _
-      = branch-path-up-top
+    proof-path-up-top (proof b _)
+      = branch-path-up-top b
 
   -- ### Construction
 

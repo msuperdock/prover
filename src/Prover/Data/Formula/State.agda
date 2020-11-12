@@ -436,44 +436,44 @@ module Internal where
       = T (formula-state-path-not-right f)
 
     formula-state-path-leftmost
-      : {f : FormulaState ss vs m}
+      : (f : FormulaState ss vs m)
       → FormulaStatePath f
-    formula-state-path-leftmost {f = hole}
+    formula-state-path-leftmost hole
       = stop
-    formula-state-path-leftmost {f = parens _}
+    formula-state-path-leftmost (parens _)
       = stop
-    formula-state-path-leftmost {f = meta _}
+    formula-state-path-leftmost (meta _)
       = stop
-    formula-state-path-leftmost {f = variable' _ _}
+    formula-state-path-leftmost (variable' _ _)
       = stop
-    formula-state-path-leftmost {f = symbol _ _ (nothing _) _ _}
+    formula-state-path-leftmost (symbol _ _ (nothing _) _ _)
       = stop
-    formula-state-path-leftmost {f = symbol _ _ (left f _) _ _}
-      = left (formula-state-path-leftmost {f = f})
+    formula-state-path-leftmost (symbol _ _ (left f _) _ _)
+      = left (formula-state-path-leftmost f)
   
     formula-state-path-rightmost
-      : {f : FormulaState ss vs m}
+      : (f : FormulaState ss vs m)
       → FormulaStatePath f
-    formula-state-path-rightmost {f = hole}
+    formula-state-path-rightmost hole
       = stop
-    formula-state-path-rightmost {f = parens _}
+    formula-state-path-rightmost (parens _)
       = stop
-    formula-state-path-rightmost {f = meta _}
+    formula-state-path-rightmost (meta _)
       = stop
-    formula-state-path-rightmost {f = variable' _ _}
+    formula-state-path-rightmost (variable' _ _)
       = stop
-    formula-state-path-rightmost {f = symbol _ _ _ (nothing _) _}
+    formula-state-path-rightmost (symbol _ _ _ (nothing _) _)
       = stop
-    formula-state-path-rightmost {f = symbol _ _ _ (right f _) _}
-      = right (formula-state-path-rightmost {f})
+    formula-state-path-rightmost (symbol _ _ _ (right f _) _)
+      = right (formula-state-path-rightmost f)
 
     sandbox-state-path-leftmost
-      : {s : Any (SandboxState ss vs m)}
+      : (s : Any (SandboxState ss vs m))
       → SandboxStatePath s
-    sandbox-state-path-leftmost {s = any (singleton _)}
-      = go zero formula-state-path-leftmost
-    sandbox-state-path-leftmost {s = any (cons _ _ _ _)}
-      = go zero formula-state-path-leftmost
+    sandbox-state-path-leftmost (any (singleton f))
+      = go zero (formula-state-path-leftmost f)
+    sandbox-state-path-leftmost (any (cons f _ _ _))
+      = go zero (formula-state-path-leftmost f)
   
     formula-state-path-left
       : {f : FormulaState ss vs m}
@@ -495,8 +495,8 @@ module Internal where
       = nothing
     formula-state-path-left {f = symbol _ _ (nothing _) _ _} stop
       = nothing
-    formula-state-path-left {f = symbol _ _ (left _ _) _ _} stop
-      = just (left formula-state-path-rightmost)
+    formula-state-path-left {f = symbol _ _ (left f _) _ _} stop
+      = just (left (formula-state-path-rightmost f))
 
     formula-state-path-left (left fp)
       with formula-state-path-left fp
@@ -524,17 +524,20 @@ module Internal where
     ... | just sp' | _
       = just (center k sp')
 
-    sandbox-state-path-left {s = any (singleton _)} end
-      = just (go zero formula-state-path-rightmost)
-    sandbox-state-path-left {s = any {suc n} (cons _ _ _ _)} end
-      = just (go (Fin.maximum n) formula-state-path-rightmost)
-    sandbox-state-path-left (go k fp)
+    sandbox-state-path-left {s = any (singleton f)} end
+      = just (go zero
+        (formula-state-path-rightmost f))
+    sandbox-state-path-left {s = s@(any {suc n} (cons _ _ _ _))} end
+      = just (go (Fin.maximum n)
+        (formula-state-path-rightmost (sandbox-state-lookup s (Fin.maximum n))))
+    sandbox-state-path-left {s = s} (go k fp)
       with formula-state-path-left fp
       | Fin.decrement k
     ... | nothing | nothing
       = nothing
     ... | nothing | just k'
-      = just (go k' formula-state-path-rightmost)
+      = just (go k' (formula-state-path-rightmost
+        (sandbox-state-lookup s k')))
     ... | just fp' | _
       = just (go k fp')
 
@@ -554,14 +557,14 @@ module Internal where
       = nothing
     formula-state-path-right {f = variable' _ _} stop
       = nothing
-    formula-state-path-right {f = parens _} stop
-      = just (center zero sandbox-state-path-leftmost)
+    formula-state-path-right {f = parens s} stop
+      = just (center zero (sandbox-state-path-leftmost s))
     formula-state-path-right {f = symbol _ _ _ (nothing _) []} stop
       = nothing
-    formula-state-path-right {f = symbol _ _ _ (right _ _) []} stop
-      = just (right formula-state-path-leftmost)
-    formula-state-path-right {f = symbol _ _ _ _ (_ ∷ _)} stop
-      = just (center zero sandbox-state-path-leftmost)
+    formula-state-path-right {f = symbol _ _ _ (right f _) []} stop
+      = just (right (formula-state-path-leftmost f))
+    formula-state-path-right {f = symbol _ _ _ _ (s ∷ _)} stop
+      = just (center zero (sandbox-state-path-leftmost s))
 
     formula-state-path-right (left fp)
       with formula-state-path-right fp
@@ -580,29 +583,35 @@ module Internal where
     formula-state-path-right (center k sp)
       with sandbox-state-path-right sp
       | Fin.increment k 
+      | inspect Fin.increment k
     formula-state-path-right {f = parens _} _
-      | nothing | nothing
+      | nothing | nothing | _
       = nothing
     formula-state-path-right {f = symbol _ _ _ (nothing _) _} _
-      | nothing | nothing
+      | nothing | nothing | _
       = nothing
-    formula-state-path-right {f = symbol _ _ _ (right _ _) _} _
-      | nothing | nothing
-      = just (right formula-state-path-leftmost)
-    ... | nothing | just k'
-      = just (center k' sandbox-state-path-leftmost)
-    ... | just sp' | _
+    formula-state-path-right {f = symbol _ _ _ (right f _) _} _
+      | nothing | nothing | _
+      = just (right (formula-state-path-leftmost f))
+    formula-state-path-right {f = parens _} (center zero _)
+      | nothing | just _ | [ p ]
+      = ⊥-elim (Maybe.nothing≢just p)
+    formula-state-path-right {f = symbol _ _ _ _ ss'} _
+      | nothing | just k' | _
+      = just (center k' (sandbox-state-path-leftmost (ss' ! k')))
+    ... | just sp' | _ | _
       = just (center k sp')
   
     sandbox-state-path-right end
       = nothing
-    sandbox-state-path-right (go k fp)
+    sandbox-state-path-right {s = s} (go k fp)
       with formula-state-path-right fp
       | Fin.increment k
     ... | nothing | nothing
       = just end
     ... | nothing | just k'
-      = just (go k' formula-state-path-leftmost)
+      = just (go k' (formula-state-path-leftmost
+        (sandbox-state-lookup s k')))
     ... | just fp' | _
       = just (go k fp')
   
@@ -614,35 +623,35 @@ module Internal where
       = maybe (sandbox-state-path-right sp) sp id
   
     formula-state-path-left-leftmost
-      : {f : FormulaState ss vs m}
-      → formula-state-path-left (formula-state-path-leftmost {f = f}) ≡ nothing
-    formula-state-path-left-leftmost {f = hole}
+      : (f : FormulaState ss vs m)
+      → formula-state-path-left (formula-state-path-leftmost f) ≡ nothing
+    formula-state-path-left-leftmost hole
       = refl
-    formula-state-path-left-leftmost {f = parens _}
+    formula-state-path-left-leftmost (parens _)
       = refl
-    formula-state-path-left-leftmost {f = meta _}
+    formula-state-path-left-leftmost (meta _)
       = refl
-    formula-state-path-left-leftmost {f = variable' _ _}
+    formula-state-path-left-leftmost (variable' _ _)
       = refl
-    formula-state-path-left-leftmost {f = symbol _ _ (nothing _) _ _}
+    formula-state-path-left-leftmost (symbol _ _ (nothing _) _ _)
       = refl
-    formula-state-path-left-leftmost {f = symbol _ _ (left f _) _ _}
-      with formula-state-path-left (formula-state-path-leftmost {f = f})
-      | formula-state-path-left-leftmost {f = f}
+    formula-state-path-left-leftmost (symbol _ _ (left f _) _ _)
+      with formula-state-path-left (formula-state-path-leftmost f)
+      | formula-state-path-left-leftmost f
     ... | _ | refl
       = refl
 
     sandbox-state-path-left-leftmost
-      : {s : Any (SandboxState ss vs m)}
-      → sandbox-state-path-left (sandbox-state-path-leftmost {s = s}) ≡ nothing
-    sandbox-state-path-left-leftmost {s = any (singleton f)}
-      with formula-state-path-left (formula-state-path-leftmost {f = f})
-      | formula-state-path-left-leftmost {f = f}
+      : (s : Any (SandboxState ss vs m))
+      → sandbox-state-path-left (sandbox-state-path-leftmost s) ≡ nothing
+    sandbox-state-path-left-leftmost (any (singleton f))
+      with formula-state-path-left (formula-state-path-leftmost f)
+      | formula-state-path-left-leftmost f
     ... | _ | refl
       = refl
-    sandbox-state-path-left-leftmost {s = any (cons f _ _ _)}
-      with formula-state-path-left (formula-state-path-leftmost {f = f})
-      | formula-state-path-left-leftmost {f = f}
+    sandbox-state-path-left-leftmost (any (cons f _ _ _))
+      with formula-state-path-left (formula-state-path-leftmost f)
+      | formula-state-path-left-leftmost f
     ... | _ | refl
       = refl
 
