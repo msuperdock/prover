@@ -106,10 +106,10 @@ dependent-functor-identity-collection'
   → (C : A → ChainCategory n)
   → (C' : (x : A) → DependentCategory (C x))
   → (R : (x : A) → DependentRelation (C' x))
-  → {F : ChainFunctor (C x₁) (C x₂)}
-  → {F' : DependentFunctor (C' x₁) (C' x₂) F}
-  → x₂ ≡ x₁
-  → (i : DependentInjective (R x₁) (R x₂) F')
+  → {F : ChainFunctor (C x₂) (C x₁)}
+  → {F' : DependentFunctor (C' x₂) (C' x₁) F}
+  → x₁ ≡ x₂
+  → (i : DependentInjective (R x₂) (R x₁) F')
   → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentFunctorIdentity
@@ -154,16 +154,16 @@ dependent-functor-compose-collection'
   → {R : DependentRelation C'}
   → {S : DependentRelation D'}
   → (T : (x : A) → DependentRelation (E' x))
-  → {F : ChainFunctor D (E x₁)}
+  → {F : ChainFunctor D (E x₂)}
   → {G : ChainFunctor C D}
-  → {H : ChainFunctor C (E x₂)}
-  → {F' : DependentFunctor D' (E' x₁) F}
+  → {H : ChainFunctor C (E x₁)}
+  → {F' : DependentFunctor D' (E' x₂) F}
   → {G' : DependentFunctor C' D' G}
-  → {H' : DependentFunctor C' (E' x₂) H}
-  → x₂ ≡ x₁
-  → (i : DependentInjective S (T x₁) F')
+  → {H' : DependentFunctor C' (E' x₁) H}
+  → x₁ ≡ x₂
+  → (i : DependentInjective S (T x₂) F')
   → (j : DependentInjective R S G')
-  → (k : DependentInjective R (T x₂) H')
+  → (k : DependentInjective R (T x₁) H')
   → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentFunctorCompose
@@ -219,18 +219,18 @@ dependent-functor-square-collection'
   → {S₁ : DependentRelation D₁'}
   → (S₂ : (x : A) → DependentRelation (D₂' x))
   → {F : ChainFunctor C₁ C₂}
-  → {G : ChainFunctor D₁ (D₂ x₁)}
+  → {G : ChainFunctor D₁ (D₂ x₂)}
   → {H₁ : ChainFunctor C₁ D₁}
-  → {H₂ : ChainFunctor C₂ (D₂ x₂)}
+  → {H₂ : ChainFunctor C₂ (D₂ x₁)}
   → {F' : DependentFunctor C₁' C₂' F}
-  → {G' : DependentFunctor D₁' (D₂' x₁) G}
+  → {G' : DependentFunctor D₁' (D₂' x₂) G}
   → {H₁' : DependentFunctor C₁' D₁' H₁}
-  → {H₂' : DependentFunctor C₂' (D₂' x₂) H₂}
-  → x₂ ≡ x₁
+  → {H₂' : DependentFunctor C₂' (D₂' x₁) H₂}
+  → x₁ ≡ x₂
   → (i : DependentInjective R₁ R₂ F')
-  → (j : DependentInjective S₁ (S₂ x₁) G')
+  → (j : DependentInjective S₁ (S₂ x₂) G')
   → (k₁ : DependentInjective R₁ S₁ H₁')
-  → (k₂ : DependentInjective R₂ (S₂ x₂) H₂')
+  → (k₂ : DependentInjective R₂ (S₂ x₁) H₂')
   → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentFunctorSquare

@@ -92,9 +92,9 @@ dependent-functor-identity-simple'
   → {n : ℕ}
   → (C : A → ChainCategory n)
   → (C' : (x : A) → DependentCategory (C x))
-  → {F : ChainFunctor (C x₁) (C x₂)}
-  → {F' : DependentFunctor (C' x₁) (C' x₂) F}
-  → x₂ ≡ x₁
+  → {F : ChainFunctor (C x₂) (C x₁)}
+  → {F' : DependentFunctor (C' x₂) (C' x₁) F}
+  → x₁ ≡ x₂
   → ChainFunctorIdentity F
   → DependentFunctorIdentity F'
   → DependentSimpleFunctorIdentity
@@ -130,13 +130,13 @@ dependent-functor-compose-simple'
   → {C' : DependentCategory C}
   → {D' : DependentCategory D}
   → (E' : (x : A) → DependentCategory (E x))
-  → {F : ChainFunctor D (E x₁)}
+  → {F : ChainFunctor D (E x₂)}
   → {G : ChainFunctor C D}
-  → {H : ChainFunctor C (E x₂)}
-  → {F' : DependentFunctor D' (E' x₁) F}
+  → {H : ChainFunctor C (E x₁)}
+  → {F' : DependentFunctor D' (E' x₂) F}
   → {G' : DependentFunctor C' D' G}
-  → {H' : DependentFunctor C' (E' x₂) H}
-  → x₂ ≡ x₁
+  → {H' : DependentFunctor C' (E' x₁) H}
+  → x₁ ≡ x₂
   → ChainFunctorCompose F G H
   → DependentFunctorCompose F' G' H'
   → DependentSimpleFunctorCompose
@@ -180,14 +180,14 @@ dependent-functor-square-simple'
   → {D₁' : DependentCategory D₁}
   → (D₂' : (x : A) → DependentCategory (D₂ x))
   → {F : ChainFunctor C₁ C₂}
-  → {G : ChainFunctor D₁ (D₂ x₁)}
+  → {G : ChainFunctor D₁ (D₂ x₂)}
   → {H₁ : ChainFunctor C₁ D₁}
-  → {H₂ : ChainFunctor C₂ (D₂ x₂)}
+  → {H₂ : ChainFunctor C₂ (D₂ x₁)}
   → {F' : DependentFunctor C₁' C₂' F}
-  → {G' : DependentFunctor D₁' (D₂' x₁) G}
+  → {G' : DependentFunctor D₁' (D₂' x₂) G}
   → {H₁' : DependentFunctor C₁' D₁' H₁}
-  → {H₂' : DependentFunctor C₂' (D₂' x₂) H₂}
-  → x₂ ≡ x₁
+  → {H₂' : DependentFunctor C₂' (D₂' x₁) H₂}
+  → x₁ ≡ x₂
   → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F' G' H₁' H₂'
   → DependentSimpleFunctorSquare

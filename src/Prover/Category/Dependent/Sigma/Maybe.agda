@@ -109,10 +109,10 @@ dependent-functor-identity-sigma-maybe'
   → (C : A → ChainCategory n)
   → (C₁' : (x : A) → DependentCategory (C x))
   → (C₂' : (x : A) → DependentCategory (chain-category-snoc (C₁' x)))
-  → {F : ChainFunctor (C x₁) (C x₂)}
-  → {F₁' : DependentFunctor (C₁' x₁) (C₁' x₂) F}
-  → {F₂' : DependentFunctor (C₂' x₁) (C₂' x₂) (chain-functor-snoc F₁')}
-  → x₂ ≡ x₁
+  → {F : ChainFunctor (C x₂) (C x₁)}
+  → {F₁' : DependentFunctor (C₁' x₂) (C₁' x₁) F}
+  → {F₂' : DependentFunctor (C₂' x₂) (C₂' x₁) (chain-functor-snoc F₁')}
+  → x₁ ≡ x₂
   → ChainFunctorIdentity F 
   → DependentFunctorIdentity F₁'
   → DependentFunctorIdentity F₂'
@@ -159,16 +159,16 @@ dependent-functor-compose-sigma-maybe'
   → {C₂' : DependentCategory (chain-category-snoc C₁')}
   → {D₂' : DependentCategory (chain-category-snoc D₁')}
   → (E₂' : (x : A) → DependentCategory (chain-category-snoc (E₁' x)))
-  → {F : ChainFunctor D (E x₁)}
+  → {F : ChainFunctor D (E x₂)}
   → {G : ChainFunctor C D}
-  → {H : ChainFunctor C (E x₂)}
-  → {F₁' : DependentFunctor D₁' (E₁' x₁) F}
+  → {H : ChainFunctor C (E x₁)}
+  → {F₁' : DependentFunctor D₁' (E₁' x₂) F}
   → {G₁' : DependentFunctor C₁' D₁' G}
-  → {H₁' : DependentFunctor C₁' (E₁' x₂) H}
-  → {F₂' : DependentFunctor D₂' (E₂' x₁) (chain-functor-snoc F₁')}
+  → {H₁' : DependentFunctor C₁' (E₁' x₁) H}
+  → {F₂' : DependentFunctor D₂' (E₂' x₂) (chain-functor-snoc F₁')}
   → {G₂' : DependentFunctor C₂' D₂' (chain-functor-snoc G₁')}
-  → {H₂' : DependentFunctor C₂' (E₂' x₂) (chain-functor-snoc H₁')}
-  → x₂ ≡ x₁
+  → {H₂' : DependentFunctor C₂' (E₂' x₁) (chain-functor-snoc H₁')}
+  → x₁ ≡ x₂
   → ChainFunctorCompose F G H
   → DependentFunctorCompose F₁' G₁' H₁'
   → DependentFunctorCompose F₂' G₂' H₂'
@@ -226,18 +226,18 @@ dependent-functor-square-sigma-maybe'
   → {D₁₂' : DependentCategory (chain-category-snoc D₁₁')}
   → (D₂₂' : (x : A) → DependentCategory (chain-category-snoc (D₂₁' x)))
   → {F : ChainFunctor C₁ C₂}
-  → {G : ChainFunctor D₁ (D₂ x₁)}
+  → {G : ChainFunctor D₁ (D₂ x₂)}
   → {H₁ : ChainFunctor C₁ D₁}
-  → {H₂ : ChainFunctor C₂ (D₂ x₂)}
+  → {H₂ : ChainFunctor C₂ (D₂ x₁)}
   → {F₁' : DependentFunctor C₁₁' C₂₁' F}
-  → {G₁' : DependentFunctor D₁₁' (D₂₁' x₁) G}
+  → {G₁' : DependentFunctor D₁₁' (D₂₁' x₂) G}
   → {H₁₁' : DependentFunctor C₁₁' D₁₁' H₁}
-  → {H₂₁' : DependentFunctor C₂₁' (D₂₁' x₂) H₂}
+  → {H₂₁' : DependentFunctor C₂₁' (D₂₁' x₁) H₂}
   → {F₂' : DependentFunctor C₁₂' C₂₂' (chain-functor-snoc F₁')}
-  → {G₂' : DependentFunctor D₁₂' (D₂₂' x₁) (chain-functor-snoc G₁')}
+  → {G₂' : DependentFunctor D₁₂' (D₂₂' x₂) (chain-functor-snoc G₁')}
   → {H₁₂' : DependentFunctor C₁₂' D₁₂' (chain-functor-snoc H₁₁')}
-  → {H₂₂' : DependentFunctor C₂₂' (D₂₂' x₂) (chain-functor-snoc H₂₁')}
-  → x₂ ≡ x₁
+  → {H₂₂' : DependentFunctor C₂₂' (D₂₂' x₁) (chain-functor-snoc H₂₁')}
+  → x₁ ≡ x₂
   → ChainFunctorSquare F G H₁ H₂
   → DependentFunctorSquare F₁' G₁' H₁₁' H₂₁'
   → DependentFunctorSquare F₂' G₂' H₁₂' H₂₂'

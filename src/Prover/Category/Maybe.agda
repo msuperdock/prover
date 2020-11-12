@@ -415,8 +415,8 @@ functor-identity-maybe'
   : {A : Set}
   → {x₁ x₂ : A}
   → (C : A → Category)
-  → {F : Functor (C x₁) (C x₂)}
-  → x₂ ≡ x₁
+  → {F : Functor (C x₂) (C x₁)}
+  → x₁ ≡ x₂
   → FunctorIdentity F
   → FunctorIdentity
     (functor-maybe F)
@@ -448,10 +448,10 @@ functor-compose-maybe'
   → {x₁ x₂ : A}
   → {C D : Category}
   → (E : A → Category)
-  → {F : Functor D (E x₁)}
+  → {F : Functor D (E x₂)}
   → {G : Functor C D}
-  → {H : Functor C (E x₂)}
-  → x₂ ≡ x₁
+  → {H : Functor C (E x₁)}
+  → x₁ ≡ x₂
   → FunctorCompose F G H
   → FunctorCompose
     (functor-maybe F)
@@ -492,10 +492,10 @@ functor-square-maybe'
   → {C₁ C₂ D₁ : Category}
   → (D₂ : A → Category)
   → {F : Functor C₁ C₂}
-  → {G : Functor D₁ (D₂ x₁)}
+  → {G : Functor D₁ (D₂ x₂)}
   → {H₁ : Functor C₁ D₁}
-  → {H₂ : Functor C₂ (D₂ x₂)}
-  → x₂ ≡ x₁
+  → {H₂ : Functor C₂ (D₂ x₁)}
+  → x₁ ≡ x₂
   → FunctorSquare F G H₁ H₂
   → FunctorSquare
     (functor-maybe F)

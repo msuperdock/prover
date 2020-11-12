@@ -134,12 +134,12 @@ dependent-functor-identity-sigma-sum'
   → (C₁₁' C₂₁' : (x : A) → DependentCategory (C x))
   → (C₂₂' : (x : A) → DependentCategory (chain-category-snoc (C₂₁' x)))
   → (F₁ : (x : A) → DependentSplitFunctor (C₁₁' x) (C₂₁' x))
-  → {G : ChainFunctor (C x₁) (C x₂)}
-  → {G₁₁' : DependentFunctor (C₁₁' x₁) (C₁₁' x₂) G}
-  → {G₂₁' : DependentFunctor (C₂₁' x₁) (C₂₁' x₂) G}
-  → {G₂₂' : DependentFunctor (C₂₂' x₁) (C₂₂' x₂) (chain-functor-snoc G₂₁')}
-  → (s₁ : DependentSplitFunctorSquare G₁₁' G₂₁' (F₁ x₁) (F₁ x₂))
-  → x₂ ≡ x₁
+  → {G : ChainFunctor (C x₂) (C x₁)}
+  → {G₁₁' : DependentFunctor (C₁₁' x₂) (C₁₁' x₁) G}
+  → {G₂₁' : DependentFunctor (C₂₁' x₂) (C₂₁' x₁) G}
+  → {G₂₂' : DependentFunctor (C₂₂' x₂) (C₂₂' x₁) (chain-functor-snoc G₂₁')}
+  → (s₁ : DependentSplitFunctorSquare G₁₁' G₂₁' (F₁ x₂) (F₁ x₁))
+  → x₁ ≡ x₂
   → ChainFunctorIdentity G
   → DependentFunctorIdentity G₁₁'
   → DependentFunctorIdentity G₂₁'
@@ -200,22 +200,22 @@ dependent-functor-compose-sigma-sum'
   → {F₁ : DependentSplitFunctor C₁₁' C₂₁'}
   → {G₁ : DependentSplitFunctor D₁₁' D₂₁'}
   → (H₁ : (x : A) → DependentSplitFunctor (E₁₁' x) (E₂₁' x))
-  → {I : ChainFunctor D (E x₁)}
+  → {I : ChainFunctor D (E x₂)}
   → {J : ChainFunctor C D}
-  → {K : ChainFunctor C (E x₂)}
-  → {I₁₁' : DependentFunctor D₁₁' (E₁₁' x₁) I}
-  → {I₂₁' : DependentFunctor D₂₁' (E₂₁' x₁) I}
+  → {K : ChainFunctor C (E x₁)}
+  → {I₁₁' : DependentFunctor D₁₁' (E₁₁' x₂) I}
+  → {I₂₁' : DependentFunctor D₂₁' (E₂₁' x₂) I}
   → {J₁₁' : DependentFunctor C₁₁' D₁₁' J}
   → {J₂₁' : DependentFunctor C₂₁' D₂₁' J}
-  → {K₁₁' : DependentFunctor C₁₁' (E₁₁' x₂) K}
-  → {K₂₁' : DependentFunctor C₂₁' (E₂₁' x₂) K}
-  → {I₂₂' : DependentFunctor D₂₂' (E₂₂' x₁) (chain-functor-snoc I₂₁')}
+  → {K₁₁' : DependentFunctor C₁₁' (E₁₁' x₁) K}
+  → {K₂₁' : DependentFunctor C₂₁' (E₂₁' x₁) K}
+  → {I₂₂' : DependentFunctor D₂₂' (E₂₂' x₂) (chain-functor-snoc I₂₁')}
   → {J₂₂' : DependentFunctor C₂₂' D₂₂' (chain-functor-snoc J₂₁')}
-  → {K₂₂' : DependentFunctor C₂₂' (E₂₂' x₂) (chain-functor-snoc K₂₁')}
-  → (s₁ : DependentSplitFunctorSquare I₁₁' I₂₁' G₁ (H₁ x₁))
+  → {K₂₂' : DependentFunctor C₂₂' (E₂₂' x₁) (chain-functor-snoc K₂₁')}
+  → (s₁ : DependentSplitFunctorSquare I₁₁' I₂₁' G₁ (H₁ x₂))
   → (t₁ : DependentSplitFunctorSquare J₁₁' J₂₁' F₁ G₁)
-  → (u₁ : DependentSplitFunctorSquare K₁₁' K₂₁' F₁ (H₁ x₂))
-  → x₂ ≡ x₁
+  → (u₁ : DependentSplitFunctorSquare K₁₁' K₂₁' F₁ (H₁ x₁))
+  → x₁ ≡ x₂
   → ChainFunctorCompose I J K
   → DependentFunctorCompose I₁₁' J₁₁' K₁₁'
   → DependentFunctorCompose I₂₁' J₂₁' K₂₁'
@@ -291,26 +291,26 @@ dependent-functor-square-sigma-sum'
   → {G₁₁ : DependentSplitFunctor D₁₁₁' D₁₂₁'}
   → (G₂₁ : (x : A) → DependentSplitFunctor (D₂₁₁' x) (D₂₂₁' x))
   → {H : ChainFunctor C₁ C₂}
-  → {I : ChainFunctor D₁ (D₂ x₁)}
+  → {I : ChainFunctor D₁ (D₂ x₂)}
   → {J₁ : ChainFunctor C₁ D₁}
-  → {J₂ : ChainFunctor C₂ (D₂ x₂)}
+  → {J₂ : ChainFunctor C₂ (D₂ x₁)}
   → {H₁₁' : DependentFunctor C₁₁₁' C₂₁₁' H}
   → {H₂₁' : DependentFunctor C₁₂₁' C₂₂₁' H}
-  → {I₁₁' : DependentFunctor D₁₁₁' (D₂₁₁' x₁) I}
-  → {I₂₁' : DependentFunctor D₁₂₁' (D₂₂₁' x₁) I}
+  → {I₁₁' : DependentFunctor D₁₁₁' (D₂₁₁' x₂) I}
+  → {I₂₁' : DependentFunctor D₁₂₁' (D₂₂₁' x₂) I}
   → {J₁₁₁' : DependentFunctor C₁₁₁' D₁₁₁' J₁}
   → {J₁₂₁' : DependentFunctor C₁₂₁' D₁₂₁' J₁}
-  → {J₂₁₁' : DependentFunctor C₂₁₁' (D₂₁₁' x₂) J₂}
-  → {J₂₂₁' : DependentFunctor C₂₂₁' (D₂₂₁' x₂) J₂}
+  → {J₂₁₁' : DependentFunctor C₂₁₁' (D₂₁₁' x₁) J₂}
+  → {J₂₂₁' : DependentFunctor C₂₂₁' (D₂₂₁' x₁) J₂}
   → {H₂₂' : DependentFunctor C₁₂₂' C₂₂₂' (chain-functor-snoc H₂₁')}
-  → {I₂₂' : DependentFunctor D₁₂₂' (D₂₂₂' x₁) (chain-functor-snoc I₂₁')}
+  → {I₂₂' : DependentFunctor D₁₂₂' (D₂₂₂' x₂) (chain-functor-snoc I₂₁')}
   → {J₁₂₂' : DependentFunctor C₁₂₂' D₁₂₂' (chain-functor-snoc J₁₂₁')}
-  → {J₂₂₂' : DependentFunctor C₂₂₂' (D₂₂₂' x₂) (chain-functor-snoc J₂₂₁')}
+  → {J₂₂₂' : DependentFunctor C₂₂₂' (D₂₂₂' x₁) (chain-functor-snoc J₂₂₁')}
   → (s₁ : DependentSplitFunctorSquare H₁₁' H₂₁' F₁₁ F₂₁)
-  → (t₁ : DependentSplitFunctorSquare I₁₁' I₂₁' G₁₁ (G₂₁ x₁))
+  → (t₁ : DependentSplitFunctorSquare I₁₁' I₂₁' G₁₁ (G₂₁ x₂))
   → (u₁₁ : DependentSplitFunctorSquare J₁₁₁' J₁₂₁' F₁₁ G₁₁)
-  → (u₂₁ : DependentSplitFunctorSquare J₂₁₁' J₂₂₁' F₂₁ (G₂₁ x₂))
-  → x₂ ≡ x₁
+  → (u₂₁ : DependentSplitFunctorSquare J₂₁₁' J₂₂₁' F₂₁ (G₂₁ x₁))
+  → x₁ ≡ x₂
   → ChainFunctorSquare H I J₁ J₂
   → DependentFunctorSquare H₁₁' I₁₁' J₁₁₁' J₂₁₁'
   → DependentFunctorSquare H₂₁' I₂₁' J₁₂₁' J₂₂₁'
