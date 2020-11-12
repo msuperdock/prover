@@ -14,8 +14,6 @@ open import Prover.Prelude.List
   using (List; Sublist)
 open import Prover.Prelude.Maybe
   using (Maybe; just; nothing)
-open import Prover.Prelude.Nat
-  using (ℕ)
 open import Prover.Prelude.Relation
   using (Dec; Decidable; Injective; Relation; Symmetric; no; yes)
 open import Prover.Prelude.Sigma
@@ -41,20 +39,13 @@ record Collection'
     elements
       : List A
     
-  size
-    : ℕ
-  size
-    = List.length elements
-
-  field
-
     .valid
-      : (k₁ k₂ : Fin size)
+      : (k₁ k₂ : Fin (List.length elements))
       → R (elements ! k₁) (elements ! k₂)
       → k₁ ≡ k₂
 
   valid'
-    : (k₁ k₂ : Fin size)
+    : (k₁ k₂ : Fin (List.length elements))
     → R (elements ! k₁) (elements ! k₂)
     → k₁ ≡ k₂
   valid' k₁ k₂ r
@@ -86,7 +77,7 @@ module Collection where
     → (xs : Collection R)
     → (f : A → Bool)
     → find xs f ≡ nothing
-    → (k : Fin (size xs))
+    → (k : Fin (List.length (elements xs)))
     → F (f (elements xs ! k))
   find-nothing (collection xs _)
     = List.find-nothing xs
