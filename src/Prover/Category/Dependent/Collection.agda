@@ -99,7 +99,7 @@ dependent-functor-identity-collection
   → DependentFunctorIdentity
     (dependent-functor-collection i)
 
-dependent-functor-identity-collection-eq
+dependent-functor-identity-collection'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -142,7 +142,7 @@ dependent-functor-compose-collection
     (dependent-functor-collection j)
     (dependent-functor-collection k)
 
-dependent-functor-compose-collection-eq
+dependent-functor-compose-collection'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -204,7 +204,7 @@ dependent-functor-square-collection
     (dependent-functor-collection k₁)
     (dependent-functor-collection k₂)
 
-dependent-functor-square-collection-eq
+dependent-functor-square-collection'
   : {A : Set}
   → {x₁ x₂ : A}
   → {n : ℕ}
@@ -326,7 +326,7 @@ dependent-functor-identity-collection {n = suc _}
   {C = C} {C' = C'} {R = R} i p p'
   = record
   { functor
-    = λ x → dependent-functor-identity-collection-eq
+    = λ x → dependent-functor-identity-collection'
       (ChainCategory.category' C)
       (DependentCategory.category C')
       (DependentRelation.relation R)
@@ -336,7 +336,7 @@ dependent-functor-identity-collection {n = suc _}
       (DependentFunctorIdentity.functor p' x)
   }
 
-dependent-functor-identity-collection-eq _ _ _ refl
+dependent-functor-identity-collection' _ _ _ refl
   = dependent-functor-identity-collection
 
 -- ### DependentFunctorCompose
@@ -348,7 +348,7 @@ dependent-functor-compose-collection {n = suc _}
   {E = E} {E' = E'} {T = T} {G = G} i j k p p'
   = record
   { functor
-    = λ x → dependent-functor-compose-collection-eq
+    = λ x → dependent-functor-compose-collection'
       (ChainCategory.category' E)
       (DependentCategory.category E')
       (DependentRelation.relation T)
@@ -360,7 +360,7 @@ dependent-functor-compose-collection {n = suc _}
       (DependentFunctorCompose.functor p' x)
   }
 
-dependent-functor-compose-collection-eq _ _ _ refl
+dependent-functor-compose-collection' _ _ _ refl
   = dependent-functor-compose-collection
 
 -- ### DependentFunctorSquare
@@ -372,7 +372,7 @@ dependent-functor-square-collection {n = suc _}
   {D₂ = D₂} {D₂' = D₂'} {S₂ = S₂} {F = F} {H₁ = H₁} i j k₁ k₂ s s'
   = record
   { functor
-    = λ x₁ → dependent-functor-square-collection-eq
+    = λ x₁ → dependent-functor-square-collection'
       (ChainCategory.category' D₂)
       (DependentCategory.category D₂')
       (DependentRelation.relation S₂)
@@ -385,6 +385,6 @@ dependent-functor-square-collection {n = suc _}
       (DependentFunctorSquare.functor s' x₁)
   }
 
-dependent-functor-square-collection-eq _ _ _ refl
+dependent-functor-square-collection' _ _ _ refl
   = dependent-functor-square-collection
 
