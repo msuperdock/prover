@@ -3,7 +3,8 @@ module Prover.Editor.Parent where
 open import Prover.Category
   using (Category)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; ViewStack; ViewStackMap; any)
+  using (Editor; EventStack; SimpleEditor; ViewStack; ViewStackMap;
+    editor-simple)
 open import Prover.Editor.Base
   using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
@@ -327,7 +328,7 @@ simple-editor-parent
     (view-stack-parent V V')
     (event-stack-parent E E') A
 simple-editor-parent V' E' e e'
-  = any
+  = editor-simple
     (editor-parent V' E'
       (base-editor-unit e) 
       (λ k → child-editor-unit (e' k)))

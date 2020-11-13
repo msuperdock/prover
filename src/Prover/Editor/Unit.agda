@@ -18,7 +18,7 @@ open import Prover.Editor
   using (DependentEditor; DependentInnerEditor; DependentSimpleEditor;
     DependentSimpleInnerEditor; DependentSimpleSplitEditor;
     DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleEditor;
-    SimpleInnerEditor; SimpleSplitEditor; SplitEditor; ViewStack; any)
+    SimpleInnerEditor; SimpleSplitEditor; SplitEditor; ViewStack)
 open import Prover.Editor.Base
   using (BaseEditor; BaseEventStack; BaseViewStack; SimpleBaseEditor)
 open import Prover.Editor.Child
@@ -38,20 +38,19 @@ module _
   where
 
   module EditorUnit
-    {C : Category}
-    (e : Editor V E C)
+    (e : SimpleEditor V E A)
     where
 
     open EventStack E
 
-    open Category (category-unit (Category.Object C)) using () renaming
+    open Category (category-unit A) using () renaming
       ( Object
         to State
       ; Arrow
         to StateArrow
       )
 
-    open Editor e public
+    open SimpleEditor e public
       hiding (handle; handle-escape; handle-return; handle-inner-return)
 
     handle
@@ -61,8 +60,8 @@ module _
       → (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s')
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
     handle s sp e'
-      with Editor.handle e s sp e'
-    ... | ι₁ (s' , sp' , _)
+      with SimpleEditor.handle e s sp e'
+    ... | ι₁ (s' , sp')
       = ι₁ (s' , sp' , CategoryUnit.arrow)
     ... | ι₂ s'
       = ι₂ s'
@@ -73,10 +72,10 @@ module _
       → Maybe (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
     handle-escape s sp
-      with Editor.handle-escape e s sp
+      with SimpleEditor.handle-escape e s sp
     ... | nothing
       = nothing
-    ... | just (ι₁ (s' , sp' , _))
+    ... | just (ι₁ (s' , sp'))
       = just (ι₁ (s' , sp' , CategoryUnit.arrow))
     ... | just (ι₂ s')
       = just (ι₂ s')
@@ -87,10 +86,10 @@ module _
       → Maybe (s' ∈ State × sp' ∈ StatePath s' × StateArrow s s'
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
     handle-return s sp
-      with Editor.handle-return e s sp
+      with SimpleEditor.handle-return e s sp
     ... | nothing
       = nothing
-    ... | just (ι₁ (s' , sp' , _))
+    ... | just (ι₁ (s' , sp'))
       = just (ι₁ (s' , sp' , CategoryUnit.arrow))
     ... | just (ι₂ s')
       = just (ι₂ s')
@@ -103,16 +102,17 @@ module _
       → (s'' ∈ State × sp'' ∈ StatePath s'' × StateArrow s s'')
         ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
     handle-inner-return s sp s' sp'
-      with Editor.handle-inner-return e s sp s' sp'
-    ... | ι₁ (s'' , sp'' , _)
+      with SimpleEditor.handle-inner-return e s sp s' sp'
+    ... | ι₁ (s'' , sp'')
       = ι₁ (s'' , sp'' , CategoryUnit.arrow)
     ... | ι₂ s''
       = ι₂ s''
 
   editor-unit
     : SimpleEditor V E A
-    → Editor V E (category-unit A)
-  editor-unit (any e)
+    → Editor V E
+      (category-unit A)
+  editor-unit e
     = record {EditorUnit e}
 
 -- ### BaseEditor

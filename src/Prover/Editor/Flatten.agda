@@ -7,7 +7,7 @@ open import Prover.Category.Unit
 open import Prover.Editor
   using (Editor; EventStack; SimpleEditor; SimpleMainEditor;
     SimplePartialEditor; SimpleSplitEditor; SplitEditor; ViewStack;
-    ViewStackMap; any)
+    ViewStackMap)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack)
 open import Prover.Editor.Flat
@@ -341,8 +341,9 @@ simple-editor-flatten
   → FlatEditor
     (view-stack-flatten V)
     (event-stack-flatten E) A
-simple-editor-flatten (any e)
-  = editor-flatten e
+simple-editor-flatten
+  = editor-flatten
+  ∘ editor-unit
 
 -- ## Editors (nondependent)
 

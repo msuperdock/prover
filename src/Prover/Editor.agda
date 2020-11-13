@@ -420,27 +420,265 @@ record Editor
 
 -- ### SimpleEditor
 
-data SimpleEditor
+-- #### Definition
+
+record SimpleEditor
   (V : ViewStack)
   (E : EventStack)
-  : Set
-  → Set₁
+  (A : Set)
+  : Set₁
   where
 
-  any
-    : {C : Category}
-    → Editor V E C
-    → SimpleEditor V E (Category.Object C)
+  -- ##### Types
 
-simple-editor-draw
-  : {V : ViewStack}
-  → {E : EventStack}
-  → {A : Set}
-  → SimpleEditor V E A
-  → A
-  → ViewStack.View V
-simple-editor-draw (any e)
-  = Editor.draw e
+  open EventStack E
+
+  private
+
+    State
+      : Set
+    State
+      = A
+
+  -- ##### State
+
+  field
+
+    StatePath
+      : State
+      → Set
+
+    StateInner
+      : (s : State)
+      → StatePath s
+      → Set
+
+    StateInnerPath
+      : (s : State)
+      → (sp : StatePath s)
+      → StateInner s sp
+      → Set
+
+  StateStack
+    : ViewStack
+  StateStack
+    = record
+    { View
+      = State
+    ; ViewPath
+      = StatePath
+    ; ViewInner
+      = StateInner
+    ; ViewInnerPath
+      = StateInnerPath
+    }
+
+  field
+
+    initial
+      : State
+
+    initial-path
+      : (s : State)
+      → StatePath s
+
+  initial-path'
+    : StatePath initial
+  initial-path'
+    = initial-path initial
+
+  field
+
+    -- The initial path when entering from the given direction.
+    initial-path-with
+      : (s : State)
+      → Direction
+      → StatePath s
+
+  -- ##### Draw
+
+  field
+
+    draw-stack
+      : ViewStackMap StateStack V
+
+  open ViewStackMap draw-stack public using () renaming
+    ( view
+      to draw
+    ; view-with
+      to draw-with
+    ; view-path
+      to draw-path
+    ; view-inner-with
+      to draw-inner-with
+    ; view-inner-path
+      to draw-inner-path
+    )
+
+  -- ##### Mode
+
+  field
+
+    mode
+      : (s : State)
+      → StatePath s
+      → Mode
+
+    mode-inner
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → StateInnerPath s sp s'
+      → ModeInner
+
+  -- ##### Handle
+
+  field
+
+    handle
+      : (s : State)
+      → (sp : StatePath s)
+      → Event (mode s sp)
+      → Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
+
+    handle-escape
+      : (s : State)
+      → (sp : StatePath s)
+      → Maybe (Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
+
+    handle-return
+      : (s : State)
+      → (sp : StatePath s)
+      → Maybe (Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
+
+    handle-direction
+      : (s : State)
+      → StatePath s
+      → Direction
+      → Maybe (StatePath s)
+
+    handle-direction-valid
+      : (s : State)
+      → (d : Direction)
+      → handle-direction s (initial-path-with s d) d ≡ nothing
+
+    handle-inner
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → (sp' : StateInnerPath s sp s')
+      → EventInner (mode-inner s sp s' sp')
+      → Σ (StateInner s sp) (StateInnerPath s sp)
+
+    handle-inner-escape
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → StateInnerPath s sp s'
+      → Maybe (Σ (StateInner s sp) (StateInnerPath s sp))
+
+    handle-inner-return
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → StateInnerPath s sp s'
+      → Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
+
+    handle-inner-direction
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → StateInnerPath s sp s'
+      → Direction
+      → StateInnerPath s sp s'
+
+-- #### Conversion
+
+module _
+  {V : ViewStack}
+  {E : EventStack}
+  {C : Category}
+  where
+
+  module EditorSimple
+    (e : Editor V E C)
+    where
+
+    open EventStack E
+
+    open Category C using () renaming
+      ( Object
+        to State
+      )
+
+    open Editor e public
+      hiding (handle; handle-escape; handle-return; handle-inner-return)
+
+    handle
+      : (s : State)
+      → (sp : StatePath s)
+      → Event (mode s sp)
+      → Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
+    handle s sp e'
+      with Editor.handle e s sp e'
+    ... | ι₁ (s' , sp' , _)
+      = ι₁ (s' , sp')
+    ... | ι₂ s'
+      = ι₂ s'
+
+    handle-escape
+      : (s : State)
+      → (sp : StatePath s)
+      → Maybe (Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
+    handle-escape s sp
+      with Editor.handle-escape e s sp
+    ... | nothing
+      = nothing
+    ... | just (ι₁ (s' , sp' , _))
+      = just (ι₁ (s' , sp'))
+    ... | just (ι₂ s')
+      = just (ι₂ s')
+
+    handle-return
+      : (s : State)
+      → (sp : StatePath s)
+      → Maybe (Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp))
+    handle-return s sp
+      with Editor.handle-return e s sp
+    ... | nothing
+      = nothing
+    ... | just (ι₁ (s' , sp' , _))
+      = just (ι₁ (s' , sp'))
+    ... | just (ι₂ s')
+      = just (ι₂ s')
+
+    handle-inner-return
+      : (s : State)
+      → (sp : StatePath s)
+      → (s' : StateInner s sp)
+      → StateInnerPath s sp s'
+      → Σ State StatePath
+        ⊔ Σ (StateInner s sp) (StateInnerPath s sp)
+    handle-inner-return s sp s' sp'
+      with Editor.handle-inner-return e s sp s' sp'
+    ... | ι₁ (s'' , sp'' , _)
+      = ι₁ (s'' , sp'')
+    ... | ι₂ s''
+      = ι₂ s''
+
+  editor-simple
+    : Editor V E C
+    → SimpleEditor V E
+      (Category.Object C)
+  editor-simple e
+    = record {EditorSimple e}
 
 -- ## Editors (dependent)
 
@@ -630,7 +868,7 @@ dependent-editor-simple
     (dependent-category-simple C')
 
 dependent-editor-simple {n = zero} e
-  = any e
+  = editor-simple e
 
 dependent-editor-simple {n = suc _} e
   = record
@@ -1027,7 +1265,7 @@ module SimpleSplitEditor
     : A
     → ViewStack.View V
   draw-pure x
-    = simple-editor-draw editor (unbase x)
+    = SimpleEditor.draw editor (unbase x)
 
 -- #### Conversion
 
@@ -1131,7 +1369,7 @@ module SimpleInnerEditor
     : A
     → ViewStack.View V
   draw-pure x
-    = simple-editor-draw editor (unbase x)
+    = SimpleEditor.draw editor (unbase x)
 
 -- #### Conversion
 

@@ -32,7 +32,7 @@ open import Prover.Editor
     DependentSimplePartialEditor; DependentSimpleSplitEditor;
     DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleInnerEditor;
     SimpleMainEditor; SimplePartialEditor; SimpleSplitEditor; SplitEditor;
-    ViewStack; ViewStackMap; any; dependent-editor-simple)
+    ViewStack; ViewStackMap; dependent-editor-simple)
 open import Prover.Editor.Unit
   using (dependent-editor-unit)
 open import Prover.Function.Dependent

@@ -18,10 +18,13 @@ open import Prover.Editor
     DependentSimplePartialEditor; DependentSimpleSplitEditor;
     DependentSplitEditor; Editor; EventStack; InnerEditor; SimpleEditor;
     SimpleInnerEditor; SimpleMainEditor; SimplePartialEditor; SimpleSplitEditor;
-    SplitEditor; ViewStack; ViewStackMap; any; view-stack-map-compose-with)
+    SplitEditor; ViewStack; ViewStackMap; editor-simple;
+    view-stack-map-compose-with)
 open import Prover.Editor.Flat
   using (FlatEditor; FlatEventStack; FlatViewStack; FlatViewStackMap;
     flat-view-stack-map-compose)
+open import Prover.Editor.Unit
+  using (editor-unit)
 open import Prover.Function.Dependent
   using (DependentSet)
 open import Prover.Prelude
@@ -54,8 +57,10 @@ simple-editor-map-view-with
   → (A → ViewStackMap V W)
   → SimpleEditor V E A
   → SimpleEditor W E A
-simple-editor-map-view-with F (any e)
-  = any (editor-map-view-with F e)
+simple-editor-map-view-with F
+  = editor-simple
+  ∘ editor-map-view-with F
+  ∘ editor-unit
   
 simple-editor-map-view
   : {V W : ViewStack}

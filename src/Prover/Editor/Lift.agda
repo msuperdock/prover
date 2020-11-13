@@ -4,7 +4,7 @@ open import Prover.Category
   using (Category)
 open import Prover.Editor
   using (Editor; EventStack; EventStackMap; SimpleEditor; ViewStack;
-    ViewStackMap; any)
+    ViewStackMap; editor-simple)
 open import Prover.Editor.Base
   using (BaseEditor; BaseEventStack; BaseEventStackMap; BaseViewStack;
     BaseViewStackMap; SimpleBaseEditor)
@@ -269,6 +269,8 @@ simple-editor-lift
   → SimpleEditor
     (view-stack-lift V)
     (event-stack-lift E) A
-simple-editor-lift e
-  = any (editor-lift (base-editor-unit e))
+simple-editor-lift
+  = editor-simple
+  ∘ editor-lift
+  ∘ base-editor-unit
 
