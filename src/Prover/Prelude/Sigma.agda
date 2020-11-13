@@ -60,12 +60,12 @@ module Sigma where
   comma-equal
     : {A₁ : Set}
     → {A₂ : A₁ → Set}
-    → {x₁₁ x₁₂ : A₁}
-    → {x₂₁ : A₂ x₁₁}
-    → {x₂₂ : A₂ x₁₂}
-    → x₁₁ ≡ x₁₂
-    → x₂₁ ≅ x₂₂
-    → (x₁₁ , x₂₁) ≡ (x₁₂ , x₂₂)
+    → {x₁₁ x₂₁ : A₁}
+    → {x₁₂ : A₂ x₁₁}
+    → {x₂₂ : A₂ x₂₁}
+    → x₁₁ ≡ x₂₁
+    → x₁₂ ≅ x₂₂
+    → (x₁₁ , x₁₂) ≡ (x₂₁ , x₂₂)
   comma-equal refl refl
     = refl
 
@@ -74,11 +74,11 @@ module Sigma where
   comma-injective₁
     : {A₁ : Set}
     → {A₂ : A₁ → Set}
-    → {x₁₁ x₁₂ : A₁}
-    → {x₂₁ : A₂ x₁₁}
-    → {x₂₂ : A₂ x₁₂}
-    → (x₁₁ , x₂₁) ≡ (x₁₂ , x₂₂)
-    → x₁₁ ≡ x₁₂
+    → {x₁₁ x₂₁ : A₁}
+    → {x₁₂ : A₂ x₁₁}
+    → {x₂₂ : A₂ x₂₁}
+    → (x₁₁ , x₁₂) ≡ (x₂₁ , x₂₂)
+    → x₁₁ ≡ x₂₁
   comma-injective₁ refl
     = refl
 

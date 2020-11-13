@@ -31,24 +31,24 @@ dependent-split-functor-product
 dependent-split-functor-square-product
   : {n : ℕ}
   → {C₁ C₂ : ChainCategory n}
-  → {C₁₁' C₂₁' D₁₁' D₂₁' : DependentCategory C₁}
-  → {C₁₂' C₂₂' D₁₂' D₂₂' : DependentCategory C₂}
+  → {C₁₁' C₁₂' D₁₁' D₁₂' : DependentCategory C₁}
+  → {C₂₁' C₂₂' D₂₁' D₂₂' : DependentCategory C₂}
   → {F : ChainFunctor C₁ C₂}
-  → {F₁' : DependentFunctor C₁₁' C₁₂' F}
-  → {F₂' : DependentFunctor C₂₁' C₂₂' F}
-  → {G₁' : DependentFunctor D₁₁' D₁₂' F}
-  → {G₂' : DependentFunctor D₂₁' D₂₂' F}
+  → {F₁' : DependentFunctor C₁₁' C₂₁' F}
+  → {F₂' : DependentFunctor C₁₂' C₂₂' F}
+  → {G₁' : DependentFunctor D₁₁' D₂₁' F}
+  → {G₂' : DependentFunctor D₁₂' D₂₂' F}
   → {H₁₁ : DependentSplitFunctor C₁₁' D₁₁'}
   → {H₁₂ : DependentSplitFunctor C₁₂' D₁₂'}
   → {H₂₁ : DependentSplitFunctor C₂₁' D₂₁'}
   → {H₂₂ : DependentSplitFunctor C₂₂' D₂₂'}
-  → DependentSplitFunctorSquare F₁' G₁' H₁₁ H₁₂
-  → DependentSplitFunctorSquare F₂' G₂' H₂₁ H₂₂
+  → DependentSplitFunctorSquare F₁' G₁' H₁₁ H₂₁
+  → DependentSplitFunctorSquare F₂' G₂' H₁₂ H₂₂
   → DependentSplitFunctorSquare
     (dependent-functor-product F₁' F₂')
     (dependent-functor-product G₁' G₂')
-    (dependent-split-functor-product H₁₁ H₂₁)
-    (dependent-split-functor-product H₁₂ H₂₂)
+    (dependent-split-functor-product H₁₁ H₁₂)
+    (dependent-split-functor-product H₂₁ H₂₂)
 
 -- ## Definitions
 

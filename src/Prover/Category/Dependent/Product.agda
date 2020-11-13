@@ -45,15 +45,15 @@ dependent-functor-equal-product
   → {D₁' D₂' : DependentCategory D}
   → {F₁ F₂ : ChainFunctor C D}
   → {F₁₁' : DependentFunctor C₁' D₁' F₁}
-  → {F₁₂' : DependentFunctor C₁' D₁' F₂}
-  → {F₂₁' : DependentFunctor C₂' D₂' F₁}
+  → {F₁₂' : DependentFunctor C₂' D₂' F₁}
+  → {F₂₁' : DependentFunctor C₁' D₁' F₂}
   → {F₂₂' : DependentFunctor C₂' D₂' F₂}
   → ChainFunctorEqual F₁ F₂
-  → DependentFunctorEqual F₁₁' F₁₂'
-  → DependentFunctorEqual F₂₁' F₂₂'
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
   → DependentFunctorEqual
-    (dependent-functor-product F₁₁' F₂₁')
-    (dependent-functor-product F₁₂' F₂₂')
+    (dependent-functor-product F₁₁' F₁₂')
+    (dependent-functor-product F₂₁' F₂₂')
 
 dependent-functor-equal-product'
   : {A : Set}
@@ -66,16 +66,16 @@ dependent-functor-equal-product'
   → {F₁ : ChainFunctor C (D x₁)}
   → {F₂ : ChainFunctor C (D x₂)}
   → {F₁₁' : DependentFunctor C₁' (D₁' x₁) F₁}
-  → {F₁₂' : DependentFunctor C₁' (D₁' x₂) F₂}
-  → {F₂₁' : DependentFunctor C₂' (D₂' x₁) F₁}
+  → {F₁₂' : DependentFunctor C₂' (D₂' x₁) F₁}
+  → {F₂₁' : DependentFunctor C₁' (D₁' x₂) F₂}
   → {F₂₂' : DependentFunctor C₂' (D₂' x₂) F₂}
   → x₁ ≡ x₂
   → ChainFunctorEqual F₁ F₂
-  → DependentFunctorEqual F₁₁' F₁₂'
-  → DependentFunctorEqual F₂₁' F₂₂'
+  → DependentFunctorEqual F₁₁' F₂₁'
+  → DependentFunctorEqual F₁₂' F₂₂'
   → DependentFunctorEqual
-    (dependent-functor-product F₁₁' F₂₁')
-    (dependent-functor-product F₁₂' F₂₂')
+    (dependent-functor-product F₁₁' F₁₂')
+    (dependent-functor-product F₂₁' F₂₂')
 
 -- ### DependentFunctorIdentity
 
@@ -165,30 +165,30 @@ dependent-functor-compose-product'
 dependent-functor-square-product
   : {n : ℕ}
   → {C₁ C₂ D₁ D₂ : ChainCategory n}
-  → {C₁₁' C₂₁' : DependentCategory C₁}
-  → {C₁₂' C₂₂' : DependentCategory C₂}
-  → {D₁₁' D₂₁' : DependentCategory D₁}
-  → {D₁₂' D₂₂' : DependentCategory D₂}
+  → {C₁₁' C₁₂' : DependentCategory C₁}
+  → {C₂₁' C₂₂' : DependentCategory C₂}
+  → {D₁₁' D₁₂' : DependentCategory D₁}
+  → {D₂₁' D₂₂' : DependentCategory D₂}
   → {F : ChainFunctor C₁ C₂}
   → {G : ChainFunctor D₁ D₂}
   → {H₁ : ChainFunctor C₁ D₁}
   → {H₂ : ChainFunctor C₂ D₂}
-  → {F₁' : DependentFunctor C₁₁' C₁₂' F}
-  → {F₂' : DependentFunctor C₂₁' C₂₂' F}
-  → {G₁' : DependentFunctor D₁₁' D₁₂' G}
-  → {G₂' : DependentFunctor D₂₁' D₂₂' G}
+  → {F₁' : DependentFunctor C₁₁' C₂₁' F}
+  → {F₂' : DependentFunctor C₁₂' C₂₂' F}
+  → {G₁' : DependentFunctor D₁₁' D₂₁' G}
+  → {G₂' : DependentFunctor D₁₂' D₂₂' G}
   → {H₁₁' : DependentFunctor C₁₁' D₁₁' H₁}
-  → {H₂₁' : DependentFunctor C₂₁' D₂₁' H₁}
-  → {H₁₂' : DependentFunctor C₁₂' D₁₂' H₂}
+  → {H₁₂' : DependentFunctor C₁₂' D₁₂' H₁}
+  → {H₂₁' : DependentFunctor C₂₁' D₂₁' H₂}
   → {H₂₂' : DependentFunctor C₂₂' D₂₂' H₂}
   → ChainFunctorSquare F G H₁ H₂
-  → DependentFunctorSquare F₁' G₁' H₁₁' H₁₂'
-  → DependentFunctorSquare F₂' G₂' H₂₁' H₂₂'
+  → DependentFunctorSquare F₁' G₁' H₁₁' H₂₁'
+  → DependentFunctorSquare F₂' G₂' H₁₂' H₂₂'
   → DependentFunctorSquare
     (dependent-functor-product F₁' F₂')
     (dependent-functor-product G₁' G₂')
-    (dependent-functor-product H₁₁' H₂₁')
-    (dependent-functor-product H₁₂' H₂₂')
+    (dependent-functor-product H₁₁' H₁₂')
+    (dependent-functor-product H₂₁' H₂₂')
 
 dependent-functor-square-product'
   : {A : Set}
@@ -196,31 +196,31 @@ dependent-functor-square-product'
   → {n : ℕ}
   → {C₁ C₂ D₁ : ChainCategory n}
   → (D₂ : A → ChainCategory n)
-  → {C₁₁' C₂₁' : DependentCategory C₁}
-  → {C₁₂' C₂₂' : DependentCategory C₂}
-  → {D₁₁' D₂₁' : DependentCategory D₁}
-  → (D₁₂' D₂₂' : (x : A) → DependentCategory (D₂ x))
+  → {C₁₁' C₁₂' : DependentCategory C₁}
+  → {C₂₁' C₂₂' : DependentCategory C₂}
+  → {D₁₁' D₁₂' : DependentCategory D₁}
+  → (D₂₁' D₂₂' : (x : A) → DependentCategory (D₂ x))
   → {F : ChainFunctor C₁ C₂}
   → {G : ChainFunctor D₁ (D₂ x₂)}
   → {H₁ : ChainFunctor C₁ D₁}
   → {H₂ : ChainFunctor C₂ (D₂ x₁)}
-  → {F₁' : DependentFunctor C₁₁' C₁₂' F}
-  → {F₂' : DependentFunctor C₂₁' C₂₂' F}
-  → {G₁' : DependentFunctor D₁₁' (D₁₂' x₂) G}
-  → {G₂' : DependentFunctor D₂₁' (D₂₂' x₂) G}
+  → {F₁' : DependentFunctor C₁₁' C₂₁' F}
+  → {F₂' : DependentFunctor C₁₂' C₂₂' F}
+  → {G₁' : DependentFunctor D₁₁' (D₂₁' x₂) G}
+  → {G₂' : DependentFunctor D₁₂' (D₂₂' x₂) G}
   → {H₁₁' : DependentFunctor C₁₁' D₁₁' H₁}
-  → {H₁₂' : DependentFunctor C₁₂' (D₁₂' x₁) H₂}
-  → {H₂₁' : DependentFunctor C₂₁' D₂₁' H₁}
+  → {H₁₂' : DependentFunctor C₁₂' D₁₂' H₁}
+  → {H₂₁' : DependentFunctor C₂₁' (D₂₁' x₁) H₂}
   → {H₂₂' : DependentFunctor C₂₂' (D₂₂' x₁) H₂}
   → x₁ ≡ x₂
   → ChainFunctorSquare F G H₁ H₂
-  → DependentFunctorSquare F₁' G₁' H₁₁' H₁₂'
-  → DependentFunctorSquare F₂' G₂' H₂₁' H₂₂'
+  → DependentFunctorSquare F₁' G₁' H₁₁' H₂₁'
+  → DependentFunctorSquare F₂' G₂' H₁₂' H₂₂'
   → DependentFunctorSquare
     (dependent-functor-product F₁' F₂')
     (dependent-functor-product G₁' G₂')
-    (dependent-functor-product H₁₁' H₂₁')
-    (dependent-functor-product H₁₂' H₂₂')
+    (dependent-functor-product H₁₁' H₁₂')
+    (dependent-functor-product H₂₁' H₂₂')
 
 -- ## Definitions
 
@@ -346,12 +346,12 @@ dependent-functor-square-product {n = zero} _ s₁' s₂'
   = functor-square-product s₁' s₂'
 
 dependent-functor-square-product {n = suc _}
-  {D₂ = D₂} {D₁₂' = D₁₂'} {D₂₂' = D₂₂'} s s₁' s₂'
+  {D₂ = D₂} {D₂₁' = D₂₁'} {D₂₂' = D₂₂'} s s₁' s₂'
   = record
   { functor
     = λ x₁ → dependent-functor-square-product'
       (ChainCategory.category' D₂)
-      (DependentCategory.category D₁₂')
+      (DependentCategory.category D₂₁')
       (DependentCategory.category D₂₂')
       (ChainFunctorSquare.base s x₁)
       (ChainFunctorSquare.functor' s x₁)

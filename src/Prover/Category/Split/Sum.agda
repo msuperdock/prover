@@ -88,12 +88,12 @@ module _
 
 split-functor-square-sum₂
   : {C₁₁ C₁₂ C₂₁ C₂₂ : Category}
-  → {F₁ : Functor C₂₁ C₁₁}
-  → {F₂ : Functor C₂₂ C₁₂}
+  → {F₁ : Functor C₁₂ C₁₁}
+  → {F₂ : Functor C₂₂ C₂₁}
   → {F₁' : WeakFunctor F₁}
   → {F₂' : WeakFunctor F₂}
-  → {G₁ : Functor C₁₁ C₁₂}
-  → {G₂ : Functor C₂₁ C₂₂}
+  → {G₁ : Functor C₁₁ C₂₁}
+  → {G₂ : Functor C₁₂ C₂₂}
   → (s : FunctorSquare G₂ G₁ F₁ F₂)
   → WeakFunctorSquare G₁ G₂ F₁' F₂'
   → SplitFunctorSquare

@@ -66,9 +66,9 @@ module CategoryProduct
       → ArrowEqual f₁ f₂
       → ArrowEqual f₂ f₃
       → ArrowEqual f₁ f₃
-    arrow-trans (p₁₁ , p₂₁) (p₁₂ , p₂₂)
-      = Category.arrow-trans C₁ p₁₁ p₁₂
-      , Category.arrow-trans C₂ p₂₁ p₂₂
+    arrow-trans (p₁₁ , p₁₂) (p₂₁ , p₂₂)
+      = Category.arrow-trans C₁ p₁₁ p₂₁
+      , Category.arrow-trans C₂ p₁₂ p₂₂
 
     simplify
       : {x y : Object}
@@ -159,15 +159,15 @@ category-product C₁ C₂
 
 arrow-equal-product
   : {C₁ C₂ : Category}
-  → {x₁₁ x₁₂ y₁₁ y₁₂ : Category.Object C₁}
-  → {x₂₁ x₂₂ y₂₁ y₂₂ : Category.Object C₂}
+  → {x₁₁ x₂₁ y₁₁ y₂₁ : Category.Object C₁}
+  → {x₁₂ x₂₂ y₁₂ y₂₂ : Category.Object C₂}
   → {f₁₁ : Category.Arrow C₁ x₁₁ y₁₁}
-  → {f₁₂ : Category.Arrow C₁ x₁₂ y₁₂}
-  → {f₂₁ : Category.Arrow C₂ x₂₁ y₂₁}
+  → {f₁₂ : Category.Arrow C₂ x₁₂ y₁₂}
+  → {f₂₁ : Category.Arrow C₁ x₂₁ y₂₁}
   → {f₂₂ : Category.Arrow C₂ x₂₂ y₂₂}
-  → Category.ArrowEqual' C₁ f₁₁ f₁₂
-  → Category.ArrowEqual' C₂ f₂₁ f₂₂
-  → Category.ArrowEqual' (category-product C₁ C₂) (f₁₁ , f₂₁) (f₁₂ , f₂₂)
+  → Category.ArrowEqual' C₁ f₁₁ f₂₁
+  → Category.ArrowEqual' C₂ f₁₂ f₂₂
+  → Category.ArrowEqual' (category-product C₁ C₂) (f₁₁ , f₁₂) (f₂₁ , f₂₂)
 arrow-equal-product (any p₁) (any p₂)
   = any (p₁ , p₂)
 
@@ -277,19 +277,19 @@ functor-product-compose {E₁ = E₁} {E₂ = E₂} _ _ _ _
 
 module _
   {C₁ C₂ D₁ D₂ : Category}
-  {F₁₁ F₁₂ : Functor C₁ D₁}
-  {F₂₁ F₂₂ : Functor C₂ D₂}
+  {F₁₁ F₂₁ : Functor C₁ D₁}
+  {F₁₂ F₂₂ : Functor C₂ D₂}
   where
 
   module FunctorEqualProduct
-    (p₁ : FunctorEqual F₁₁ F₁₂)
-    (p₂ : FunctorEqual F₂₁ F₂₂)
+    (p₁ : FunctorEqual F₁₁ F₂₁)
+    (p₂ : FunctorEqual F₁₂ F₂₂)
     where
 
     base
       : (x : Category.Object (category-product C₁ C₂))
-      → Functor.base (functor-product F₁₁ F₂₁) x
-        ≅ Functor.base (functor-product F₁₂ F₂₂) x
+      → Functor.base (functor-product F₁₁ F₁₂) x
+        ≅ Functor.base (functor-product F₂₁ F₂₂) x
     base (x₁ , x₂)
       = Sigma.comma-equal
         (FunctorEqual.base p₁ x₁)
@@ -301,19 +301,19 @@ module _
       → Category'.ArrowEqual'
         (category-product D₁ D₂)
         (category-product D₁ D₂)
-        (Functor.map (functor-product F₁₁ F₂₁) f)
-        (Functor.map (functor-product F₁₂ F₂₂) f)
+        (Functor.map (functor-product F₁₁ F₁₂) f)
+        (Functor.map (functor-product F₂₁ F₂₂) f)
     map (f₁ , f₂)
       = arrow-equal-product
         (FunctorEqual.map p₁ f₁)
         (FunctorEqual.map p₂ f₂)
 
   functor-equal-product
-    : FunctorEqual F₁₁ F₁₂
-    → FunctorEqual F₂₁ F₂₂
+    : FunctorEqual F₁₁ F₂₁
+    → FunctorEqual F₁₂ F₂₂
     → FunctorEqual
-      (functor-product F₁₁ F₂₁)
-      (functor-product F₁₂ F₂₂)
+      (functor-product F₁₁ F₁₂)
+      (functor-product F₂₁ F₂₂)
   functor-equal-product p₁ p₂
     = record {FunctorEqualProduct p₁ p₂}
 
@@ -365,33 +365,33 @@ functor-compose-product
 
 functor-square-product
   : {C₁₁ C₁₂ C₂₁ C₂₂ D₁₁ D₁₂ D₂₁ D₂₂ : Category}
-  → {F₁ : Functor C₁₁ C₁₂}
-  → {F₂ : Functor C₂₁ C₂₂}
-  → {G₁ : Functor D₁₁ D₁₂}
-  → {G₂ : Functor D₂₁ D₂₂}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → {F₂ : Functor C₁₂ C₂₂}
+  → {G₁ : Functor D₁₁ D₂₁}
+  → {G₂ : Functor D₁₂ D₂₂}
   → {H₁₁ : Functor C₁₁ D₁₁}
   → {H₁₂ : Functor C₁₂ D₁₂}
   → {H₂₁ : Functor C₂₁ D₂₁}
   → {H₂₂ : Functor C₂₂ D₂₂}
-  → FunctorSquare F₁ G₁ H₁₁ H₁₂
-  → FunctorSquare F₂ G₂ H₂₁ H₂₂
+  → FunctorSquare F₁ G₁ H₁₁ H₂₁
+  → FunctorSquare F₂ G₂ H₁₂ H₂₂
   → FunctorSquare
     (functor-product F₁ F₂)
     (functor-product G₁ G₂)
-    (functor-product H₁₁ H₂₁)
-    (functor-product H₁₂ H₂₂)
+    (functor-product H₁₁ H₁₂)
+    (functor-product H₂₁ H₂₂)
 functor-square-product
   {F₁ = F₁} {F₂ = F₂} {G₁ = G₁} {G₂ = G₂}
   {H₁₁ = H₁₁} {H₁₂ = H₁₂} {H₂₁ = H₂₁} {H₂₂ = H₂₂} s₁ s₂
   = functor-square-from-equal
     (functor-product F₁ F₂)
     (functor-product G₁ G₂)
-    (functor-product H₁₁ H₂₁)
-    (functor-product H₁₂ H₂₂)
+    (functor-product H₁₁ H₁₂)
+    (functor-product H₂₁ H₂₂)
   $ functor-trans (functor-sym
-    (functor-product-compose H₁₂ H₂₂ F₁ F₂))
+    (functor-product-compose H₂₁ H₂₂ F₁ F₂))
   $ functor-trans (functor-equal-product
     (functor-square-to-equal s₁)
     (functor-square-to-equal s₂))
-  $ functor-product-compose G₁ G₂ H₁₁ H₂₁
+  $ functor-product-compose G₁ G₂ H₁₁ H₁₂
 

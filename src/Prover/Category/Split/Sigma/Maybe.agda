@@ -31,19 +31,19 @@ split-functor-sigma-maybe F₂
 -- ## SplitFunctorSquare
 
 split-functor-square-sigma-maybe
-  : {C₁₁ C₁₂ : Category}
-  → {C₂₁ D₂₁ : Dependent₁Category C₁₁}
-  → {C₂₂ D₂₂ : Dependent₁Category C₁₂}
-  → {F₁ : Functor C₁₁ C₁₂}
-  → {F₂ : Dependent₁Functor C₂₁ C₂₂ F₁}
-  → {G₂ : Dependent₁Functor D₂₁ D₂₂ F₁}
-  → {H₂₁ : Dependent₁SplitFunctor C₂₁ D₂₁}
+  : {C₁₁ C₂₁ : Category}
+  → {C₁₂ D₁₂ : Dependent₁Category C₁₁}
+  → {C₂₂ D₂₂ : Dependent₁Category C₂₁}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
+  → {G₂ : Dependent₁Functor D₁₂ D₂₂ F₁}
+  → {H₁₂ : Dependent₁SplitFunctor C₁₂ D₁₂}
   → {H₂₂ : Dependent₁SplitFunctor C₂₂ D₂₂}
-  → Dependent₁SplitFunctorSquare F₂ G₂ H₂₁ H₂₂
+  → Dependent₁SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
     (functor-sigma-maybe F₂)
     (functor-sigma-maybe G₂)
-    (split-functor-sigma-maybe H₂₁)
+    (split-functor-sigma-maybe H₁₂)
     (split-functor-sigma-maybe H₂₂)
 split-functor-square-sigma-maybe s₂
   = split-functor-square-sigma

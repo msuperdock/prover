@@ -147,21 +147,21 @@ module _
 
 split-functor-square-product
   : {C₁₁ C₁₂ C₂₁ C₂₂ D₁₁ D₁₂ D₂₁ D₂₂ : Category}
-  → {F₁ : Functor C₁₁ C₁₂}
-  → {F₂ : Functor C₂₁ C₂₂}
-  → {G₁ : Functor D₁₁ D₁₂}
-  → {G₂ : Functor D₂₁ D₂₂}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → {F₂ : Functor C₁₂ C₂₂}
+  → {G₁ : Functor D₁₁ D₂₁}
+  → {G₂ : Functor D₁₂ D₂₂}
   → {H₁₁ : SplitFunctor C₁₁ D₁₁}
   → {H₁₂ : SplitFunctor C₁₂ D₁₂}
   → {H₂₁ : SplitFunctor C₂₁ D₂₁}
   → {H₂₂ : SplitFunctor C₂₂ D₂₂}
-  → SplitFunctorSquare F₁ G₁ H₁₁ H₁₂
-  → SplitFunctorSquare F₂ G₂ H₂₁ H₂₂
+  → SplitFunctorSquare F₁ G₁ H₁₁ H₂₁
+  → SplitFunctorSquare F₂ G₂ H₁₂ H₂₂
   → SplitFunctorSquare
     (functor-product F₁ F₂)
     (functor-product G₁ G₂)
-    (split-functor-product H₁₁ H₂₁)
-    (split-functor-product H₁₂ H₂₂)
+    (split-functor-product H₁₁ H₁₂)
+    (split-functor-product H₂₁ H₂₂)
 split-functor-square-product s₁ s₂
   = record
   { partial-functor 

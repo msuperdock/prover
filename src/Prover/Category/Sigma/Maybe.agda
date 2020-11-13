@@ -56,13 +56,13 @@ functor-equal-sigma-maybe
   : {C₁ D₁ : Category}
   → {C₂ : Dependent₁Category C₁}
   → {D₂ : Dependent₁Category D₁}
-  → {F₁₁ F₁₂ : Functor C₁ D₁}
-  → {F₂₁ : Dependent₁Functor C₂ D₂ F₁₁}
-  → {F₂₂ : Dependent₁Functor C₂ D₂ F₁₂}
-  → FunctorEqual F₁₁ F₁₂
-  → Dependent₁FunctorEqual F₂₁ F₂₂
+  → {F₁₁ F₂₁ : Functor C₁ D₁}
+  → {F₁₂ : Dependent₁Functor C₂ D₂ F₁₁}
+  → {F₂₂ : Dependent₁Functor C₂ D₂ F₂₁}
+  → FunctorEqual F₁₁ F₂₁
+  → Dependent₁FunctorEqual F₁₂ F₂₂
   → FunctorEqual
-    (functor-sigma-maybe F₂₁)
+    (functor-sigma-maybe F₁₂)
     (functor-sigma-maybe F₂₂)
 functor-equal-sigma-maybe p₁ p₂
   = functor-equal-sigma p₁
@@ -109,25 +109,25 @@ functor-compose-sigma-maybe p₁ p₂
 -- ## FunctorSquare
 
 functor-square-sigma-maybe
-  : {C₁₁ C₁₂ D₁₁ D₁₂ : Category}
-  → {C₂₁ : Dependent₁Category C₁₁}
-  → {C₂₂ : Dependent₁Category C₁₂}
-  → {D₂₁ : Dependent₁Category D₁₁}
-  → {D₂₂ : Dependent₁Category D₁₂}
-  → {F₁ : Functor C₁₁ C₁₂}
-  → {G₁ : Functor D₁₁ D₁₂}
+  : {C₁₁ C₂₁ D₁₁ D₂₁ : Category}
+  → {C₁₂ : Dependent₁Category C₁₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {D₁₂ : Dependent₁Category D₁₁}
+  → {D₂₂ : Dependent₁Category D₂₁}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → {G₁ : Functor D₁₁ D₂₁}
   → {H₁₁ : Functor C₁₁ D₁₁}
-  → {H₁₂ : Functor C₁₂ D₁₂}
-  → {F₂ : Dependent₁Functor C₂₁ C₂₂ F₁}
-  → {G₂ : Dependent₁Functor D₂₁ D₂₂ G₁}
-  → {H₂₁ : Dependent₁Functor C₂₁ D₂₁ H₁₁}
-  → {H₂₂ : Dependent₁Functor C₂₂ D₂₂ H₁₂}
-  → FunctorSquare F₁ G₁ H₁₁ H₁₂
-  → Dependent₁FunctorSquare F₂ G₂ H₂₁ H₂₂
+  → {H₂₁ : Functor C₂₁ D₂₁}
+  → {F₂ : Dependent₁Functor C₁₂ C₂₂ F₁}
+  → {G₂ : Dependent₁Functor D₁₂ D₂₂ G₁}
+  → {H₁₂ : Dependent₁Functor C₁₂ D₁₂ H₁₁}
+  → {H₂₂ : Dependent₁Functor C₂₂ D₂₂ H₂₁}
+  → FunctorSquare F₁ G₁ H₁₁ H₂₁
+  → Dependent₁FunctorSquare F₂ G₂ H₁₂ H₂₂
   → FunctorSquare
     (functor-sigma-maybe F₂)
     (functor-sigma-maybe G₂)
-    (functor-sigma-maybe H₂₁)
+    (functor-sigma-maybe H₁₂)
     (functor-sigma-maybe H₂₂)
 functor-square-sigma-maybe s₁ s₂
   = functor-square-sigma s₁
@@ -136,14 +136,14 @@ functor-square-sigma-maybe s₁ s₂
 -- ## FunctorSquare₁
 
 functor-square-sigma-maybe₁
-  : {C₁₁ C₁₂ : Category}
-  → {C₂₁ : Dependent₁Category C₁₁}
-  → {C₂₂ : Dependent₁Category C₁₂}
-  → {F₁ : Functor C₁₁ C₁₂}
-  → (F₂ : Dependent₁Functor C₂₁ C₂₂ F₁)
+  : {C₁₁ C₂₁ : Category}
+  → {C₁₂ : Dependent₁Category C₁₁}
+  → {C₂₂ : Dependent₁Category C₂₁}
+  → {F₁ : Functor C₁₁ C₂₁}
+  → (F₂ : Dependent₁Functor C₁₂ C₂₂ F₁)
   → FunctorSquare
     (functor-sigma-maybe F₂) F₁
-    (functor-sigma-maybe₁ C₂₁)
+    (functor-sigma-maybe₁ C₁₂)
     (functor-sigma-maybe₁ C₂₂)
 functor-square-sigma-maybe₁ F₂
   = functor-square-sigma₁

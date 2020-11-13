@@ -112,12 +112,12 @@ module _
 
 module _
   {C₁₁ C₁₂ C₂₁ C₂₂ : Category}
-  {F₁ : Functor C₂₁ C₁₁}
-  {F₂ : Functor C₂₂ C₁₂}
+  {F₁ : Functor C₁₂ C₁₁}
+  {F₂ : Functor C₂₂ C₂₁}
   {F₁' : WeakFunctor F₁}
   {F₂' : WeakFunctor F₂}
-  {G₁ : Functor C₁₁ C₁₂}
-  {G₂ : Functor C₂₁ C₂₂}
+  {G₁ : Functor C₁₁ C₂₁}
+  {G₂ : Functor C₁₂ C₂₂}
   where
 
   module PartialFunctorSquareSum₂
@@ -126,7 +126,7 @@ module _
     where
 
     base
-      : {x₁' : Category.Object C₂₁}
+      : {x₁' : Category.Object C₁₂}
       → (x₁ : Category.Object (category-sum F₁))
       → PartialFunctor.base (partial-functor-sum₂ F₁') x₁ ≡ just x₁'
       → PartialFunctor.base (partial-functor-sum₂ F₂')
@@ -137,7 +137,7 @@ module _
 
     map
       : {x₁ y₁ : Category.Object (category-sum F₁)}
-      → {x₁' y₁' : Category.Object C₂₁}
+      → {x₁' y₁' : Category.Object C₁₂}
       → (p₁ : PartialFunctor.base (partial-functor-sum₂ F₁') x₁ ≡ just x₁')
       → (q₁ : PartialFunctor.base (partial-functor-sum₂ F₁') y₁ ≡ just y₁')
       → (f₁ : Category.Arrow (category-sum F₁) x₁ y₁)
@@ -146,13 +146,13 @@ module _
           (Functor.map (functor-sum s) f₁))
         (Functor.map G₂
           (PartialFunctor.map (partial-functor-sum₂ F₁') p₁ q₁ f₁))
-    map {x₁ = ι₂ x₂₁} {y₁ = ι₂ y₂₁} refl refl (CategorySum.arrow₁ f₁₁)
-      = WeakFunctorSquare.map' s' x₂₁ y₂₁
-        (FunctorSquare.base s x₂₁)
-        (FunctorSquare.base s y₂₁) f₁₁
-      $ Category.arrow-equal' C₁₂
-        (FunctorSquare.base s x₂₁)
-        (FunctorSquare.base s y₂₁)
+    map {x₁ = ι₂ x₁₂} {y₁ = ι₂ y₁₂} refl refl (CategorySum.arrow₁ f₁₁)
+      = WeakFunctorSquare.map' s' x₁₂ y₁₂
+        (FunctorSquare.base s x₁₂)
+        (FunctorSquare.base s y₁₂) f₁₁
+      $ Category.arrow-equal' C₂₁
+        (FunctorSquare.base s x₁₂)
+        (FunctorSquare.base s y₁₂)
         (Functor.map G₁ f₁₁)
     map refl refl (CategorySum.arrow₂ _)
       = Category.arrow-refl C₂₂
