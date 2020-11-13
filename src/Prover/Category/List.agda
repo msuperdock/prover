@@ -2,7 +2,7 @@ module Prover.Category.List where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any'; functor-compose';
+    FunctorIdentity; FunctorSquare; functor-compose';
     functor-compose-from-equal; functor-compose-to-equal; functor-identity';
     functor-identity-from-equal; functor-identity-to-equal;
     functor-square-from-equal; functor-square-to-equal; functor-sym;
@@ -146,7 +146,7 @@ module CategoryList
   lookup-equal' nothing'
     = nothing
   lookup-equal' (just' l p)
-    = just l (any' p)
+    = just l (Category.any' C p)
 
   record ArrowEqual
     {xs ys : Object}
@@ -965,7 +965,7 @@ module _
           (CategoryList.identity-lookup D (base xs) k)
       map-identity' xs k
         = CategoryList.just k
-        $ any'
+        $ Category.any' D
         $ Category.arrow-trans' D (Category.arrow-equal' D p p
           (Functor.map F (Category.identity C (xs ! k))))
         $ Category.arrow-trans' D (Functor.map-identity' F (xs ! k))
@@ -1002,7 +1002,7 @@ module _
         = CategoryList.nothing
       ... | just (m , f)
         = CategoryList.just m
-        $ any'
+        $ Category.any' D
         $ Category.arrow-trans' D (Category.arrow-equal' D p r
           (Functor.map F (Category.compose C f g)))
         $ Category.arrow-trans' D (Functor.map-compose' F f g)

@@ -1,7 +1,7 @@
 module Prover.Category.Split.List where
 
 open import Prover.Category
-  using (Category; Functor; any')
+  using (Category; Functor)
 open import Prover.Category.List
   using (module CategoryList; category-list; functor-list; functor-square-list)
 open import Prover.Category.Partial
@@ -104,7 +104,7 @@ module _
         = CategoryList.nothing
       ... | just (l , f)
         = CategoryList.just l
-        $ any'
+        $ Category.any' D
         $ Category.arrow-trans' D (SplitFunctor.map-equal' F p'' p''' q'' q'''
           (Category.arrow-equal' C p' q' (SplitFunctor.unmap F f)))
         $ SplitFunctor.map-unmap'' F p''' q''' f
@@ -230,7 +230,7 @@ module _
       normalize-valid' {xs' = any xs'} (any xs) refl k
         | _ | [ refl ] | just _ | [ p ] | just _ | [ p' ] | refl
         = CategoryList.just k
-        $ any'
+        $ Category.any' D
         $ Category.arrow-trans' D (SplitFunctor.map-equal' F q q q' r
           (normalize-lookup-equal xs p k))
         $ SplitFunctor.normalize-valid' F (Vec.lookup xs k) q q r

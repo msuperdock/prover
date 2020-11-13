@@ -1,7 +1,7 @@
 module Prover.Category.Partial.Sigma where
 
 open import Prover.Category
-  using (Category; Functor; any; any')
+  using (Category; Functor)
 open import Prover.Category.Dependent1
   using (Dependent₁Category; Dependent₁Functor)
 open import Prover.Category.Dependent1.Partial
@@ -236,12 +236,12 @@ module _
       {x₁ = (x₁₁ , x₁₂)} {y₁ = (y₁₁ , _)} refl refl refl refl
       (CategorySigma.arrow f₁₁ f₁₂ refl)
       {f₂ = CategorySigma.arrow f₂₁ _ refl}
-      (any (CategorySigma.arrow-equal r₁ r₂))
+      (Category.any (CategorySigma.arrow-equal r₁ r₂))
       | just _ | [ p₁ ] | just _ | [ p₂ ] | just _ | [ q₁ ] | just _ | [ q₂ ]
       = arrow-equal-sigma D₂₂
         (Maybe.just-injective (trans (sym p₂)
           (Dependent₁PartialFunctorSquare.base s x₁₁ x₁₂ p₁)))
-        (any (Category.arrow-sym C₂₁ r₁))
+        (Category.any (Category.arrow-sym C₂₁ r₁))
         (Dependent₁PartialFunctorSquare.map'' s y₁₁
           (Dependent₁PartialFunctor.base-square H₁₂ f₁₁ x₁₂ p₁) q₁
           (Dependent₁PartialFunctor.base-square H₂₂ f₂₁
@@ -264,7 +264,7 @@ module _
           (functor-sigma G₂)
           (PartialFunctor.map (partial-functor-sigma H₁₂) p₁ q₁ f₁))
     map {x₁ = x₁} {y₁ = y₁} p₁ q₁ f₁
-      = any'
+      = Category.any' (category-sigma D₂₂)
       $ map' p₁ (base x₁ p₁) q₁ (base y₁ q₁) f₁
       $ Category.arrow-refl' (category-sigma C₂₂)
 

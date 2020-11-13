@@ -1,7 +1,7 @@
 module Prover.Category.Split where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare; any; functor-compose';
+  using (Category; Functor; FunctorSquare; functor-compose';
     functor-square-compose)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare; partial-functor-compose;
@@ -110,7 +110,7 @@ record SplitFunctor
     with trans (sym p) (base-unbase x)
     | trans (sym q) (base-unbase y)
   ... | refl | refl
-    = any (map-unmap' p q f)
+    = Category.any (map-unmap' p q f)
 
   normalize-valid'
     : {x' x'' : Category.Object D}
@@ -127,7 +127,7 @@ record SplitFunctor
     with irrelevant p p'
     | irrelevant q (base-unbase x')
   ... | refl | refl
-    = any (normalize-valid x p)
+    = Category.any (normalize-valid x p)
 
 -- ### Compose
 

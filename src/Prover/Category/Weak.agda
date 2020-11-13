@@ -1,7 +1,7 @@
 module Prover.Category.Weak where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare; any; functor-compose')
+  using (Category; Functor; FunctorSquare; functor-compose')
 open import Prover.Prelude
 
 -- ## WeakFunctor
@@ -97,7 +97,7 @@ record WeakFunctor
     → {f₂ : Category.Arrow C x₂ y₂}
     → Category.ArrowEqual' C f₁ f₂
     → Category.ArrowEqual D (map' x' y' p₁ q₁ f₁) (map' x' y' p₂ q₂ f₂)
-  map-equal'' x' y' refl refl refl refl (any p)
+  map-equal'' x' y' refl refl refl refl (Category.any p)
     = map-equal x' y' p
 
 -- ### Compose

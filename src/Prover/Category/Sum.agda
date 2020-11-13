@@ -2,7 +2,7 @@ module Prover.Category.Sum where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any; any'; functor-compose';
+    FunctorIdentity; FunctorSquare; functor-compose';
     functor-compose-from-equal; functor-compose-to-equal; functor-identity';
     functor-identity-from-equal; functor-identity-to-equal;
     functor-square-compose'; functor-square-identity';
@@ -293,8 +293,8 @@ arrow-equal₁
     (category-sum F)
     (CategorySum.arrow₁ {x = x₁} {y = y₁} f₁)
     (CategorySum.arrow₁ {x = x₂} {y = y₂} f₂)
-arrow-equal₁ _ refl refl (any p₁)
-  = any (CategorySum.arrow₁-equal p₁)
+arrow-equal₁ _ refl refl (Category.any p₁)
+  = Category.any (CategorySum.arrow₁-equal p₁)
 
 arrow-equal₂
   : {C₁ C₂ : Category}
@@ -307,8 +307,8 @@ arrow-equal₂
     (category-sum F)
     (CategorySum.arrow₂ f₁₂)
     (CategorySum.arrow₂ f₂₂)
-arrow-equal₂ _ (any p)
-  = any (CategorySum.arrow₂-equal p)
+arrow-equal₂ _ (Category.any p)
+  = Category.any (CategorySum.arrow₂-equal p)
 
 -- ## Functor
 
@@ -392,7 +392,8 @@ module _
         (Functor.map G (Functor.map H₂ f₂))
         (Category.arrow D₁ p q f₁)
     map-arrow' {f₂ = f₂} refl refl r
-      = any' (Category.arrow-trans' D₁ (FunctorSquare.map s f₂) r)
+      = Category.any' D₁
+      $ Category.arrow-trans' D₁ (FunctorSquare.map s f₂) r
 
     map-arrow
       : {x₂ y₂ : Category.Object C₂}

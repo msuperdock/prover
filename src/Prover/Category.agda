@@ -122,15 +122,6 @@ data ArrowEqual''
     → Category''.ArrowEqual C f₁ f₂
     → ArrowEqual'' C C f₁ f₂
 
-any'
-  : {C : Category''}
-  → {x y : Category''.Object C}
-  → {f₁ f₂ : Category''.Arrow C x y}
-  → ArrowEqual'' C C f₁ f₂
-  → Category''.ArrowEqual C f₁ f₂
-any' (any p)
-  = p
-
 -- ### Module
 
 module Category
@@ -150,6 +141,14 @@ module Category
     → Set
   ArrowEqual'
     = ArrowEqual'' C C
+
+  any'
+    : {x y : Object}
+    → {f₁ f₂ : Arrow x y}
+    → ArrowEqual' f₁ f₂
+    → ArrowEqual f₁ f₂
+  any' (any p)
+    = p
 
   arrow-refl'
     : {x y : Object}

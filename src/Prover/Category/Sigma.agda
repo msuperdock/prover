@@ -2,7 +2,7 @@ module Prover.Category.Sigma where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any; functor-compose';
+    FunctorIdentity; FunctorSquare; functor-compose';
     functor-compose-from-equal; functor-compose-to-equal; functor-identity';
     functor-identity-from-equal; functor-identity-to-equal;
     functor-square-from-equal; functor-square-to-equal; functor-sym;
@@ -310,8 +310,8 @@ arrow-equal-sigma
     (category-sigma C₂)
     (CategorySigma.arrow f₁₁ f₁₂ p₁₂)
     (CategorySigma.arrow f₂₁ f₂₂ p₂₂)
-arrow-equal-sigma _ refl (any q₁) q₂@(any _)
-  = any (CategorySigma.arrow-equal q₁ q₂)
+arrow-equal-sigma _ refl (Category.any q₁) q₂@(Category.any _)
+  = Category.any (CategorySigma.arrow-equal q₁ q₂)
 
 -- ## Functor
 

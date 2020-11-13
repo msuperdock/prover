@@ -2,7 +2,7 @@ module Prover.Category.Maybe where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any; functor-compose';
+    FunctorIdentity; FunctorSquare; functor-compose';
     functor-compose-from-equal; functor-compose-to-equal; functor-identity';
     functor-identity-from-equal; functor-identity-to-equal;
     functor-square-from-equal; functor-square-to-equal; functor-sym;
@@ -203,8 +203,8 @@ arrow-equal-just
     (category-maybe C)
     (just f₁)
     (just f₂)
-arrow-equal-just _ (any p)
-  = any (CategoryMaybe.just p)
+arrow-equal-just _ (Category.any p)
+  = Category.any (CategoryMaybe.just p)
 
 -- ## Functor
 

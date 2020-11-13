@@ -2,7 +2,7 @@ module Prover.Category.Product where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any; functor-compose';
+    FunctorIdentity; FunctorSquare; functor-compose';
     functor-compose-from-equal; functor-compose-to-equal; functor-identity';
     functor-identity-from-equal; functor-identity-to-equal;
     functor-square-from-equal; functor-square-to-equal; functor-sym;
@@ -168,8 +168,8 @@ arrow-equal-product
   → Category.ArrowEqual' C₁ f₁₁ f₂₁
   → Category.ArrowEqual' C₂ f₁₂ f₂₂
   → Category.ArrowEqual' (category-product C₁ C₂) (f₁₁ , f₁₂) (f₂₁ , f₂₂)
-arrow-equal-product (any p₁) (any p₂)
-  = any (p₁ , p₂)
+arrow-equal-product (Category.any p₁) (Category.any p₂)
+  = Category.any (p₁ , p₂)
 
 -- ## Functor
 
