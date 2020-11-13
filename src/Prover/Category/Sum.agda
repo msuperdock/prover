@@ -276,7 +276,7 @@ module _
 
 -- ### Equality
 
-arrow-equal₁
+arrow-equal-sum₁
   : {C₁ C₂ : Category}
   → (F : Functor C₂ C₁)
   → {x₁ x₂ y₁ y₂ : Category.Object (category-sum F)}
@@ -293,10 +293,10 @@ arrow-equal₁
     (category-sum F)
     (CategorySum.arrow₁ {x = x₁} {y = y₁} f₁)
     (CategorySum.arrow₁ {x = x₂} {y = y₂} f₂)
-arrow-equal₁ _ refl refl (Category.any p₁)
+arrow-equal-sum₁ _ refl refl (Category.any p₁)
   = Category.any (CategorySum.arrow₁-equal p₁)
 
-arrow-equal₂
+arrow-equal-sum₂
   : {C₁ C₂ : Category}
   → (F : Functor C₂ C₁)
   → {x₁₂ x₂₂ y₁₂ y₂₂ : Category.Object C₂}
@@ -307,7 +307,7 @@ arrow-equal₂
     (category-sum F)
     (CategorySum.arrow₂ f₁₂)
     (CategorySum.arrow₂ f₂₂)
-arrow-equal₂ _ (Category.any p)
+arrow-equal-sum₂ _ (Category.any p)
   = Category.any (CategorySum.arrow₂-equal p)
 
 -- ## Functor
@@ -553,7 +553,7 @@ module _
         (Functor.map (functor-sum (functor-square-compose' s t)) f)
         (Functor.map (functor-compose' (functor-sum s) (functor-sum t)) f)
     map {x = x} {y = y} (CategorySum.arrow₁ f₁)
-      = arrow-equal₁ H (base x) (base y)
+      = arrow-equal-sum₁ H (base x) (base y)
       $ Category.arrow-trans' E₁ (Category.arrow-equal' E₁
         (FunctorSum.base-equal (functor-square-compose' s t) x)
         (FunctorSum.base-equal (functor-square-compose' s t) y)
@@ -672,7 +672,7 @@ module _
         (Functor.map (functor-sum s₁) f)
         (Functor.map (functor-sum s₂) f)
     map {x = x} {y = y} (CategorySum.arrow₁ f₁)
-      = arrow-equal₁ G (base x) (base y)
+      = arrow-equal-sum₁ G (base x) (base y)
       $ Category.arrow-trans' D₁ (Category.arrow-equal' D₁
         (FunctorSum.base-equal s₁ x)
         (FunctorSum.base-equal s₁ y)
@@ -683,7 +683,7 @@ module _
         (FunctorSum.base-equal s₂ y)
         (Functor.map H₂₁ f₁))
     map (CategorySum.arrow₂ f₂)
-      = arrow-equal₂ G (FunctorEqual.map p₂ f₂)
+      = arrow-equal-sum₂ G (FunctorEqual.map p₂ f₂)
 
   functor-equal-sum
     : (s₁ : FunctorSquare H₁₂ H₁₁ F G)
