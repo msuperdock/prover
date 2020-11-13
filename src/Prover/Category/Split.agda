@@ -4,8 +4,8 @@ open import Prover.Category
   using (Category; Functor; FunctorSquare; functor-compose';
     functor-square-compose)
 open import Prover.Category.Partial
-  using (PartialFunctor; PartialFunctorSquare; partial-functor-compose;
-    partial-functor-square-compose)
+  using (PartialFunctor; PartialFunctorSquare; functor-partial;
+    partial-functor-compose; partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Function.Split
@@ -485,4 +485,138 @@ module _
       (split-functor-weak H₂)
   split-functor-square-weak s
     = record {SplitFunctorSquareWeak s}
+
+-- ## TotalSplitFunctor
+
+-- ### Definition
+
+record TotalSplitFunctor
+  (C D : Category)
+  : Set
+  where
+
+  no-eta-equality
+
+  field
+
+    functor
+      : Functor C D
+
+  open Functor functor public
+
+  field
+
+    functor'
+      : Functor D C
+
+  open Functor functor' public using () renaming
+    ( base
+      to unbase
+    ; map
+      to unmap
+    )
+
+  field
+
+    unbase-base
+      : (x : Category.Object C)
+      → unbase (base x) ≡ x
+
+    base-unbase
+      : (x : Category.Object D)
+      → base (unbase x) ≡ x
+
+    map-unmap
+      : {x y : Category.Object D}
+      → (f : Category.Arrow D x y)
+      → Category.ArrowEqual' D (map (unmap f)) f
+
+-- ### Conversion
+
+module _
+  {C D : Category}
+  where
+
+  module SplitFunctorUntotal
+    (F : TotalSplitFunctor C D)
+    where
+
+    open TotalSplitFunctor F public using () renaming
+      ( functor'
+        to functor
+      )
+
+    partial-functor
+      : PartialFunctor C D
+    partial-functor
+      = functor-partial
+        (TotalSplitFunctor.functor F)
+
+    open PartialFunctor partial-functor
+
+    open Functor functor using () renaming
+      ( base
+        to unbase
+      ; map
+        to unmap
+      )
+
+    abstract
+
+      base-unbase
+        : (x : Category.Object D)
+        → base (unbase x) ≡ just x
+      base-unbase x
+        = sub just
+          (TotalSplitFunctor.base-unbase F x)
+
+      map-unmap'
+        : {x x' y y' : Category.Object D}
+        → (p : base (unbase x) ≡ just x')
+        → (q : base (unbase y) ≡ just y')
+        → (f : Category.Arrow D x y)
+        → Category.ArrowEqual' D
+          (map p q (unmap f)) f
+      map-unmap' refl refl
+        = TotalSplitFunctor.map-unmap F
+
+      map-unmap
+        : {x y : Category.Object D}
+        → (f : Category.Arrow D x y)
+        → Category.ArrowEqual D
+          (map (base-unbase x) (base-unbase y) (unmap f)) f
+      map-unmap {x = x} {y = y} f
+        = Category.any' D
+        $ map-unmap' (base-unbase x) (base-unbase y) f
+
+      normalize-arrow
+        : {x' : Category.Object D}
+        → (x : Category.Object C)
+        → base x ≡ just x'
+        → Category.Arrow C x (unbase x')
+      normalize-arrow x refl
+        with TotalSplitFunctor.unbase F (TotalSplitFunctor.base F x)
+        | TotalSplitFunctor.unbase-base F x
+      ... | _ | refl
+        = Category.identity C x
+
+      normalize-valid
+        : {x' : Category.Object D}
+        → (x : Category.Object C)
+        → (p : base x ≡ just x')
+        → Category.ArrowEqual D
+          (map p (base-unbase x') (normalize-arrow x p))
+          (Category.identity D x')
+      normalize-valid x refl
+        with TotalSplitFunctor.unbase F (TotalSplitFunctor.base F x)
+        | TotalSplitFunctor.unbase-base F x
+        | TotalSplitFunctor.base-unbase F (TotalSplitFunctor.base F x)
+      ... | _ | refl | refl
+        = TotalSplitFunctor.map-identity F x
+
+  split-functor-untotal
+    : TotalSplitFunctor C D
+    → SplitFunctor C D
+  split-functor-untotal F
+    = record {SplitFunctorUntotal F}
 

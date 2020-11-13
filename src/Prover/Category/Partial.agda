@@ -124,6 +124,75 @@ record PartialFunctor
   map-compose' p q r f g
     = any (map-compose p q r f g)
 
+-- ### Conversion
+
+module _
+  {C D : Category}
+  where
+
+  module FunctorPartial
+    (F : Functor C D)
+    where
+
+    base
+      : Category.Object C
+      → Maybe (Category.Object D)
+    base x
+      = just (Functor.base F x)
+
+    map
+      : {x y : Category.Object C}
+      → {x' y' : Category.Object D}
+      → base x ≡ just x'
+      → base y ≡ just y'
+      → Category.Arrow C x y
+      → Category.Arrow D x' y'
+    map refl refl
+      = Functor.map F
+
+    abstract
+
+      map-equal
+        : {x y : Category.Object C}
+        → {x' y' : Category.Object D}
+        → {f₁ f₂ : Category.Arrow C x y}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → Category.ArrowEqual C f₁ f₂
+        → Category.ArrowEqual D (map p q f₁) (map p q f₂)
+      map-equal refl refl
+        = Functor.map-equal F
+
+      map-identity
+        : {x' : Category.Object D}
+        → (x : Category.Object C)
+        → (p : base x ≡ just x')
+        → Category.ArrowEqual D
+          (map p p (Category.identity C x))
+          (Category.identity D x')
+      map-identity x refl
+        = Functor.map-identity F x
+
+      map-compose
+        : {x y z : Category.Object C}
+        → {x' y' z' : Category.Object D}
+        → (p : base x ≡ just x')
+        → (q : base y ≡ just y')
+        → (r : base z ≡ just z')
+        → (f : Category.Arrow C y z)
+        → (g : Category.Arrow C x y)
+        → Category.ArrowEqual D
+          (map p r (Category.compose C f g))
+          (Category.compose D (map q r f) (map p q g))
+      map-compose refl refl refl
+        = Functor.map-compose F
+
+  functor-partial
+    : Functor C D
+    → PartialFunctor C D
+  functor-partial F
+    = record {FunctorPartial F}
+
 -- ### Compose
 
 module _
