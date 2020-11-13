@@ -5,9 +5,9 @@ open import Prover.Category
 open import Prover.Category.Unit
   using (category-unit)
 open import Prover.Editor
-  using (Editor; EventStack; SimpleEditor; SimpleMainEditor;
-    SimplePartialEditor; SimpleSplitEditor; SplitEditor; ViewStack;
-    ViewStackMap)
+  using (Editor; EventStack; InnerEditor; SimpleEditor; SimpleInnerEditor;
+    SimpleMainEditor; SimplePartialEditor; SimpleSplitEditor; SplitEditor;
+    ViewStack; ViewStackMap)
 open import Prover.Editor.Base
   using (BaseEventStack; BaseViewStack)
 open import Prover.Editor.Flat
@@ -362,6 +362,22 @@ split-editor-flatten e
   = flat-editor-map (SplitEditor.base e)
   $ editor-flatten (SplitEditor.editor e)
 
+-- ### InnerEditor
+
+inner-editor-flatten
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {C : Category}
+  → InnerEditor V E S P C
+  → FlatEditor
+    (view-stack-flatten V)
+    (event-stack-flatten E)
+    (Category.Object C)
+inner-editor-flatten e
+  = flat-editor-map (InnerEditor.base e)
+  $ editor-flatten (InnerEditor.editor e)
+
 -- ### SimplePartialEditor
 
 simple-partial-editor-flatten
@@ -475,4 +491,19 @@ module _
       (event-stack-flatten E) S
   simple-main-editor-flatten e
     = record {SimpleMainEditorFlatten e}
+
+-- ### SimpleInnerEditor
+
+simple-inner-editor-flatten
+  : {V : ViewStack}
+  → {E : EventStack}
+  → {S P : Set}
+  → {A : Set}
+  → SimpleInnerEditor V E S P A
+  → FlatEditor
+    (view-stack-flatten V)
+    (event-stack-flatten E) A
+simple-inner-editor-flatten e
+  = flat-editor-map (SimpleInnerEditor.base e)
+  $ simple-editor-flatten (SimpleInnerEditor.editor e)
 
