@@ -1,11 +1,15 @@
 module Prover.Category.List.Unit where
 
 open import Prover.Category
-  using (Category)
+  using (Category; Functor)
+open import Prover.Category.List
+  using (module CategoryList; category-list)
+open import Prover.Category.Unit
+  using (module CategoryUnit; category-unit)
 open import Prover.Prelude
 
 open List
-  using (_∷_)
+  using (_∷_; _!_)
 
 -- ## Category
 
@@ -309,16 +313,6 @@ module CategoryListUnit where
         = compose-equal-lookup ps qs
       }
 
-    precompose-lookup
-      : {A B : Set}
-      → {xs : List A}
-      → {ys : List B}
-      → (fs : Arrow xs ys)
-      → (k : Fin (List.length xs))
-      → Arrow.lookup (compose fs (identity xs)) k ≡ Arrow.lookup fs k
-    precompose-lookup _ _
-      = refl
-
     precompose
       : {A B : Set}
       → {xs : List A}
@@ -326,10 +320,10 @@ module CategoryListUnit where
       → (fs : Arrow xs ys)
       → ArrowEqual
         (compose fs (identity xs)) fs
-    precompose fs
+    precompose _
       = record
       { lookup
-        = precompose-lookup fs
+        = λ _ → refl
       }
 
     postcompose-lookup
@@ -409,4 +403,282 @@ category-list-unit A
   ; Object
     = List A
   }
+
+-- ## Functor
+
+module FunctorListUnit
+  (A : Set)
+  where
+
+  base
+    : Category.Object (category-list (category-unit A))
+    → Category.Object (category-list-unit A)
+  base
+    = id
+
+  map-lookup
+    : {xs ys : Category.Object (category-list (category-unit A))}
+    → Category.Arrow (category-list (category-unit A)) xs ys
+    → Fin (List.length (base xs))
+    → Maybe (Fin (List.length (base ys)))
+  map-lookup fs k
+    with CategoryList.Arrow.lookup fs k
+  ... | nothing
+    = nothing
+  ... | just (l , _)
+    = just l
+
+  abstract
+  
+    map-injective
+      : {xs ys : Category.Object (category-list (category-unit A))}
+      → (fs : Category.Arrow (category-list (category-unit A)) xs ys)
+      → (k₁ k₂ : Fin (List.length (base xs)))
+      → {l : Fin (List.length (base ys))}
+      → map-lookup fs k₁ ≡ just l
+      → map-lookup fs k₂ ≡ just l
+      → k₁ ≡ k₂
+    map-injective fs k₁ k₂ _ _
+      with CategoryList.Arrow.lookup fs k₁
+      | inspect (CategoryList.Arrow.lookup fs) k₁
+      | CategoryList.Arrow.lookup fs k₂
+      | inspect (CategoryList.Arrow.lookup fs) k₂
+    map-injective fs k₁ k₂ refl refl | just _ | [ p₁ ] | just _ | [ p₂ ]
+      = CategoryList.Arrow.injective fs k₁ k₂ p₁ p₂
+
+  map
+    : {xs ys : Category.Object (category-list (category-unit A))}
+    → Category.Arrow (category-list (category-unit A)) xs ys
+    → Category.Arrow (category-list-unit A)
+      (base xs)
+      (base ys)
+  map fs
+    = record
+    { lookup
+      = map-lookup fs
+    ; injective
+      = map-injective fs
+    }
+
+  abstract
+
+    map-equal-lookup
+      : {xs ys : Category.Object (category-list (category-unit A))}
+      → {fs₁ fs₂ : Category.Arrow (category-list (category-unit A)) xs ys}
+      → Category.ArrowEqual (category-list (category-unit A)) fs₁ fs₂
+      → (k : Fin (List.length xs))
+      → map-lookup fs₁ k ≡ map-lookup fs₂ k
+    map-equal-lookup {fs₁ = fs₁} {fs₂ = fs₂} ps k
+      with CategoryList.Arrow.lookup fs₁ k
+      | CategoryList.Arrow.lookup fs₂ k
+      | CategoryList.ArrowEqual.lookup ps k
+    ... | _ | _ | CategoryList.nothing
+      = refl
+    ... | _ | _ | CategoryList.just _ _
+      = refl
+
+    map-equal
+      : {xs ys : Category.Object (category-list (category-unit A))}
+      → {fs₁ fs₂ : Category.Arrow (category-list (category-unit A)) xs ys}
+      → Category.ArrowEqual (category-list (category-unit A)) fs₁ fs₂
+      → Category.ArrowEqual (category-list-unit A)
+        (map fs₁)
+        (map fs₂)
+    map-equal ps
+      = record
+      { lookup
+        = map-equal-lookup ps
+      }
+
+    map-identity
+      : (xs : Category.Object (category-list (category-unit A)))
+      → Category.ArrowEqual (category-list-unit A)
+        (map (Category.identity (category-list (category-unit A)) xs))
+        (Category.identity (category-list-unit A) (base xs))
+    map-identity _
+      = record
+      { lookup
+        = λ _ → refl
+      }
+
+    map-compose-lookup
+      : {xs ys zs : Category.Object (category-list (category-unit A))}
+      → (fs : Category.Arrow (category-list (category-unit A)) ys zs)
+      → (gs : Category.Arrow (category-list (category-unit A)) xs ys)
+      → (k : Fin (List.length xs))
+      → map-lookup (Category.compose (category-list (category-unit A)) fs gs) k
+        ≡ CategoryListUnit.compose-lookup (map fs) (map gs) k
+    map-compose-lookup fs gs k
+      with CategoryList.Arrow.lookup gs k
+    ... | nothing
+      = refl
+    ... | just (l , _)
+      with CategoryList.Arrow.lookup fs l
+    ... | nothing
+      = refl
+    ... | just _
+      = refl
+
+    map-compose
+      : {xs ys zs : Category.Object (category-list (category-unit A))}
+      → (fs : Category.Arrow (category-list (category-unit A)) ys zs)
+      → (gs : Category.Arrow (category-list (category-unit A)) xs ys)
+      → Category.ArrowEqual (category-list-unit A)
+        (map (Category.compose (category-list (category-unit A)) fs gs))
+        (Category.compose (category-list-unit A) (map fs) (map gs))
+    map-compose fs gs
+      = record
+      { lookup
+        = map-compose-lookup fs gs
+      }
+
+functor-list-unit
+  : (A : Set)
+  → Functor
+    (category-list (category-unit A))
+    (category-list-unit A)
+functor-list-unit A
+  = record {FunctorListUnit A}
+
+-- ## Functor'
+
+module FunctorListUnit'
+  (A : Set)
+  where
+
+  base
+    : Category.Object (category-list-unit A)
+    → Category.Object (category-list (category-unit A))
+  base
+    = id
+
+  map-lookup
+    : {xs ys : Category.Object (category-list-unit A)}
+    → Category.Arrow (category-list-unit A) xs ys
+    → (k : Fin (List.length (base xs)))
+    → Maybe (l ∈ Fin (List.length (base ys))
+      × Category.Arrow (category-unit A) (base xs ! k) (base ys ! l))
+  map-lookup fs k
+    with CategoryListUnit.Arrow.lookup fs k
+  ... | nothing
+    = nothing
+  ... | just l
+    = just (l , CategoryUnit.arrow)
+
+  abstract
+
+    map-injective
+      : {xs ys : Category.Object (category-list-unit A)}
+      → (fs : Category.Arrow (category-list-unit A) xs ys)
+      → (k₁ k₂ : Fin (List.length (base xs)))
+      → {l : Fin (List.length (base ys))}
+      → {f₁ : Category.Arrow (category-unit A) (base xs ! k₁) (base ys ! l)}
+      → {f₂ : Category.Arrow (category-unit A) (base xs ! k₂) (base ys ! l)}
+      → map-lookup fs k₁ ≡ just (l , f₁)
+      → map-lookup fs k₂ ≡ just (l , f₂)
+      → k₁ ≡ k₂
+    map-injective fs k₁ k₂ _ _
+      with CategoryListUnit.Arrow.lookup fs k₁
+      | inspect (CategoryListUnit.Arrow.lookup fs) k₁
+      | CategoryListUnit.Arrow.lookup fs k₂
+      | inspect (CategoryListUnit.Arrow.lookup fs) k₂
+    map-injective fs k₁ k₂ refl refl | just _ | [ p₁ ] | just _ | [ p₂ ]
+      = CategoryListUnit.Arrow.injective fs k₁ k₂ p₁ p₂
+
+  map
+    : {xs ys : Category.Object (category-list-unit A)}
+    → Category.Arrow (category-list-unit A) xs ys
+    → Category.Arrow (category-list (category-unit A))
+      (base xs)
+      (base ys)
+  map fs
+    = record
+    { lookup
+      = map-lookup fs
+    ; injective
+      = map-injective fs
+    }
+
+  abstract
+
+    map-equal-lookup
+      : {xs ys : Category.Object (category-list-unit A)}
+      → {fs₁ fs₂ : Category.Arrow (category-list-unit A) xs ys}
+      → Category.ArrowEqual (category-list-unit A) fs₁ fs₂
+      → (k : Fin (List.length xs))
+      → CategoryList.LookupEqual (category-unit A) (base xs) (base ys) k
+        (map-lookup fs₁ k)
+        (map-lookup fs₂ k)
+    map-equal-lookup {fs₁ = fs₁} {fs₂ = fs₂} ps k
+      with CategoryListUnit.Arrow.lookup fs₁ k
+      | CategoryListUnit.Arrow.lookup fs₂ k
+      | CategoryListUnit.ArrowEqual.lookup ps k
+    ... | nothing | _ | refl
+      = CategoryList.nothing
+    ... | just l | _ | refl
+      = CategoryList.just l refl
+
+    map-equal
+      : {xs ys : Category.Object (category-list-unit A)}
+      → {fs₁ fs₂ : Category.Arrow (category-list-unit A) xs ys}
+      → Category.ArrowEqual (category-list-unit A) fs₁ fs₂
+      → Category.ArrowEqual (category-list (category-unit A))
+        (map fs₁)
+        (map fs₂)
+    map-equal ps
+      = record
+      { lookup
+        = map-equal-lookup ps
+      }
+
+    map-identity
+      : (xs : Category.Object (category-list-unit A))
+      → Category.ArrowEqual (category-list (category-unit A))
+        (map (Category.identity (category-list-unit A) xs))
+        (Category.identity (category-list (category-unit A)) (base xs))
+    map-identity _
+      = record
+      { lookup
+        = λ k → CategoryList.just k refl
+      }
+
+    map-compose-lookup
+      : {xs ys zs : Category.Object (category-list-unit A)}
+      → (fs : Category.Arrow (category-list-unit A) ys zs)
+      → (gs : Category.Arrow (category-list-unit A) xs ys)
+      → (k : Fin (List.length xs))
+      → CategoryList.LookupEqual (category-unit A) (base xs) (base zs) k
+        (map-lookup (Category.compose (category-list-unit A) fs gs) k)
+        (CategoryList.compose-lookup (category-unit A) (map fs) (map gs) k)
+    map-compose-lookup fs gs k
+      with CategoryListUnit.Arrow.lookup gs k
+    ... | nothing
+      = CategoryList.nothing
+    ... | just l
+      with CategoryListUnit.Arrow.lookup fs l
+    ... | nothing
+      = CategoryList.nothing
+    ... | just m
+      = CategoryList.just m refl
+
+    map-compose
+      : {xs ys zs : Category.Object (category-list-unit A)}
+      → (fs : Category.Arrow (category-list-unit A) ys zs)
+      → (gs : Category.Arrow (category-list-unit A) xs ys)
+      → Category.ArrowEqual (category-list (category-unit A))
+        (map (Category.compose (category-list-unit A) fs gs))
+        (Category.compose (category-list (category-unit A)) (map fs) (map gs))
+    map-compose fs gs
+      = record
+      { lookup
+        = map-compose-lookup fs gs
+      }
+
+functor-list-unit'
+  : (A : Set)
+  → Functor
+    (category-list-unit A)
+    (category-list (category-unit A))
+functor-list-unit' A
+  = record {FunctorListUnit' A}
 

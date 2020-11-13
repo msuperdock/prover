@@ -878,8 +878,8 @@ module _
       → (k : Fin (List.length (base xs)))
       → Maybe (l ∈ Fin (List.length (base ys))
         × Category.Arrow D (base xs ! k) (base ys ! l))
-    map-lookup {xs = xs} {ys = ys} f k
-      with CategoryList.Arrow.lookup f k
+    map-lookup {xs = xs} {ys = ys} fs k
+      with CategoryList.Arrow.lookup fs k
     ... | nothing
       = nothing
     ... | just (l , g)
@@ -922,7 +922,7 @@ module _
 
     abstract
 
-      map-equal'
+      map-equal-lookup
         : {xs ys : Category.Object (category-list C)}
         → {fs₁ fs₂ : Category.Arrow (category-list C) xs ys}
         → Category.ArrowEqual (category-list C) fs₁ fs₂
@@ -930,7 +930,7 @@ module _
         → CategoryList.LookupEqual D (base xs) (base ys) k
           (map-lookup fs₁ k)
           (map-lookup fs₂ k)
-      map-equal' {xs = xs} {ys = ys} {fs₁ = fs₁} {fs₂ = fs₂} ps k
+      map-equal-lookup {xs = xs} {ys = ys} {fs₁ = fs₁} {fs₂ = fs₂} ps k
         with CategoryList.Arrow.lookup fs₁ k
         | CategoryList.Arrow.lookup fs₂ k
         | CategoryList.ArrowEqual.lookup ps k
@@ -951,16 +951,16 @@ module _
       map-equal ps
         = record
         { lookup
-          = map-equal' ps
+          = map-equal-lookup ps
         }
 
-      map-identity'
+      map-identity-lookup
         : (xs : Category.Object (category-list C))
         → (k : Fin (List.length xs))
         → CategoryList.LookupEqual D (base xs) (base xs) k
           (map-lookup (Category.identity (category-list C) xs) k)
           (CategoryList.identity-lookup D (base xs) k)
-      map-identity' xs k
+      map-identity-lookup xs k
         = CategoryList.just k
         $ Category.any' D
         $ Category.arrow-trans' D (Category.arrow-equal' D p p
@@ -978,10 +978,10 @@ module _
       map-identity xs
         = record
         { lookup
-          = map-identity' xs
+          = map-identity-lookup xs
         }
 
-      map-compose'
+      map-compose-lookup
         : {xs ys zs : Category.Object (category-list C)}
         → (fs : Category.Arrow (category-list C) ys zs)
         → (gs : Category.Arrow (category-list C) xs ys)
@@ -989,7 +989,7 @@ module _
         → CategoryList.LookupEqual D (base xs) (base zs) k
           (map-lookup (Category.compose (category-list C) fs gs) k)
           (CategoryList.compose-lookup D (map fs) (map gs) k)
-      map-compose' {xs = xs} {ys = ys} {zs = zs} fs gs k
+      map-compose-lookup {xs = xs} {ys = ys} {zs = zs} fs gs k
         with CategoryList.Arrow.lookup gs k
       ... | nothing
         = CategoryList.nothing
@@ -1021,7 +1021,7 @@ module _
       map-compose fs gs
         = record
         { lookup
-          = map-compose' fs gs
+          = map-compose-lookup fs gs
         }
 
   functor-list
