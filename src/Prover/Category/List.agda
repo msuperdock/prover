@@ -154,10 +154,6 @@ module CategoryList
     : Set
     where
 
-    constructor
-
-      arrow-equal
-
     field
 
       lookup
@@ -183,10 +179,11 @@ module CategoryList
       → {fs₁ fs₂ : Arrow xs ys}
       → ArrowEqual fs₁ fs₂
       → ArrowEqual fs₂ fs₁
-    arrow-sym (arrow-equal p)
+    arrow-sym ps
       = record
       { lookup
-        = λ k → lookup-sym (p k)
+        = λ k → lookup-sym
+          (ArrowEqual.lookup ps k)
       }
 
     arrow-trans
@@ -195,13 +192,13 @@ module CategoryList
       → ArrowEqual fs₁ fs₂
       → ArrowEqual fs₂ fs₃
       → ArrowEqual fs₁ fs₃
-    arrow-trans (arrow-equal p₁) (arrow-equal p₂)
+    arrow-trans ps₁ ps₂
       = record
       { lookup
-        = λ k → lookup-trans (p₁ k) (p₂ k)
+        = λ k → lookup-trans
+          (ArrowEqual.lookup ps₁ k)
+          (ArrowEqual.lookup ps₂ k)
       }
-
-  abstract
 
     simplify-lookup
       : (xs ys : Object)
@@ -282,9 +279,9 @@ module CategoryList
       = record
       { lookup
         = λ k
-          → lookup-refl'
-          $ simplify-lookup-equal xs ys
-            (Arrow.lookup fs) k
+        → lookup-refl'
+        $ simplify-lookup-equal xs ys
+          (Arrow.lookup fs) k
       }
 
   identity-lookup
