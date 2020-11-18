@@ -69,10 +69,10 @@ data TextEvent
     : Char
     → TextEvent
 
-TextWithBaseEventStack
+base-event-stack-text-with
   : (Char → Bool)
   → BaseEventStack
-TextWithBaseEventStack p
+base-event-stack-text-with p
   = record
   { Mode
     = ⊤
@@ -80,9 +80,9 @@ TextWithBaseEventStack p
     = λ _ → TextWithEvent p
   }
 
-TextBaseEventStack
+base-event-stack-text
   : BaseEventStack
-TextBaseEventStack
+base-event-stack-text
   = record
   { Mode
     = ⊤
@@ -90,24 +90,24 @@ TextBaseEventStack
     = λ _ → TextEvent
   }
 
-TextWithEventStack
+event-stack-text-with
   : (Char → Bool)
   → EventStack
-TextWithEventStack p
+event-stack-text-with p
   = event-stack-lift
-    (TextWithBaseEventStack p)
+    (base-event-stack-text-with p)
 
-TextEventStack
+event-stack-text
   : EventStack
-TextEventStack
+event-stack-text
   = event-stack-lift
-    TextBaseEventStack
+    base-event-stack-text
 
-TextFlatEventStack
+flat-event-stack-text
   : FlatEventStack
-TextFlatEventStack
+flat-event-stack-text
   = base-event-stack-flatten
-    TextBaseEventStack
+    base-event-stack-text
 
 -- ### State
 
@@ -151,14 +151,14 @@ decode-encode-text (c ∷ cs)
 
 -- #### Module
 
-module TextWithSimpleBaseEditor
+module SimpleBaseEditorTextWith
   (p : Char → Bool)
   where
 
   -- ##### Types
 
   open BaseViewStack PlainTextBaseViewStack
-  open BaseEventStack (TextWithBaseEventStack p)
+  open BaseEventStack (base-event-stack-text-with p)
 
   State
     : Set
@@ -279,32 +279,32 @@ module TextWithSimpleBaseEditor
 
 -- #### Function
 
-text-with-simple-base-editor
+simple-base-editor-text-with
   : (p : Char → Bool)
   → SimpleBaseEditor
     PlainTextBaseViewStack
-    (TextWithBaseEventStack p)
+    (base-event-stack-text-with p)
     (TextWithState p)
-text-with-simple-base-editor p
-  = record {TextWithSimpleBaseEditor p}
+simple-base-editor-text-with p
+  = record {SimpleBaseEditorTextWith p}
 
 -- ### SimpleEditor
 
-text-with-simple-editor
+simple-editor-text-with
   : (p : Char → Bool)
   → SimpleEditor
     PlainTextViewStack
-    (TextWithEventStack p)
+    (event-stack-text-with p)
     (TextWithState p)
-text-with-simple-editor p
+simple-editor-text-with p
   = simple-editor-lift
-    (text-with-simple-base-editor p)
+    (simple-base-editor-text-with p)
 
 -- ### SimpleSplitEditor
 
 -- #### TextWith
 
-module TextWithSplitFunction
+module SplitFunctionTextWith
   (p : Char → Bool)
   where
 
@@ -348,42 +348,42 @@ module TextWithSplitFunction
   base-unbase (_ ∷ _)
     = refl
 
-text-with-split-function
+split-function-text-with
   : (p : Char → Bool)
   → SplitFunction
     (TextWithState p)
     (TextWith p)
-text-with-split-function p
-  = record {TextWithSplitFunction p}
+split-function-text-with p
+  = record {SplitFunctionTextWith p}
 
-text-with-simple-split-editor
+simple-split-editor-text-with
   : (p : Char → Bool)
   → SimpleSplitEditor
     PlainTextViewStack
-    (TextWithEventStack p)
+    (event-stack-text-with p)
     (TextWith p)
-text-with-simple-split-editor p
+simple-split-editor-text-with p
   = record
   { editor
-    = text-with-simple-editor p
+    = simple-editor-text-with p
   ; split-functor
-    = text-with-split-function p
+    = split-function-text-with p
   }
 
 -- #### Text
 
-module TextBaseEventStackMap where
+module BaseEventStackMapText where
 
   mode
-    : BaseEventStack.Mode (TextWithBaseEventStack (const true))
-    → BaseEventStack.Mode TextBaseEventStack
+    : BaseEventStack.Mode (base-event-stack-text-with (const true))
+    → BaseEventStack.Mode base-event-stack-text
   mode
     = id
 
   event
-    : (m : BaseEventStack.Mode (TextWithBaseEventStack (const true)))
-    → BaseEventStack.Event TextBaseEventStack (mode m)
-    → BaseEventStack.Event (TextWithBaseEventStack (const true)) m
+    : (m : BaseEventStack.Mode (base-event-stack-text-with (const true)))
+    → BaseEventStack.Event base-event-stack-text (mode m)
+    → BaseEventStack.Event (base-event-stack-text-with (const true)) m
   event _ delete-previous
     = delete-previous
   event _ delete-next
@@ -391,47 +391,47 @@ module TextBaseEventStackMap where
   event _ (insert c)
     = insert (char-with c refl)
 
-text-base-event-stack-map
+base-event-stack-map-text
   : BaseEventStackMap
-    (TextWithBaseEventStack (const true))
-    TextBaseEventStack
-text-base-event-stack-map
-  = record {TextBaseEventStackMap}
+    (base-event-stack-text-with (const true))
+    base-event-stack-text
+base-event-stack-map-text
+  = record {BaseEventStackMapText}
 
-text-event-stack-map
+event-stack-map-text
   : EventStackMap
-    (TextWithEventStack (const true))
-    TextEventStack
-text-event-stack-map
+    (event-stack-text-with (const true))
+    event-stack-text
+event-stack-map-text
   = event-stack-map-lift
-    text-base-event-stack-map
+    base-event-stack-map-text
 
-text-simple-split-editor
+simple-split-editor-text
   : SimpleSplitEditor
     PlainTextViewStack
-    TextEventStack
+    event-stack-text
     Text
-text-simple-split-editor
-  = simple-split-editor-map-event text-event-stack-map
+simple-split-editor-text
+  = simple-split-editor-map-event event-stack-map-text
   $ simple-split-editor-map (retraction-split Text.retraction)
-  $ text-with-simple-split-editor (const true)
+  $ simple-split-editor-text-with (const true)
 
 -- ### FlatEditor
 
-text-flat-editor
+flat-editor-text
   : FlatEditor
     PlainTextFlatViewStack
-    TextFlatEventStack
+    flat-event-stack-text
     Text
-text-flat-editor
+flat-editor-text
   = flat-editor-map-view (base-view-stack-flatten-lift PlainTextBaseViewStack)
-  $ flat-editor-map-event (base-event-stack-flatten-lift TextBaseEventStack)
+  $ flat-editor-map-event (base-event-stack-flatten-lift base-event-stack-text)
   $ simple-split-editor-flatten
-  $ text-simple-split-editor
+  $ simple-split-editor-text
 
 -- ## Command
 
-module CommandFlatStackMap
+module FlatViewStackMapCommand
   (p : String)
   where
 
@@ -454,22 +454,22 @@ module CommandFlatStackMap
     = k
 
 -- Takes a prompt string, not including colon or space.
-command-flat-stack-map
+flat-view-stack-map-command
   : String
   → FlatViewStackMap
     PlainTextFlatViewStack
     CommandFlatViewStack
-command-flat-stack-map p
-  = record {CommandFlatStackMap p}
+flat-view-stack-map-command p
+  = record {FlatViewStackMapCommand p}
 
 -- Takes a prompt string, not including colon or space.
-command-flat-editor
+flat-editor-command
   : String
   → FlatEditor
     CommandFlatViewStack
-    TextFlatEventStack
+    flat-event-stack-text
     Text
-command-flat-editor s
-  = flat-editor-map-view (command-flat-stack-map s)
-  $ text-flat-editor
+flat-editor-command s
+  = flat-editor-map-view (flat-view-stack-map-command s)
+  $ flat-editor-text
 

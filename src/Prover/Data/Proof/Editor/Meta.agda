@@ -3,14 +3,14 @@ module Prover.Data.Proof.Editor.Meta where
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Editor
-  using (FormulaEvent; FormulaEventStack; FormulaViewStack;
-    formula-simple-partial-editor)
+  using (FormulaEvent; event-stack-formula; simple-partial-editor-formula;
+    view-stack-formula)
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Meta.Editor
-  using (meta-simple-partial-editor)
+  using (simple-partial-editor-meta)
 open import Prover.Data.Number.Editor
-  using (NumberEvent; NumberEventStack)
+  using (NumberEvent; event-stack-number)
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Data.Text.Editor
@@ -84,7 +84,7 @@ ProofMetaFlatEvent number
 ProofMetaFlatEvent formula
   = FormulaEvent
 
-ProofMetaEventStack
+event-stack-proof-meta
   = record
   { Mode
     = ProofMetaMode
@@ -96,9 +96,9 @@ ProofMetaEventStack
     = λ _ → TextEvent
   }
 
-ProofMetaFlatEventStack
+flat-event-stack-proof-meta
   : FlatEventStack
-ProofMetaFlatEventStack
+flat-event-stack-proof-meta
   = record
   { Mode
     = ProofMetaFlatMode
@@ -112,35 +112,35 @@ ProofMetaFlatEventStack
 
 -- #### Product
 
-ProofMetaProductViewStack
+view-stack-proof-meta-product
   : ViewStack
-ProofMetaProductViewStack
+view-stack-proof-meta-product
   = view-stack-product
     RichTextViewStack
-    FormulaViewStack
+    view-stack-formula
 
-ProofMetaProductEventStack
+event-stack-proof-meta-product
   : EventStack
-ProofMetaProductEventStack
+event-stack-proof-meta-product
   = event-stack-product
-    NumberEventStack
-    FormulaEventStack
+    event-stack-number
+    event-stack-formula
 
-proof-meta-product-editor
+simple-partial-editor-proof-meta-product
   : (ss : Symbols)
   → (vs : Variables)
   → SimplePartialEditor
-    ProofMetaProductViewStack
-    ProofMetaProductEventStack
+    view-stack-proof-meta-product
+    event-stack-proof-meta-product
     (Meta × Formula ss vs false)
-proof-meta-product-editor ss vs
+simple-partial-editor-proof-meta-product ss vs
   = simple-partial-editor-product Direction.right
-    meta-simple-partial-editor
-    (formula-simple-partial-editor ss vs false)
+    simple-partial-editor-meta
+    (simple-partial-editor-formula ss vs false)
 
 -- #### View
 
-module ProofMetaViewStackMap
+module ViewStackMapProofMeta
   (b : Bool)
   where
 
@@ -186,14 +186,14 @@ module ProofMetaViewStackMap
     }
 
   view
-    : ViewStack.View ProofMetaProductViewStack
+    : ViewStack.View view-stack-proof-meta-product
     → ViewStack.View WindowViewStack
   view (m , f)
     = view-window false m f
 
   view-with
-    : (v : ViewStack.View ProofMetaProductViewStack)
-    → ViewStack.ViewPath ProofMetaProductViewStack v
+    : (v : ViewStack.View view-stack-proof-meta-product)
+    → ViewStack.ViewPath view-stack-proof-meta-product v
     → ViewStack.View WindowViewStack
   view-with (m , f) (ι₁ _)
     = view-window false m f
@@ -203,8 +203,8 @@ module ProofMetaViewStackMap
     = view-window false m f
   
   view-path
-    : (v : ViewStack.View ProofMetaProductViewStack)
-    → (vp : ViewStack.ViewPath ProofMetaProductViewStack v)
+    : (v : ViewStack.View view-stack-proof-meta-product)
+    → (vp : ViewStack.ViewPath view-stack-proof-meta-product v)
     → ViewStack.ViewPath WindowViewStack
       (view-with v vp)
   view-path _ (ι₁ tp)
@@ -215,10 +215,10 @@ module ProofMetaViewStackMap
     = go zero (text (suc (suc zero)) fp)
 
   view-inner-with
-    : (v : ViewStack.View ProofMetaProductViewStack)
-    → (vp : ViewStack.ViewPath ProofMetaProductViewStack v)
-    → (v' : ViewStack.ViewInner ProofMetaProductViewStack v vp)
-    → ViewStack.ViewInnerPath ProofMetaProductViewStack v vp v'
+    : (v : ViewStack.View view-stack-proof-meta-product)
+    → (vp : ViewStack.ViewPath view-stack-proof-meta-product v)
+    → (v' : ViewStack.ViewInner view-stack-proof-meta-product v vp)
+    → ViewStack.ViewInnerPath view-stack-proof-meta-product v vp v'
     → ViewStack.ViewInner WindowViewStack
       (view-with v vp)
       (view-path v vp)
@@ -226,10 +226,10 @@ module ProofMetaViewStackMap
     = c
 
   view-inner-path
-    : (v : ViewStack.View ProofMetaProductViewStack)
-    → (vp : ViewStack.ViewPath ProofMetaProductViewStack v)
-    → (v' : ViewStack.ViewInner ProofMetaProductViewStack v vp)
-    → (vp' : ViewStack.ViewInnerPath ProofMetaProductViewStack v vp v')
+    : (v : ViewStack.View view-stack-proof-meta-product)
+    → (vp : ViewStack.ViewPath view-stack-proof-meta-product v)
+    → (v' : ViewStack.ViewInner view-stack-proof-meta-product v vp)
+    → (vp' : ViewStack.ViewInnerPath view-stack-proof-meta-product v vp v')
     → ViewStack.ViewInnerPath WindowViewStack
       (view-with v vp)
       (view-path v vp)
@@ -237,78 +237,78 @@ module ProofMetaViewStackMap
   view-inner-path _ (ι₂ _) _ cp
     = cp
 
-proof-meta-view-stack-map
+view-stack-map-proof-meta
   : Bool
   → ViewStackMap
-    ProofMetaProductViewStack
+    view-stack-proof-meta-product
     WindowViewStack
-proof-meta-view-stack-map b
-  = record {ProofMetaViewStackMap b}
+view-stack-map-proof-meta b
+  = record {ViewStackMapProofMeta b}
 
 -- #### Event
 
-module ProofMetaEventStackMap where
+module EventStackMapProofMeta where
 
   mode
-    : EventStack.Mode ProofMetaProductEventStack
-    → EventStack.Mode ProofMetaEventStack
+    : EventStack.Mode event-stack-proof-meta-product
+    → EventStack.Mode event-stack-proof-meta
   mode (ι₁ _)
     = number
   mode (ι₂ _)
     = formula
 
   mode-inner
-    : EventStack.ModeInner ProofMetaProductEventStack
-    → EventStack.ModeInner ProofMetaEventStack
+    : EventStack.ModeInner event-stack-proof-meta-product
+    → EventStack.ModeInner event-stack-proof-meta
   mode-inner _
     = tt
 
   event
-    : (m : EventStack.Mode ProofMetaProductEventStack)
-    → EventStack.Event ProofMetaEventStack (mode m)
-    → EventStack.Event ProofMetaProductEventStack m
+    : (m : EventStack.Mode event-stack-proof-meta-product)
+    → EventStack.Event event-stack-proof-meta (mode m)
+    → EventStack.Event event-stack-proof-meta-product m
   event (ι₁ _)
     = id
   event (ι₂ _)
     = id
 
   event-inner
-    : (m : EventStack.ModeInner ProofMetaProductEventStack)
-    → EventStack.EventInner ProofMetaEventStack (mode-inner m)
-    → EventStack.EventInner ProofMetaProductEventStack m
+    : (m : EventStack.ModeInner event-stack-proof-meta-product)
+    → EventStack.EventInner event-stack-proof-meta (mode-inner m)
+    → EventStack.EventInner event-stack-proof-meta-product m
   event-inner (ι₂ _)
     = id
 
-proof-meta-event-stack-map
+event-stack-map-proof-meta
   : EventStackMap
-    ProofMetaProductEventStack
-    ProofMetaEventStack
-proof-meta-event-stack-map
-  = record {ProofMetaEventStackMap}
+    event-stack-proof-meta-product
+    event-stack-proof-meta
+event-stack-map-proof-meta
+  = record {EventStackMapProofMeta}
 
 -- #### Editor
 
-proof-meta-simple-partial-editor
+simple-partial-editor-proof-meta
   : (ss : Symbols)
   → (vs : Variables)
   → SimplePartialEditor
     WindowViewStack
-    ProofMetaEventStack
+    event-stack-proof-meta
     (Meta × Formula ss vs false)
-proof-meta-simple-partial-editor ss vs
-  = simple-partial-editor-map-view-with proof-meta-view-stack-map
-  $ simple-partial-editor-map-event proof-meta-event-stack-map
-  $ proof-meta-product-editor ss vs
+simple-partial-editor-proof-meta ss vs
+  = simple-partial-editor-map-view-with view-stack-map-proof-meta
+  $ simple-partial-editor-map-event event-stack-map-proof-meta
+  $ simple-partial-editor-proof-meta-product ss vs
 
 -- ### FlatEditor
 
 -- #### Event
 
-module ProofMetaFlatEventStackMap where
+module FlatEventStackMapProofMeta where
 
   mode
-    : FlatEventStack.Mode (event-stack-flatten ProofMetaEventStack)
-    → FlatEventStack.Mode ProofMetaFlatEventStack
+    : FlatEventStack.Mode (event-stack-flatten event-stack-proof-meta)
+    → FlatEventStack.Mode flat-event-stack-proof-meta
   mode (ι₁ number)
     = number
   mode (ι₁ formula)
@@ -317,9 +317,9 @@ module ProofMetaFlatEventStackMap where
     = text
 
   event
-    : (m : FlatEventStack.Mode (event-stack-flatten ProofMetaEventStack))
-    → FlatEventStack.Event ProofMetaFlatEventStack (mode m)
-    → FlatEventStack.Event (event-stack-flatten ProofMetaEventStack) m
+    : (m : FlatEventStack.Mode (event-stack-flatten event-stack-proof-meta))
+    → FlatEventStack.Event flat-event-stack-proof-meta (mode m)
+    → FlatEventStack.Event (event-stack-flatten event-stack-proof-meta) m
   event (ι₁ number)
     = id
   event (ι₁ formula)
@@ -327,24 +327,24 @@ module ProofMetaFlatEventStackMap where
   event (ι₂ _)
     = id
 
-proof-meta-flat-event-stack-map
+flat-event-stack-map-proof-meta
   : FlatEventStackMap
-    (event-stack-flatten ProofMetaEventStack)
-    ProofMetaFlatEventStack
-proof-meta-flat-event-stack-map
-  = record {ProofMetaFlatEventStackMap}
+    (event-stack-flatten event-stack-proof-meta)
+    flat-event-stack-proof-meta
+flat-event-stack-map-proof-meta
+  = record {FlatEventStackMapProofMeta}
 
 -- #### Editor
 
-proof-meta-flat-editor
+flat-editor-proof-meta
   : (ss : Symbols)
   → (vs : Variables)
   → FlatEditor
     WindowFlatViewStack
-    ProofMetaFlatEventStack
+    flat-event-stack-proof-meta
     (Meta × Formula ss vs false)
-proof-meta-flat-editor ss vs
-  = flat-editor-map-event proof-meta-flat-event-stack-map
+flat-editor-proof-meta ss vs
+  = flat-editor-map-event flat-event-stack-map-proof-meta
   $ simple-partial-editor-flatten
-  $ proof-meta-simple-partial-editor ss vs
+  $ simple-partial-editor-proof-meta ss vs
 

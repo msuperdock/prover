@@ -15,8 +15,8 @@ open import Prover.Client.Run
 open import Prover.Data.Formula.Editor
   using (FormulaEvent)
 open import Prover.Data.Proof.Editor
-  using (ProofEvent; ProofEventStack; ProofModeInner; ProofViewInner;
-    ProofViewInnerPath; ProofViewStack; both; command; proof-simple-main-editor;
+  using (ProofEvent; ProofModeInner; ProofViewInner; ProofViewInnerPath; both;
+    command; event-stack-proof; simple-main-editor-proof; view-stack-proof;
     window)
 open import Prover.Data.Rule
   using (Rule)
@@ -41,9 +41,9 @@ open List
 
 -- ## Types
 
-ProofWindowViewStack
+view-stack-proof-window
   : ViewStack
-ProofWindowViewStack
+view-stack-proof-window
   = record
   { View
     = Window
@@ -57,13 +57,13 @@ ProofWindowViewStack
 
 -- ## Editor
 
-module ProofViewStackMap
+module ViewStackMapProof
   (b : Bool)
   where
 
   view
-    : ViewStack.View ProofViewStack
-    → ViewStack.View ProofWindowViewStack
+    : ViewStack.View view-stack-proof
+    → ViewStack.View view-stack-proof-window
   view ls
     = record
     { name
@@ -75,69 +75,69 @@ module ProofViewStackMap
     }
 
   view-with
-    : (v : ViewStack.View ProofViewStack)
-    → ViewStack.ViewPath ProofViewStack v
-    → ViewStack.View ProofWindowViewStack
+    : (v : ViewStack.View view-stack-proof)
+    → ViewStack.ViewPath view-stack-proof v
+    → ViewStack.View view-stack-proof-window
   view-with v _
     = view v
   
   view-path
-    : (v : ViewStack.View ProofViewStack)
-    → (vp : ViewStack.ViewPath ProofViewStack v)
-    → ViewStack.ViewPath ProofWindowViewStack
+    : (v : ViewStack.View view-stack-proof)
+    → (vp : ViewStack.ViewPath view-stack-proof v)
+    → ViewStack.ViewPath view-stack-proof-window
       (view-with v vp)
   view-path _
     = id
 
   view-inner-with
-    : (v : ViewStack.View ProofViewStack)
-    → (vp : ViewStack.ViewPath ProofViewStack v)
-    → (v' : ViewStack.ViewInner ProofViewStack v vp)
-    → ViewStack.ViewInnerPath ProofViewStack v vp v'
-    → ViewStack.ViewInner ProofWindowViewStack
+    : (v : ViewStack.View view-stack-proof)
+    → (vp : ViewStack.ViewPath view-stack-proof v)
+    → (v' : ViewStack.ViewInner view-stack-proof v vp)
+    → ViewStack.ViewInnerPath view-stack-proof v vp v'
+    → ViewStack.ViewInner view-stack-proof-window
       (view-with v vp)
       (view-path v vp)
   view-inner-with _ _ v _
     = v
 
   view-inner-path
-    : (v : ViewStack.View ProofViewStack)
-    → (vp : ViewStack.ViewPath ProofViewStack v)
-    → (v' : ViewStack.ViewInner ProofViewStack v vp)
-    → (vp' : ViewStack.ViewInnerPath ProofViewStack v vp v')
-    → ViewStack.ViewInnerPath ProofWindowViewStack
+    : (v : ViewStack.View view-stack-proof)
+    → (vp : ViewStack.ViewPath view-stack-proof v)
+    → (v' : ViewStack.ViewInner view-stack-proof v vp)
+    → (vp' : ViewStack.ViewInnerPath view-stack-proof v vp v')
+    → ViewStack.ViewInnerPath view-stack-proof-window
       (view-with v vp)
       (view-path v vp)
       (view-inner-with v vp v' vp')
   view-inner-path _ _ _
     = id
 
-proof-view-stack-map
+view-stack-map-proof
   : Bool
   → ViewStackMap
-    ProofViewStack
-    ProofWindowViewStack
-proof-view-stack-map b
-  = record {ProofViewStackMap b}
+    view-stack-proof
+    view-stack-proof-window
+view-stack-map-proof b
+  = record {ViewStackMapProof b}
 
-proof-window-simple-main-editor
+simple-main-editor-proof-window
   : {ss : Symbols}
   → Rules ss
   → Rule ss
   → SimpleMainEditor
-    ProofWindowViewStack
-    ProofEventStack
+    view-stack-proof-window
+    event-stack-proof
     Value
-proof-window-simple-main-editor rs r
-  = simple-main-editor-map-view-with proof-view-stack-map
-  $ proof-simple-main-editor rs r
+simple-main-editor-proof-window rs r
+  = simple-main-editor-map-view-with view-stack-map-proof
+  $ simple-main-editor-proof rs r
 
 -- ## Client
 
-module ProofClient where
+module ClientProof where
 
-  open ViewStack ProofWindowViewStack
-  open EventStack ProofEventStack
+  open ViewStack view-stack-proof-window
+  open EventStack event-stack-proof
 
   draw
     : (v : View)
@@ -239,12 +239,12 @@ module ProofClient where
   handle-inner ProofModeInner.formula _
     = nothing
 
-proof-client
+client-proof
   : Client
-    ProofWindowViewStack
-    ProofEventStack
-proof-client
-  = record {ProofClient}
+    view-stack-proof-window
+    event-stack-proof
+client-proof
+  = record {ClientProof}
 
 -- ## Main
 
@@ -253,6 +253,6 @@ main
 main
   = simple-main-editor-run
     "/data/code/prover/test.json"
-    (proof-window-simple-main-editor rules ∧-commutative)
-    proof-client
+    (simple-main-editor-proof-window rules ∧-commutative)
+    client-proof
 

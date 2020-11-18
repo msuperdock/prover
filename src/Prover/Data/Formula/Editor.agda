@@ -19,7 +19,7 @@ open import Prover.Data.Symbol
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Data.Text.Editor
-  using (TextEvent; TextFlatEventStack; command-flat-editor)
+  using (TextEvent; flat-editor-command; flat-event-stack-text)
 open import Prover.Data.Token
   using (Token)
 open import Prover.Data.Variables
@@ -67,9 +67,9 @@ FormulaViewPath
 FormulaViewPath f
   = Maybe (RichTextPath f)
 
-FormulaViewStack
+view-stack-formula
   : ViewStack
-FormulaViewStack
+view-stack-formula
   = record
   { View
     = FormulaView
@@ -96,9 +96,9 @@ data FormulaEvent
   insert-symbol
     : FormulaEvent
 
-FormulaEventStack
+event-stack-formula
   : EventStack
-FormulaEventStack
+event-stack-formula
   = record
   { Mode
     = ⊤
@@ -453,9 +453,9 @@ decode-encode-formulas {ss = ss} {vs = vs} {m = m} (f ∷ fs)
 
 -- #### View
 
-FormulaBaseViewStack
+base-view-stack-formula
   : BaseViewStack
-FormulaBaseViewStack
+base-view-stack-formula
   = record
   { View
     = FormulaView
@@ -472,9 +472,9 @@ data FormulaBaseEvent
   insert-parens
     : FormulaBaseEvent
 
-FormulaBaseEventStack
+base-event-stack-formula
   : BaseEventStack
-FormulaBaseEventStack
+base-event-stack-formula
   = record
   { Mode
     = ⊤
@@ -484,7 +484,7 @@ FormulaBaseEventStack
 
 -- #### Module
 
-module FormulaSimpleBaseEditor
+module SimpleBaseEditorFormula
   (ss : Symbols)
   (vs : Variables)
   (m : Bool)
@@ -492,8 +492,8 @@ module FormulaSimpleBaseEditor
 
   -- ##### Types
 
-  open BaseViewStack FormulaBaseViewStack
-  open BaseEventStack FormulaBaseEventStack
+  open BaseViewStack base-view-stack-formula
+  open BaseEventStack base-event-stack-formula
 
   State
     : Set
@@ -602,16 +602,16 @@ module FormulaSimpleBaseEditor
 
 -- #### Editor
 
-formula-simple-base-editor
+simple-base-editor-formula
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleBaseEditor
-    FormulaBaseViewStack
-    FormulaBaseEventStack
+    base-view-stack-formula
+    base-event-stack-formula
     (Any (SandboxState ss vs m))
-formula-simple-base-editor ss vs m
-  = record {FormulaSimpleBaseEditor ss vs m}
+simple-base-editor-formula ss vs m
+  = record {SimpleBaseEditorFormula ss vs m}
 
 -- ### SimpleChildEditor
 
@@ -629,23 +629,23 @@ data FormulaKey
 
 -- #### View
 
-FormulaChildViewStack
+flat-view-stack-formula-child
   : FormulaKey
   → FlatViewStack
-FormulaChildViewStack _
+flat-view-stack-formula-child _
   = CommandFlatViewStack
 
 -- #### Event
 
-FormulaChildEventStack
+flat-event-stack-formula-child
   : FormulaKey
   → FlatEventStack
-FormulaChildEventStack _
-  = TextFlatEventStack
+flat-event-stack-formula-child _
+  = flat-event-stack-text
 
 -- #### Variable
 
-module FormulaSimpleChildEditorVariable
+module SimpleChildEditorFormulaVariable
   (ss : Symbols)
   (vs : Variables)
   (m : Bool)
@@ -656,7 +656,7 @@ module FormulaSimpleChildEditorVariable
   BaseState
     = Any (SandboxState ss vs m)
 
-  open SimpleBaseEditor (formula-simple-base-editor ss vs m) using () renaming
+  open SimpleBaseEditor (simple-base-editor-formula ss vs m) using () renaming
     ( StatePath
       to BaseStatePath
     )
@@ -672,12 +672,12 @@ module FormulaSimpleChildEditorVariable
     : (s : BaseState)
     → (sp : BaseStatePath s)
     → FlatEditor
-      (FormulaChildViewStack variable')
-      (FormulaChildEventStack variable')
+      (flat-view-stack-formula-child variable')
+      (flat-event-stack-formula-child variable')
       (Result s sp)
   flat-editor _ _
     = flat-editor-map (Variables.find-member vs)
-    $ command-flat-editor "v"
+    $ flat-editor-command "v"
 
   update
     : (s : BaseState)
@@ -687,20 +687,20 @@ module FormulaSimpleChildEditorVariable
   update s sp (Variables.member v p)
     = sandbox-state-insert-variable s sp v p
 
-formula-simple-child-editor-variable
+simple-child-editor-formula-variable
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleChildEditor
-    (FormulaChildViewStack variable')
-    (FormulaChildEventStack variable')
-    (formula-simple-base-editor ss vs m)
-formula-simple-child-editor-variable ss vs m
-  = record {FormulaSimpleChildEditorVariable ss vs m}
+    (flat-view-stack-formula-child variable')
+    (flat-event-stack-formula-child variable')
+    (simple-base-editor-formula ss vs m)
+simple-child-editor-formula-variable ss vs m
+  = record {SimpleChildEditorFormulaVariable ss vs m}
 
 -- #### Symbol
 
-module FormulaSimpleChildEditorSymbol
+module SimpleChildEditorFormulaSymbol
   (ss : Symbols)
   (vs : Variables)
   (m : Bool)
@@ -711,7 +711,7 @@ module FormulaSimpleChildEditorSymbol
   BaseState
     = Any (SandboxState ss vs m)
 
-  open SimpleBaseEditor (formula-simple-base-editor ss vs m) using () renaming
+  open SimpleBaseEditor (simple-base-editor-formula ss vs m) using () renaming
     ( StatePath
       to BaseStatePath
     )
@@ -727,12 +727,12 @@ module FormulaSimpleChildEditorSymbol
     : (s : BaseState)
     → (sp : BaseStatePath s)
     → FlatEditor
-      (FormulaChildViewStack symbol)
-      (FormulaChildEventStack symbol)
+      (flat-view-stack-formula-child symbol)
+      (flat-event-stack-formula-child symbol)
       (Result s sp)
   flat-editor _ _
     = flat-editor-map (Symbols.lookup-member ss)
-    $ command-flat-editor "s"
+    $ flat-editor-command "s"
 
   update
     : (s : BaseState)
@@ -742,16 +742,16 @@ module FormulaSimpleChildEditorSymbol
   update s sp (Symbols.member s' p)
     = sandbox-state-insert-symbol s sp s' p
 
-formula-simple-child-editor-symbol
+simple-child-editor-formula-symbol
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleChildEditor
-    (FormulaChildViewStack symbol)
-    (FormulaChildEventStack symbol)
-    (formula-simple-base-editor ss vs m)
-formula-simple-child-editor-symbol ss vs m
-  = record {FormulaSimpleChildEditorSymbol ss vs m}
+    (flat-view-stack-formula-child symbol)
+    (flat-event-stack-formula-child symbol)
+    (simple-base-editor-formula ss vs m)
+simple-child-editor-formula-symbol ss vs m
+  = record {SimpleChildEditorFormulaSymbol ss vs m}
 
 -- #### Editor
 
@@ -761,122 +761,122 @@ formula-simple-child-editor
   → (m : Bool)
   → (k : FormulaKey)
   → SimpleChildEditor
-    (FormulaChildViewStack k)
-    (FormulaChildEventStack k)
-    (formula-simple-base-editor ss vs m)
+    (flat-view-stack-formula-child k)
+    (flat-event-stack-formula-child k)
+    (simple-base-editor-formula ss vs m)
 formula-simple-child-editor ss vs m variable'
-  = formula-simple-child-editor-variable ss vs m
+  = simple-child-editor-formula-variable ss vs m
 formula-simple-child-editor ss vs m symbol
-  = formula-simple-child-editor-symbol ss vs m
+  = simple-child-editor-formula-symbol ss vs m
 
 -- ### SimpleEditor
 
 -- #### Parent
 
-FormulaParentViewStack
+view-stack-formula-parent
   : ViewStack
-FormulaParentViewStack
+view-stack-formula-parent
   = view-stack-parent
-    FormulaBaseViewStack
-    FormulaChildViewStack
+    base-view-stack-formula
+    flat-view-stack-formula-child
 
-FormulaParentEventStack
+event-stack-formula-parent
   : EventStack
-FormulaParentEventStack
+event-stack-formula-parent
   = event-stack-parent
-    FormulaBaseEventStack
-    FormulaChildEventStack
+    base-event-stack-formula
+    flat-event-stack-formula-child
 
-formula-parent-editor
+simple-editor-formula-parent
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleEditor
-    FormulaParentViewStack
-    FormulaParentEventStack
+    view-stack-formula-parent
+    event-stack-formula-parent
     (Any (SandboxState ss vs m))
-formula-parent-editor ss vs m
+simple-editor-formula-parent ss vs m
   = simple-editor-parent
-    FormulaChildViewStack
-    FormulaChildEventStack
-    (formula-simple-base-editor ss vs m)
+    flat-view-stack-formula-child
+    flat-event-stack-formula-child
+    (simple-base-editor-formula ss vs m)
     (formula-simple-child-editor ss vs m)
 
 -- #### View
 
-module FormulaViewStackMap where
+module ViewStackMapFormula where
 
   view
-    : ViewStack.View FormulaParentViewStack
-    → ViewStack.View FormulaViewStack
+    : ViewStack.View view-stack-formula-parent
+    → ViewStack.View view-stack-formula
   view
     = id
 
   view-with
-    : (v : ViewStack.View FormulaParentViewStack)
-    → ViewStack.ViewPath FormulaParentViewStack v
-    → ViewStack.View FormulaViewStack
+    : (v : ViewStack.View view-stack-formula-parent)
+    → ViewStack.ViewPath view-stack-formula-parent v
+    → ViewStack.View view-stack-formula
   view-with v _
     = view v
   
   view-path
-    : (v : ViewStack.View FormulaParentViewStack)
-    → (vp : ViewStack.ViewPath FormulaParentViewStack v)
-    → ViewStack.ViewPath FormulaViewStack
+    : (v : ViewStack.View view-stack-formula-parent)
+    → (vp : ViewStack.ViewPath view-stack-formula-parent v)
+    → ViewStack.ViewPath view-stack-formula
       (view-with v vp)
   view-path _
     = id
 
   view-inner-with
-    : (v : ViewStack.View FormulaParentViewStack)
-    → (vp : ViewStack.ViewPath FormulaParentViewStack v)
-    → (v' : ViewStack.ViewInner FormulaParentViewStack v vp)
-    → ViewStack.ViewInnerPath FormulaParentViewStack v vp v'
-    → ViewStack.ViewInner FormulaViewStack
+    : (v : ViewStack.View view-stack-formula-parent)
+    → (vp : ViewStack.ViewPath view-stack-formula-parent v)
+    → (v' : ViewStack.ViewInner view-stack-formula-parent v vp)
+    → ViewStack.ViewInnerPath view-stack-formula-parent v vp v'
+    → ViewStack.ViewInner view-stack-formula
       (view-with v vp)
       (view-path v vp)
   view-inner-with _ _ (_ , c) _
     = c
 
   view-inner-path
-    : (v : ViewStack.View FormulaParentViewStack)
-    → (vp : ViewStack.ViewPath FormulaParentViewStack v)
-    → (v' : ViewStack.ViewInner FormulaParentViewStack v vp)
-    → (vp' : ViewStack.ViewInnerPath FormulaParentViewStack v vp v')
-    → ViewStack.ViewInnerPath FormulaViewStack
+    : (v : ViewStack.View view-stack-formula-parent)
+    → (vp : ViewStack.ViewPath view-stack-formula-parent v)
+    → (v' : ViewStack.ViewInner view-stack-formula-parent v vp)
+    → (vp' : ViewStack.ViewInnerPath view-stack-formula-parent v vp v')
+    → ViewStack.ViewInnerPath view-stack-formula
       (view-with v vp)
       (view-path v vp)
       (view-inner-with v vp v' vp')
   view-inner-path _ _ _
     = id
 
-formula-view-stack-map
+view-stack-map-formula
   : ViewStackMap
-    FormulaParentViewStack
-    FormulaViewStack
-formula-view-stack-map
-  = record {FormulaViewStackMap}
+    view-stack-formula-parent
+    view-stack-formula
+view-stack-map-formula
+  = record {ViewStackMapFormula}
 
 -- #### Event
 
-module FormulaEventStackMap where
+module EventStackMapFormula where
 
   mode
-    : EventStack.Mode FormulaParentEventStack
-    → EventStack.Mode FormulaEventStack
+    : EventStack.Mode event-stack-formula-parent
+    → EventStack.Mode event-stack-formula
   mode
     = id
 
   mode-inner
-    : EventStack.ModeInner FormulaParentEventStack
-    → EventStack.ModeInner FormulaEventStack
+    : EventStack.ModeInner event-stack-formula-parent
+    → EventStack.ModeInner event-stack-formula
   mode-inner _
     = tt
 
   event
-    : (m : EventStack.Mode FormulaParentEventStack)
-    → EventStack.Event FormulaEventStack (mode m)
-    → EventStack.Event FormulaParentEventStack m
+    : (m : EventStack.Mode event-stack-formula-parent)
+    → EventStack.Event event-stack-formula (mode m)
+    → EventStack.Event event-stack-formula-parent m
   event _ insert-parens
     = ι₁ insert-parens
   event _ insert-variable
@@ -885,62 +885,62 @@ module FormulaEventStackMap where
     = ι₂ symbol
 
   event-inner
-    : (m : EventStack.ModeInner FormulaParentEventStack)
-    → EventStack.EventInner FormulaEventStack (mode-inner m)
-    → EventStack.EventInner FormulaParentEventStack m
+    : (m : EventStack.ModeInner event-stack-formula-parent)
+    → EventStack.EventInner event-stack-formula (mode-inner m)
+    → EventStack.EventInner event-stack-formula-parent m
   event-inner _
     = id
 
-formula-event-stack-map
+event-stack-map-formula
   : EventStackMap
-    FormulaParentEventStack
-    FormulaEventStack
-formula-event-stack-map
-  = record {FormulaEventStackMap}
+    event-stack-formula-parent
+    event-stack-formula
+event-stack-map-formula
+  = record {EventStackMapFormula}
 
 -- #### Editor
 
-formula-simple-editor
+simple-editor-formula
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleEditor
-    FormulaViewStack
-    FormulaEventStack
+    view-stack-formula
+    event-stack-formula
     (Any (SandboxState ss vs m))
-formula-simple-editor ss vs m
-  = simple-editor-map-view formula-view-stack-map
-  $ simple-editor-map-event formula-event-stack-map
-  $ formula-parent-editor ss vs m
+simple-editor-formula ss vs m
+  = simple-editor-map-view view-stack-map-formula
+  $ simple-editor-map-event event-stack-map-formula
+  $ simple-editor-formula-parent ss vs m
 
 -- ### SimpleSplitEditor
 
-formula-simple-split-editor
+simple-split-editor-formula
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimpleSplitEditor
-    FormulaViewStack
-    FormulaEventStack
+    view-stack-formula
+    event-stack-formula
     (Formula ss vs m)
-formula-simple-split-editor ss vs m
+simple-split-editor-formula ss vs m
   = record
   { editor
-    = formula-simple-editor ss vs m
+    = simple-editor-formula ss vs m
   ; split-functor
     = SandboxState.split-function ss vs m
   }
 
 -- ### SimplePartialEditor
 
-formula-simple-partial-editor
+simple-partial-editor-formula
   : (ss : Symbols)
   → (vs : Variables)
   → (m : Bool)
   → SimplePartialEditor
-    FormulaViewStack
-    FormulaEventStack
+    view-stack-formula
+    event-stack-formula
     (Formula ss vs m)
-formula-simple-partial-editor ss vs m
-  = SimpleSplitEditor.partial-editor (formula-simple-split-editor ss vs m)
+simple-partial-editor-formula ss vs m
+  = SimpleSplitEditor.partial-editor (simple-split-editor-formula ss vs m)
 

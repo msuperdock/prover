@@ -8,7 +8,7 @@ open import Prover.Data.Formula
   using (Formula; _≟_frm)
 open import Prover.Data.Formula.Editor
   using (FormulaEvent; decode-encode-formula; decode-formula; encode-formula;
-    formula-simple-split-editor)
+    simple-split-editor-formula)
 open import Prover.Data.Identifier
   using (Identifier)
 open import Prover.Data.Identifier.Editor
@@ -20,7 +20,7 @@ open import Prover.Data.Number.Editor
 open import Prover.Data.Proof
   using (Branch; BranchPath; Proof; ProofPath; go; proof; stop)
 open import Prover.Data.Proof.Editor.Meta
-  using (ProofMetaFlatEventStack; ProofMetaFlatMode; proof-meta-flat-editor)
+  using (ProofMetaFlatMode; flat-editor-proof-meta; flat-event-stack-proof-meta)
 open import Prover.Data.Rule
   using (Rule; rule)
 open import Prover.Data.Rules
@@ -28,7 +28,7 @@ open import Prover.Data.Rules
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Data.Text.Editor
-  using (TextEvent; TextFlatEventStack; command-flat-editor)
+  using (TextEvent; flat-editor-command; flat-event-stack-text)
 open import Prover.Data.Variables
   using (Variables)
 open import Prover.Editor
@@ -107,9 +107,9 @@ data ProofViewInnerPath
     → CommandPath c
     → ProofViewInnerPath (both w c)
 
-ProofViewStack
+view-stack-proof
   : ViewStack
-ProofViewStack
+view-stack-proof
   = record
   { View
     = List Line
@@ -156,9 +156,9 @@ ProofEventInner number
 ProofEventInner formula
   = FormulaEvent
 
-ProofEventStack
+event-stack-proof
   : EventStack
-ProofEventStack
+event-stack-proof
   = record
   { Mode
     = ⊤
@@ -191,7 +191,7 @@ module _
     : Formula ss vs true
     → RichText
   draw-formula
-    = SimpleSplitEditor.draw-pure (formula-simple-split-editor ss vs true)
+    = SimpleSplitEditor.draw-pure (simple-split-editor-formula ss vs true)
 
   draw-branch
     : List (Formula ss vs false)
@@ -474,12 +474,12 @@ decode-encode-proof {rs = rs} {r = r} (proof b q)
 
 -- ### Record
 
-proof-encoding
+encoding-proof
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
   → Encoding (Proof rs r) Value
-proof-encoding rs r
+encoding-proof rs r
   = record
   { encode
     = encode-proof
@@ -495,9 +495,9 @@ proof-encoding rs r
 
 -- #### View
 
-ProofBaseViewStack
+base-view-stack-proof
   : BaseViewStack
-ProofBaseViewStack
+base-view-stack-proof
   = record
   { View
     = List Line
@@ -507,9 +507,9 @@ ProofBaseViewStack
 
 -- #### Event
 
-ProofBaseEventStack
+base-event-stack-proof
   : BaseEventStack
-ProofBaseEventStack
+base-event-stack-proof
   = record
   { Mode
     = ⊤
@@ -519,7 +519,7 @@ ProofBaseEventStack
 
 -- #### Module
 
-module ProofSimpleBaseEditor
+module SimpleBaseEditorProof
   {ss : Symbols}
   (rs : Rules ss)
   (r : Rule ss)
@@ -527,8 +527,8 @@ module ProofSimpleBaseEditor
 
   -- ##### Types
 
-  open BaseViewStack ProofBaseViewStack
-  open BaseEventStack ProofBaseEventStack
+  open BaseViewStack base-view-stack-proof
+  open BaseEventStack base-event-stack-proof
 
   State
     : Set
@@ -636,16 +636,16 @@ module ProofSimpleBaseEditor
 
 -- #### Editor
 
-proof-simple-base-editor
+simple-base-editor-proof
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
   → SimpleBaseEditor
-    ProofBaseViewStack
-    ProofBaseEventStack
+    base-view-stack-proof
+    base-event-stack-proof
     (Proof rs r)
-proof-simple-base-editor rs r
-  = record {ProofSimpleBaseEditor rs r}
+simple-base-editor-proof rs r
+  = record {SimpleBaseEditorProof rs r}
 
 -- ### SimpleChildEditor
 
@@ -663,23 +663,23 @@ data ProofKey
 
 -- #### View
 
-ProofChildViewStack
+flat-view-stack-proof-child
   : ProofKey
   → FlatViewStack
-ProofChildViewStack infer
+flat-view-stack-proof-child infer
   = CommandFlatViewStack
-ProofChildViewStack meta
+flat-view-stack-proof-child meta
   = WindowFlatViewStack
 
 -- #### Event
 
-ProofChildEventStack
+flat-event-stack-proof-child
   : ProofKey
   → FlatEventStack
-ProofChildEventStack infer
-  = TextFlatEventStack
-ProofChildEventStack meta
-  = ProofMetaFlatEventStack
+flat-event-stack-proof-child infer
+  = flat-event-stack-text
+flat-event-stack-proof-child meta
+  = flat-event-stack-proof-meta
 
 -- #### Infer
 
@@ -687,7 +687,7 @@ module _
   {ss : Symbols}
   where
 
-  module ProofSimpleChildEditorInfer
+  module SimpleChildEditorProofInfer
     (rs : Rules ss)
     (r : Rule ss)
     where
@@ -697,7 +697,7 @@ module _
     BaseState
       = Proof rs r
 
-    open SimpleBaseEditor (proof-simple-base-editor rs r) using () renaming
+    open SimpleBaseEditor (simple-base-editor-proof rs r) using () renaming
       ( StatePath
         to BaseStatePath
       )
@@ -743,12 +743,12 @@ module _
       : (s : BaseState)
       → (sp : BaseStatePath s)
       → FlatEditor
-        (ProofChildViewStack infer)
-        (ProofChildEventStack infer)
+        (flat-view-stack-proof-child infer)
+        (flat-event-stack-proof-child infer)
         (Result s sp)
     flat-editor s sp
       = flat-editor-map (result-map s sp)
-      $ command-flat-editor "i"
+      $ flat-editor-command "i"
 
     update
       : (s : BaseState)
@@ -758,15 +758,15 @@ module _
     update p pp (result r q m)
       = Proof.infer p pp r q m
 
-  proof-simple-child-editor-infer
+  simple-child-editor-proof-infer
     : (rs : Rules ss)
     → (r : Rule ss)
     → SimpleChildEditor
-      (ProofChildViewStack infer)
-      (ProofChildEventStack infer)
-      (proof-simple-base-editor rs r)
-  proof-simple-child-editor-infer rs r
-    = record {ProofSimpleChildEditorInfer rs r}
+      (flat-view-stack-proof-child infer)
+      (flat-event-stack-proof-child infer)
+      (simple-base-editor-proof rs r)
+  simple-child-editor-proof-infer rs r
+    = record {SimpleChildEditorProofInfer rs r}
 
 -- #### Meta
 
@@ -774,7 +774,7 @@ module _
   {ss : Symbols}
   where
 
-  module ProofSimpleChildEditorMeta
+  module SimpleChildEditorProofMeta
     (rs : Rules ss)
     (r : Rule ss)
     where
@@ -784,7 +784,7 @@ module _
     BaseState
       = Proof rs r
 
-    open SimpleBaseEditor (proof-simple-base-editor rs r) using () renaming
+    open SimpleBaseEditor (simple-base-editor-proof rs r) using () renaming
       ( StatePath
         to BaseStatePath
       )
@@ -800,11 +800,11 @@ module _
       : (s : BaseState)
       → (sp : BaseStatePath s)
       → FlatEditor
-        (ProofChildViewStack meta)
-        (ProofChildEventStack meta)
+        (flat-view-stack-proof-child meta)
+        (flat-event-stack-proof-child meta)
         (Result s sp)
     flat-editor _ _
-      = proof-meta-flat-editor ss (Rule.variables r)
+      = flat-editor-proof-meta ss (Rule.variables r)
 
     update
       : (s : BaseState)
@@ -814,96 +814,96 @@ module _
     update p pp (m , f)
       = Proof.substitute-meta p pp m f
 
-  proof-simple-child-editor-meta
+  simple-child-editor-proof-meta
     : (rs : Rules ss)
     → (r : Rule ss)
     → SimpleChildEditor
-      (ProofChildViewStack meta)
-      (ProofChildEventStack meta)
-      (proof-simple-base-editor rs r)
-  proof-simple-child-editor-meta rs r
-    = record {ProofSimpleChildEditorMeta rs r}
+      (flat-view-stack-proof-child meta)
+      (flat-event-stack-proof-child meta)
+      (simple-base-editor-proof rs r)
+  simple-child-editor-proof-meta rs r
+    = record {SimpleChildEditorProofMeta rs r}
 
 -- #### Editor
 
-proof-simple-child-editor
+simple-child-editor-proof
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
   → (k : ProofKey)
   → SimpleChildEditor
-    (ProofChildViewStack k)
-    (ProofChildEventStack k)
-    (proof-simple-base-editor rs r)
-proof-simple-child-editor rs r infer
-  = proof-simple-child-editor-infer rs r
-proof-simple-child-editor rs r meta
-  = proof-simple-child-editor-meta rs r
+    (flat-view-stack-proof-child k)
+    (flat-event-stack-proof-child k)
+    (simple-base-editor-proof rs r)
+simple-child-editor-proof rs r infer
+  = simple-child-editor-proof-infer rs r
+simple-child-editor-proof rs r meta
+  = simple-child-editor-proof-meta rs r
 
 -- ### SimpleEditor
 
 -- #### Parent
 
-ProofParentViewStack
+view-stack-proof-parent
   : ViewStack
-ProofParentViewStack
+view-stack-proof-parent
   = view-stack-parent
-    ProofBaseViewStack
-    ProofChildViewStack
+    base-view-stack-proof
+    flat-view-stack-proof-child
 
-ProofParentEventStack
+event-stack-proof-parent
   : EventStack
-ProofParentEventStack
+event-stack-proof-parent
   = event-stack-parent
-    ProofBaseEventStack
-    ProofChildEventStack
+    base-event-stack-proof
+    flat-event-stack-proof-child
 
-proof-parent-editor
+simple-editor-proof-parent
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
   → SimpleEditor
-    ProofParentViewStack
-    ProofParentEventStack
+    view-stack-proof-parent
+    event-stack-proof-parent
     (Proof rs r)
-proof-parent-editor rs r
+simple-editor-proof-parent rs r
   = simple-editor-parent
-    ProofChildViewStack
-    ProofChildEventStack
-    (proof-simple-base-editor rs r)
-    (proof-simple-child-editor rs r)
+    flat-view-stack-proof-child
+    flat-event-stack-proof-child
+    (simple-base-editor-proof rs r)
+    (simple-child-editor-proof rs r)
 
 -- #### View
 
-module ProofViewStackMap where
+module ViewStackMapProof where
 
   view
-    : ViewStack.View ProofParentViewStack
-    → ViewStack.View ProofViewStack
+    : ViewStack.View view-stack-proof-parent
+    → ViewStack.View view-stack-proof
   view
     = id
 
   view-with
-    : (v : ViewStack.View ProofParentViewStack)
-    → ViewStack.ViewPath ProofParentViewStack v
-    → ViewStack.View ProofViewStack
+    : (v : ViewStack.View view-stack-proof-parent)
+    → ViewStack.ViewPath view-stack-proof-parent v
+    → ViewStack.View view-stack-proof
   view-with v _
     = view v
   
   view-path
-    : (v : ViewStack.View ProofParentViewStack)
-    → (vp : ViewStack.ViewPath ProofParentViewStack v)
-    → ViewStack.ViewPath ProofViewStack
+    : (v : ViewStack.View view-stack-proof-parent)
+    → (vp : ViewStack.ViewPath view-stack-proof-parent v)
+    → ViewStack.ViewPath view-stack-proof
       (view-with v vp)
   view-path _
     = id
 
   view-inner-with
-    : (v : ViewStack.View ProofParentViewStack)
-    → (vp : ViewStack.ViewPath ProofParentViewStack v)
-    → (v' : ViewStack.ViewInner ProofParentViewStack v vp)
-    → ViewStack.ViewInnerPath ProofParentViewStack v vp v'
-    → ViewStack.ViewInner ProofViewStack
+    : (v : ViewStack.View view-stack-proof-parent)
+    → (vp : ViewStack.ViewPath view-stack-proof-parent v)
+    → (v' : ViewStack.ViewInner view-stack-proof-parent v vp)
+    → ViewStack.ViewInnerPath view-stack-proof-parent v vp v'
+    → ViewStack.ViewInner view-stack-proof
       (view-with v vp)
       (view-path v vp)
   view-inner-with _ _ (infer , c) _
@@ -914,11 +914,11 @@ module ProofViewStackMap where
     = both w c
 
   view-inner-path
-    : (v : ViewStack.View ProofParentViewStack)
-    → (vp : ViewStack.ViewPath ProofParentViewStack v)
-    → (v' : ViewStack.ViewInner ProofParentViewStack v vp)
-    → (vp' : ViewStack.ViewInnerPath ProofParentViewStack v vp v')
-    → ViewStack.ViewInnerPath ProofViewStack
+    : (v : ViewStack.View view-stack-proof-parent)
+    → (vp : ViewStack.ViewPath view-stack-proof-parent v)
+    → (v' : ViewStack.ViewInner view-stack-proof-parent v vp)
+    → (vp' : ViewStack.ViewInnerPath view-stack-proof-parent v vp v')
+    → ViewStack.ViewInnerPath view-stack-proof
       (view-with v vp)
       (view-path v vp)
       (view-inner-with v vp v' vp')
@@ -929,26 +929,26 @@ module ProofViewStackMap where
   view-inner-path _ _ (meta , (_ , just _)) cp
     = both cp
 
-proof-view-stack-map
+view-stack-map-proof
   : ViewStackMap
-    ProofParentViewStack
-    ProofViewStack
-proof-view-stack-map
-  = record {ProofViewStackMap}
+    view-stack-proof-parent
+    view-stack-proof
+view-stack-map-proof
+  = record {ViewStackMapProof}
 
 -- #### Event
 
-module ProofEventStackMap where
+module EventStackMapProof where
 
   mode
-    : EventStack.Mode ProofParentEventStack
-    → EventStack.Mode ProofEventStack
+    : EventStack.Mode event-stack-proof-parent
+    → EventStack.Mode event-stack-proof
   mode
     = id
 
   mode-inner
-    : EventStack.ModeInner ProofParentEventStack
-    → EventStack.ModeInner ProofEventStack
+    : EventStack.ModeInner event-stack-proof-parent
+    → EventStack.ModeInner event-stack-proof
   mode-inner (infer , _)
     = text
   mode-inner (meta , ProofMetaFlatMode.text)
@@ -959,18 +959,18 @@ module ProofEventStackMap where
     = formula
 
   event
-    : (m : EventStack.Mode ProofParentEventStack)
-    → EventStack.Event ProofEventStack (mode m)
-    → EventStack.Event ProofParentEventStack m
+    : (m : EventStack.Mode event-stack-proof-parent)
+    → EventStack.Event event-stack-proof (mode m)
+    → EventStack.Event event-stack-proof-parent m
   event _ infer-hypotheses
     = ι₂ infer
   event _ substitute-meta
     = ι₂ meta
 
   event-inner
-    : (m : EventStack.ModeInner ProofParentEventStack)
-    → EventStack.EventInner ProofEventStack (mode-inner m)
-    → EventStack.EventInner ProofParentEventStack m
+    : (m : EventStack.ModeInner event-stack-proof-parent)
+    → EventStack.EventInner event-stack-proof (mode-inner m)
+    → EventStack.EventInner event-stack-proof-parent m
   event-inner (infer , _)
     = id
   event-inner (meta , ProofMetaFlatMode.text)
@@ -980,44 +980,44 @@ module ProofEventStackMap where
   event-inner (meta , ProofMetaFlatMode.formula)
     = id
 
-proof-event-stack-map
+event-stack-map-proof
   : EventStackMap
-    ProofParentEventStack
-    ProofEventStack
-proof-event-stack-map
-  = record {ProofEventStackMap}
+    event-stack-proof-parent
+    event-stack-proof
+event-stack-map-proof
+  = record {EventStackMapProof}
 
 -- #### Editor
 
-proof-simple-editor
+simple-editor-proof
   : {ss : Symbols}
   → (rs : Rules ss)
   → (r : Rule ss)
   → SimpleEditor
-    ProofViewStack
-    ProofEventStack
+    view-stack-proof
+    event-stack-proof
     (Proof rs r)
-proof-simple-editor rs r
-  = simple-editor-map-view proof-view-stack-map
-  $ simple-editor-map-event proof-event-stack-map
-  $ proof-parent-editor rs r
+simple-editor-proof rs r
+  = simple-editor-map-view view-stack-map-proof
+  $ simple-editor-map-event event-stack-map-proof
+  $ simple-editor-proof-parent rs r
 
 -- ### SimpleMainEditor
 
-proof-simple-main-editor
+simple-main-editor-proof
   : {ss : Symbols}
   → Rules ss
   → Rule ss
   → SimpleMainEditor
-    ProofViewStack
-    ProofEventStack
+    view-stack-proof
+    event-stack-proof
     Value
-proof-simple-main-editor rs r
+simple-main-editor-proof rs r
   = record
   { editor
-    = proof-simple-editor rs r
+    = simple-editor-proof rs r
   ; state-encoding
-    = proof-encoding rs r
+    = encoding-proof rs r
   ; bool-function
     = Proof.is-complete
   }

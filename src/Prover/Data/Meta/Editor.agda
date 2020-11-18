@@ -3,7 +3,7 @@ module Prover.Data.Meta.Editor where
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Number.Editor
-  using (NumberEventStack; number-simple-partial-editor)
+  using (event-stack-number; simple-partial-editor-number)
 open import Prover.Editor
   using (SimplePartialEditor; ViewStackMap)
 open import Prover.Editor.Base
@@ -39,7 +39,7 @@ draw-meta-empty
 
 -- ### SimplePartialEditor
 
-module MetaBaseViewStackMap where
+module BaseViewStackMapMeta where
 
   view
     : BaseViewStack.View PlainTextBaseViewStack
@@ -67,27 +67,27 @@ module MetaBaseViewStackMap where
   view-path (_ ∷ _) (just tp)
     = style (text (suc zero) (plain tp))
 
-meta-base-view-stack-map
+base-view-stack-map-meta
   : BaseViewStackMap
     PlainTextBaseViewStack
     RichTextBaseViewStack
-meta-base-view-stack-map
-  = record {MetaBaseViewStackMap}
+base-view-stack-map-meta
+  = record {BaseViewStackMapMeta}
 
-meta-view-stack-map
+view-stack-map-meta
   : ViewStackMap
     PlainTextViewStack
     RichTextViewStack
-meta-view-stack-map
+view-stack-map-meta
   = view-stack-map-lift
-    meta-base-view-stack-map
+    base-view-stack-map-meta
 
-meta-simple-partial-editor
+simple-partial-editor-meta
   : SimplePartialEditor
     RichTextViewStack
-    NumberEventStack
+    event-stack-number
     Meta
-meta-simple-partial-editor
-  = simple-partial-editor-map-view meta-view-stack-map
-  $ number-simple-partial-editor
+simple-partial-editor-meta
+  = simple-partial-editor-map-view view-stack-map-meta
+  $ simple-partial-editor-number
 

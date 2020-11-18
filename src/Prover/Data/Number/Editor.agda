@@ -1,7 +1,7 @@
 module Prover.Data.Number.Editor where
 
 open import Prover.Data.Text.Editor
-  using (TextWithEvent; text-with-simple-split-editor)
+  using (TextWithEvent; simple-split-editor-text-with)
 open import Prover.Editor
   using (EventStack; SimplePartialEditor; SimpleSplitEditor)
 open import Prover.Editor.Base
@@ -25,9 +25,9 @@ NumberEvent
 NumberEvent
   = TextWithEvent Char.is-digit
 
-NumberBaseEventStack
+base-event-stack-number
   : BaseEventStack
-NumberBaseEventStack
+base-event-stack-number
   = record
   { Mode
     = ⊤
@@ -35,33 +35,33 @@ NumberBaseEventStack
     = λ _ → NumberEvent
   }
 
-NumberEventStack
+event-stack-number
   : EventStack
-NumberEventStack
+event-stack-number
   = event-stack-lift
-    NumberBaseEventStack
+    base-event-stack-number
 
 -- ## Editors
 
 -- ### SimpleSplitEditor
 
-number-simple-split-editor
+simple-split-editor-number
   : SimpleSplitEditor
     PlainTextViewStack
-    NumberEventStack
+    event-stack-number
     ℕ
-number-simple-split-editor
+simple-split-editor-number
   = simple-split-editor-map
     (retraction-split CharWith.retraction-digits)
-  $ text-with-simple-split-editor Char.is-digit
+  $ simple-split-editor-text-with Char.is-digit
 
 -- ### SimplePartialEditor
 
-number-simple-partial-editor
+simple-partial-editor-number
   : SimplePartialEditor
     PlainTextViewStack
-    NumberEventStack
+    event-stack-number
     ℕ
-number-simple-partial-editor
-  = SimpleSplitEditor.partial-editor number-simple-split-editor
+simple-partial-editor-number
+  = SimpleSplitEditor.partial-editor simple-split-editor-number
 
