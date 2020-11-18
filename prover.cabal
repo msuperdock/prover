@@ -176,6 +176,7 @@ executable prover
     MAlonzo.Code.Prover.Data.Token,
     MAlonzo.Code.Prover.Data.Variable,
     MAlonzo.Code.Prover.Data.Variables,
+    -- MAlonzo.Code.Prover.Data.Variables.Category,
     MAlonzo.Code.Prover.Editor,
     MAlonzo.Code.Prover.Editor.Base,
     MAlonzo.Code.Prover.Editor.Child,
