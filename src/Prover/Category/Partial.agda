@@ -1,7 +1,7 @@
 module Prover.Category.Partial where
 
 open import Prover.Category
-  using (Category; Functor; any)
+  using (Category; Functor; FunctorSquare)
 open import Prover.Function.Partial
   using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
@@ -86,14 +86,15 @@ record PartialFunctor
     → (q₂ : base y₂ ≡ just y₂')
     → Category.ArrowEqual' C f₁ f₂
     → Category.ArrowEqual' D (map p₁ q₁ f₁) (map p₂ q₂ f₂)
-  map-equal' p₁ p₂ q₁ q₂ (any r)
+  map-equal' p₁ p₂ q₁ q₂ (Category.any r)
     with trans (sym p₁) p₂
     | trans (sym q₁) q₂
   ... | refl | refl
     with irrelevant p₁ p₂
     | irrelevant q₁ q₂
   ... | refl | refl
-    = any (map-equal p₁ q₁ r)
+    = Category.any
+    $ map-equal p₁ q₁ r
 
   map-identity'
     : {x₁' x₂' : Category.Object D}
@@ -108,7 +109,8 @@ record PartialFunctor
   ... | refl
     with irrelevant p₁ p₂
   ... | refl
-    = any (map-identity x p₁)
+    = Category.any
+    $ map-identity x p₁
 
   map-compose'
     : {x y z : Category.Object C}
@@ -122,7 +124,8 @@ record PartialFunctor
       (map p r (Category.compose C f g))
       (Category.compose D (map q r f) (map p q g))
   map-compose' p q r f g
-    = any (map-compose p q r f g)
+    = Category.any
+    $ map-compose p q r f g
 
 -- ### Conversion
 
@@ -379,7 +382,8 @@ record PartialFunctorSquare
   map'' {x₁ = x₁} {y₁ = y₁} p₁ q₁ p₂ q₂ f₁ r
     = Category.arrow-trans' D₂ (Category.arrow-sym' D₂
       (PartialFunctor.map-equal' H₂ (base x₁ p₁) p₂ (base y₁ q₁) q₂ r))
-    $ any (map p₁ q₁ f₁)
+    $ Category.any
+    $ map p₁ q₁ f₁
 
   map-arrow
     : {x₁ y₁ : Category.Object C₁}
@@ -400,6 +404,75 @@ record PartialFunctorSquare
       (Category.arrow D₂ p' q' (Functor.map G (PartialFunctor.map H₁ r₁ s₁ f₁)))
   map-arrow refl refl refl refl
     = map'
+
+-- ### Conversion
+
+module _
+  {C₁ C₂ D₁ D₂ : Category}
+  {F : Functor C₁ C₂}
+  {G : Functor D₁ D₂}
+  {H₁ : Functor C₁ D₁}
+  {H₂ : Functor C₂ D₂}
+  where
+
+  module FunctorSquarePartial
+    (s : FunctorSquare F G H₁ H₂)
+    where
+
+    base
+      : {x₁' : Category.Object D₁}
+      → (x₁ : Category.Object C₁)
+      → PartialFunctor.base (functor-partial H₁) x₁ ≡ just x₁'
+      → PartialFunctor.base (functor-partial H₂) (Functor.base F x₁)
+        ≡ just (Functor.base G x₁')
+    base x₁ refl
+      = sub just (FunctorSquare.base s x₁)
+
+    map'
+      : {x₁ y₁ : Category.Object C₁}
+      → {x₂ y₂ : Category.Object C₂}
+      → {x₁' y₁' : Category.Object D₁}
+      → {x₂' y₂' : Category.Object D₂}
+      → (p₁ : PartialFunctor.base (functor-partial H₁) x₁ ≡ just x₁')
+      → (q₁ : PartialFunctor.base (functor-partial H₁) y₁ ≡ just y₁')
+      → (p₂ : PartialFunctor.base (functor-partial H₂) x₂ ≡ just x₂')
+      → (q₂ : PartialFunctor.base (functor-partial H₂) y₂ ≡ just y₂')
+      → (f₁ : Category.Arrow C₁ x₁ y₁)
+      → {f₂ : Category.Arrow C₂ x₂ y₂}
+      → Category.ArrowEqual' C₂ (Functor.map F f₁) f₂
+      → Category.ArrowEqual' D₂
+        (PartialFunctor.map (functor-partial H₂) p₂ q₂ f₂)
+        (Functor.map G (PartialFunctor.map (functor-partial H₁) p₁ q₁ f₁))
+    map' refl refl refl refl f₁ r
+      = Category.arrow-trans' D₂ (Functor.map-equal' H₂
+        (Category.arrow-sym' C₂ r))
+      $ FunctorSquare.map s f₁
+
+    map
+      : {x₁ y₁ : Category.Object C₁}
+      → {x₁' y₁' : Category.Object D₁}
+      → (p₁ : PartialFunctor.base (functor-partial H₁) x₁ ≡ just x₁')
+      → (q₁ : PartialFunctor.base (functor-partial H₁) y₁ ≡ just y₁')
+      → (f₁ : Category.Arrow C₁ x₁ y₁)
+      → Category.ArrowEqual D₂
+        (PartialFunctor.map (functor-partial H₂) (base x₁ p₁) (base y₁ q₁)
+          (Functor.map F f₁))
+        (Functor.map G
+          (PartialFunctor.map (functor-partial H₁) p₁ q₁ f₁))
+    map {x₁ = x₁} {y₁ = y₁} p₁ q₁ f₁
+      = Category.any' D₂
+      $ map' p₁ q₁
+        (base x₁ p₁)
+        (base y₁ q₁) f₁
+        (Category.arrow-refl' C₂)
+
+  functor-square-partial
+    : FunctorSquare F G H₁ H₂
+    → PartialFunctorSquare F G
+      (functor-partial H₁)
+      (functor-partial H₂)
+  functor-square-partial s
+    = record {FunctorSquarePartial s}
 
 -- ### Compose
 

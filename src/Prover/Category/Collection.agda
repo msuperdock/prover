@@ -2,10 +2,11 @@ module Prover.Category.Collection where
 
 open import Prover.Category
   using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
-    FunctorIdentity; FunctorSquare; any)
+    FunctorIdentity; FunctorSquare)
 open import Prover.Category.List
-  using (category-list; functor-compose-list; functor-equal-list;
-    functor-identity-list; functor-list; functor-square-list)
+  using (module CategoryList; module FunctorList; category-list;
+    functor-compose-list; functor-equal-list; functor-identity-list;
+    functor-list; functor-square-list)
 open import Prover.Function.Relation
   using (FunctionInjective)
 open import Prover.Prelude
@@ -36,8 +37,7 @@ module CategoryCollection
     field
 
       elements
-        : Category.Arrow
-          (category-list C)
+        : CategoryList.Arrow C
           (Collection.elements xs)
           (Collection.elements ys)
 
@@ -54,8 +54,7 @@ module CategoryCollection
     field
 
       elements
-        : Category.ArrowEqual
-          (category-list C)
+        : CategoryList.ArrowEqual C
           (Arrow.elements fs₁)
           (Arrow.elements fs₂)
 
@@ -68,8 +67,7 @@ module CategoryCollection
     arrow-refl
       = record
       { elements
-        = Category.arrow-refl
-          (category-list C)
+        = CategoryList.arrow-refl C
       }
 
     arrow-sym
@@ -80,8 +78,7 @@ module CategoryCollection
     arrow-sym (arrow-equal ps)
       = record
       { elements
-        = Category.arrow-sym
-          (category-list C) ps
+        = CategoryList.arrow-sym C ps
       }
 
     arrow-trans
@@ -93,8 +90,7 @@ module CategoryCollection
     arrow-trans (arrow-equal ps₁) (arrow-equal ps₂)
       = record
       { elements
-        = Category.arrow-trans
-          (category-list C) ps₁ ps₂
+        = CategoryList.arrow-trans C ps₁ ps₂
       }
 
     simplify
@@ -104,8 +100,7 @@ module CategoryCollection
     simplify (arrow fs)
       = record
       { elements
-        = Category.simplify
-          (category-list C) fs
+        = CategoryList.simplify C fs
       }
 
     simplify-equal
@@ -116,8 +111,7 @@ module CategoryCollection
     simplify-equal (arrow fs)
       = record
       { elements
-        = Category.simplify-equal
-          (category-list C) fs
+        = CategoryList.simplify-equal C fs
       }
 
   identity
@@ -126,8 +120,7 @@ module CategoryCollection
   identity (collection xs _)
     = record
     { elements
-      = Category.identity
-        (category-list C) xs
+      = CategoryList.identity C xs
     }
 
   compose
@@ -138,8 +131,7 @@ module CategoryCollection
   compose (arrow fs) (arrow gs)
     = record
     { elements
-      = Category.compose
-        (category-list C) fs gs
+      = CategoryList.compose C fs gs
     }
 
   abstract
@@ -156,8 +148,7 @@ module CategoryCollection
     compose-equal (arrow-equal ps) (arrow-equal qs)
       = record
       { elements
-        = Category.compose-equal
-          (category-list C) ps qs
+        = CategoryList.compose-equal C ps qs
       }
 
     precompose
@@ -168,8 +159,7 @@ module CategoryCollection
     precompose (arrow fs)
       = record
       { elements
-        = Category.precompose
-          (category-list C) fs
+        = CategoryList.precompose C fs
       }
 
     postcompose
@@ -180,8 +170,7 @@ module CategoryCollection
     postcompose (arrow fs)
       = record
       { elements
-        = Category.postcompose
-          (category-list C) fs
+        = CategoryList.postcompose C fs
       }
 
     associative
@@ -195,8 +184,7 @@ module CategoryCollection
     associative (arrow fs) (arrow gs) (arrow hs)
       = record
       { elements
-        = Category.associative
-          (category-list C) fs gs hs
+        = CategoryList.associative C fs gs hs
       }
 
 category-collection
@@ -225,7 +213,7 @@ arrow-equal-collection
     (category-collection C R)
     (CategoryCollection.arrow {xs = xs₁} {ys = ys₁} fs₁)
     (CategoryCollection.arrow {xs = xs₂} {ys = ys₂} fs₂)
-arrow-equal-collection _ _ _ _ (any p)
+arrow-equal-collection _ _ _ _ (Category.any p)
   = Category.any
   $ record
   { elements
@@ -260,8 +248,7 @@ module _
     map (CategoryCollection.arrow fs)
       = record
       { elements
-        = Functor.map
-          (functor-list F) fs
+        = FunctorList.map F fs
       }
 
     abstract
@@ -274,8 +261,7 @@ module _
       map-equal (CategoryCollection.arrow-equal ps)
         = record
         { elements
-          = Functor.map-equal
-            (functor-list F) ps
+          = FunctorList.map-equal F ps
         }
 
       map-identity
@@ -286,8 +272,7 @@ module _
       map-identity (collection xs _)
         = record
         { elements
-          = Functor.map-identity
-            (functor-list F) xs
+          = FunctorList.map-identity F xs
         }
 
       map-compose
@@ -300,8 +285,7 @@ module _
       map-compose (CategoryCollection.arrow fs) (CategoryCollection.arrow gs)
         = record
         { elements
-          = Functor.map-compose
-            (functor-list F) fs gs
+          = FunctorList.map-compose F fs gs
         }
 
   functor-collection

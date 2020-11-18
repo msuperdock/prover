@@ -1,17 +1,26 @@
 module Prover.Category.List.Unit where
 
 open import Prover.Category
-  using (Category; Functor)
+  using (module Category'; Category; Functor; FunctorCompose; FunctorEqual;
+    FunctorIdentity; FunctorSquare; functor-compose';
+    functor-compose-from-equal; functor-identity'; functor-identity-from-equal;
+    functor-square-from-equal; functor-sym; functor-trans)
 open import Prover.Category.List
-  using (module CategoryList; category-list)
+  using (module CategoryList; module FunctorList; category-list; functor-list)
 open import Prover.Category.Unit
-  using (module CategoryUnit; category-unit)
+  using (module CategoryUnit; category-unit; functor-unit)
+open import Prover.Function
+  using (Function; FunctionCompose; FunctionEqual; FunctionIdentity;
+    FunctionSquare; function-compose; function-compose-to-equal;
+      function-identity; function-identity-to-equal; function-square-to-equal)
 open import Prover.Prelude
 
 open List
   using (_∷_; _!_)
 
 -- ## Category
+
+-- ### Function
 
 module CategoryListUnit where
 
@@ -21,6 +30,8 @@ module CategoryListUnit where
     (ys : List B)
     : Set
     where
+
+    no-eta-equality
 
     field
 
@@ -404,9 +415,226 @@ category-list-unit A
     = List A
   }
 
+-- ### Equality
+
+arrow-equal-list-unit
+  : {A : Set}
+  → {m n : ℕ}
+  → {xs₁ xs₂ : Vec A m}
+  → {ys₁ ys₂ : Vec A n}
+  → {fs₁ : Category.Arrow (category-list-unit A) (any xs₁) (any ys₁)}
+  → {fs₂ : Category.Arrow (category-list-unit A) (any xs₂) (any ys₂)}
+  → xs₁ ≡ xs₂
+  → ys₁ ≡ ys₂
+  → ((k : Fin m)
+    → CategoryListUnit.Arrow.lookup fs₁ k
+    ≡ CategoryListUnit.Arrow.lookup fs₂ k)
+  → Category.ArrowEqual' (category-list-unit A) fs₁ fs₂
+arrow-equal-list-unit refl refl f
+  = Category.any
+  $ record
+  { lookup
+    = f
+  }
+
 -- ## Functor
 
-module FunctorListUnit
+-- ### Function
+
+module _
+  {A B : Set}
+  where
+
+  module FunctorListUnit
+    (F : Function A B)
+    where
+
+    base
+      : Category.Object (category-list-unit A)
+      → Category.Object (category-list-unit B)
+    base
+      = List.map
+        (Function.base F)
+
+    map-lookup
+      : {xs ys : Category.Object (category-list-unit A)}
+      → Category.Arrow (category-list-unit A) xs ys
+      → Fin (List.length (base xs))
+      → Maybe (Fin (List.length (base ys)))
+    map-lookup
+      = CategoryListUnit.Arrow.lookup
+
+    map
+      : {xs ys : Category.Object (category-list-unit A)}
+      → Category.Arrow (category-list-unit A) xs ys
+      → Category.Arrow (category-list-unit B) (base xs) (base ys)
+    map fs
+      = record
+      { lookup
+        = map-lookup fs
+      ; injective
+        = CategoryListUnit.Arrow.injective fs
+      }
+
+    abstract
+
+      map-equal
+        : {xs ys : Category.Object (category-list-unit A)}
+        → {fs₁ fs₂ : Category.Arrow (category-list-unit A) xs ys}
+        → Category.ArrowEqual (category-list-unit A) fs₁ fs₂
+        → Category.ArrowEqual (category-list-unit B) (map fs₁) (map fs₂)
+      map-equal ps
+        = record
+        { lookup
+          = CategoryListUnit.ArrowEqual.lookup ps
+        }
+
+      map-identity
+        : (xs : Category.Object (category-list-unit A))
+        → Category.ArrowEqual (category-list-unit B)
+          (map (Category.identity (category-list-unit A) xs))
+          (Category.identity (category-list-unit B) (base xs))
+      map-identity _
+        = record
+        { lookup
+          = λ _ → refl
+        }
+
+      map-compose-lookup
+        : {xs ys zs : Category.Object (category-list-unit A)}
+        → (fs : Category.Arrow (category-list-unit A) ys zs)
+        → (gs : Category.Arrow (category-list-unit A) xs ys)
+        → (k : Fin (List.length xs))
+        → CategoryListUnit.compose-lookup fs gs k
+          ≡ CategoryListUnit.compose-lookup (map fs) (map gs) k
+      map-compose-lookup _ gs k
+        with CategoryListUnit.Arrow.lookup gs k
+      ... | nothing
+        = refl
+      ... | just _
+        = refl
+
+      map-compose
+        : {xs ys zs : Category.Object (category-list-unit A)}
+        → (fs : Category.Arrow (category-list-unit A) ys zs)
+        → (gs : Category.Arrow (category-list-unit A) xs ys)
+        → Category.ArrowEqual (category-list-unit B)
+          (map (Category.compose (category-list-unit A) fs gs))
+          (Category.compose (category-list-unit B) (map fs) (map gs))
+      map-compose fs gs
+        = record
+        { lookup
+          = map-compose-lookup fs gs
+        }
+
+  functor-list-unit
+    : Function A B
+    → Functor
+      (category-list-unit A)
+      (category-list-unit B)
+  functor-list-unit F
+    = record {FunctorListUnit F}
+
+-- ### Identity
+
+module FunctorListUnitIdentity
+  (A : Set)
+  where
+
+  base'
+    : {n : ℕ}
+    → (xs : Vec A n)
+    → Vec.map id xs ≡ xs
+  base'
+    = Vec.map-identity
+
+  base
+    : (xs : Category.Object (category-list-unit A))
+    → Functor.base
+      (functor-list-unit (function-identity A)) xs
+    ≅ Functor.base
+      (functor-identity' (category-list-unit A)) xs
+  base
+    = List.map-identity
+  
+  map
+    : {xs ys : Category.Object (category-list-unit A)}
+    → (fs : Category.Arrow (category-list-unit A) xs ys)
+    → Category'.ArrowEqual'
+      (category-list-unit A)
+      (category-list-unit A)
+      (Functor.map
+        (functor-list-unit (function-identity A)) fs)
+      (Functor.map
+        (functor-identity' (category-list-unit A)) fs)
+  map {xs = any xs} {ys = any ys} _
+    = arrow-equal-list-unit (base' xs) (base' ys) (λ _ → refl)
+
+functor-list-unit-identity
+  : (A : Set)
+  → FunctorEqual
+    (functor-list-unit (function-identity A))
+    (functor-identity' (category-list-unit A))
+functor-list-unit-identity A
+  = record {FunctorListUnitIdentity A}
+
+-- ### Compose
+
+module _
+  {A B C : Set}
+  where
+
+  module FunctorListUnitCompose
+    (F : Function B C)
+    (G : Function A B)
+    where
+
+    base'
+      : {n : ℕ}
+      → (xs : Vec A n)
+      → Vec.map (Function.base F ∘ Function.base G) xs
+        ≡ Vec.map (Function.base F) (Vec.map (Function.base G) xs)
+    base'
+      = Vec.map-compose
+        (Function.base F)
+        (Function.base G)
+
+    base
+      : (xs : Category.Object (category-list-unit A))
+      → Functor.base
+        (functor-list-unit (function-compose F G)) xs
+      ≅ Functor.base
+        (functor-compose' (functor-list-unit F) (functor-list-unit G)) xs
+    base
+      = List.map-compose
+        (Function.base F)
+        (Function.base G)
+  
+    map
+      : {xs ys : Category.Object (category-list-unit A)}
+      → (fs : Category.Arrow (category-list-unit A) xs ys)
+      → Category'.ArrowEqual'
+        (category-list-unit C)
+        (category-list-unit C)
+        (Functor.map
+          (functor-list-unit (function-compose F G)) fs)
+        (Functor.map
+          (functor-compose' (functor-list-unit F) (functor-list-unit G)) fs)
+    map {xs = any xs} {ys = any ys} _
+      = arrow-equal-list-unit (base' xs) (base' ys) (λ _ → refl)
+
+  functor-list-unit-compose
+    : (F : Function B C)
+    → (G : Function A B)
+    → FunctorEqual
+      (functor-list-unit (function-compose F G))
+      (functor-compose' (functor-list-unit F) (functor-list-unit G))
+  functor-list-unit-compose F G
+    = record {FunctorListUnitCompose F G}
+
+-- ## Functor'
+
+module FunctorListUnit'
   (A : Set)
   where
 
@@ -532,17 +760,17 @@ module FunctorListUnit
         = map-compose-lookup fs gs
       }
 
-functor-list-unit
+functor-list-unit'
   : (A : Set)
   → Functor
     (category-list (category-unit A))
     (category-list-unit A)
-functor-list-unit A
-  = record {FunctorListUnit A}
+functor-list-unit' A
+  = record {FunctorListUnit' A}
 
--- ## Functor'
+-- ## Functor''
 
-module FunctorListUnit'
+module FunctorListUnit''
   (A : Set)
   where
 
@@ -674,11 +902,250 @@ module FunctorListUnit'
         = map-compose-lookup fs gs
       }
 
-functor-list-unit'
+functor-list-unit''
   : (A : Set)
   → Functor
     (category-list-unit A)
     (category-list (category-unit A))
-functor-list-unit' A
-  = record {FunctorListUnit' A}
+functor-list-unit'' A
+  = record {FunctorListUnit'' A}
+
+-- ## FunctorEqual
+
+module _
+  {A B : Set}
+  {F₁ F₂ : Function A B}
+  where
+
+  module FunctorEqualListUnit
+    (p : FunctionEqual F₁ F₂)
+    where
+
+    base'
+      : {n : ℕ}
+      → (xs : Vec A n)
+      → Vec.map (Function.base F₁) xs
+        ≡ Vec.map (Function.base F₂) xs
+    base'
+      = Vec.map-equal
+        (Function.base F₁)
+        (Function.base F₂)
+        (FunctionEqual.base p)
+
+    base
+      : (xs : Category.Object (category-list-unit A))
+      → Functor.base (functor-list-unit F₁) xs
+        ≅ Functor.base (functor-list-unit F₂) xs
+    base
+      = List.map-equal
+        (Function.base F₁)
+        (Function.base F₂)
+        (FunctionEqual.base p)
+  
+    map
+      : {xs ys : Category.Object (category-list-unit A)}
+      → (fs : Category.Arrow (category-list-unit A) xs ys)
+      → Category'.ArrowEqual'
+        (category-list-unit B)
+        (category-list-unit B)
+        (Functor.map (functor-list-unit F₁) fs)
+        (Functor.map (functor-list-unit F₂) fs)
+    map {xs = any xs} {ys = any ys} _
+      = arrow-equal-list-unit (base' xs) (base' ys) (λ _ → refl)
+
+  functor-equal-list-unit
+    : FunctionEqual F₁ F₂
+    → FunctorEqual
+      (functor-list-unit F₁)
+      (functor-list-unit F₂)
+  functor-equal-list-unit p
+    = record {FunctorEqualListUnit p}
+
+-- ## FunctorIdentity
+
+functor-identity-list-unit
+  : {A : Set}
+  → {F : Function A A}
+  → FunctionIdentity F
+  → FunctorIdentity
+    (functor-list-unit F)
+functor-identity-list-unit {A  = A} p
+  = functor-identity-from-equal
+  $ functor-trans (functor-equal-list-unit
+    (function-identity-to-equal p))
+  $ functor-list-unit-identity A
+
+-- ## FunctorCompose
+
+functor-compose-list-unit
+  : {A B C : Set}
+  → {F : Function B C}
+  → {G : Function A B}
+  → {H : Function A C}
+  → FunctionCompose F G H
+  → FunctorCompose
+    (functor-list-unit F)
+    (functor-list-unit G)
+    (functor-list-unit H)
+functor-compose-list-unit {F = F} {G = G} p
+  = functor-compose-from-equal
+    (functor-list-unit F)
+    (functor-list-unit G)
+  $ functor-trans (functor-equal-list-unit
+    (function-compose-to-equal p))
+  $ functor-list-unit-compose F G
+
+-- ## FunctorSquare
+
+functor-square-list-unit
+  : {A₁ A₂ B₁ B₂ : Set}
+  → {F : Function A₁ A₂}
+  → {G : Function B₁ B₂}
+  → {H₁ : Function A₁ B₁}
+  → {H₂ : Function A₂ B₂}
+  → FunctionSquare F G H₁ H₂
+  → FunctorSquare
+    (functor-list-unit F)
+    (functor-list-unit G)
+    (functor-list-unit H₁)
+    (functor-list-unit H₂)
+functor-square-list-unit {F = F} {G = G} {H₁ = H₁} {H₂ = H₂} s
+  = functor-square-from-equal
+    (functor-list-unit F)
+    (functor-list-unit G)
+    (functor-list-unit H₁)
+    (functor-list-unit H₂)
+  $ functor-trans (functor-sym
+    (functor-list-unit-compose H₂ F))
+  $ functor-trans (functor-equal-list-unit
+    (function-square-to-equal s))
+  $ functor-list-unit-compose G H₁
+
+-- ## FunctorSquare'
+
+module _
+  {A₁ A₂ : Set}
+  where
+
+  module FunctorSquareListUnit'
+    (F : Function A₁ A₂)
+    where
+
+    base
+      : (xs₁ : Category.Object (category-list (category-unit A₁)))
+      → Functor.base (functor-list-unit' A₂)
+        (Functor.base (functor-list (functor-unit F)) xs₁) 
+      ≅ Functor.base (functor-list-unit F)
+        (Functor.base (functor-list-unit' A₁) xs₁)
+    base _
+      = refl
+
+    map'
+      : {xs₁ ys₁ : Category.Object (category-list (category-unit A₁))}
+      → (fs₁ : Category.Arrow (category-list (category-unit A₁)) xs₁ ys₁)
+      → (k : Fin (List.length xs₁))
+      → FunctorListUnit'.map-lookup A₂
+        (Functor.map (functor-list (functor-unit F)) fs₁) k
+      ≡ FunctorListUnit.map-lookup F
+        (Functor.map (functor-list-unit' A₁) fs₁) k
+    map' fs₁ k
+      with CategoryList.Arrow.lookup fs₁ k
+    ... | nothing
+      = refl
+    ... | just _
+      = refl
+
+    map
+      : {xs₁ ys₁ : Category.Object (category-list (category-unit A₁))}
+      → (fs₁ : Category.Arrow (category-list (category-unit A₁)) xs₁ ys₁)
+      → Category'.ArrowEqual'
+        (category-list-unit A₂)
+        (category-list-unit A₂)
+        (Functor.map (functor-list-unit' A₂)
+          (Functor.map (functor-list (functor-unit F)) fs₁))
+        (Functor.map (functor-list-unit F)
+          (Functor.map (functor-list-unit' A₁) fs₁))
+    map fs₁
+      = Category.any
+      $ record
+      { lookup
+        = map' fs₁
+      }
+
+  functor-square-list-unit'
+    : (F : Function A₁ A₂)
+    → FunctorSquare
+      (functor-list (functor-unit F))
+      (functor-list-unit F)
+      (functor-list-unit' A₁)
+      (functor-list-unit' A₂)
+  functor-square-list-unit' F
+    = record {FunctorSquareListUnit' F}
+
+-- ## FunctorSquare''
+
+module _
+  {A₁ A₂ : Set}
+  where
+
+  module FunctorSquareListUnit''
+    (F : Function A₁ A₂)
+    where
+
+    base
+      : (xs₁ : Category.Object (category-list-unit A₁))
+      → Functor.base (functor-list-unit'' A₂)
+        (Functor.base (functor-list-unit F) xs₁) 
+      ≅ Functor.base (functor-list (functor-unit F))
+        (Functor.base (functor-list-unit'' A₁) xs₁)
+    base _
+      = refl
+
+    map'
+      : {xs₁ ys₁ : Category.Object (category-list-unit A₁)}
+      → (fs₁ : Category.Arrow (category-list-unit A₁) xs₁ ys₁)
+      → (k : Fin (List.length xs₁))
+      → CategoryList.LookupEqual
+        (category-unit A₂)
+        (Functor.base (functor-list-unit'' A₂)
+          (Functor.base (functor-list-unit F) xs₁))
+        (Functor.base (functor-list-unit'' A₂)
+          (Functor.base (functor-list-unit F) ys₁)) k
+        (FunctorListUnit''.map-lookup A₂
+          (Functor.map (functor-list-unit F) fs₁) k)
+        (FunctorList.map-lookup (functor-unit F)
+          (Functor.map (functor-list-unit'' A₁) fs₁) k)
+    map' fs₁ k
+      with CategoryListUnit.Arrow.lookup fs₁ k
+    ... | nothing
+      = CategoryList.nothing
+    ... | just l
+      = CategoryList.just l refl
+
+    map
+      : {xs₁ ys₁ : Category.Object (category-list-unit A₁)}
+      → (fs₁ : Category.Arrow (category-list-unit A₁) xs₁ ys₁)
+      → Category'.ArrowEqual'
+        (category-list (category-unit A₂))
+        (category-list (category-unit A₂))
+        (Functor.map (functor-list-unit'' A₂)
+          (Functor.map (functor-list-unit F) fs₁))
+        (Functor.map (functor-list (functor-unit F))
+          (Functor.map (functor-list-unit'' A₁) fs₁))
+    map fs₁
+      = Category.any
+      $ record
+      { lookup
+        = map' fs₁
+      }
+
+  functor-square-list-unit''
+    : (F : Function A₁ A₂)
+    → FunctorSquare
+      (functor-list-unit F)
+      (functor-list (functor-unit F))
+      (functor-list-unit'' A₁)
+      (functor-list-unit'' A₂)
+  functor-square-list-unit'' F
+    = record {FunctorSquareListUnit'' F}
 

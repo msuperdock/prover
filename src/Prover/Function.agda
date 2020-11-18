@@ -4,6 +4,8 @@ open import Prover.Prelude
 
 -- ## Function
 
+-- ### Definition
+
 record Function
   (A B : Set)
   : Set
@@ -18,6 +20,31 @@ record Function
     base
       : A
       → B
+
+-- ### Identity
+
+function-identity
+  : (A : Set)
+  → Function A A
+function-identity _
+  = record
+  { base
+    = id
+  }
+
+-- ### Compose
+
+function-compose
+  : {A B C : Set}
+  → Function B C
+  → Function A B
+  → Function A C
+function-compose F G
+  = record
+  { base
+    = Function.base F
+    ∘ Function.base G
+  }
 
 -- ## FunctionEqual
 
@@ -36,6 +63,8 @@ record FunctionEqual
 
 -- ## FunctionIdentity
 
+-- ### Definition
+
 record FunctionIdentity
   {A₁ A₂ : Set}
   (F : Function A₁ A₂)
@@ -48,7 +77,19 @@ record FunctionIdentity
       : (x₁ : A₁)
       → Function.base F x₁ ≅ x₁
 
+-- ### Equality
+
+function-identity-to-equal
+  : {A₁ A₂ : Set}
+  → {F : Function A₁ A₂}
+  → FunctionIdentity F
+  → FunctionEqual F (function-identity A₁)
+function-identity-to-equal p
+  = record {FunctionIdentity p}
+
 -- ## FunctionCompose
+
+-- ### Definition
 
 record FunctionCompose
   {A B C₁ C₂ : Set}
@@ -64,7 +105,21 @@ record FunctionCompose
       : (x : A)
       → Function.base H x ≅ Function.base F (Function.base G x)
 
+-- ### Equality
+
+function-compose-to-equal
+  : {A B C₁ C₂ : Set}
+  → {F : Function B C₁}
+  → {G : Function A B}
+  → {H : Function A C₂}
+  → FunctionCompose F G H
+  → FunctionEqual H (function-compose F G)
+function-compose-to-equal p
+  = record {FunctionCompose p}
+
 -- ## FunctionSquare
+
+-- ### Definition
 
 record FunctionSquare
   {A₁ A₂ B₁ B₂ B₃ : Set}
@@ -81,4 +136,17 @@ record FunctionSquare
       : (x₁ : A₁)
       → Function.base H₂ (Function.base F x₁)
         ≅ Function.base G (Function.base H₁ x₁)
+
+-- ### Equality
+
+function-square-to-equal
+  : {A₁ A₂ B₁ B₂ B₃ : Set}
+  → {F : Function A₁ A₂}
+  → {G : Function B₁ B₃}
+  → {H₁ : Function A₁ B₁}
+  → {H₂ : Function A₂ B₂}
+  → FunctionSquare F G H₁ H₂
+  → FunctionEqual (function-compose H₂ F) (function-compose G H₁)
+function-square-to-equal s
+  = record {FunctionSquare s}
 

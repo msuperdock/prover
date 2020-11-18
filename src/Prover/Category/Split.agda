@@ -5,7 +5,8 @@ open import Prover.Category
     functor-square-compose)
 open import Prover.Category.Partial
   using (PartialFunctor; PartialFunctorSquare; functor-partial;
-    partial-functor-compose; partial-functor-square-compose)
+    functor-square-partial; partial-functor-compose;
+    partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Function.Split
@@ -537,7 +538,7 @@ module _
   {C D : Category}
   where
 
-  module SplitFunctorUntotal
+  module TotalSplitFunctorPartial
     (F : TotalSplitFunctor C D)
     where
 
@@ -614,9 +615,55 @@ module _
       ... | _ | refl | refl
         = TotalSplitFunctor.map-identity F x
 
-  split-functor-untotal
+  total-split-functor-partial
     : TotalSplitFunctor C D
     → SplitFunctor C D
-  split-functor-untotal F
-    = record {SplitFunctorUntotal F}
+  total-split-functor-partial F
+    = record {TotalSplitFunctorPartial F}
+
+-- ## TotalSplitFunctorSquare
+
+-- ### Definition
+
+record TotalSplitFunctorSquare
+  {C₁ C₂ D₁ D₂ : Category}
+  (F : Functor C₁ C₂)
+  (G : Functor D₁ D₂)
+  (H₁ : TotalSplitFunctor C₁ D₁)
+  (H₂ : TotalSplitFunctor C₂ D₂)
+  : Set
+  where
+
+  field
+
+    functor
+      : FunctorSquare F G
+        (TotalSplitFunctor.functor H₁)
+        (TotalSplitFunctor.functor H₂)
+
+    functor'
+      : FunctorSquare G F
+        (TotalSplitFunctor.functor' H₁)
+        (TotalSplitFunctor.functor' H₂)
+
+-- ### Conversion
+
+total-split-functor-square-partial
+  : {C₁ C₂ D₁ D₂ : Category}
+  → {F : Functor C₁ C₂}
+  → {G : Functor D₁ D₂}
+  → {H₁ : TotalSplitFunctor C₁ D₁}
+  → {H₂ : TotalSplitFunctor C₂ D₂}
+  → TotalSplitFunctorSquare F G H₁ H₂
+  → SplitFunctorSquare F G
+    (total-split-functor-partial H₁)
+    (total-split-functor-partial H₂)
+total-split-functor-square-partial s
+  = record
+  { partial-functor
+    = functor-square-partial
+      (TotalSplitFunctorSquare.functor s)
+  ; functor
+    = TotalSplitFunctorSquare.functor' s
+  }
 
