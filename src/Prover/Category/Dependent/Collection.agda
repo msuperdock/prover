@@ -246,7 +246,8 @@ dependent-functor-square-collection'
 dependent-category-collection {n = zero} {C' = C'} R
   = category-collection C' R
 
-dependent-category-collection {n = suc _} {C = C} {C' = C'} R
+dependent-category-collection {n = suc _}
+  {C = C} {C' = C'} R
   = record
   { category
     = λ x → dependent-category-collection
@@ -279,7 +280,8 @@ dependent-category-collection {n = suc _} {C = C} {C' = C'} R
 dependent-functor-collection {n = zero} {F' = F'} i
   = functor-collection F' i
 
-dependent-functor-collection {n = suc _} {R = R} {S = S} {F = F} {F' = F'} i
+dependent-functor-collection {n = suc _}
+  {R = R} {S = S} {F = F} {F' = F'} i
   = record
   { functor
     = λ x → dependent-functor-collection
