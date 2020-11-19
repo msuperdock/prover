@@ -171,6 +171,7 @@ executable prover
     MAlonzo.Code.Prover.Data.Proof.Editor,
     MAlonzo.Code.Prover.Data.Proof.Editor.Meta,
     MAlonzo.Code.Prover.Data.Rule,
+    -- MAlonzo.Code.Prover.Data.Rule.Category,
     MAlonzo.Code.Prover.Data.Rules,
     MAlonzo.Code.Prover.Data.Symbol,
     MAlonzo.Code.Prover.Data.Symbols,

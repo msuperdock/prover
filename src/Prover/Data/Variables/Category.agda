@@ -15,3 +15,6 @@ category-variables
 category-variables
   = category-collection-unit (Equal Variable)
 
+module CategoryVariables
+  = Category category-variables
+
