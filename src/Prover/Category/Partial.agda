@@ -1,10 +1,63 @@
 module Prover.Category.Partial where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare)
+  using (Category; Functor; FunctorSquare; Precategory)
 open import Prover.Function.Partial
   using (PartialFunction; PartialFunctionSquare)
 open import Prover.Prelude
+
+-- ## PartialPrefunctor
+
+record PartialPrefunctor
+  (C : Category)
+  (D : Precategory)
+  : Set
+  where
+
+  no-eta-equality
+
+  field
+
+    base
+      : Category.Object C
+      → Maybe (Precategory.Object D)
+
+    map
+      : {x y : Category.Object C}
+      → {x' y' : Precategory.Object D}
+      → base x ≡ just x'
+      → base y ≡ just y'
+      → Category.Arrow C x y
+      → Precategory.Arrow D x' y'
+
+    map-equal
+      : {x y : Category.Object C}
+      → {x' y' : Precategory.Object D}
+      → {f₁ f₂ : Category.Arrow C x y}
+      → (p : base x ≡ just x')
+      → (q : base y ≡ just y')
+      → Category.ArrowEqual C f₁ f₂
+      → Precategory.ArrowEqual D (map p q f₁) (map p q f₂)
+
+    map-identity
+      : {x' : Precategory.Object D}
+      → (x : Category.Object C)
+      → (p : base x ≡ just x')
+      → Precategory.ArrowEqual D
+        (map p p (Category.identity C x))
+        (Precategory.identity D x')
+
+    map-compose
+      : {x y z : Category.Object C}
+      → {x' y' z' : Precategory.Object D}
+      → (p : base x ≡ just x')
+      → (q : base y ≡ just y')
+      → (r : base z ≡ just z')
+      → (f : Category.Arrow C y z)
+      → (g : Category.Arrow C x y)
+      → Precategory.ArrowEqual D
+        (map p r (Category.compose C f g))
+        (Precategory.compose D (map q r f) (map p q g))
 
 -- ## PartialFunctor
 

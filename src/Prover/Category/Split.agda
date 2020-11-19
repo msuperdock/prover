@@ -1,17 +1,78 @@
 module Prover.Category.Split where
 
 open import Prover.Category
-  using (Category; Functor; FunctorSquare; functor-compose';
-    functor-square-compose)
+  using (Category; Functor; FunctorSquare; Precategory; Prefunctor;
+    functor-compose'; functor-square-compose)
 open import Prover.Category.Partial
-  using (PartialFunctor; PartialFunctorSquare; functor-partial;
-    functor-square-partial; partial-functor-compose;
+  using (PartialFunctor; PartialFunctorSquare; PartialPrefunctor;
+    functor-partial; functor-square-partial; partial-functor-compose;
     partial-functor-square-compose)
 open import Prover.Category.Weak
   using (WeakFunctor; WeakFunctorSquare)
 open import Prover.Function.Split
   using (SplitFunction; SplitFunctionSquare)
 open import Prover.Prelude
+
+-- ## SplitPrefunctor
+
+record SplitPrefunctor
+  (C : Category)
+  (D : Precategory)
+  : Set
+  where
+
+  no-eta-equality
+
+  field
+
+    partial-prefunctor
+      : PartialPrefunctor C D
+
+  open PartialPrefunctor partial-prefunctor public
+
+  field
+
+    prefunctor
+      : Prefunctor D C
+
+  open Prefunctor prefunctor public using () renaming
+    ( base
+      to unbase
+    ; map
+      to unmap
+    ; map-equal
+      to unmap-equal
+    ; map-identity
+      to unmap-identity
+    ; map-compose
+      to unmap-compose
+    )
+
+  field
+
+    base-unbase
+      : (x' : Precategory.Object D)
+      → base (unbase x') ≡ just x'
+
+    map-unmap
+      : {x' y' : Precategory.Object D}
+      → (f' : Precategory.Arrow D x' y')
+      → Precategory.ArrowEqual D
+        (map (base-unbase x') (base-unbase y') (unmap f')) f'
+
+    normalize-arrow
+      : {x' : Precategory.Object D}
+      → (x : Category.Object C)
+      → base x ≡ just x'
+      → Category.Arrow C x (unbase x')
+
+    normalize-valid
+      : {x' : Precategory.Object D}
+      → (x : Category.Object C)
+      → (p : base x ≡ just x')
+      → Precategory.ArrowEqual D
+        (map p (base-unbase x') (normalize-arrow x p))
+        (Precategory.identity D x')
 
 -- ## SplitFunctor
 

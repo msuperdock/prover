@@ -5,6 +5,58 @@ open import Prover.Function
     FunctionSquare)
 open import Prover.Prelude
 
+-- ## Precategory
+
+record Precategory
+  : Set₁
+  where
+
+  no-eta-equality
+
+  field
+
+    Object
+      : Set
+
+    Arrow
+      : Object
+      → Object
+      → Set
+
+    ArrowEqual
+      : {x y : Object}
+      → Arrow x y
+      → Arrow x y
+      → Set
+
+    arrow-refl
+      : {x y : Object}
+      → {f : Arrow x y}
+      → ArrowEqual f f
+
+    arrow-sym
+      : {x y : Object}
+      → {f₁ f₂ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₁
+
+    arrow-trans
+      : {x y : Object}
+      → {f₁ f₂ f₃ : Arrow x y}
+      → ArrowEqual f₁ f₂
+      → ArrowEqual f₂ f₃
+      → ArrowEqual f₁ f₃
+
+    identity
+      : (x : Object)
+      → Arrow x x
+
+    compose
+      : {x y z : Object}
+      → Arrow y z
+      → Arrow x y
+      → Arrow x z
+
 -- ## Category
 
 -- ### Definition
@@ -321,6 +373,47 @@ module Category' where
     → ArrowEqual' C₁ C₃ f₁ f₃
   arrow-trans' {C₁ = C₁} p₁@(any _) p₂@(any _)
     = Category.arrow-trans' C₁ p₁ p₂
+
+-- ## Prefunctor
+
+record Prefunctor
+  (C : Precategory)
+  (D : Category)
+  : Set
+  where
+
+  no-eta-equality
+
+  field
+
+    base
+      : Precategory.Object C
+      → Category.Object D
+
+    map
+      : {x y : Precategory.Object C}
+      → Precategory.Arrow C x y
+      → Category.Arrow D (base x) (base y)
+
+    map-equal
+      : {x y : Precategory.Object C}
+      → {f₁ f₂ : Precategory.Arrow C x y}
+      → Precategory.ArrowEqual C f₁ f₂
+      → Category.ArrowEqual D (map f₁) (map f₂)
+
+    map-identity
+      : (x : Precategory.Object C)
+      → Category.ArrowEqual D
+        (map (Precategory.identity C x))
+        (Category.identity D (base x))
+
+    map-compose
+      : {x y z : Precategory.Object C}
+      → (f : Precategory.Arrow C y z)
+      → (g : Precategory.Arrow C x y)
+      → Category.ArrowEqual D
+        (map (Precategory.compose C f g))
+        (Category.compose D (map f) (map g))
 
 -- ## Functor
 
