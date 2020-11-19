@@ -1,4 +1,4 @@
-module Check where
+module All where
 
 import Main
 import Prover.Editor

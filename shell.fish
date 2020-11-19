@@ -16,7 +16,7 @@ function check-agda
     --local-interfaces \
     --no-libraries \
     --include-path=. \
-    Check.agda
+    All.agda 
   or return $status
   echo 'All done.'
 
