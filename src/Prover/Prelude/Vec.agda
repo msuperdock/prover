@@ -344,6 +344,16 @@ module Vec where
     ... | _ | yes (is-member k m)
       = yes (is-member (suc k) m)
 
+    is-member-cons
+      : {n : ℕ}
+      → {xs : Vec A n}
+      → {y : A}
+      → (x : A)
+      → IsMember xs y
+      → IsMember (x ∷ xs) y
+    is-member-cons _ (is-member k p)
+      = is-member (suc k) p
+
     record Member
       {n : ℕ}
       (xs : Vec A n)
@@ -359,7 +369,7 @@ module Vec where
         value
           : A
 
-        valid
+        .valid
           : IsMember xs value
 
   -- ### Properties
@@ -695,8 +705,8 @@ module Vec where
       → (x : A)
       → (xs : Vec A n)
       → xs ⊆ x ∷ xs
-    ⊆-cons _ _ (is-member k p)
-      = is-member (suc k) p
+    ⊆-cons x _
+      = is-member-cons x
 
     ⊆-cons-left
       : {n₁ n₂ : ℕ}
@@ -838,8 +848,8 @@ module Vec where
     | find-member xs f
   ... | false | nothing
     = nothing
-  ... | false | just (member y (is-member k p))
-    = just (member y (is-member (suc k) p))
+  ... | false | just (member y p)
+    = just (member y (is-member-cons x p))
   ... | true | _
     = just (member x (is-member zero refl))
 

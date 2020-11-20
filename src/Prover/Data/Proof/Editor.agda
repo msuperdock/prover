@@ -717,7 +717,7 @@ module _
         value
           : Rule ss
   
-        member
+        .member
           : rul value ∈ rs
   
         match

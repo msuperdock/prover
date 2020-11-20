@@ -568,7 +568,7 @@ module Internal where
       → Metas
       → (f : Formula ss vs true)
       → (r : Rule ss)
-      → rul r ∈ rs
+      → .(rul r ∈ rs)
       → Formula.Match (Rule.conclusion r) f
       → BranchWith rs f
     branch-with-infer-formula ms f r@(rule _ _ (any hs) c) p
@@ -592,7 +592,7 @@ module Internal where
       → (p : Proof rs r)
       → (pp : ProofPath p)
       → (r' : Rule ss)
-      → rul r' ∈ rs
+      → .(rul r' ∈ rs)
       → Formula.Match (Rule.conclusion r') (proof-lookup p pp)
       → Σ (Proof rs r) ProofPath
     proof-infer p pp r q m
