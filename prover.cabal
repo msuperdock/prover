@@ -161,6 +161,7 @@ executable prover
     MAlonzo.Code.Prover.Data.Formula.Insert,
     MAlonzo.Code.Prover.Data.Formula.State,
     MAlonzo.Code.Prover.Data.Identifier,
+    -- MAlonzo.Code.Prover.Data.Identifier.Category,
     MAlonzo.Code.Prover.Data.Identifier.Editor,
     MAlonzo.Code.Prover.Data.Meta,
     MAlonzo.Code.Prover.Data.Meta.Editor,
