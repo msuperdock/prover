@@ -1,39 +1,37 @@
 module Prover.Data.Variables where
 
+open import Prover.Data.Collection.Named
+  using (NamedCollection)
+open import Prover.Data.Equal
+  using (Equal; _≡_)
+open import Prover.Data.Maybe
+  using (just)
+open import Prover.Data.Relation
+  using (Dec; Decidable)
 open import Prover.Data.Variable
   using (Variable; _≟_var)
-open import Prover.Prelude
 
 -- ## Definition
 
 Variables
   : Set
 Variables
-  = FinSet Variable
+  = NamedCollection Variable.name
 
 -- ## Module
 
 module Variables where
 
-  open FinSet public
-    using (Member; empty; member)
+  open NamedCollection Variable.name public
+    using (Member; empty; insert; lookup; lookup-member; lookup-member-nothing;
+      member)
 
-  -- ### Interface
+  -- ### Equality
 
-  is-member
-    : Variables
-    → Variable
-    → Bool
-  is-member vs
-    = FinSet.is-member vs _≟_var
-
-  insert
-    : (vs : Variables)
-    → (v : Variable)
-    → is-member vs v ≡ false
-    → Variables
-  insert vs
-    = FinSet.insert vs _≟_var
+  _≟_vars
+    : Decidable (Equal Variables)
+  _≟_vars
+    = NamedCollection.decidable Variable.name _≟_var
 
   -- ### Membership
 
@@ -42,29 +40,27 @@ module Variables where
     → Variables
     → Set
   var v ∈ vs
-    = FinSet.IsMember vs v
-  
+    = NamedCollection.IsMember Variable.name vs v
+
   var_∈?_
     : (v : Variable)
     → (vs : Variables)
     → Dec (var v ∈ vs)
   var v ∈? vs
-    = FinSet.is-member? vs _≟_var v
+    = NamedCollection.is-member? Variable.name vs _≟_var v
 
-  _≟_vars
-    : Decidable (Equal Variables)
-  _≟_vars
-    = FinSet.decidable _≟_var
-
-  find-member
+  lookup-member-just
     : (vs : Variables)
-    → Variable
-    → Maybe (Member vs)
-  find-member vs
-    = FinSet.find-member vs _≟_var
+    → (v : Variable)
+    → {m : Member vs}
+    → .(var v ∈ vs)
+    → lookup-member vs (Variable.name v) ≡ just m
+    → v ≡ Member.value m
+  lookup-member-just vs
+    = NamedCollection.lookup-member-just Variable.name vs _≟_var
 
 -- ## Exports
 
 open Variables public
-  using (var_∈_; var_∈?_; _≟_vars)
+  using (_≟_vars; var_∈_; var_∈?_)
 

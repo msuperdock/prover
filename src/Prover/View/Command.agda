@@ -1,10 +1,11 @@
 module Prover.View.Command where
 
-open import Prover.Editor.Flat
-  using (FlatViewStack)
-open import Prover.View.Text
-  using (PlainText; PlainTextPath)
-open import Prover.Prelude
+open import Prover.Data.Fin
+  using (Fin)
+open import Prover.Data.String
+  using (String)
+open import Prover.Data.Text
+  using (Text)
 
 -- ## Definitions
 
@@ -23,23 +24,11 @@ record Command
       : String
 
     text
-      : PlainText
+      : Text
 
 CommandPath
   : Command
   → Set
 CommandPath (command _ t)
-  = PlainTextPath t
-
--- ## Stacks
-
-CommandFlatViewStack
-  : FlatViewStack
-CommandFlatViewStack
-  = record
-  { View
-    = Command
-  ; ViewPath
-    = CommandPath
-  }
+  = Fin (Text.length t)
 

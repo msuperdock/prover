@@ -1,45 +1,19 @@
 module Prover.Data.Rules where
 
-open import Prover.Data.Identifier
-  using (Identifier; _≟_idn)
+open import Prover.Data.Collection.Named
+  using (NamedCollection)
+open import Prover.Data.Empty
+  using (¬_)
+open import Prover.Data.Equal
+  using (_≡_)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
 open import Prover.Data.Rule
-  using (Rule; _≟_rul; rule)
+  using (Rule; _≟_rul)
 open import Prover.Data.Symbols
   using (Symbols)
-open import Prover.Prelude
-
--- ## Utilities
-
-relation
-  : (ss : Symbols)
-  → Relation (Rule ss)
-relation _
-  = Relation.map Rule.name
-    (Equal Identifier)
-
-symmetric
-  : (ss : Symbols)
-  → Symmetric (relation ss)
-symmetric _
-  = Symmetric.map Rule.name
-    (Equal Identifier)
-    (Symmetric.equal Identifier)
-
-transitive
-  : (ss : Symbols)
-  → Transitive (relation ss)
-transitive _
-  = Transitive.map Rule.name
-    (Equal Identifier)
-    (Transitive.equal Identifier)
-
-decidable
-  : (ss : Symbols)
-  → Decidable (relation ss)
-decidable _
-  = Decidable.map Rule.name
-    (Equal Identifier)
-    _≟_idn
+open import Prover.Data.Text
+  using (Text)
 
 -- ## Definition
 
@@ -47,16 +21,14 @@ Rules
   : Symbols
   → Set
 Rules ss
-  = Collection
-    {A = Rule ss}
-    (relation ss)
+  = NamedCollection (Rule.name {ss = ss})
 
 -- ## Module
 
 module Rules where
 
-  open Collection public
-    using (Member; empty; member)
+  open NamedCollection public
+    using (member)
 
   -- ### Interface
 
@@ -66,21 +38,29 @@ module Rules where
 
     lookup
       : Rules ss
-      → Identifier
+      → Text
       → Maybe (Rule ss)
-    lookup rs n
-      = Collection.find rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name)
+    lookup
+      = NamedCollection.lookup Rule.name
 
     insert
       : (rs : Rules ss)
       → (r : Rule ss)
       → lookup rs (Rule.name r) ≡ nothing
       → Rules ss
-    insert rs r
-      = Collection.insert rs
-        (symmetric ss)
-        (decidable ss) r
+    insert
+      = NamedCollection.insert Rule.name
+
+  -- ### Construction
+
+  module _
+    {ss : Symbols}
+    where
+
+    empty
+      : Rules ss
+    empty
+      = NamedCollection.empty Rule.name
 
   -- ### Membership
 
@@ -93,32 +73,32 @@ module Rules where
       → Rules ss
       → Set
     rul r ∈ rs
-      = Collection.IsMember rs r
+      = NamedCollection.IsMember Rule.name rs r
 
-    rul_∈?_
-      : (r : Rule ss)
-      → (rs : Rules ss)
-      → Dec (rul r ∈ rs)
-    rul r ∈? rs
-      = Collection.is-member? rs _≟_rul r
+    Member
+      : Rules ss
+      → Set
+    Member
+      = NamedCollection.Member Rule.name
+
+    module Member where
+
+      open NamedCollection.Member public
 
     lookup-member
       : (rs : Rules ss)
-      → Identifier
+      → Text
       → Maybe (Member rs)
-    lookup-member rs n
-      = Collection.find-member rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name)
+    lookup-member
+      = NamedCollection.lookup-member Rule.name
 
     lookup-member-nothing
       : (rs : Rules ss)
       → (r : Rule ss)
       → lookup-member rs (Rule.name r) ≡ nothing
       → ¬ rul r ∈ rs
-    lookup-member-nothing rs r@(rule n _ _ _)
-      = Collection.find-member-nothing rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name) r
-        (Bool.from-decidable-true _≟_idn n n refl)
+    lookup-member-nothing
+      = NamedCollection.lookup-member-nothing Rule.name
 
     lookup-member-just
       : (rs : Rules ss)
@@ -127,12 +107,8 @@ module Rules where
       → .(rul r ∈ rs)
       → lookup-member rs (Rule.name r) ≡ just m
       → r ≡ Member.value m
-    lookup-member-just rs r@(rule n _ _ _) p q
-      = Collection.find-member-just-equal rs
-        (Bool.from-decidable _≟_idn n ∘ Rule.name)
-        (Unique.decidable (symmetric ss) (transitive ss) (decidable ss) r)
-        (Bool.from-decidable-true _≟_idn n n refl)
-        (Dec.recompute (rul r ∈? rs) p) q
+    lookup-member-just rs
+      = NamedCollection.lookup-member-just Rule.name rs _≟_rul
 
 -- ## Exports
 

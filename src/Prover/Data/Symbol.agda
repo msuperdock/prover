@@ -2,13 +2,22 @@ module Prover.Data.Symbol where
 
 open import Prover.Data.Associativity
   using (Associativity; _≟_ass)
-open import Prover.Data.Identifier
-  using (Identifier; _≟_idn)
-open import Prover.Data.Precedence
-  using (Precedence; _≟_prc)
+open import Prover.Data.Bool
+  using (Bool; _∨_; _∧_; _≟_bool; false; true)
+open import Prover.Data.Equal
+  using (Equal; _≡_; refl)
+open import Prover.Data.If
+  using (If)
+open import Prover.Data.Nat
+  using (ℕ; _≟_nat; suc)
+open import Prover.Data.Relation
+  using (Dec; Decidable; no; yes)
+open import Prover.Data.Text
+  using (Text; _≟_txt)
 open import Prover.Data.Token
   using (Token; _≟_tkn)
-open import Prover.Prelude
+open import Prover.Data.Vec
+  using (Vec)
 
 -- ## Definition
 
@@ -62,13 +71,13 @@ record Symbol'
       : SymbolValid has-left has-right center-arity arity
 
     name
-      : Identifier
+      : Text
 
     tokens
       : Vec Token (suc center-arity)
 
     precedence
-      : If Precedence (has-left ∨ has-right)
+      : If ℕ (has-left ∨ has-right)
 
     associativity
       : If Associativity (has-left ∧ has-right)
@@ -91,9 +100,9 @@ module Symbol where
       : {a ca : ℕ}
       → {hr : Bool}
       → {v : SymbolValid true hr ca a}
-      → {n : Identifier}
+      → {n : Text}
       → {ts : Vec Token (suc ca)}
-      → {ip : If Precedence (true ∨ hr)}
+      → {ip : If ℕ (true ∨ hr)}
       → {ia : If Associativity (true ∧ hr)}
       → HasLeft (symbol v n ts ip ia)
 
@@ -106,9 +115,9 @@ module Symbol where
       : {a ca : ℕ}
       → {hl : Bool}
       → {v : SymbolValid hl true ca a}
-      → {n : Identifier}
+      → {n : Text}
       → {ts : Vec Token (suc ca)}
-      → {ip : If Precedence (hl ∨ true)}
+      → {ip : If ℕ (hl ∨ true)}
       → {ia : If Associativity (hl ∧ true)}
       → HasRight (symbol v n ts ip ia)
 
@@ -137,9 +146,9 @@ module Symbol where
       : {a ca : ℕ}
       → {hr : Bool}
       → {v : SymbolValid false hr ca a}
-      → {n : Identifier}
+      → {n : Text}
       → {ts : Vec Token (suc ca)}
-      → {ip : If Precedence (false ∨ hr)}
+      → {ip : If ℕ (false ∨ hr)}
       → {ia : If Associativity (false ∧ hr)}
       → ¬HasLeft (symbol v n ts ip ia)
 
@@ -152,9 +161,9 @@ module Symbol where
       : {a ca : ℕ}
       → {hl : Bool}
       → {v : SymbolValid hl false ca a}
-      → {n : Identifier}
+      → {n : Text}
       → {ts : Vec Token (suc ca)}
-      → {ip : If Precedence (hl ∨ false)}
+      → {ip : If ℕ (hl ∨ false)}
       → {ia : If Associativity (hl ∧ false)}
       → ¬HasRight (symbol v n ts ip ia)
 
@@ -180,9 +189,9 @@ module Symbol where
   
   _≟_prc?
     : {b : Bool}
-    → Decidable (Equal (If Precedence b))
+    → Decidable (Equal (If ℕ b))
   _≟_prc?
-    = If.decidable _≟_prc
+    = If.decidable _≟_nat
 
   _≟_ass?
     : {b : Bool}
@@ -210,7 +219,7 @@ module Symbol where
     = no (λ {refl → ¬p refl})
   ... | yes refl | yes refl | yes refl | yes refl
     with valid-equal v₁ v₂
-    | n₁ ≟ n₂ idn
+    | n₁ ≟ n₂ txt
     | ts₁ ≟ ts₂ tkns
     | ip₁ ≟ ip₂ prc?
     | ia₁ ≟ ia₂ ass?
@@ -229,5 +238,5 @@ module Symbol where
 -- ## Exports
 
 open Symbol public
-  using (_≟_sym; tt)
+  using (_≟_sym)
 

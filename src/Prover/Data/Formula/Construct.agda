@@ -2,15 +2,30 @@ module Prover.Data.Formula.Construct where
 
 open import Prover.Data.Associativity
   using (Associativity)
-open import Prover.Data.Precedence
-  using (Precedence; _<_prc)
+open import Prover.Data.Bool
+  using (Bool; T; false; true)
+open import Prover.Data.Empty
+  using (⊥-elim)
+open import Prover.Data.Equal
+  using (refl; rewrite'; sym; trans)
+open import Prover.Data.Function
+  using (_∘_)
+open import Prover.Data.If
+  using (If)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
+open import Prover.Data.Nat
+  using (module Nat; ℕ; _<_nat)
+open import Prover.Data.Relation
+  using (Dec; τ₁; τ₂; τ₃; no; yes)
+open import Prover.Data.Sigma
+  using (_×_; _,_)
 open import Prover.Data.Symbol
-  using (Symbol; SymbolValid; symbol; tt)
-open import Prover.Prelude
+  using (Symbol; SymbolValid; symbol)
 
 open SymbolValid
 
--- ## Definition
+-- ## Internal
 
 module Internal where
 
@@ -27,7 +42,7 @@ module Internal where
 
   construct-to-pair
     : Construct
-    → Maybe (Precedence × Associativity)
+    → Maybe (ℕ × Associativity)
   construct-to-pair atom
     = nothing
   construct-to-pair (symbol (symbol neither _ _ _ _))
@@ -52,7 +67,7 @@ module Internal where
   ... | nothing | _
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
-    with Precedence.compare p₁ p₂
+    with Nat.compare p₁ p₂
     | a₁
     | a₂
   ... | τ₁ _ _ _ | _ | _
@@ -110,7 +125,7 @@ module Internal where
   ... | nothing | _
     = false
   ... | just (p₁ , a₁) | just (p₂ , a₂)
-    with Precedence.compare p₁ p₂
+    with Nat.compare p₁ p₂
     | a₁
     | a₂
   ... | τ₁ _ _ _ | _ | _
@@ -162,7 +177,8 @@ module Internal where
     → ConstructLeftValid s₂ c
     → T (construct-is-right-valid s₁ (ConstructRightValid.has-right rv) c)
   construct-left-valid-right-valid' s₁ s₂ c
-    (construct-right-valid tt rv) (construct-left-valid tt _)
+    (construct-right-valid Symbol.tt rv)
+    (construct-left-valid Symbol.tt _)
     with construct-to-pair (symbol s₁)
     | construct-to-pair (symbol s₂)
     | construct-to-pair c
@@ -175,17 +191,17 @@ module Internal where
   ... | _ | _ | τ₁ _ _ _
     = refl
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (Precedence.<-trans p q))
+    = ⊥-elim (¬r (Nat.<-trans p q))
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (Precedence.<-trans p q))
+    = ⊥-elim (¬r (Nat.<-trans p q))
   ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
+    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x nat) (sym q) p))
   ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
+    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x nat) (sym q) p))
   ... | τ₂ _ p _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
+    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ nat) p q))
   ... | τ₂ _ p _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
+    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ nat) p q))
   ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
   ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
@@ -210,7 +226,8 @@ module Internal where
     → ConstructRightValid s₂ c
     → T (construct-is-left-valid s₁ (ConstructLeftValid.has-left lv) c)
   construct-right-valid-left-valid' s₁ s₂ c
-    (construct-left-valid tt lv) (construct-right-valid tt _)
+    (construct-left-valid Symbol.tt lv)
+    (construct-right-valid Symbol.tt _)
     with construct-to-pair (symbol s₁)
     | construct-to-pair (symbol s₂)
     | construct-to-pair c
@@ -223,17 +240,17 @@ module Internal where
   ... | _ | _ | τ₁ _ _ _
     = refl
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (Precedence.<-trans p q))
+    = ⊥-elim (¬r (Nat.<-trans p q))
   ... | τ₁ p _ _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (Precedence.<-trans p q))
+    = ⊥-elim (¬r (Nat.<-trans p q))
   ... | τ₁ p _ _ | τ₂ _ q _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
+    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x nat) (sym q) p))
   ... | τ₁ p  _ _ | τ₂ _ q _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x prc) (sym q) p))
+    = ⊥-elim (¬r (rewrite' (λ x → p₁ < x nat) (sym q) p))
   ... | τ₂ _ p _ | τ₁ q _ _ | τ₃ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
+    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ nat) p q))
   ... | τ₂ _ p _ | τ₁ q _ _ | τ₂ ¬r _ _
-    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ prc) p q))
+    = ⊥-elim (¬r (rewrite' (λ x → x < p₃ nat) p q))
   ... | τ₂ _ p _ | τ₂ _ q _ | τ₃ _ ¬r _
     = ⊥-elim (¬r (trans p q))
   ... | τ₂ _ _ _ | τ₂ _ _ _ | τ₂ _ _ _
@@ -320,7 +337,8 @@ module Construct where
 
   open Internal.Construct public
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( ConstructLeftValid
       to LeftValid
     ; ConstructRightValid
@@ -344,7 +362,8 @@ module LeftSubconstruct where
 
   open Internal.LeftSubconstruct public
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( left-subconstruct-right-valid
       to right-valid
     )
@@ -358,7 +377,8 @@ module RightSubconstruct where
 
   open Internal.RightSubconstruct public
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( right-subconstruct-left-valid
       to left-valid
     )

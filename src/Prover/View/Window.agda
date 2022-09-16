@@ -1,19 +1,15 @@
 module Prover.View.Window where
 
-open import Prover.Editor
-  using (ViewStack)
-open import Prover.Editor.Flat
-  using (FlatViewStack)
-open import Prover.Editor.Flatten
-  using (view-stack-flatten)
-open import Prover.View.Command
-  using (Command; CommandPath)
+open import Prover.Data.Bool
+  using (Bool)
+open import Prover.Data.Fin
+  using (Fin)
+open import Prover.Data.List
+  using (List; _!_)
+open import Prover.Data.String
+  using (String)
 open import Prover.View.Line
   using (Line; LinePath)
-open import Prover.Prelude
-
-open List
-  using (_!_)
 
 -- ## Definitions
 
@@ -46,26 +42,4 @@ data WindowPath
     : (k : Fin (List.length (Window.lines w)))
     → LinePath (Window.lines w ! k)
     → WindowPath w
-
--- ## Stacks
-
-WindowViewStack
-  : ViewStack
-WindowViewStack
-  = record
-  { View
-    = Window
-  ; ViewPath
-    = WindowPath
-  ; ViewInner
-    = λ _ _ → Command
-  ; ViewInnerPath
-    = λ _ _ → CommandPath
-  }
-
-WindowFlatViewStack
-  : FlatViewStack
-WindowFlatViewStack
-  = view-stack-flatten
-    WindowViewStack
 

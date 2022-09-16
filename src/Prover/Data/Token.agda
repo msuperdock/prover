@@ -1,9 +1,19 @@
 module Prover.Data.Token where
 
-open import Prover.Prelude
-
-open List
-  using ([]; _∷_)
+open import Prover.Data.Bool
+  using (Bool; T; _∨_; false; not; true)
+open import Prover.Data.Char
+  using (Char; _≟_char)
+open import Prover.Data.Equal
+  using (Equal; refl)
+open import Prover.Data.Fin
+  using (Fin; suc; zero)
+open import Prover.Data.List
+  using (List; []; _∷_)
+open import Prover.Data.Nat
+  using (ℕ)
+open import Prover.Data.Relation
+  using (Decidable; no; yes)
 
 -- ## Definition
 

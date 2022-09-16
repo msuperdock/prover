@@ -1,23 +1,41 @@
 module Prover.Data.Proof where
 
+open import Prover.Data.Any
+  using (any)
+open import Prover.Data.Bool
+  using (Bool; _∧_; false; true)
+open import Prover.Data.Equal
+  using (_≡_; refl; rewrite'; trans)
+open import Prover.Data.Fin
+  using (Fin; suc; zero)
 open import Prover.Data.Formula
   using (Formula; frm_∈?_)
+open import Prover.Data.Function
+  using (_∘_; id)
+open import Prover.Data.List
+  using (List)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
 open import Prover.Data.Meta
   using (Meta)
 open import Prover.Data.Metas
   using (Metas)
+open import Prover.Data.Nat
+  using (ℕ; zero)
+open import Prover.Data.Relation
+  using (no; yes)
 open import Prover.Data.Rule
   using (Rule; rule) 
 open import Prover.Data.Rules
   using (Rules; rul_∈_)
+open import Prover.Data.Sigma
+  using (Σ; _,_)
 open import Prover.Data.Symbols
   using (Symbols)
 open import Prover.Data.Variables
   using (Variables)
-open import Prover.Prelude
-
-open Vec public
-  using ([]; _∷_; _!_)
+open import Prover.Data.Vec
+  using (Vec; []; _∷_; _!_)
 
 -- ## Internal
 
@@ -615,7 +633,8 @@ module Branch where
 
   open Internal.Branch public
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( branch-conclusion
       to conclusion
     ; branch-is-complete-assumption
@@ -637,7 +656,8 @@ open Internal public
 
 module Proof where
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( proof-assumption
       to assumption
     ; proof-infer
@@ -676,7 +696,8 @@ ProofPath
 
 module ProofPath where
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( proof-path-down
       to down
     ; proof-path-top

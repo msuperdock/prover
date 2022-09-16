@@ -1,29 +1,44 @@
 module Prover.Data.Formula.State where
 
+open import Category.Simple.Split
+  using (SimpleSplitFunctor)
+
+open import Prover.Data.Any
+  using (Any; any)
+open import Prover.Data.Bool
+  using (Bool; T; false; true)
+open import Prover.Data.Empty
+  using (⊥-elim)
+open import Prover.Data.Equal
+  using (_≡_; refl; sub)
+open import Prover.Data.Fin
+  using (Fin; suc; zero)
 open import Prover.Data.Formula
   using (Formula)
 open import Prover.Data.Formula.Construct
   using (Construct)
+open import Prover.Data.Function
+  using (id)
+open import Prover.Data.Inspect
+  using ([_]; inspect)
+open import Prover.Data.Maybe
+  using (Maybe; just; maybe; nothing)
 open import Prover.Data.Meta
   using (Meta)
+open import Prover.Data.Nat
+  using (ℕ; suc; zero)
+open import Prover.Data.Relation
+  using (no; yes)
 open import Prover.Data.Symbol
-  using (Symbol; both; left; neither; right; symbol; tt)
+  using (Symbol; both; left; neither; right; symbol)
 open import Prover.Data.Symbols
   using (Symbols; sym_∈_)
 open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
   using (Variables; var_∈_)
-open import Prover.Function
-  using (function)
-open import Prover.Function.Partial
-  using (partial-function)
-open import Prover.Function.Split
-  using (SplitFunction)
-open import Prover.Prelude
-
-open Vec
-  using ([]; _∷_; _!_)
+open import Prover.Data.Vec
+  using (Vec; []; _∷_; _!_)
 
 -- ## Internal
 
@@ -158,7 +173,7 @@ module Internal where
       : Symbol.¬HasLeft s
       → Left ss vs m s
   
-    left
+    just
       : (f : FormulaState ss vs m)
       → Construct.LeftValid s (formula-state-construct f)
       → Left ss vs m s
@@ -169,7 +184,7 @@ module Internal where
       : Symbol.¬HasRight s
       → Right ss vs m s
   
-    right
+    just
       : (f : FormulaState ss vs m)
       → Construct.RightValid s (formula-state-construct f)
       → Right ss vs m s
@@ -203,7 +218,7 @@ module Internal where
     = true
   formula-state-left-closed (symbol _ _ (nothing _) _ _)
     = true
-  formula-state-left-closed (symbol _ _ (left f _) _ _)
+  formula-state-left-closed (symbol _ _ (just f _) _ _)
     = formula-state-left-closed f
   
   FormulaStateLeftClosed f
@@ -219,7 +234,7 @@ module Internal where
     = true
   formula-state-right-closed (symbol _ _ _ (nothing _) _)
     = true
-  formula-state-right-closed (symbol _ _ _ (right f _) _)
+  formula-state-right-closed (symbol _ _ _ (just f _) _)
     = formula-state-right-closed f
   
   FormulaStateRightClosed f
@@ -321,7 +336,7 @@ module Internal where
         → {r : Right ss vs m s}
         → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
         → FormulaStatePath f
-        → FormulaStatePath (symbol s p (left f lv) r cs)
+        → FormulaStatePath (symbol s p (just f lv) r cs)
 
       right
         : {s : Symbol}
@@ -331,7 +346,7 @@ module Internal where
         → {rv : Construct.RightValid s (formula-state-construct f)}
         → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
         → FormulaStatePath f
-        → FormulaStatePath (symbol s p l (right f rv) cs)
+        → FormulaStatePath (symbol s p l (just f rv) cs)
   
       center
         : {f : FormulaState ss vs m}
@@ -371,7 +386,7 @@ module Internal where
         → {lv : Construct.LeftValid s (formula-state-construct f)}
         → {r : Right ss vs m s}
         → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
-        → FormulaStateHasLeft (symbol s p (left f lv) r cs)
+        → FormulaStateHasLeft (symbol s p (just f lv) r cs)
 
     data FormulaStateHasRight
       : FormulaState ss vs m
@@ -385,7 +400,7 @@ module Internal where
         → {f : FormulaState ss vs m}
         → {rv : Construct.RightValid s (formula-state-construct f)}
         → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
-        → FormulaStateHasRight (symbol s p l (right f rv) cs)
+        → FormulaStateHasRight (symbol s p l (just f rv) cs)
 
     formula-state-left
       : (f : FormulaState ss vs m)
@@ -448,7 +463,7 @@ module Internal where
       = stop
     formula-state-path-leftmost (symbol _ _ (nothing _) _ _)
       = stop
-    formula-state-path-leftmost (symbol _ _ (left f _) _ _)
+    formula-state-path-leftmost (symbol _ _ (just f _) _ _)
       = left (formula-state-path-leftmost f)
   
     formula-state-path-rightmost
@@ -464,7 +479,7 @@ module Internal where
       = stop
     formula-state-path-rightmost (symbol _ _ _ (nothing _) _)
       = stop
-    formula-state-path-rightmost (symbol _ _ _ (right f _) _)
+    formula-state-path-rightmost (symbol _ _ _ (just f _) _)
       = right (formula-state-path-rightmost f)
 
     sandbox-state-path-leftmost
@@ -495,7 +510,7 @@ module Internal where
       = nothing
     formula-state-path-left {f = symbol _ _ (nothing _) _ _} stop
       = nothing
-    formula-state-path-left {f = symbol _ _ (left f _) _ _} stop
+    formula-state-path-left {f = symbol _ _ (just f _) _ _} stop
       = just (left (formula-state-path-rightmost f))
 
     formula-state-path-left (left fp)
@@ -561,7 +576,7 @@ module Internal where
       = just (center zero (sandbox-state-path-leftmost s))
     formula-state-path-right {f = symbol _ _ _ (nothing _) []} stop
       = nothing
-    formula-state-path-right {f = symbol _ _ _ (right f _) []} stop
+    formula-state-path-right {f = symbol _ _ _ (just f _) []} stop
       = just (right (formula-state-path-leftmost f))
     formula-state-path-right {f = symbol _ _ _ _ (s ∷ _)} stop
       = just (center zero (sandbox-state-path-leftmost s))
@@ -590,7 +605,7 @@ module Internal where
     formula-state-path-right {f = symbol _ _ _ (nothing _) _} _
       | nothing | nothing | _
       = nothing
-    formula-state-path-right {f = symbol _ _ _ (right f _) _} _
+    formula-state-path-right {f = symbol _ _ _ (just f _) _} _
       | nothing | nothing | _
       = just (right (formula-state-path-leftmost f))
     formula-state-path-right {f = parens _} (center zero _)
@@ -635,7 +650,7 @@ module Internal where
       = refl
     formula-state-path-left-leftmost (symbol _ _ (nothing _) _ _)
       = refl
-    formula-state-path-left-leftmost (symbol _ _ (left f _) _ _)
+    formula-state-path-left-leftmost (symbol _ _ (just f _) _ _)
       with formula-state-path-left (formula-state-path-leftmost f)
       | formula-state-path-left-leftmost f
     ... | _ | refl
@@ -692,17 +707,17 @@ module Internal where
       : {s : Symbol}
       → Left ss vs m s
     left-hole {s = symbol {has-left = false} _ _ _ _ _}
-      = nothing tt
+      = nothing Symbol.tt
     left-hole {s = symbol {has-left = true} _ _ _ _ _}
-      = left hole (Construct.left-valid tt refl)
+      = just hole (Construct.left-valid Symbol.tt refl)
 
     right-hole
       : {s : Symbol}
       → Right ss vs m s
     right-hole {s = symbol {has-right = false} _ _ _ _ _}
-      = nothing tt
+      = nothing Symbol.tt
     right-hole {s = symbol {has-right = true} _ _ _ _ _}
-      = right hole (Construct.right-valid tt refl)
+      = just hole (Construct.right-valid Symbol.tt refl)
 
     left-force
       : {s : Symbol}
@@ -712,9 +727,9 @@ module Internal where
     left-force {s = s} hl f
       with Construct.left-valid? s (formula-state-construct f)
     ... | no _
-      = left (parens (any (singleton f))) (Construct.left-valid hl refl)
+      = just (parens (any (singleton f))) (Construct.left-valid hl refl)
     ... | yes lv
-      = left f lv
+      = just f lv
   
     right-force
       : {s : Symbol}
@@ -724,25 +739,25 @@ module Internal where
     right-force {s = s} hr f
       with Construct.right-valid? s (formula-state-construct f)
     ... | no _
-      = right (parens (any (singleton f))) (Construct.right-valid hr refl)
+      = just (parens (any (singleton f))) (Construct.right-valid hr refl)
     ... | yes rv
-      = right f rv
+      = just f rv
 
     parens-template
       : Any (SandboxState ss vs m)
     parens-template
-      = any (singleton (parens (sandbox-state-hole)))
+      = any (singleton (parens sandbox-state-hole))
 
     variable-template
       : (v : Variable)
-      → .(var v ∈ vs)
+      → var v ∈ vs
       → Any (SandboxState ss vs m)
     variable-template v p
       = any (singleton (variable' v p))
 
     symbol-template
       : (s : Symbol)
-      → .(sym s ∈ ss)
+      → sym s ∈ ss
       → Any (SandboxState ss vs m)
     symbol-template s p
       = any (singleton (symbol s p left-hole right-hole sandbox-state-holes))
@@ -788,7 +803,7 @@ module Internal where
       = just (Formula.symbol s p fs)
 
     formula-state-to-formula
-      (symbol s@(symbol left _ _ _ _) p (left l _) _ cs)
+      (symbol s@(symbol left _ _ _ _) p (just l _) _ cs)
       with formula-state-to-formula l
       | sandbox-state-to-formulas cs
     ... | nothing | _
@@ -799,7 +814,7 @@ module Internal where
       = just (Formula.symbol s p (f ∷ fs))
 
     formula-state-to-formula
-      (symbol s@(symbol right _ _ _ _) p _ (right r _) cs)
+      (symbol s@(symbol right _ _ _ _) p _ (just r _) cs)
       with formula-state-to-formula r
       | sandbox-state-to-formulas cs
     ... | nothing | _
@@ -810,7 +825,7 @@ module Internal where
       = just (Formula.symbol s p (Vec.snoc fs f))
 
     formula-state-to-formula
-      (symbol s@(symbol both _ _ _ _) p (left l _) (right r _) cs)
+      (symbol s@(symbol both _ _ _ _) p (just l _) (just r _) cs)
       with formula-state-to-formula l
       | formula-state-to-formula r
       | sandbox-state-to-formulas cs
@@ -879,29 +894,29 @@ module Internal where
     formula-state-from-formula
       (Formula.symbol s@(symbol neither _ _ _ _) p fs)
       = symbol s p
-        (nothing tt)
-        (nothing tt)
+        (nothing Symbol.tt)
+        (nothing Symbol.tt)
         (sandbox-state-from-formulas fs)
 
     formula-state-from-formula
       (Formula.symbol s@(symbol left _ _ _ _) p (f ∷ fs))
       = symbol s p
-        (left-force tt (formula-state-from-formula f))
-        (nothing tt)
+        (left-force Symbol.tt (formula-state-from-formula f))
+        (nothing Symbol.tt)
         (sandbox-state-from-formulas fs)
   
     formula-state-from-formula
       (Formula.symbol s@(symbol right _ _ _ _) p fs)
       = symbol s p
-        (nothing tt)
-        (right-force tt (formula-state-from-formulas-last fs))
+        (nothing Symbol.tt)
+        (right-force Symbol.tt (formula-state-from-formulas-last fs))
         (sandbox-state-from-formulas-init fs)
   
     formula-state-from-formula
       (Formula.symbol s@(symbol both _ _ _ _) p (f ∷ fs))
       = symbol s p
-        (left-force tt (formula-state-from-formula f))
-        (right-force tt (formula-state-from-formulas-last fs))
+        (left-force Symbol.tt (formula-state-from-formula f))
+        (right-force Symbol.tt (formula-state-from-formulas-last fs))
         (sandbox-state-from-formulas-init fs)
   
     formula-state-from-formulas-last (f ∷ [])
@@ -1096,23 +1111,28 @@ module Internal where
     ... | _ | refl | _ | refl
       = refl
 
-  -- #### Retraction
+  -- #### Split
 
-  sandbox-state-split-function
+  sandbox-state-simple-split-functor
     : (ss : Symbols)
     → (vs : Variables)
     → (m : Bool)
-    → SplitFunction (Any (SandboxState ss vs m)) (Formula ss vs m)
-  sandbox-state-split-function _ _ _
+    → SimpleSplitFunctor
+      (Any (SandboxState ss vs m))
+      (Formula ss vs m)
+  sandbox-state-simple-split-functor _ _ _
     = record
-    { partial-function
-      = partial-function sandbox-state-to-formula
-    ; function
-      = function sandbox-state-from-formula
-    ; base-unbase
-      = sandbox-state-to-from-formula
+    { base
+      = record
+      { base
+        = sandbox-state-to-formula
+      ; unbase
+        = sandbox-state-from-formula
+      ; base-unbase
+        = sandbox-state-to-from-formula
+      }
     }
-  
+
   -- ### Properties
   
   module _
@@ -1131,7 +1151,7 @@ module Internal where
       → FormulaStateLeftClosed (symbol s p l r' cs')
     formula-state-left-closed-equal _ _ (nothing _) _ _ _ _
       = id
-    formula-state-left-closed-equal _ _ (left _ _) _ _ _ _
+    formula-state-left-closed-equal _ _ (just _ _) _ _ _ _
       = id
   
     formula-state-right-closed-equal
@@ -1144,7 +1164,7 @@ module Internal where
       → FormulaStateRightClosed (symbol s p l' r cs')
     formula-state-right-closed-equal _ _ _ _ (nothing _) _ _
       = id
-    formula-state-right-closed-equal _ _ _ _ (right _ _) _ _
+    formula-state-right-closed-equal _ _ _ _ (just _ _) _ _
       = id
   
 -- ## Modules
@@ -1160,11 +1180,12 @@ Left
 Left
   = Internal.Left
 
-open Internal.Left public
-
 module Left where
 
-  open Internal public using () renaming
+  open Internal.Left public
+
+  open Internal public
+    using () renaming
     ( left-hole
       to hole
     )
@@ -1180,11 +1201,12 @@ Right
 Right
   = Internal.Right
 
-open Internal.Right public
-
 module Right where
 
-  open Internal public using () renaming
+  open Internal.Right public
+
+  open Internal public
+    using () renaming
     ( right-hole
       to hole
     )
@@ -1194,14 +1216,14 @@ module Right where
 FormulaState
   = Internal.FormulaState
 
-open Internal.FormulaStateHasLeft public
-open Internal.FormulaStateHasRight public
-
 module FormulaState where
 
   open Internal.FormulaState public
+  open Internal.FormulaStateHasLeft public
+  open Internal.FormulaStateHasRight public
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( FormulaStateHasLeft
       to HasLeft
     ; FormulaStateHasRight
@@ -1231,7 +1253,8 @@ open Internal.FormulaStatePath public
 
 module FormulaStatePath where
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( FormulaStatePathNotLeft
       to NotLeft
     ; FormulaStatePathNotRight
@@ -1254,7 +1277,8 @@ module SandboxState where
   open Internal public
     using (parens-template; symbol-template; variable-template)
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( SandboxStateLeftClosed
       to LeftClosed
     ; sandbox-state-hole
@@ -1263,8 +1287,8 @@ module SandboxState where
       to length
     ; sandbox-state-lookup
       to lookup
-    ; sandbox-state-split-function
-      to split-function
+    ; sandbox-state-simple-split-functor
+      to simple-split-functor
     )
 
 -- ### SandboxStatePath
@@ -1276,7 +1300,8 @@ open Internal.SandboxStatePath public
 
 module SandboxStatePath where
 
-  open Internal public using () renaming
+  open Internal public
+    using () renaming
     ( sandbox-state-path-cons
       to cons
     ; sandbox-state-path-left

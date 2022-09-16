@@ -1,13 +1,17 @@
 module Prover.View.Interface where
 
+open import Prover.Data.Fin
+  using (Fin)
+open import Prover.Data.List
+  using (List; _!_)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
 open import Prover.View.Command
   using (Command; CommandPath)
 open import Prover.View.Window
   using (Window; WindowPath)
-open import Prover.Prelude
 
-open List
-  using (_!_)
+-- ## Definitions
 
 record Interface
   : Set

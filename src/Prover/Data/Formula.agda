@@ -1,11 +1,33 @@
 module Prover.Data.Formula where
 
-open import Prover.Data.Identifier
-  using (_≟_idn)
+open import Prover.Data.Bool
+  using (Bool; T; _∧_; false; true)
+open import Prover.Data.Collection
+  using (_⊆_)
+open import Prover.Data.Empty
+  using (¬_)
+open import Prover.Data.Equal
+  using (Equal; _≡_; _≢_; refl; sub; sym; trans)
+open import Prover.Data.Function
+  using (_∘_; id)
+open import Prover.Data.Inspect
+  using ([_]; inspect)
+open import Prover.Data.List
+  using (List)
+open import Prover.Data.Map
+  using (Map)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
 open import Prover.Data.Meta
   using (Meta; _≟_met)
 open import Prover.Data.Metas
   using (Metas)
+open import Prover.Data.Nat
+  using (ℕ)
+open import Prover.Data.Relation
+  using (Dec; Decidable; no; yes)
+open import Prover.Data.Sigma
+  using (_,_)
 open import Prover.Data.Symbol
   using (Symbol; _≟_sym)
 open import Prover.Data.Symbols
@@ -14,12 +36,8 @@ open import Prover.Data.Variable
   using (Variable; _≟_var)
 open import Prover.Data.Variables
   using (Variables; var_∈_)
-open import Prover.Prelude
-
-open Collection
-  using (_⊆_)
-open Vec
-  using ([]; _∷_)
+open import Prover.Data.Vec
+  using (Vec; []; _∷_)
 
 -- ## Definition
 
@@ -116,7 +134,7 @@ module Formula where
     ... | yes refl
       = yes refl
     variable' v₁ _ ≟ variable' v₂ _ frm
-      with v₁ ≟ v₂ idn
+      with v₁ ≟ v₂ var
     ... | no ¬p
       = no (λ {refl → ¬p refl})
     ... | yes refl
@@ -400,11 +418,11 @@ module Formula where
     
     substitute-symbol-formulas
       : {s : Symbol}
-      → .{p : sym s ∈ ss}
+      → .{p p' : sym s ∈ ss}
       → {fs' : Vec (Formula ss vs' true) (Symbol.arity s)}
       → (fs : Vec (Formula ss vs false) (Symbol.arity s))
       → (subs : Substitutions ss vs')
-      → substitute (symbol s p fs) subs ≡ just (symbol s p fs')
+      → substitute (symbol s p fs) subs ≡ just (symbol s p' fs')
       → substitutes fs subs ≡ just fs'
     substitute-symbol-formulas fs subs _
       with substitutes fs subs
@@ -869,10 +887,10 @@ module Formula where
     match-symbol-formulas
       : {subs : Substitutions ss vs'}
       → {s : Symbol}
-      → .{p : sym s ∈ ss}
+      → .{p p' : sym s ∈ ss}
       → {fs : Vec (Formula ss vs false) (Symbol.arity s)}
       → {fs' : Vec (Formula ss vs' true) (Symbol.arity s)}
-      → MatchWith subs (symbol s p fs) (symbol s p fs')
+      → MatchWith subs (symbol s p fs) (symbol s p' fs')
       → MatchesWith subs fs fs'
     match-symbol-formulas {fs = fs} (match-with subs' q r)
       = matches-with subs' q (substitute-symbol-formulas fs subs' r)

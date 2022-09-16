@@ -1,6 +1,7 @@
 module Prover.Data.Meta where
 
-open import Prover.Prelude
+open import Prover.Data.Nat
+  using (module Nat; ℕ)
 
 -- ## Definition
 
@@ -13,7 +14,8 @@ Meta
 
 module Meta where
 
-  open Nat public using () renaming
+  open Nat public
+    using () renaming
     ( _≟_nat
       to _≟_met
     )

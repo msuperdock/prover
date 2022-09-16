@@ -1,43 +1,76 @@
 module Main where
 
+open import Client
+  using (Client)
+open import Client.Aeson
+  using (Value)
+open import Client.Brick
+  using (Attribute; AttributeName; InputEvent; Widget)
+open import Client.Event
+  using (SpecialEvent)
+open import Client.Run
+  using (simple-main-editor-run)
+open import Editor.Simple
+  using (SimpleMainEditor)
+open import Editor.Simple.Map.View
+  using (simple-main-editor-map-view-with)
+open import Stack
+  using (EventStack; ViewStack; ViewStackMap)
+open import Event.Text
+  using (TextEvent)
+open import Event.TextWith
+  using (TextWithEvent)
+
 open import Examples
   using (∧-commutative; rules)
 open import Prover.Client
-  using (Client)
-open import Prover.Client.Aeson
-  using (Value)
-open import Prover.Client.Brick
-  using (InputEvent; Widget; draw-interface-with)
-open import Prover.Client.Event
-  using (SpecialEvent)
-open import Prover.Client.Run
-  using (simple-main-editor-run)
-open import Prover.Data.Formula.Editor
-  using (FormulaEvent)
-open import Prover.Data.Proof.Editor
-  using (ProofEvent; ProofModeInner; ProofViewInner; ProofViewInnerPath; both;
-    command; event-stack-proof; simple-main-editor-proof; view-stack-proof;
-    window)
+  using (attributes'; draw-interface-with)
+open import Prover.Data.Bool
+  using (Bool)
+open import Prover.Data.Char
+  using (Char)
+open import Prover.Data.CharWith
+  using (char-with)
+open import Prover.Data.Direction
+  using (Direction)
+open import Prover.Data.Fin
+  using (suc; zero)
+open import Prover.Data.Function
+  using (_$_; id)
+open import Prover.Data.IO
+  using (IO)
+open import Prover.Data.List
+  using (List; []; _∷_)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
+open import Prover.Data.Relation
+  using (no; yes)
 open import Prover.Data.Rule
   using (Rule)
 open import Prover.Data.Rules
   using (Rules)
+open import Prover.Data.Sigma
+  using (_×_)
+open import Prover.Data.Sum
+  using (_⊔_; ι₁; ι₂)
 open import Prover.Data.Symbols
   using (Symbols)
-open import Prover.Data.Text.Editor
-  using (TextEvent; TextWithEvent)
-open import Prover.Editor
-  using (EventStack; SimpleMainEditor; ViewStack; ViewStackMap)
-open import Prover.Editor.Map.View
-  using (simple-main-editor-map-view-with)
+open import Prover.Data.Unit
+  using (⊤)
+open import Prover.Editor.Simple.Proof
+  using (simple-main-editor-proof)
+open import Prover.Event.Formula
+  using (FormulaEvent)
+open import Prover.Event.Proof
+  using (ProofEvent; ProofModeInner)
+open import Prover.Stack.Proof
+  using (event-stack-proof; view-stack-proof)
 open import Prover.View.Interface
   using (command; interface; nothing; window)
+open import Prover.View.Proof
+  using (ProofViewInner; ProofViewInnerPath; both; command; window)
 open import Prover.View.Window
   using (Window)
-open import Prover.Prelude
-
-open List
-  using ([]; _∷_)
 
 -- ## Types
 
@@ -139,6 +172,11 @@ module ClientProof where
   open ViewStack view-stack-proof-window
   open EventStack event-stack-proof
 
+  attributes
+    : List (AttributeName × Attribute)
+  attributes
+    = attributes'
+
   draw
     : (v : View)
     → ViewPath v
@@ -219,11 +257,11 @@ module ClientProof where
   handle-inner ProofModeInner.text (InputEvent.char c)
     = just (ι₁ (TextEvent.insert c))
 
-  handle-inner ProofModeInner.number InputEvent.backspace
+  handle-inner ProofModeInner.nat InputEvent.backspace
     = just (ι₁ TextWithEvent.delete-previous)
-  handle-inner ProofModeInner.number InputEvent.delete
+  handle-inner ProofModeInner.nat InputEvent.delete
     = just (ι₁ TextWithEvent.delete-next)
-  handle-inner ProofModeInner.number (InputEvent.char c)
+  handle-inner ProofModeInner.nat (InputEvent.char c)
     with (Char.is-digit? c)
   ... | no _
     = nothing

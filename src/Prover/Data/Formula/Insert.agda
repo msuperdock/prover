@@ -1,22 +1,38 @@
 module Prover.Data.Formula.Insert where
 
+open import Prover.Data.Any
+  using (Any; any)
+open import Prover.Data.Bool
+  using (Bool)
+open import Prover.Data.Equal
+  using (_≡_; refl; rewrite')
+open import Prover.Data.Fin
+  using (suc; zero)
 open import Prover.Data.Formula.Construct
   using (Construct; LeftSubconstruct; RightSubconstruct)
 open import Prover.Data.Formula.State
   using (FormulaState; FormulaStatePath; Left; Right; SandboxState;
-    SandboxStatePath; center; end; go; left; nothing; right; stop; tt)
+    SandboxStatePath; center; end; go; left; right; stop)
+open import Prover.Data.Function
+  using (_$_; _∘_; const; id)
+open import Prover.Data.Maybe
+  using (Maybe; just; maybe; nothing)
+open import Prover.Data.Relation
+  using (no; yes)
+open import Prover.Data.Sigma
+  using (Σ; _×_; _,_; π₁)
+open import Prover.Data.Sum
+  using (_⊔_; ι₁; ι₂)
 open import Prover.Data.Symbol
-  using (Symbol; tt)
+  using (Symbol)
 open import Prover.Data.Symbols
   using (Symbols; sym_∈_)
 open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
   using (Variables; var_∈_)
-open import Prover.Prelude
-
-open Vec
-  using (_!_)
+open import Prover.Data.Vec
+  using (Vec; _!_)
 
 -- #### Split
 
@@ -121,35 +137,43 @@ module _
     → SandboxStatePath s
     → SandboxStateSplit s
 
-  formula-state-split f@FormulaState.hole stop
+  formula-state-split
+    f@FormulaState.hole stop
     = simple nothing (right-subformula f id RightSubconstruct.reflexive)
-  formula-state-split f@(FormulaState.parens _) stop
+  formula-state-split
+    f@(FormulaState.parens _) stop
     = simple nothing (right-subformula f id RightSubconstruct.reflexive)
-  formula-state-split f@(FormulaState.meta _) stop
+  formula-state-split
+    f@(FormulaState.meta _) stop
     = simple nothing (right-subformula f id RightSubconstruct.reflexive)
-  formula-state-split f@(FormulaState.variable' _ _) stop
+  formula-state-split
+    f@(FormulaState.variable' _ _) stop
     = simple nothing (right-subformula f id RightSubconstruct.reflexive)
 
-  formula-state-split f@(FormulaState.symbol _ _ (nothing _) _ _) stop
+  formula-state-split
+    f@(FormulaState.symbol _ _ (Left.nothing _) _ _) stop
     = simple nothing (right-subformula f id RightSubconstruct.reflexive)
-  formula-state-split (FormulaState.symbol s p (left f lv) r cs) stop
+  formula-state-split
+    (FormulaState.symbol s p (Left.just f lv) r cs) stop
     = simple
       (just (left-subformula f id
         (LeftSubconstruct.recursive lv LeftSubconstruct.reflexive)))
       (right-subformula (FormulaState.symbol s p Left.hole r cs)
-        (FormulaState.right-closed-equal s p (left f lv) Left.hole r cs cs)
+        (FormulaState.right-closed-equal s p (Left.just f lv) Left.hole r cs cs)
         RightSubconstruct.reflexive)
 
-  formula-state-split (FormulaState.symbol s p l@(left f lv) r cs) (left fp)
+  formula-state-split
+    (FormulaState.symbol s p l@(Left.just f lv) r cs)
+    (left fp)
     with formula-state-split f fp
 
   ... | simple nothing (right-subformula r' _ rs)
     = simple nothing
       (right-subformula
         (FormulaState.symbol s p
-          (left r' (RightSubconstruct.left-valid rs s lv)) r cs)
+          (Left.just r' (RightSubconstruct.left-valid rs s lv)) r cs)
         (FormulaState.right-closed-equal s p l
-          (left r' (RightSubconstruct.left-valid rs s lv)) r cs cs)
+          (Left.just r' (RightSubconstruct.left-valid rs s lv)) r cs cs)
         RightSubconstruct.reflexive)
 
   ... | simple (just (left-subformula l' lc ls)) (right-subformula r' _ rs)
@@ -158,21 +182,23 @@ module _
         (LeftSubconstruct.recursive lv ls)))
       (right-subformula
         (FormulaState.symbol s p
-          (left r' (RightSubconstruct.left-valid rs s lv)) r cs)
+          (Left.just r' (RightSubconstruct.left-valid rs s lv)) r cs)
         (FormulaState.right-closed-equal s p l
-          (left r' (RightSubconstruct.left-valid rs s lv)) r cs cs)
+          (Left.just r' (RightSubconstruct.left-valid rs s lv)) r cs cs)
         RightSubconstruct.reflexive)
 
   ... | complex l' r' g
     = complex l' r' ((λ {(formula-state-modified f' q lc _ fp')
       → formula-state-modified
         (FormulaState.symbol s p
-          (left f' (rewrite' (Construct.LeftValid s) q lv)) r cs) refl lc
+          (Left.just f' (rewrite' (Construct.LeftValid s) q lv)) r cs) refl lc
         (FormulaState.right-closed-equal s p l
-          (left f' (rewrite' (Construct.LeftValid s) q lv)) r cs cs)
+          (Left.just f' (rewrite' (Construct.LeftValid s) q lv)) r cs cs)
         (left fp')}) ∘ g)
 
-  formula-state-split (FormulaState.symbol s p l r@(right f rv) cs) (right fp)
+  formula-state-split
+    (FormulaState.symbol s p l r@(Right.just f rv) cs)
+    (right fp)
     with formula-state-split f fp
   ... | simple nothing (right-subformula r' rc rs)
     = simple
@@ -186,9 +212,9 @@ module _
     = simple
       (just (left-subformula
         (FormulaState.symbol s p l
-          (right l' (LeftSubconstruct.right-valid ls s rv)) cs)
+          (Right.just l' (LeftSubconstruct.right-valid ls s rv)) cs)
         (FormulaState.left-closed-equal s p l r
-          (right l' (LeftSubconstruct.right-valid ls s rv)) cs cs)
+          (Right.just l' (LeftSubconstruct.right-valid ls s rv)) cs cs)
         LeftSubconstruct.reflexive))
       (right-subformula r' rc (RightSubconstruct.recursive rv rs))
 
@@ -196,12 +222,14 @@ module _
     = complex l' r' ((λ {(formula-state-modified f' q _ rc fp')
       → formula-state-modified
         (FormulaState.symbol s p l
-          (right f' (rewrite' (Construct.RightValid s) q rv)) cs) refl
+          (Right.just f' (rewrite' (Construct.RightValid s) q rv)) cs) refl
         (FormulaState.left-closed-equal s p l r
-          (right f' (rewrite' (Construct.RightValid s) q rv)) cs cs) rc
+          (Right.just f' (rewrite' (Construct.RightValid s) q rv)) cs cs) rc
         (right fp')}) ∘ g)
 
-  formula-state-split (FormulaState.parens s) (center zero sp)
+  formula-state-split
+    (FormulaState.parens s)
+    (center zero sp)
     with sandbox-state-split s sp
   ... | simple l' r'
     = complex (Maybe.map π₁ l') r' (λ {(s' , sp')
@@ -214,7 +242,9 @@ module _
         (FormulaState.parens s') refl id id
         (center zero sp')}) ∘ g)
 
-  formula-state-split (FormulaState.symbol s p l r cs) (center k sp)
+  formula-state-split
+    (FormulaState.symbol s p l r cs)
+    (center k sp)
     with sandbox-state-split (cs ! k) sp
   ... | simple l' r'
     = complex (Maybe.map π₁ l') r' (λ {(s' , sp')
@@ -236,7 +266,9 @@ module _
   sandbox-state-split s end
     = simple (just (s , id)) nothing
 
-  sandbox-state-split (any (SandboxState.singleton f)) (go zero fp)
+  sandbox-state-split
+    (any (SandboxState.singleton f))
+    (go zero fp)
     with formula-state-split f fp
   ... | simple nothing (right-subformula r _ _)
     = simple nothing
@@ -251,7 +283,9 @@ module _
         (any (SandboxState.singleton f')) lc
         (go zero fp)}) ∘ g)
 
-  sandbox-state-split (any (SandboxState.cons f rc s lc)) (go zero fp)
+  sandbox-state-split
+    (any (SandboxState.cons f rc s lc))
+    (go zero fp)
     with formula-state-split f fp
   ... | simple nothing (right-subformula r rc' _)
     = simple nothing
@@ -266,7 +300,9 @@ module _
         (any (SandboxState.cons f' (rc' rc) s lc)) lc'
         (go zero fp)}) ∘ g)
 
-  sandbox-state-split (any (SandboxState.cons f rc s lc)) (go (suc k) fp)
+  sandbox-state-split
+    (any (SandboxState.cons f rc s lc))
+    (go (suc k) fp)
     with sandbox-state-split s (go k fp)
   ... | simple nothing r
     = simple
@@ -311,8 +347,8 @@ module _
     → {r : Right ss vs m s}
     → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
     → (FormulaStatePath f → FormulaStatePath f')
-    → FormulaStatePath (FormulaState.symbol s p (left f lv) r cs)
-    → FormulaStatePath (FormulaState.symbol s p (left f' lv') r cs)
+    → FormulaStatePath (FormulaState.symbol s p (Left.just f lv) r cs)
+    → FormulaStatePath (FormulaState.symbol s p (Left.just f' lv') r cs)
   formula-state-path-map-left _ stop
     = stop
   formula-state-path-map-left g (left fp)
@@ -331,8 +367,8 @@ module _
     → {rv' : Construct.RightValid s (FormulaState.construct f')}
     → {cs : Vec (Any (SandboxState ss vs m)) (Symbol.center-arity s)}
     → (FormulaStatePath f → FormulaStatePath f')
-    → FormulaStatePath (FormulaState.symbol s p l (right f rv) cs)
-    → FormulaStatePath (FormulaState.symbol s p l (right f' rv') cs)
+    → FormulaStatePath (FormulaState.symbol s p l (Right.just f rv) cs)
+    → FormulaStatePath (FormulaState.symbol s p l (Right.just f' rv') cs)
   formula-state-path-map-right _ stop
     = stop
   formula-state-path-map-right _ (left fp)
@@ -382,7 +418,7 @@ module _
     → ((fp : FormulaStatePath f) → FormulaStatePath.NotLeft fp → A)
     → FormulaStatePath f
     → A
-  formula-state-path-cat-left tt g _ (left fp)
+  formula-state-path-cat-left FormulaState.tt g _ (left fp)
     = g fp
   formula-state-path-cat-left _ _ h fp@stop
     = h fp refl
@@ -399,7 +435,7 @@ module _
     → ((fp : FormulaStatePath f) → FormulaStatePath.NotRight fp → A)
     → FormulaStatePath f
     → A
-  formula-state-path-cat-right tt g _ (right fp)
+  formula-state-path-cat-right FormulaState.tt g _ (right fp)
     = g fp
   formula-state-path-cat-right _ _ h fp@stop
     = h fp refl
@@ -481,7 +517,9 @@ module _
     → FormulaStateUpdateLeftResult f f'
 
   formula-state-update-left
-    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p
+      l@(Left.just _ (Construct.left-valid Symbol.tt _)) r cs)
+    FormulaState.tt
     f'@FormulaState.hole
     = record
     { formula-state
@@ -498,10 +536,12 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt refl)
+      l' = Left.just f' (Construct.left-valid Symbol.tt refl)
 
   formula-state-update-left
-    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p
+      l@(Left.just _ (Construct.left-valid Symbol.tt _)) r cs)
+    FormulaState.tt
     f'@(FormulaState.parens _)
     = record
     { formula-state
@@ -518,10 +558,12 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt refl)
+      l' = Left.just f' (Construct.left-valid Symbol.tt refl)
 
   formula-state-update-left
-    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p
+      l@(Left.just _ (Construct.left-valid Symbol.tt _)) r cs)
+    FormulaState.tt
     f'@(FormulaState.meta _)
     = record
     { formula-state
@@ -538,10 +580,12 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt refl)
+      l' = Left.just f' (Construct.left-valid Symbol.tt refl)
 
   formula-state-update-left
-    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p
+      l@(Left.just _ (Construct.left-valid Symbol.tt _)) r cs)
+    FormulaState.tt
     f'@(FormulaState.variable' _ _)
     = record
     { formula-state
@@ -558,10 +602,12 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' (Construct.left-valid tt refl)
+      l' = Left.just f' (Construct.left-valid Symbol.tt refl)
 
   formula-state-update-left
-    (FormulaState.symbol s p l@(left _ (Construct.left-valid tt _)) r cs) tt
+    (FormulaState.symbol s p
+      l@(Left.just _ (Construct.left-valid Symbol.tt _)) r cs)
+    FormulaState.tt
     f'@(FormulaState.symbol s' _ _ _ _)
     with Construct.left-valid? s (Construct.symbol s')
     | Construct.right-valid? s' (Construct.symbol s)
@@ -582,9 +628,9 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left
+      l' = Left.just
         (FormulaState.parens (any (SandboxState.singleton f')))
-        (Construct.left-valid tt refl)
+        (Construct.left-valid Symbol.tt refl)
   
   ... | yes lv | _
     = record
@@ -602,12 +648,12 @@ module _
       = formula-state-path-map-not-left
     }
     where
-      l' = left f' lv
+      l' = Left.just f' lv
 
   formula-state-update-left
     f@(FormulaState.symbol s _ _ _ _) hl
-    (FormulaState.symbol s' p' l' r'@(right f'' rv') cs')
-    | _ | yes rv@(Construct.right-valid tt _)
+    (FormulaState.symbol s' p' l' r'@(Right.just f'' rv') cs')
+    | _ | yes rv@(Construct.right-valid Symbol.tt _)
     with formula-state-update-left f hl f''
 
   ... | formula-state-update-left-result f''' q _ rc g'' g
@@ -626,7 +672,7 @@ module _
       = λ fp ¬l → right (g fp ¬l)
     }
     where
-      r'' = right f''' (right-valid-sum s s' f'' f''' q rv rv')
+      r'' = Right.just f''' (right-valid-sum s s' f'' f''' q rv rv')
 
   record FormulaStateUpdateRightResult
     (f : FormulaState ss vs m)
@@ -671,7 +717,9 @@ module _
     → FormulaStateUpdateRightResult f f'
 
   formula-state-update-right
-    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l
+      r@(Right.just _ (Construct.right-valid Symbol.tt _)) cs)
+    FormulaState.tt
     f'@FormulaState.hole
     = record
     { formula-state
@@ -688,10 +736,12 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt refl)
+      r' = Right.just f' (Construct.right-valid Symbol.tt refl)
 
   formula-state-update-right
-    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l
+      r@(Right.just _ (Construct.right-valid Symbol.tt _)) cs)
+    FormulaState.tt
     f'@(FormulaState.parens _)
     = record
     { formula-state
@@ -708,10 +758,12 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt refl)
+      r' = Right.just f' (Construct.right-valid Symbol.tt refl)
 
   formula-state-update-right
-    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l
+      r@(Right.just _ (Construct.right-valid Symbol.tt _)) cs)
+    FormulaState.tt
     f'@(FormulaState.meta _)
     = record
     { formula-state
@@ -728,10 +780,12 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt refl)
+      r' = Right.just f' (Construct.right-valid Symbol.tt refl)
 
   formula-state-update-right
-    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l
+      r@(Right.just _ (Construct.right-valid Symbol.tt _)) cs)
+    FormulaState.tt
     f'@(FormulaState.variable' _ _)
     = record
     { formula-state
@@ -748,10 +802,12 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' (Construct.right-valid tt refl)
+      r' = Right.just f' (Construct.right-valid Symbol.tt refl)
 
   formula-state-update-right
-    (FormulaState.symbol s p l r@(right _ (Construct.right-valid tt _)) cs) tt
+    (FormulaState.symbol s p l
+      r@(Right.just _ (Construct.right-valid Symbol.tt _)) cs)
+    FormulaState.tt
     f'@(FormulaState.symbol s' _ _ _ _)
     with Construct.right-valid? s (Construct.symbol s')
     | Construct.left-valid? s' (Construct.symbol s)
@@ -772,9 +828,9 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right
+      r' = Right.just
         (FormulaState.parens (any (SandboxState.singleton f')))
-        (Construct.right-valid tt refl)
+        (Construct.right-valid Symbol.tt refl)
   
   ... | yes rv | _
     = record
@@ -792,12 +848,12 @@ module _
       = formula-state-path-map-not-right
     }
     where
-      r' = right f' rv
+      r' = Right.just f' rv
 
   formula-state-update-right
     f@(FormulaState.symbol s _ _ _ _) hr
-    (FormulaState.symbol s' p' l'@(left f'' lv') r' cs')
-    | _ | yes lv@(Construct.left-valid tt _)
+    (FormulaState.symbol s' p' l'@(Left.just f'' lv') r' cs')
+    | _ | yes lv@(Construct.left-valid Symbol.tt _)
     with formula-state-update-right f hr f''
 
   ... | formula-state-update-right-result f''' q _ lc g'' g
@@ -816,7 +872,7 @@ module _
       = λ fp ¬r → left (g fp ¬r)
     }
     where
-      l'' = left f''' (left-valid-sum s s' f'' f''' q lv lv')
+      l'' = Left.just f''' (left-valid-sum s s' f'' f''' q lv lv')
 
 -- #### Insert
 
@@ -905,16 +961,21 @@ module _
     → (f' : FormulaState ss vs m)
     → FormulaState.LeftClosed f ⊔ FormulaStateCombined f' f
 
-  formula-state-insert-left (FormulaState.parens _) _
+  formula-state-insert-left
+    (FormulaState.parens _) _
     = ι₁ refl
-  formula-state-insert-left (FormulaState.meta _) _
+  formula-state-insert-left
+    (FormulaState.meta _) _
     = ι₁ refl
-  formula-state-insert-left (FormulaState.variable' _ _) _
+  formula-state-insert-left
+    (FormulaState.variable' _ _) _
     = ι₁ refl
-  formula-state-insert-left (FormulaState.symbol _ _ (nothing _) _ _) _
+  formula-state-insert-left
+    (FormulaState.symbol _ _ (Left.nothing _) _ _) _
     = ι₁ refl
 
-  formula-state-insert-left FormulaState.hole f'
+  formula-state-insert-left
+    FormulaState.hole f'
     = ι₂
     $ record
     { formula-state
@@ -929,12 +990,13 @@ module _
       = const (FormulaStatePath.rightmost f')
     }
 
-  formula-state-insert-left f@(FormulaState.symbol _ _ (left f'' _) _ _) f'
+  formula-state-insert-left
+    f@(FormulaState.symbol _ _ (Left.just f'' _) _ _) f'
     with formula-state-insert-left f'' f'
   ... | ι₁ lc
     = ι₁ lc
   ... | ι₂ (formula-state-combined f''' lc' _ g' g'')
-    with formula-state-update-left f tt f'''
+    with formula-state-update-left f FormulaState.tt f'''
   ... | formula-state-update-left-result f'''' _ lc''' rc g''' g
     = ι₂
     $ record
@@ -947,7 +1009,7 @@ module _
     ; map-left
       = g''' ∘ g'
     ; map-right
-      = formula-state-path-cat-left tt (g''' ∘ g'') g
+      = formula-state-path-cat-left FormulaState.tt (g''' ∘ g'') g
     }
 
   -- Put the second FormulaState in the rightmost hole of the first, if any.
@@ -956,16 +1018,21 @@ module _
     → (f' : FormulaState ss vs m)
     → FormulaState.RightClosed f ⊔ FormulaStateCombined f f'
 
-  formula-state-insert-right (FormulaState.parens _) _
+  formula-state-insert-right
+    (FormulaState.parens _) _
     = ι₁ refl
-  formula-state-insert-right (FormulaState.meta _) _
+  formula-state-insert-right
+    (FormulaState.meta _) _
     = ι₁ refl
-  formula-state-insert-right (FormulaState.variable' _ _) _
+  formula-state-insert-right
+    (FormulaState.variable' _ _) _
     = ι₁ refl
-  formula-state-insert-right (FormulaState.symbol _ _ _ (nothing _) _) _
+  formula-state-insert-right
+    (FormulaState.symbol _ _ _ (Right.nothing _) _) _
     = ι₁ refl
 
-  formula-state-insert-right FormulaState.hole f'
+  formula-state-insert-right
+    FormulaState.hole f'
     = ι₂
     $ record
     { formula-state
@@ -980,12 +1047,13 @@ module _
       = id
     }
 
-  formula-state-insert-right f@(FormulaState.symbol _ _ _ (right f'' _) _) f'
+  formula-state-insert-right
+    f@(FormulaState.symbol _ _ _ (Right.just f'' _) _) f'
     with formula-state-insert-right f'' f'
   ... | ι₁ rc
     = ι₁ rc
   ... | ι₂ (formula-state-combined f''' _ rc' g'' g')
-    with formula-state-update-right f tt f'''
+    with formula-state-update-right f FormulaState.tt f'''
   ... | formula-state-update-right-result f'''' _ rc''' lc g''' g
     = ι₂
     $ record
@@ -996,7 +1064,7 @@ module _
     ; right-closed
       = rc''' ∘ rc'
     ; map-left
-      = formula-state-path-cat-right tt (g''' ∘ g'') g
+      = formula-state-path-cat-right FormulaState.tt (g''' ∘ g'') g
     ; map-right
       = g''' ∘ g'
     }
@@ -1220,7 +1288,7 @@ module _
     : (s₁ : Any (SandboxState ss vs m))
     → SandboxStatePath s₁
     → (v : Variable)
-    → .(var v ∈ vs)
+    → (var v ∈ vs)
     → Σ (Any (SandboxState ss vs m)) SandboxStatePath
   sandbox-state-insert-variable s₁ sp₁ v p
     = sandbox-state-insert s₁ sp₁
@@ -1231,7 +1299,7 @@ module _
     : (s₁ : Any (SandboxState ss vs m))
     → SandboxStatePath s₁
     → (s : Symbol)
-    → .(sym s ∈ ss)
+    → (sym s ∈ ss)
     → Σ (Any (SandboxState ss vs m)) SandboxStatePath
   sandbox-state-insert-symbol s₁ sp₁ s p
     = sandbox-state-insert s₁ sp₁

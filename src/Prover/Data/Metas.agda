@@ -1,11 +1,15 @@
 module Prover.Data.Metas where
 
+open import Prover.Data.Bool
+  using (Bool; false; true)
+open import Prover.Data.List
+  using (List; []; _∷_)
 open import Prover.Data.Meta
   using (Meta)
-open import Prover.Prelude
-
-open List
-  using ([]; _∷_)
+open import Prover.Data.Nat
+  using (suc; zero)
+open import Prover.Data.Sigma
+  using (_×_; _,_)
 
 -- ## Definition
 

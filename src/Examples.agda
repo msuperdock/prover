@@ -1,30 +1,47 @@
 module Examples where
 
+open import Prover.Data.Any
+  using (any)
 open import Prover.Data.Associativity
   using (Associativity)
-open import Prover.Data.Identifier
-  using (Identifier)
+open import Prover.Data.Bool
+  using (false)
+open import Prover.Data.Empty
+  using (⊥)
+open import Prover.Data.Equal
+  using (_≡_; refl)
 open import Prover.Data.Formula
   using (Formula)
+open import Prover.Data.Function
+  using (_$_)
+open import Prover.Data.If
+  using (just; nothing)
+open import Prover.Data.Maybe
+  using (Maybe; just; nothing)
+open import Prover.Data.Relation
+  using (Dec; no; yes)
 open import Prover.Data.Rule
   using (Rule)
 open import Prover.Data.Rules
   using (Rules)
+open import Prover.Data.String
+  using (String)
 open import Prover.Data.Symbol
   using (Symbol; both; left; neither)
 open import Prover.Data.Symbols
   using (Symbols; sym_∈?_)
+open import Prover.Data.Text
+  using (Text)
 open import Prover.Data.Token
   using (IsValid; Token; token)
+open import Prover.Data.Unit
+  using (⊤)
 open import Prover.Data.Variable
   using (Variable)
 open import Prover.Data.Variables
   using (Variables; var_∈?_)
-open import Prover.Prelude
-  hiding (_,_; _∧_)
-
-open Vec
-  using ([]; _∷_)
+open import Prover.Data.Vec
+  using (Vec; []; _∷_)
 
 -- ## Utilities
 
@@ -45,14 +62,6 @@ to-witness
 to-witness {p = yes p} _
   = p
 
-is-false?
-  : (x : Bool)
-  → Dec (x ≡ false)
-is-false? false
-  = yes refl
-is-false? true
-  = no (λ ())
-
 is-nothing?
   : {A : Set}
   → (x : Maybe A)
@@ -62,26 +71,13 @@ is-nothing? nothing
 is-nothing? (just _)
   = no Maybe.just≢nothing
 
--- ## Identifier
+-- ## Text
 
-NonEmpty
+text
   : String
-  → Set
-NonEmpty s
-  with String.to-list s
-... | any Vec.nil
-  = ⊥
-... | any (Vec.cons _ _)
-  = ⊤
-
-identifier'
-  : (n : String)
-  → {_ : NonEmpty n}
-  → Identifier
-identifier' n
-  with String.to-list n
-... | any cs@(Vec.cons _ _)
-  = any cs
+  → Text
+text
+  = String.to-list
 
 -- ## Symbol
 
@@ -105,7 +101,7 @@ token' s
   { valid
     = left
   ; name
-    = identifier' "formula"
+    = text "formula"
   ; tokens
     = token' " formula" ∷ []
   ; precedence
@@ -121,7 +117,7 @@ token' s
   { valid
     = left
   ; name
-    = identifier' "context"
+    = text "context"
   ; tokens
     = token' " context" ∷ []
   ; precedence
@@ -137,7 +133,7 @@ token' s
   { valid
     = both
   ; name
-    = identifier' "turnstile"
+    = text "turnstile"
   ; tokens
     = token' " ⊢ " ∷ []
   ; precedence
@@ -153,7 +149,7 @@ token' s
   { valid
     = neither
   ; name
-    = identifier' "empty"
+    = text "empty"
   ; tokens
     = token' "∅" ∷ []
   ; precedence
@@ -169,7 +165,7 @@ token' s
   { valid
     = both
   ; name
-    = identifier' "comma"
+    = text "comma"
   ; tokens
     = token' ", " ∷ []
   ; precedence
@@ -185,7 +181,7 @@ token' s
   { valid
     = both
   ; name
-    = identifier' "and"
+    = text "and"
   ; tokens
     = token' " ∧ " ∷ []
   ; precedence
@@ -220,24 +216,39 @@ symbols
 ⟨Γ⟩
   : Variable
 ⟨Γ⟩
-  = identifier' "g"
+  = record
+  { name
+    = text "Γ"
+  ; token
+    = token' "Γ"
+  }
 
 ⟨φ⟩
   : Variable
 ⟨φ⟩
-  = identifier' "p"
+  = record
+  { name
+    = text "φ"
+  ; token
+    = token' "φ"
+  }
 
 ⟨ψ⟩
   : Variable
 ⟨ψ⟩
-  = identifier' "q"
+  = record
+  { name
+    = text "ψ"
+  ; token
+    = token' "ψ"
+  }
 
 -- ## Variables
 
 variables-insert
   : (v : Variable)
   → (vs : Variables)
-  → {_ : True (is-false? (Variables.is-member vs v))}
+  → {_ : True (is-nothing? (Variables.lookup vs (Variable.name v)))}
   → Variables
 variables-insert v vs {p}
   = Variables.insert vs v (to-witness p)
@@ -366,7 +377,7 @@ _∧_ f₀ f₁
 ∧-formation
   = record
   { name
-    = identifier' "and-formation"
+    = text "and-formation"
   ; variables
     = ⟪φ,ψ⟫
   ; hypotheses
@@ -383,7 +394,7 @@ _∧_ f₀ f₁
 ∅-formation
   = record
   { name
-    = identifier' "empty-formation"
+    = text "empty-formation"
   ; variables
     = ⟪⟫
   ; hypotheses
@@ -398,7 +409,7 @@ _∧_ f₀ f₁
 ,-formation
   = record
   { name
-    = identifier' "comma-formation"
+    = text "comma-formation"
   ; variables
     = ⟪Γ,φ⟫
   ; hypotheses
@@ -415,7 +426,7 @@ axiom
 axiom
   = record
   { name
-    = identifier' "axiom"
+    = text "axiom"
   ; variables
     = ⟪Γ,φ⟫
   ; hypotheses
@@ -432,7 +443,7 @@ weakening
 weakening
   = record
   { name
-    = identifier' "weakening"
+    = text "weakening"
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
@@ -449,7 +460,7 @@ weakening
 ∧-introduction
   = record
   { name
-    = identifier' "and-introduction"
+    = text "and-introduction"
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
@@ -466,7 +477,7 @@ weakening
 ∧-elimination-left
   = record
   { name
-    = identifier' "and-elimination-left"
+    = text "and-elimination-left"
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
@@ -482,7 +493,7 @@ weakening
 ∧-elimination-right
   = record
   { name
-    = identifier' "and-elimination-right"
+    = text "and-elimination-right"
   ; variables
     = ⟪Γ,φ,ψ⟫
   ; hypotheses
@@ -498,7 +509,7 @@ weakening
 ∧-commutative
   = record
   { name
-    = identifier' "and-commutative"
+    = text "and-commutative"
   ; variables
     = ⟪φ,ψ⟫
   ; hypotheses

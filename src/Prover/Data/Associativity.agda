@@ -1,6 +1,9 @@
 module Prover.Data.Associativity where
 
-open import Prover.Prelude
+open import Prover.Data.Equal
+  using (Equal; refl)
+open import Prover.Data.Relation
+  using (Decidable; no; yes)
 
 -- ## Definition
 

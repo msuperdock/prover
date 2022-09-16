@@ -1,5 +1,7 @@
 module Prover.View.Style where
 
+-- ## Definition
+
 data Style
   : Set
   where

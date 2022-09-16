@@ -1,19 +1,35 @@
 module Prover.Data.Rule where
 
-open import Prover.Data.Identifier
-  using (Identifier; _≟_idn)
+open import Prover.Data.Any
+  using (any)
+open import Prover.Data.Bool
+  using (false; true)
+open import Prover.Data.Equal
+  using (Equal; _≡_; refl)
 open import Prover.Data.Formula
   using (Formula; Substitutions; _≟_frm; _≟_frms')
+open import Prover.Data.Function
+  using (_$_)
+open import Prover.Data.List
+  using (List)
+open import Prover.Data.Map
+  using (Map)
+open import Prover.Data.Maybe
+  using (just)
 open import Prover.Data.Meta
   using (Meta)
+open import Prover.Data.Nat
+  using (ℕ)
+open import Prover.Data.Relation
+  using (Dec; Decidable; no; yes)
 open import Prover.Data.Symbols
   using (Symbols)
+open import Prover.Data.Text
+  using (Text; _≟_txt)
 open import Prover.Data.Variables
   using (Variables; _≟_vars)
-open import Prover.Prelude
-
-open Vec
-  using (_∷_)
+open import Prover.Data.Vec
+  using (Vec; _∷_)
 
 -- ## Definition
 
@@ -29,7 +45,7 @@ record Rule'
   field
 
     name
-      : Identifier
+      : Text
 
     variables
       : Variables
@@ -68,7 +84,7 @@ module Rule where
     _≟_rul
       : Decidable (Equal (Rule ss))
     rule n₁ vs₁ hs₁ c₁ ≟ rule n₂ vs₂ hs₂ c₂ rul
-      with n₁ ≟ n₂ idn
+      with n₁ ≟ n₂ txt
       | vs₁ ≟ vs₂ vars
   
     ... | no ¬p | _

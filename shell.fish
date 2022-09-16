@@ -1,37 +1,26 @@
-function agda-unused $argv
-  command agda-unused --root "$NIX_ROOT/src"
-end
+set common \
+  '--no-libraries' \
+  "--include-path=$NIX_ROOT/src" \
+  '--include-path=/data/code/agda-editor/src'
 
-function with-dir
-  set dir (pwd); cd $argv[1]
-  eval $argv[2..-1]; set st $status
-  cd $dir; return $st
+set --export AGDA_ARGS $common \
+  '--local-interfaces'
+set --export AGDA_UNUSED_ARGS $common
+
+function check-unused
+  agda-unused --global $AGDA_UNUSED_ARGS "$NIX_ROOT/src/All.agda"
 end
 
 function check-agda
   echo; echo 'Checking Agda code:'; echo
-
-  with-dir "$NIX_ROOT/src" \
-    agda \
-    --local-interfaces \
-    --no-libraries \
-    --include-path=. \
-    All.agda 
-  or return $status
+  agda $AGDA_ARGS "$NIX_ROOT/src/Main.agda"; or return $status
   echo 'All done.'
 
   echo; echo 'Checking for unused code:'; echo
-  agda-unused
+  check-unused
 end
 
 function build-agda
-  with-dir "$NIX_ROOT/src" \
-    agda \
-    --compile \
-    --ghc-dont-call-ghc \
-    --local-interfaces \
-    --no-libraries \
-    --include-path=. \
-    Main.agda
+  agda --compile --ghc-dont-call-ghc $AGDA_ARGS "$NIX_ROOT/src/Main.agda"
 end
 

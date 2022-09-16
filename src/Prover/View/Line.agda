@@ -1,8 +1,11 @@
 module Prover.View.Line where
 
-open import Prover.View.Text
+open import Prover.Data.Bool
+  using (Bool)
+open import Prover.View.RichText
   using (RichText; RichTextPath)
-open import Prover.Prelude
+
+-- ## Definitions
 
 record Line
   : Set
